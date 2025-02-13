@@ -4,23 +4,26 @@ import messagebox
 
 
 # ctk.set_appearance_mode("system")  
+
+
 ctk.set_default_color_theme("blue")
-
-
 
 
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.frameTelaProduto = None  #Inicializa o atributo como None
         self.janela()
-    
+        
+    def criaFrames(self):
+        self.frameTelaCadastro = None
+        self.frameTelaProduto = None
+        self.frameTelaLogin = None
+
+
     # define as propriedades da janela
     def janela(self):
+        self.criaFrames()
         self.resizable(False, False)
-        if self.frameTelaProduto is not None:
-            self.frameTelaProduto.place_forget()
-
         alturaTela = 900
         larguraTela = 1280
         self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
@@ -29,35 +32,46 @@ class App(ctk.CTk):
     # tela de login inicial
     def telaLogin(self):
         self.title("login")
+        
+        if(self.frameTelaProduto == None):
+            pass
+        else:
+            self.frameTelaProduto.destroy()
+
     
         # ================ widgets da tela login =====================#
-        self.frame = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
-        self.frame.place(x=140, y=100)     # colocando no lugar
-        self.frame.grid_propagate(False)   # evita ela de se configurar automaticamente
+        self.frameTelaLogin = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
+        self.frameTelaLogin.place(x=140, y=100)     # colocando no lugar
+        self.frameTelaLogin.grid_propagate(False)   # evita ela de se configurar automaticamente
 
-        self.texto = ctk.CTkLabel(self.frame, width=1000, height=100, text="Fazer login", font=("Century Gothic bold", 30))
+        self.texto = ctk.CTkLabel(self.frameTelaLogin, width=1000, height=100, text="Fazer login", font=("Century Gothic bold", 30))
         self.texto.grid(row=0, column=0, padx=10, pady=20)
 
-        self.email = ctk.CTkEntry(self.frame, placeholder_text="Email", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-        self.email.grid(row=1, column=0, padx=10, pady=10)
+        self.login = ctk.CTkEntry(self.frameTelaLogin, placeholder_text="login", width=350, corner_radius=5, font=("Century Gothic bold", 20))
+        self.login.grid(row=1, column=0, padx=10, pady=10)
 
-        self.senha = ctk.CTkEntry(self.frame, placeholder_text="Senha", width=350, corner_radius=5, font=("Century Gothic bold", 20), show="*")
+        self.senha = ctk.CTkEntry(self.frameTelaLogin, placeholder_text="Senha", width=350, corner_radius=5, font=("Century Gothic bold", 20), show="*")
         self.senha.grid(row=2, column=0, padx=10, pady=10)
 
-        self.botao = ctk.CTkButton(self.frame, text="Entrar", width=200, corner_radius=5, font=("Arial", 15), command=self.telaProduto)
+        # self.botao = ctk.CTkButton(self.frame, text="Entrar", width=200, corner_radius=5, font=("Arial", 15), command=self.telaProduto)
+        # self.botao.grid(row=3, column=0, padx=20, pady=20)
+
+        self.botao = ctk.CTkButton(self.frameTelaLogin, text="Entrar", width=200, corner_radius=5, font=("Arial", 15), command=self.consultarUsuarioCadastrado)
         self.botao.grid(row=3, column=0, padx=20, pady=20)
 
+
         # texto antes do cadastro de produtos
-        self.textoCadastro = ctk.CTkLabel(self.frame, text="Caso não tenha cadastro", font=("Arial", 15))
+        self.textoCadastro = ctk.CTkLabel(self.frameTelaLogin, text="Caso não tenha cadastro", font=("Arial", 15))
         self.textoCadastro.grid(row=4, column=0, padx=10, pady=10)
-        # botão do cadastro de produtos que leva para a tela de cadastro
-        self.botaoCadastro = ctk.CTkButton(self.frame, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=self.telaDeCadastro)
+
+        # botão do cadastro de funcionarios
+        self.botaoCadastro = ctk.CTkButton(self.frameTelaLogin, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=self.telaDeCadastroFuncionario)
         self.botaoCadastro.grid(row=5, column=0, padx=20, pady=20)
         # ================ widgets da tela login =====================#
 
     # tela de cadastro de produtos
     def telaProduto(self):
-        self.frame.place_forget()
+        self.frameTelaLogin.destroy()
         self.title("TelaProduto")
         self.frameTelaProduto = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
         self.frameTelaProduto.place(x=140, y=100)     
@@ -88,8 +102,9 @@ class App(ctk.CTk):
         self.botaoVoltar = ctk.CTkButton(self.frameTelaProduto, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.telaLogin)
         self.botaoVoltar.grid(row=5, column=0, padx=20, pady=20)
 
-    def telaDeCadastro(self):
-        self.frame.place_forget()
+    # cadastro de funcionários/usuários
+    def telaDeCadastroFuncionario(self):
+        self.frameTelaLogin.destroy()
         self.title("TelaCadastro")
         self.frameTelaCadastro = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
         self.frameTelaCadastro.place(x=140, y=100)     
@@ -97,49 +112,90 @@ class App(ctk.CTk):
 
         # ================ widgets da tela cadastro =====================#
         # titulo
-        self.textoCadastro = ctk.CTkLabel(self.frameTelaCadastro, width=1000, height=0, text="Cadastrar Usuário", font=("Century Gothic bold", 30))
+        self.textoCadastro = ctk.CTkLabel(self.frameTelaCadastro, width=950, height=0, text="Cadastrar Usuário", font=("Century Gothic bold", 30))
         self.textoCadastro.grid(row=0, column=0, padx=10, pady=20)
 
+        # nome
+        self.labelNome = ctk.CTkLabel(self.frameTelaCadastro, text="Nome a ser registrado*", font=("Century Gothic bold", 15))
+        self.labelNome.place(x=100, y=100)
+        self.nome = ctk.CTkEntry(self.frameTelaCadastro, placeholder_text="Nome", width=350, corner_radius=5, font=("Century Gothic bold", 20))
+        self.nome.place(x=100, y=130)
 
-
-        self.labelNome = ctk.CTkLabel(self.frameTelaCadastro, text="Digite o nome a ser registrado", font=("Century Gothic bold", 15))
-        self.labelNome.place(x=100, y=150)
-        self.nome = ctk.CTkEntry(self.frameTelaCadastro, placeholder_text="Login", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-        self.nome.place(x=100, y=100)
         # login
-        self.login = ctk.CTkEntry(self.frameTelaCadastro, placeholder_text="Nome", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-        self.login.place(x=100, y=200)
-        # cpf
-        # senha
-        # email/contato
-        self.cargo = ctk.CTkEntry(self.frameTelaCadastro, placeholder_text="Cargo", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-        self.cargo.place(x=550, y=100)
+        self.labelLogin = ctk.CTkLabel(self.frameTelaCadastro, text="Login para ser usado na tela principal*", font=("Century Gothic bold", 15))   
+        self.labelLogin.place(x=100, y=200)
+        self.login = ctk.CTkEntry(self.frameTelaCadastro, placeholder_text="Login", width=350, corner_radius=5, font=("Century Gothic bold", 20))
+        self.login.place(x=100, y=230)
 
+        # senha
+        self.labelSenha = ctk.CTkLabel(self.frameTelaCadastro, text="Senha para utilizar na tela principal*", font=("Century Gothic bold", 15))
+        self.labelSenha.place(x=100, y=300)
+        self.senha = ctk.CTkEntry(self.frameTelaCadastro, placeholder_text="Senha", width=350, corner_radius=5, font=("Century Gothic bold", 20))
+        self.senha.place(x=100, y=330)
+
+        # cargo
+        self.labelCargo = ctk.CTkLabel(self.frameTelaCadastro, text="Cargo do funcionário", font=("Century Gothic bold", 15))   
+        self.labelCargo.place(x=550, y=100)
+        opcoes = ["Gerente", "Vendedor(a) interno", "Vendedor(a) externo", "Financeiro"]
+        self.cargo = ctk.CTkComboBox(self.frameTelaCadastro, width=350, corner_radius=5, font=("Century Gothic bold", 20), values=opcoes)
+        self.cargo.place(x=550, y=130)
+
+        # cpf
+        self.labelCpf = ctk.CTkLabel(self.frameTelaCadastro, text="Documento do funcionário*", font=("Century Gothic bold", 15))
+        self.labelCpf.place(x=550, y=200)
+        self.cpf = ctk.CTkEntry(self.frameTelaCadastro, placeholder_text="CPF", width=350, corner_radius=5, font=("Century Gothic bold", 20))
+        self.cpf.place(x=550, y=230)
+
+        # email/contato
+        self.labelContato = ctk.CTkLabel(self.frameTelaCadastro, text="Contato do funcionário", font=("Century Gothic bold", 15))
+        self.labelContato.place(x=550, y=300)
+        self.contato = ctk.CTkEntry(self.frameTelaCadastro, placeholder_text="Contato", width=350, corner_radius=5, font=("Century Gothic bold", 20))
+        self.contato.place(x=550, y=330)
+
+
+        # ============== Botões =============== #
+        # voltar
         self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastro, text="Voltar", width=200, fg_color="#088b1b", corner_radius=5, font=("Arial", 15), command=self.telaLogin)
-        self.botaoVoltar.place(x=200, y=400)
+        self.botaoVoltar.place(x=200, y=600)
         
-        # botão que cria um novo usuário no banco de dados
+        # registra no bd
         self.botaoCadastrarUsuario = ctk.CTkButton(self.frameTelaCadastro, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=self.registraUsuarioNoBanco)
-        self.botaoCadastrarUsuario.place(x=600, y=400)
+        self.botaoCadastrarUsuario.place(x=600, y=600)
+
+
 
     def registraUsuarioNoBanco(self):
         nome = self.nome.get()
         cargo = self.cargo.get()
+        login = self.login.get()
+        cpf = self.cpf.get()
+        senha = self.senha.get()
+        contato = self.contato.get()
 
-        print(type(nome))
-        print(type(cargo))
+        queryInserirFuncionario = "INSERT INTO funcionarios(nome, cargo, login, cpf, senha, contato) VALUES(%s, %s, %s, %s, %s, %s);"
 
-        db.cursor.lastrowid
+        if not nome or not login or not cpf or not senha : 
+            messagebox.showinfo(title="Registro falhou", message="campos obrigatórios não podem estar em branco") 
+        else:
+            db.cursor.execute(queryInserirFuncionario, (nome, cargo, login, cpf, senha, contato,))
+            db.conn.commit()
+            messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
+            self.telaLogin()
 
-        db.cursor.execute("""
-            INSERT INTO funcionarios(nome, cargo) VALUES(%s, %s)
-        """, (nome, cargo))
-        db.conn.commit()
+    def consultarUsuarioCadastrado(self):
+        login = self.login.get()
+        queryConsultarLogin = "SELECT id FROM funcionarios WHERE login = %s;"
+        db.cursor.execute(queryConsultarLogin, (login,))
+        resultados = db.cursor.fetchall()
 
-        messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
+        if resultados == ((0,),):
+            self.telaProduto()
+        else:
+            messagebox.showerror(title="Erro", message="Usuário não cadastrado")
+        # print(resultados)
+        
 
-        self.telaLogin()
-
+        
 
 
 if __name__ == "__main__":
