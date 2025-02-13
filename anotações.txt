@@ -1,0 +1,25 @@
+1 - tela de login pra criação de perfis ✅
+2 - relatório de vendas podendo selecionar a vendedora, e o período ✅
+3 - estoque geral e fiscal (não representável no protótipo)
+4 - tela de saída seleção de produtos e criação de nota *em produção* 
+    4.1 - nota fiscal pode ter a opção de ser dada a entrada pelo arquivo XML ✅
+
+5 - tela de cadastros
+    5.1 - clientes
+        5.1.1 - nome                ✅    
+        5.1.2 - cpf/cnpj            ✅
+        5.1.3 - inscrição estadual  ✅
+        5.1.4 - RG                  ✅
+        5.1.5 - endereço            ✅
+        5.1.6 - cep                 ✅
+        5.1.7 - número              ✅
+        5.1.8 - bairro              ✅
+        5.1.9 - cidade              ✅
+
+    5.2 - produtos
+        5.2.1 - nome do produto       ✅
+        5.2.2 - Código do produto     ✅
+        5.2.3 - valor de custo        ✅
+        5.2.4 - valor de venda        ✅
+        5.2.5 - codigo ncm, cfop cest ✅
+    
