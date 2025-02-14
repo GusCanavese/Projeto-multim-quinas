@@ -22,4 +22,11 @@
         5.2.3 - valor de custo        ✅
         5.2.4 - valor de venda        ✅
         5.2.5 - codigo ncm, cfop cest ✅
+
+
+
+
+ANOTAÇÕES
+- RETIRAR CONTATO E O CPF da aba de cadastrar funcionários
+
     
