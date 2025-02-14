@@ -7,6 +7,10 @@ import messagebox
 ctk.set_default_color_theme("blue")
 
 
+#! proxima coisa que é necessário fazer é a criação de perfis 
+
+
+
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -27,7 +31,7 @@ class App(ctk.CTk):
         alturaTela = 900
         larguraTela = 1280
         self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
-        self.telaDeCadastroFuncionario()
+        self.telaLogin()
 
     # tela de login inicial
     def telaLogin(self):
@@ -59,45 +63,49 @@ class App(ctk.CTk):
 
     # tela que define os botões que vão levar para as outras funcionalidades
     def telaAcoes(self):
+        usuarioNegado = self.login.get()
+        queryVerificaUsuarioBloqueado = "SELECT cargo FROM funcionarios WHERE login = %s;"
+        db.cursor.execute(queryVerificaUsuarioBloqueado, (usuarioNegado,))
+        resultado = db.cursor.fetchall()
         self.frameTelaAcoes = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
         self.frameTelaAcoes.place(x=140, y=100)     # colocando no lugar
         self.frameTelaAcoes.grid_propagate(False)
-        
+        print(resultado)
+
         # título
         self.Acoes = ctk.CTkLabel(self.frameTelaAcoes, width=950, height=0, text="Ações", font=("Century Gothic bold", 30))
         self.Acoes.place(relx=0.5, y=50, anchor="center")
 
-        # botão do cadastro de funcionarios
-        self.botaoCadastro = ctk.CTkButton(self.frameTelaAcoes, text="Cadastros", width=300, corner_radius=5, font=("Arial", 18), command=self.telaDeCadastroFuncionario)
-        self.botaoCadastro.place(relx=0.33, y=200, anchor="center")
-
-        # botão de relatório de vendas # ! ainda não está ativo nem possui uma tela criada para ele 
-        self.botaoRelatorioDeVendas = ctk.CTkButton(self.frameTelaAcoes, text="Relatório de vendas", width=300, corner_radius=5, font=("Arial", 18), command=self)
-        self.botaoRelatorioDeVendas.place(relx=0.66, y=200, anchor="center")
-
-        # botão de gerar pedidos # ! ainda não está ativo nem possui uma tela criada para ele
-        self.botaogGerarPedido = ctk.CTkButton(self.frameTelaAcoes, text="Gerar pedido", width=300, corner_radius=5, font=("Arial", 18), command=self)
-        self.botaogGerarPedido.place(relx=0.33, y=250, anchor="center")
-
-        # botão de contas a pagar e a receber da loja # ! ainda não está ativo nem possui uma tela criada para ele 
-        self.botaoContasPagarReceber = ctk.CTkButton(self.frameTelaAcoes, text="Contas a pagar/receber", width=300, corner_radius=5, font=("Arial", 18), command=self)
-        self.botaoContasPagarReceber.place(relx=0.66, y=250, anchor="center")
-
-        # botão de gerar faturamento # ! ainda não está ativo nem possui uma tela criada para ele 
-        self.botaoGerarFaturamento = ctk.CTkButton(self.frameTelaAcoes, text="Gerar faturamento", width=300, corner_radius=5, font=("Arial", 18), command=self)
-        self.botaoGerarFaturamento.place(relx=0.33, y=300, anchor="center")
-
-        # botão de consultar estoque # ! ainda não está ativo nem possui uma tela criada para ele 
-        self.botaoConsultarEstoque = ctk.CTkButton(self.frameTelaAcoes, text="Consultar estoque", width=300, corner_radius=5, font=("Arial", 18), command=self)
-        self.botaoConsultarEstoque.place(relx=0.66, y=300, anchor="center")
-
-        # botão de gerar orçamento # ! ainda não está ativo nem possui uma tela criada para ele 
-        self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Gerar orçamento", width=300, corner_radius=5, font=("Arial", 18), command=self)
-        self.botaoGerarOrcamento.place(relx=0.33, y=350, anchor="center")
-
-        # botão de trocar usuário 
+        # botão de trocar usuário é diferente dos outros        
         self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Trocar usuário", width=200, corner_radius=5, font=("Arial", 18), command=self.telaLogin)
         self.botaoGerarOrcamento.place(relx=0.33, y=650, anchor="center")
+
+        botoes = {
+            "Cadastros":              (0.33, 200, self.telaDeCadastroFuncionario),
+            "Gerar pedido":           (0.33, 250, self),
+            "Contas a pagar/receber": (0.66, 250, self),
+            "Gerar faturamento":      (0.33, 300, self),
+            "Consultar estoque":      (0.66, 300, self),
+            "Relatório de vendas":    (0.66, 200, self),
+            "Gerar orçamento":        (0.33, 350, self),
+        }
+        
+        self.botoesTelaAcoes = {} 
+
+        for texto, (relx, y, comando) in botoes.items():
+            botao = ctk.CTkButton(self.frameTelaAcoes, text=texto, width=300, corner_radius=5, font=("Arial", 18), command=comando)
+            botao.place(relx=relx, y=y, anchor="center")
+            self.botoesTelaAcoes[texto] = botao
+
+            if resultado == (('Vendedor(a) externo',),):
+                botoesOcultar = ["Cadastros", "Gerar pedido"]
+
+                for botao in botoesOcultar:
+                    if botao in self.botoesTelaAcoes:
+                        self.botoesTelaAcoes[botao].place_forget()
+
+            
+            
 
     # tela de cadastro de produtos
     def telaProduto(self):
@@ -211,7 +219,7 @@ class App(ctk.CTk):
         db.cursor.execute(queryConsultarLogin, (login,))
         resultados = db.cursor.fetchall()
 
-        if resultados == ((23,),):
+        if resultados != ():
             self.telaAcoes()
 
             if(self.frameUsuarioNaoCadastrado == None):
