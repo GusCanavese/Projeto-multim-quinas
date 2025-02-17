@@ -29,4 +29,52 @@
 ANOTAÇÕES
 - RETIRAR CONTATO E O CPF da aba de cadastrar funcionários
 
+
+ #! tela de cadastro de produtos por enquanto ta parada
+    # def telaProduto(self):
+    #     if(self.frameTelaLogin == None):
+    #         pass
+    #     else:
+    #         self.frameTelaLogin.destroy()
+
+    #     self.title("TelaProduto")
+    #     self.frameTelaProduto = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
+    #     self.frameTelaProduto.place(x=140, y=100)     
+    #     self.frameTelaProduto.grid_propagate(False)
+
+    #     self.frameTelaProduto = ctk.CTkFrame(self, height=400, width=680)
+    #     self.frameTelaProduto.place(x=10, y=10)
+
+    #     self.labelCadastro = ctk.CTkLabel(self.frameTelaProduto, text="Cadastro do produto", font=("Century Gothic bold", 20))
+    #     self.labelCadastro.grid(padx=30, pady=10)
+
+    #     self.nomeLabel = ctk.CTkLabel(self.frameTelaProduto, text="Nome do produto", font=("Century Gothic bold", 10))
+    #     self.nomeLabel.place(x=100, y=130)
+    #     self.nome = ctk.CTkEntry(self.frameTelaProduto, placeholder_text="Nome", width=300, corner_radius=5, font=("Century Gothic bold", 15))
+    #     self.nome.grid(row=1, column=0, padx=30, pady=40)
+
+    #     self.quantidadeLabel = ctk.CTkLabel(self.frameTelaProduto, text="Quantidade do produto", font=("Century Gothic bold", 10))
+    #     self.quantidadeLabel.place(x=35, y=140)
+    #     self.quantidade = ctk.CTkEntry(self.frameTelaProduto, placeholder_text="Quantidade", width=300, corner_radius=5, font=("Century Gothic bold", 15))
+    #     self.quantidade.grid(row=2, column=0, padx=30, pady=10)
+
+    #     self.valor = ctk.CTkEntry(self.frameTelaProduto, placeholder_text="Valor", width=300, corner_radius=5, font=("Century Gothic bold", 15))
+    #     self.valor.grid(row=3, column=0, padx=30, pady=10)
+
+    #     self.codigo = ctk.CTkEntry(self.frameTelaProduto, placeholder_text="Código", width=300, corner_radius=5, font=("Century Gothic bold", 15))
+    #     self.codigo.grid(row=4, column=0, padx=30, pady=10)
+
+    #     self.botaoVoltar = ctk.CTkButton(self.frameTelaProduto, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.telaLogin)
+    #     self.botaoVoltar.grid(row=5, column=0, padx=20, pady=20)
+
+
+
+
+
+
+
+
+
+
+
     
