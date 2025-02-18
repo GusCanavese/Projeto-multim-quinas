@@ -27,7 +27,7 @@
 
 
 ANOTAÇÕES
-- RETIRAR CONTATO E O CPF da aba de cadastrar funcionários
+- VENDEDOR INTERNO ainda poderá cadastrar outras coisas
 
 USUÁRIO BLOQUEADO(Yara): userbloq 123
 USUÁRIO SEMIBLOQUEADO(vendedor interno) semibloq 123
