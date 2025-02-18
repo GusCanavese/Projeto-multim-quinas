@@ -1,12 +1,13 @@
 import customtkinter as ctk
 import db
-import messagebox
+from tkinter import messagebox
+# import messagebox
 
 
 # ctk.set_appearance_mode("system")  
 ctk.set_default_color_theme("blue")
 
-# ! conectar o cadastro de produtos ao banco de dados
+
 
 class App(ctk.CTk):
     def __init__(self):
@@ -33,15 +34,11 @@ class App(ctk.CTk):
         self.telaLogin()
 
 
+# ! fazer a tela do cadastro de fornecedores
 
     # tela de login inicial
     def telaLogin(self):
         self.title("login")
-        if(self.frameTelaProduto == None):
-            pass
-        else:
-            self.frameTelaProduto.destroy()
-
         self.frameTelaLogin = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
         self.frameTelaLogin.place(x=140, y=100)     # colocando no lugar
         self.frameTelaLogin.grid_propagate(False)   # evita ela de se configurar automaticamente
@@ -64,18 +61,13 @@ class App(ctk.CTk):
 
     # tela que define os botões que vão levar para as outras funcionalidades
     def telaAcoes(self):
+        self.criaFrames()# reseta o endereço de memória de todos os frames para None novamente, e em seguida cria o atual
         usuarioBloqueado = self.login.get()
         queryConsultaUsuarioBloqueado = "SELECT cargo FROM funcionarios WHERE login = %s;"
         db.cursor.execute(queryConsultaUsuarioBloqueado, (usuarioBloqueado,))
         cargoUsuarioBloqueado = db.cursor.fetchall()
-        print(cargoUsuarioBloqueado)
-        login = self.login.get()
-        senha = self.senha.get()
-        usuarioLogado = [login, senha]
-        print(usuarioLogado[1])
-        print(senha)
+
         
-            
         self.frameTelaAcoes = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
         self.frameTelaAcoes.place(x=140, y=100)     # colocando no lugar
         self.frameTelaAcoes.grid_propagate(False)
@@ -131,7 +123,7 @@ class App(ctk.CTk):
             self.botaoGerarOrcamento.place(relx=0.33, y=350, anchor="center")
 
         # botão de trocar usuário 
-        self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Trocar usuário", width=200, corner_radius=5, font=("Arial", 18), command=self.telaLogin)
+        self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Trocar usuário", width=200, corner_radius=5, font=("Arial", 18), command=self.frameTelaAcoes.destroy)
         self.botaoGerarOrcamento.place(relx=0.33, y=650, anchor="center")
 
     # tela para acessar todos os outros cadastros possíveis
@@ -165,7 +157,7 @@ class App(ctk.CTk):
         self.botaoGerarFaturamento.place(relx=0.33, y=300, anchor="center")
 
         # botão para voltar para a tela
-        self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaCadastros, text="Voltar", width=200, corner_radius=5, font=("Arial", 18), command=self.voltarParaAcoes)
+        self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaCadastros, text="Voltar", width=200, corner_radius=5, font=("Arial", 18), command=self.frameTelaCadastros.destroy)
         self.botaoGerarOrcamento.place(relx=0.33, y=650, anchor="center")
 
     # cadastro de funcionários/usuários
@@ -207,7 +199,7 @@ class App(ctk.CTk):
 
         # ============== Botões =============== #
         # voltar
-        self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroFuncionario, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.voltarParaCadastros)
+        self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroFuncionario, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameTelaCadastroFuncionario.destroy)
         self.botaoVoltar.place(x=200, y=600)
         
         # registra no bd
@@ -293,35 +285,13 @@ class App(ctk.CTk):
         self.CNPJ.place(x=770, y=330)
 
         # voltar
-        self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroProduto, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.voltarParaCadastros)
+        self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroProduto, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameTelaCadastroProduto.destroy)
         self.botaoVoltar.place(x=200, y=600)
 
         # botão de cadastrar
         self.botaoCadastrarUsuario = ctk.CTkButton(self.frameTelaCadastroProduto, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=self.registraProdutoNoBanco)
         self.botaoCadastrarUsuario.place(x=800, y=600)
     
-
-
-
-    #? resetar telas # * liberar memoria 
-    def voltarParaCadastros(self):
-
-        if self.frameTelaCadastroProduto:
-            self.frameTelaCadastroProduto.destroy()
-            self.frameTelaCadastroProduto = None
-        
-        elif self.frameTelaCadastroFuncionario:
-            self.frameTelaCadastroFuncionario.destroy()
-            self.frameTelaCadastroFuncionario = None
-
-        self.telaCadastros()
-
-    def voltarParaAcoes(self):
-        if self.frameTelaCadastros:
-            self.frameTelaCadastros.destroy()
-            self.frameTelaCadastros = None
-
-        self.telaAcoes()
 
 
 
@@ -343,7 +313,7 @@ class App(ctk.CTk):
             db.cursor.execute(queryInserirFuncionario, (nome, cargo, login, senha,))
             db.conn.commit()
             messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
-            self.telaCadastros()
+            self.frameTelaCadastroFuncionario.destroy()
    
     # é chamado quando se cadastra um novo usuário
     def registraProdutoNoBanco(self):
@@ -369,18 +339,19 @@ class App(ctk.CTk):
             db.cursor.execute(queryInserirProdutos, (nome, valorCusto, valorVenda, quantidade, codigoInterno, NCM, CFOP, CEST, origemCST, descricao, CNPJ,))
             db.conn.commit()
             messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
-            self.telaCadastros()
+            self.frameTelaCadastroProduto.destroy()
 
     # é chamado quando estamos entrando no sistema
     def consultarUsuarioCadastrado(self):
         login = self.login.get()
         senha = self.senha.get()
-        queryConsultarLogin = "SELECT cargo FROM funcionarios WHERE login = %s;"
-        db.cursor.execute(queryConsultarLogin, (login,))
+        queryConsultarLogin = "SELECT cargo FROM funcionarios WHERE login = %s AND senha= %s;"
+        db.cursor.execute(queryConsultarLogin, (login, senha,))
         resultados = db.cursor.fetchall()
+        print(resultados)
 
         if senha and login:
-            if resultados != ():
+            if resultados:
                 self.telaAcoes()
             if(self.frameUsuarioNaoCadastrado == None):
                 pass
