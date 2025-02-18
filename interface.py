@@ -30,7 +30,7 @@ class App(ctk.CTk):
         alturaTela = 900
         larguraTela = 1280
         self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
-        self.telaCadastroProdutos()
+        self.telaLogin()
 
 
 
@@ -69,6 +69,12 @@ class App(ctk.CTk):
         db.cursor.execute(queryConsultaUsuarioBloqueado, (usuarioBloqueado,))
         cargoUsuarioBloqueado = db.cursor.fetchall()
         print(cargoUsuarioBloqueado)
+        login = self.login.get()
+        senha = self.senha.get()
+        usuarioLogado = [login, senha]
+        print(usuarioLogado[1])
+        print(senha)
+        
             
         self.frameTelaAcoes = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
         self.frameTelaAcoes.place(x=140, y=100)     # colocando no lugar
@@ -159,42 +165,38 @@ class App(ctk.CTk):
         self.botaoGerarFaturamento.place(relx=0.33, y=300, anchor="center")
 
         # botão para voltar para a tela
-        self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaCadastros, text="Voltar", width=200, corner_radius=5, font=("Arial", 18), command=self.telaAcoes)
+        self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaCadastros, text="Voltar", width=200, corner_radius=5, font=("Arial", 18), command=self.voltarParaAcoes)
         self.botaoGerarOrcamento.place(relx=0.33, y=650, anchor="center")
 
     # cadastro de funcionários/usuários
-    def telaDeCadastroFuncionario(self):
-        if(self.frameTelaLogin == None):
-            pass
-        else:
-            self.frameTelaLogin.destroy()
-        self.title("TelaCadastro")
+    def telaDeCadastroFuncionario(self):            
         self.frameTelaCadastroFuncionario = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
         self.frameTelaCadastroFuncionario.place(x=140, y=100)     
         self.frameTelaCadastroFuncionario.grid_propagate(False)
 
+
         # ================ widgets da tela cadastro =====================#
         # titulo
-        self.textoCadastro = ctk.CTkLabel(self.frameTelaCadastroFuncionario, width=950, height=0, text="Cadastrar Usuário", font=("Century Gothic bold", 30))
+        self.textoCadastro = ctk.CTkLabel(self.frameTelaCadastroFuncionario, width=950, height=0, text="Cadastrar funcionário", font=("Century Gothic bold", 30))
         self.textoCadastro.grid(row=0, column=0, padx=10, pady=20)
 
         # nome
         self.labelNome = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Nome", font=("Century Gothic bold", 15))
         self.labelNome.place(x=100, y=100)
-        self.nome = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="Nome", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-        self.nome.place(x=100, y=130)
+        self.nomeFuncionario = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="nomeFuncionario", width=350, corner_radius=5, font=("Century Gothic bold", 20))
+        self.nomeFuncionario.place(x=100, y=130)
 
         # login
         self.labelLogin = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Login para acesso*", font=("Century Gothic bold", 15))   
         self.labelLogin.place(x=100, y=200)
-        self.login = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="Login", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-        self.login.place(x=100, y=230)
+        self.loginFuncionario = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="Login", width=350, corner_radius=5, font=("Century Gothic bold", 20))
+        self.loginFuncionario.place(x=100, y=230)
 
         # senha
         self.labelSenha = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Senha para acesso*", font=("Century Gothic bold", 15))
         self.labelSenha.place(x=550, y=200)
-        self.senha = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="Senha", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-        self.senha.place(x=550, y=230)
+        self.senhaFuncionario = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="Senha", width=350, corner_radius=5, font=("Century Gothic bold", 20))
+        self.senhaFuncionario.place(x=550, y=230)
 
         # cargo
         self.labelCargo = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Cargo", font=("Century Gothic bold", 15))   
@@ -205,7 +207,7 @@ class App(ctk.CTk):
 
         # ============== Botões =============== #
         # voltar
-        self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroFuncionario, text="Voltar", width=200, fg_color="#088b1b", corner_radius=5, font=("Arial", 15), command=self.voltarParaCadastros)
+        self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroFuncionario, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.voltarParaCadastros)
         self.botaoVoltar.place(x=200, y=600)
         
         # registra no bd
@@ -223,10 +225,10 @@ class App(ctk.CTk):
         self.textoCadastro.place(relx=0.5, y=50, anchor="center")
 
         # Nome
-        self.labelNome = ctk.CTkLabel(self.frameTelaCadastroProduto, text="Nome do produto", font=("Century Gothic bold", 15))
-        self.labelNome.place(x=100, y=100)
-        self.nome = ctk.CTkEntry(self.frameTelaCadastroProduto, placeholder_text="Nome", width=280, corner_radius=5, font=("Century Gothic bold", 20))
-        self.nome.place(x=100, y=130)
+        self.labelNomeProduto = ctk.CTkLabel(self.frameTelaCadastroProduto, text="Nome do produto", font=("Century Gothic bold", 15))
+        self.labelNomeProduto.place(x=100, y=100)
+        self.nomeProduto = ctk.CTkEntry(self.frameTelaCadastroProduto, placeholder_text="Nome", width=280, corner_radius=5, font=("Century Gothic bold", 20))
+        self.nomeProduto.place(x=100, y=130)
 
         # valor custo
         self.labelValorCusto = ctk.CTkLabel(self.frameTelaCadastroProduto, text="Valor de custo", font=("Century Gothic bold", 15))
@@ -293,35 +295,50 @@ class App(ctk.CTk):
         # voltar
         self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroProduto, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.voltarParaCadastros)
         self.botaoVoltar.place(x=200, y=600)
+
+        # botão de cadastrar
+        self.botaoCadastrarUsuario = ctk.CTkButton(self.frameTelaCadastroProduto, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=self.registraProdutoNoBanco)
+        self.botaoCadastrarUsuario.place(x=800, y=600)
     
-    # resetar telas # * liberar memoria 
+
+
+
+    #? resetar telas # * liberar memoria 
     def voltarParaCadastros(self):
 
         if self.frameTelaCadastroProduto:
             self.frameTelaCadastroProduto.destroy()
             self.frameTelaCadastroProduto = None
         
-        if self.frameTelaCadastroFuncionario:
+        elif self.frameTelaCadastroFuncionario:
             self.frameTelaCadastroFuncionario.destroy()
             self.frameTelaCadastroFuncionario = None
 
-            
-        
-
-
         self.telaCadastros()
+
+    def voltarParaAcoes(self):
+        if self.frameTelaCadastros:
+            self.frameTelaCadastros.destroy()
+            self.frameTelaCadastros = None
+
+        self.telaAcoes()
+
+
+
+
+    #? ===================== FUNÇÕES DO BANCO DE DADOS ===================== #
 
     # é chamado quando é cadastrado um novo usuário
     def registraUsuarioNoBanco(self):
-        nome = self.nome.get()
+        nome = self.nomeFuncionario.get()
         cargo = self.cargo.get()
-        login = self.login.get()
-        senha = self.senha.get()
+        login = self.loginFuncionario.get()
+        senha = self.senhaFuncionario.get()
 
         queryInserirFuncionario = "INSERT INTO funcionarios(nome, cargo, login, senha) VALUES(%s, %s, %s, %s);"
 
         if not nome or not login or not senha : 
-            messagebox.showinfo(title="Registro falhou", message="campos obrigatórios não podem estar em branco") 
+            messagebox.showinfo(title="Registro falhou", message="Campos obrigatórios não podem estar em branco")
         else:
             db.cursor.execute(queryInserirFuncionario, (nome, cargo, login, senha,))
             db.conn.commit()
@@ -330,21 +347,47 @@ class App(ctk.CTk):
    
     # é chamado quando se cadastra um novo usuário
     def registraProdutoNoBanco(self):
-        pass
+        nome = self.nomeProduto.get()
+        valorCusto = self.ValorCusto.get()
+        valorVenda = self.ValorVenda.get()
+        quantidade = self.Quantidade.get()
+        codigoInterno = self.CodigoInterno.get()
+        NCM = self.NCM.get()
+        CFOP = self.CFOP.get()
+        CEST = self.CEST.get()
+        origemCST = self.OrigemCST.get()
+        descricao = self.Descricao.get()
+        CNPJ = self.CNPJ.get()
+        queryInserirProdutos = "INSERT INTO produtos(nome_do_produto, valor_de_custo, valor_de_venda, quantidade, codigo_interno, codigo_ncm, codigo_cfop, codigo_cest, origem_cst, descricao, CNPJ) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+
+        if not(nome and valorCusto and valorVenda and quantidade and codigoInterno and NCM and CFOP and CEST and origemCST and descricao and CNPJ):
+            self.frameProdutoNaoCadastrado = ctk.CTkFrame(self, height=60, width=300, corner_radius=5, border_width=2, border_color="red",fg_color="transparent")
+            self.frameProdutoNaoCadastrado.place(relx=0.5, y=600, anchor="center")
+            self.ProdutoNaoCadastrado = ctk.CTkLabel(self.frameProdutoNaoCadastrado,  text="Prencha os campos obrigatórios", font=("Arial", 18))
+            self.ProdutoNaoCadastrado.place(relx=0.5, y=30, anchor="center")
+        else:
+            db.cursor.execute(queryInserirProdutos, (nome, valorCusto, valorVenda, quantidade, codigoInterno, NCM, CFOP, CEST, origemCST, descricao, CNPJ,))
+            db.conn.commit()
+            messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
+            self.telaCadastros()
 
     # é chamado quando estamos entrando no sistema
     def consultarUsuarioCadastrado(self):
         login = self.login.get()
+        senha = self.senha.get()
         queryConsultarLogin = "SELECT cargo FROM funcionarios WHERE login = %s;"
         db.cursor.execute(queryConsultarLogin, (login,))
         resultados = db.cursor.fetchall()
 
-        if resultados != ():
-            self.telaAcoes()
+        if senha and login:
+            if resultados != ():
+                self.telaAcoes()
             if(self.frameUsuarioNaoCadastrado == None):
                 pass
             else:
                 self.frameUsuarioNaoCadastrado.destroy()
+
+        
                 
         else:
             self.frameUsuarioNaoCadastrado = ctk.CTkFrame(self, height=100, width=300, corner_radius=5, border_width=2, border_color="red",fg_color="transparent")

@@ -28,6 +28,13 @@
 
 ANOTAÇÕES
 - VENDEDOR INTERNO ainda poderá cadastrar outras coisas
+- fazer entrar com enter na tela de login 
+
+- tornar senha obrigatopria na tela de login
+- fazer um perfil persistente, onde você não se disconecta
+
+
+- COINECTAR ao banco de dados a tela de cadastro de produtos
 
 USUÁRIO BLOQUEADO(Yara): userbloq 123
 USUÁRIO SEMIBLOQUEADO(vendedor interno) semibloq 123
