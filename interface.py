@@ -31,7 +31,9 @@ class App(ctk.CTk):
         alturaTela = 900
         larguraTela = 1280
         self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
-        self.telaLogin()
+        self.telaCadastroFornecedores()
+
+
 
 
 # ! fazer a tela do cadastro de fornecedores
@@ -126,6 +128,9 @@ class App(ctk.CTk):
         self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Trocar usuário", width=200, corner_radius=5, font=("Arial", 18), command=self.frameTelaAcoes.destroy)
         self.botaoGerarOrcamento.place(relx=0.33, y=650, anchor="center")
 
+
+    #? ===================== FUNÇÕES DAS TELAS DE CADASTRO ===================== #
+
     # tela para acessar todos os outros cadastros possíveis
     def telaCadastros(self):
         self.frameTelaCadastros = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
@@ -140,71 +145,25 @@ class App(ctk.CTk):
         self.botaoCadastro = ctk.CTkButton(self.frameTelaCadastros, text="Produtos", width=300, corner_radius=5, font=("Arial", 18), command=self.telaCadastroProdutos)
         self.botaoCadastro.place(relx=0.33, y=200, anchor="center")
 
-        # botão de relatório de vendas # ! ainda não está ativo nem possui uma tela criada para ele 
+        # botão de cadastrar clientes # ! ainda não está ativo nem possui uma tela criada para ele 
         self.botaoRelatorioDeVendas = ctk.CTkButton(self.frameTelaCadastros, text="Clientes", width=300, corner_radius=5, font=("Arial", 18), command=self)
         self.botaoRelatorioDeVendas.place(relx=0.66, y=200, anchor="center")
 
-        # botão de gerar pedidos # ! ainda não está ativo nem possui uma tela criada para ele
-        self.botaogGerarPedido = ctk.CTkButton(self.frameTelaCadastros, text="Fornecedores", width=300, corner_radius=5, font=("Arial", 18), command=self)
+        # botão de cadastrar fornecedores
+        self.botaogGerarPedido = ctk.CTkButton(self.frameTelaCadastros, text="Fornecedores", width=300, corner_radius=5, font=("Arial", 18), command=self.telaCadastroFornecedores)
         self.botaogGerarPedido.place(relx=0.33, y=250, anchor="center")
 
-        # botão de contas a pagar e a receber da loja 
-        self.botaoContasPagarReceber = ctk.CTkButton(self.frameTelaCadastros, text="Funcionários", width=300, corner_radius=5, font=("Arial", 18), command=self.telaDeCadastroFuncionario)
+        # botão de cadastrar funcionários
+        self.botaoContasPagarReceber = ctk.CTkButton(self.frameTelaCadastros, text="Funcionários", width=300, corner_radius=5, font=("Arial", 18), command=self.telaCadastroFuncionario)
         self.botaoContasPagarReceber.place(relx=0.66, y=250, anchor="center")
 
-        # botão de gerar faturamento # ! ainda não está ativo nem possui uma tela criada para ele 
+        # botão cadastrar transportadoras # ! ainda não está ativo nem possui uma tela criada para ele 
         self.botaoGerarFaturamento = ctk.CTkButton(self.frameTelaCadastros, text="Transportadoras", width=300, corner_radius=5, font=("Arial", 18), command=self)
         self.botaoGerarFaturamento.place(relx=0.33, y=300, anchor="center")
 
         # botão para voltar para a tela
         self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaCadastros, text="Voltar", width=200, corner_radius=5, font=("Arial", 18), command=self.frameTelaCadastros.destroy)
         self.botaoGerarOrcamento.place(relx=0.33, y=650, anchor="center")
-
-    # cadastro de funcionários/usuários
-    def telaDeCadastroFuncionario(self):            
-        self.frameTelaCadastroFuncionario = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
-        self.frameTelaCadastroFuncionario.place(x=140, y=100)     
-        self.frameTelaCadastroFuncionario.grid_propagate(False)
-
-
-        # ================ widgets da tela cadastro =====================#
-        # titulo
-        self.textoCadastro = ctk.CTkLabel(self.frameTelaCadastroFuncionario, width=950, height=0, text="Cadastrar funcionário", font=("Century Gothic bold", 30))
-        self.textoCadastro.grid(row=0, column=0, padx=10, pady=20)
-
-        # nome
-        self.labelNome = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Nome", font=("Century Gothic bold", 15))
-        self.labelNome.place(x=100, y=100)
-        self.nomeFuncionario = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="nomeFuncionario", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-        self.nomeFuncionario.place(x=100, y=130)
-
-        # login
-        self.labelLogin = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Login para acesso*", font=("Century Gothic bold", 15))   
-        self.labelLogin.place(x=100, y=200)
-        self.loginFuncionario = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="Login", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-        self.loginFuncionario.place(x=100, y=230)
-
-        # senha
-        self.labelSenha = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Senha para acesso*", font=("Century Gothic bold", 15))
-        self.labelSenha.place(x=550, y=200)
-        self.senhaFuncionario = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="Senha", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-        self.senhaFuncionario.place(x=550, y=230)
-
-        # cargo
-        self.labelCargo = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Cargo", font=("Century Gothic bold", 15))   
-        self.labelCargo.place(x=550, y=100)
-        opcoes = ["Gerente", "Vendedor(a) interno", "Vendedor(a) externo", "Financeiro"]
-        self.cargo = ctk.CTkComboBox(self.frameTelaCadastroFuncionario, width=350, corner_radius=5, font=("Century Gothic bold", 20), values=opcoes)
-        self.cargo.place(x=550, y=130)
-
-        # ============== Botões =============== #
-        # voltar
-        self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroFuncionario, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameTelaCadastroFuncionario.destroy)
-        self.botaoVoltar.place(x=200, y=600)
-        
-        # registra no bd
-        self.botaoCadastrarUsuario = ctk.CTkButton(self.frameTelaCadastroFuncionario, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=self.registraUsuarioNoBanco)
-        self.botaoCadastrarUsuario.place(x=600, y=600)
 
     # tela para cadastro de produtos e suas especificações
     def telaCadastroProdutos(self):
@@ -293,6 +252,201 @@ class App(ctk.CTk):
         self.botaoCadastrarUsuario.place(x=800, y=600)
     
 
+        # cadastro de funcionários/usuários
+    
+    # tela para cadastros de funcionários
+    def telaCadastroFuncionario(self):
+        self.frameTelaCadastroFuncionario = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
+        self.frameTelaCadastroFuncionario.place(x=140, y=100)     
+        self.frameTelaCadastroFuncionario.grid_propagate(False)
+
+
+        # ================ widgets da tela cadastro =====================#
+        # titulo
+        self.textoCadastro = ctk.CTkLabel(self.frameTelaCadastroFuncionario, width=950, height=0, text="Cadastrar funcionário", font=("Century Gothic bold", 30))
+        self.textoCadastro.grid(row=0, column=0, padx=10, pady=20)
+
+        # nome
+        self.labelNomeFuncionario = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Nome", font=("Century Gothic bold", 15))
+        self.labelNomeFuncionario.place(x=100, y=100)
+        self.nomeFuncionario = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="nomeFuncionario", width=350, corner_radius=5, font=("Century Gothic bold", 20))
+        self.nomeFuncionario.place(x=100, y=130)
+
+        # login
+        self.labelLogin = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Login para acesso*", font=("Century Gothic bold", 15))   
+        self.labelLogin.place(x=100, y=200)
+        self.loginFuncionario = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="Login", width=350, corner_radius=5, font=("Century Gothic bold", 20))
+        self.loginFuncionario.place(x=100, y=230)
+
+        # senha
+        self.labelSenha = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Senha para acesso*", font=("Century Gothic bold", 15))
+        self.labelSenha.place(x=550, y=200)
+        self.senhaFuncionario = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="Senha", width=350, corner_radius=5, font=("Century Gothic bold", 20))
+        self.senhaFuncionario.place(x=550, y=230)
+
+        # cargo
+        self.labelCargo = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Cargo", font=("Century Gothic bold", 15))   
+        self.labelCargo.place(x=550, y=100)
+        opcoes = ["Gerente", "Vendedor(a) interno", "Vendedor(a) externo", "Financeiro"]
+        self.cargo = ctk.CTkComboBox(self.frameTelaCadastroFuncionario, width=350, corner_radius=5, font=("Century Gothic bold", 20), values=opcoes)
+        self.cargo.place(x=550, y=130)
+
+        # ============== Botões =============== #
+        # voltar
+        self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroFuncionario, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameTelaCadastroFuncionario.destroy)
+        self.botaoVoltar.place(x=200, y=600)
+        
+        # registra no bd
+        self.botaoCadastrarUsuario = ctk.CTkButton(self.frameTelaCadastroFuncionario, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=self.registraUsuarioNoBanco)
+        self.botaoCadastrarUsuario.place(x=600, y=600)
+
+    # tela para cadastrar fornecedores de produtos    
+    def telaCadastroFornecedores(self):
+        def meDesmarque(checkboxSelecionada):
+            match checkboxSelecionada:
+                    case 1:
+                        self.checkboxInativo.deselect()
+                        return 1
+                    case 2:
+                        self.checkboxAtivo.deselect()
+                        return 2
+                    case 3:
+                        self.checkboxPJ.deselect()
+                        self.labelCNPJFornecedor = ctk.CTkLabel(self.frameTelaCadastroFornecedores, text="Insira o CNPJ", font=("Century Gothic bold", 15))
+                        self.labelCNPJFornecedor.place(x=800, y=200)
+                        self.CNPJFornecedor = ctk.CTkEntry(self.frameTelaCadastroFornecedores, placeholder_text="CNPJ", width=300, corner_radius=5, font=("Century Gothic bold", 20))
+                        self.CNPJFornecedor.place(x=800, y=230)
+                        if hasattr(self, "CPFFornecedor"):
+                            self.CNPJFornecedor.destroy()
+                        return 3
+                    case 4:
+                        self.checkboxCPF.deselect()
+                        self.labelCPFfornecedor = ctk.CTkLabel(self.frameTelaCadastroFornecedores, width=100, text="Insira o CPF", font=("Century Gothic bold", 15), anchor="w")
+                        self.labelCPFfornecedor.place(x=800, y=200)
+                        self.CPFfornecedor = ctk.CTkEntry(self.frameTelaCadastroFornecedores, placeholder_text="CPF", width=300, corner_radius=5, font=("Century Gothic bold", 20))
+                        self.CPFfornecedor.place(x=800, y=230)
+                        if hasattr(self, "CNPJFornecedor"):
+                            self.CNPJFornecedor.destroy()
+                        return 4
+                    case 5:
+                        self.checkboxEstrangeira.deselect()
+                        return 5
+                    case 6:
+                        self.checkboxNacional.deselect()
+                        return 6
+                    case 7:
+                        self.checkboxNaoFabricante.deselect()
+                        return 7
+                    case 8:
+                        self.checkboxFabricante.deselect()
+                        return 8
+                    case 9:
+                        self.checkboxNaoRecebeEmail.deselect()
+                        self.labelEmailFornecedor = ctk.CTkLabel(self.frameTelaCadastroFornecedores, text="Email", font=("Century Gothic bold", 15))
+                        self.labelEmailFornecedor.place(x=100, y=400)
+                        self.emailFornecedor = ctk.CTkEntry(self.frameTelaCadastroFornecedores, placeholder_text="Email", width=300, corner_radius=5, font=("Century Gothic bold", 20))
+                        self.emailFornecedor.place(x=100, y=430)
+                        return 9
+                    case 10:
+                        if hasattr(self, "emailFornecedor"):
+                            self.emailFornecedor.destroy()
+
+                        if hasattr(self, "labelEmailFornecedor"):
+                            self.labelEmailFornecedor.destroy()
+
+                        self.checkboxRecebeEmail.deselect()
+                        return 10
+        
+
+        self.frameTelaCadastroFornecedores = ctk.CTkFrame(self, height=700, width=1200, corner_radius=5)
+        self.frameTelaCadastroFornecedores.place(x=40, y=100)      
+        self.frameTelaCadastroFornecedores.grid_propagate(False)
+        
+        # titulo
+        self.textoCadastroFornecedores = ctk.CTkLabel(self.frameTelaCadastroFornecedores, height=0, text="Cadastrar fornecedores", font=("Century Gothic bold", 30))
+        self.textoCadastroFornecedores.place(relx=0.5, y=40, anchor="center")
+
+        # checkbox ATIVO
+        self.checkboxAtivo = ctk.CTkCheckBox(self.frameTelaCadastroFornecedores, text="Sim", command=lambda: self.after(10, lambda: meDesmarque(1)))
+        self.checkboxAtivo.place(x=150, y=120, anchor="center")
+        self.checkboxInativo = ctk.CTkCheckBox(self.frameTelaCadastroFornecedores, text="Não", command=lambda: self.after(10, lambda: meDesmarque(2)))
+        self.checkboxInativo.place(x=210, y=120, anchor="center")
+        self.checkboxAtivoLabel = ctk.CTkLabel(self.frameTelaCadastroFornecedores, height=0, text="ATIVO?", font=("Century Gothic bold", 14))
+        self.checkboxAtivoLabel.place(x=125, y=90, anchor="center")
+        
+        # checkbox TIPO
+        self.checkboxCPF = ctk.CTkCheckBox(self.frameTelaCadastroFornecedores, text="CPF", command=lambda: self.after(10, lambda: meDesmarque(3)))
+        self.checkboxCPF.place(x=330, y=120, anchor="center")
+        self.checkboxPJ = ctk.CTkCheckBox(self.frameTelaCadastroFornecedores, text="CNPJ", command=lambda: self.after(10, lambda: meDesmarque(4)))
+        self.checkboxPJ.place(x=390, y=120, anchor="center")
+        self.checkboxCPFouPJLabel = ctk.CTkLabel(self.frameTelaCadastroFornecedores, height=0, text="TIPO", font=("Century Gothic bold", 14))
+        self.checkboxCPFouPJLabel.place(x=295, y=90, anchor="center")
+
+        # checkbox ORIGEM
+        self.checkboxNacional = ctk.CTkCheckBox(self.frameTelaCadastroFornecedores, text="Nacional", command=lambda: self.after(10, lambda: meDesmarque(5)))
+        self.checkboxNacional.place(x=540, y=120, anchor="center")
+        self.checkboxEstrangeira = ctk.CTkCheckBox(self.frameTelaCadastroFornecedores, text="Estrangeira", command=lambda: self.after(10, lambda: meDesmarque(6)))
+        self.checkboxEstrangeira.place(x=630, y=120, anchor="center")
+        self.checkboxOrigemLabel = ctk.CTkLabel(self.frameTelaCadastroFornecedores, height=0, text="ORIGEM", font=("Century Gothic bold", 14))
+        self.checkboxOrigemLabel.place(x=520, y=90, anchor="center")
+
+        # checkbox FABRICANTE
+        self.checkboxFabricante = ctk.CTkCheckBox(self.frameTelaCadastroFornecedores, text="Sim", command=lambda: self.after(10, lambda: meDesmarque(7)))
+        self.checkboxFabricante.place(x=800, y=120, anchor="center")
+        self.checkboxNaoFabricante = ctk.CTkCheckBox(self.frameTelaCadastroFornecedores, text="Não", command=lambda: self.after(10, lambda: meDesmarque(8)))
+        self.checkboxNaoFabricante.place(x=860, y=120, anchor="center")
+        self.checkboxFabricanteLabel = ctk.CTkLabel(self.frameTelaCadastroFornecedores, height=0, text="FABRICANTE", font=("Century Gothic bold", 14))
+        self.checkboxFabricanteLabel.place(x=795, y=90, anchor="center")
+
+        # checkbox EMAIL
+        self.checkboxRecebeEmail = ctk.CTkCheckBox(self.frameTelaCadastroFornecedores, text="Sim", command=lambda: self.after(10, lambda: meDesmarque(9)))
+        self.checkboxRecebeEmail.place(x=1010, y=120, anchor="center")
+        self.checkboxNaoRecebeEmail = ctk.CTkCheckBox(self.frameTelaCadastroFornecedores, text="Não", command=lambda: self.after(10, lambda: meDesmarque(10)))
+        self.checkboxNaoRecebeEmail.place(x=1090, y=120, anchor="center")
+        self.checkboxEmailLabel = ctk.CTkLabel(self.frameTelaCadastroFornecedores, height=0, text="RECEBE EMAIL?", font=("Century Gothic bold", 14))
+        self.checkboxEmailLabel.place(x=1015, y=90, anchor="center")
+
+        # nome real
+        self.labelNome = ctk.CTkLabel(self.frameTelaCadastroFornecedores, text="Razão social", font=("Century Gothic bold", 15))
+        self.labelNome.place(x=100, y=200)
+        self.nomeFornecedor = ctk.CTkEntry(self.frameTelaCadastroFornecedores, placeholder_text="Nome", width=300, corner_radius=5, font=("Century Gothic bold", 20))
+        self.nomeFornecedor.place(x=100, y=230)
+
+        # nome fantasia
+        self.labelNome = ctk.CTkLabel(self.frameTelaCadastroFornecedores, text="Nome fantasia", font=("Century Gothic bold", 15))
+        self.labelNome.place(x=450, y=200)
+        self.nomeFantasia = ctk.CTkEntry(self.frameTelaCadastroFornecedores, placeholder_text="Nome", width=300, corner_radius=5, font=("Century Gothic bold", 20))
+        self.nomeFantasia.place(x=450, y=230)
+
+        # inscrição estadual
+        self.labelinscriçãoEstadual = ctk.CTkLabel(self.frameTelaCadastroFornecedores, text="Inscrição estadual", font=("Century Gothic bold", 15))
+        self.labelinscriçãoEstadual.place(x=100, y=300)
+        self.inscriçãoEstadual = ctk.CTkEntry(self.frameTelaCadastroFornecedores, placeholder_text="Nº inscrição", width=300, corner_radius=5, font=("Century Gothic bold", 20))
+        self.inscriçãoEstadual.place(x=100, y=330)
+
+        # código crt
+        self.labelcodigoCRT = ctk.CTkLabel(self.frameTelaCadastroFornecedores, text="CRT", font=("Century Gothic bold", 15))
+        self.labelcodigoCRT.place(x=450, y=300)
+        self.codigoCRT = ctk.CTkEntry(self.frameTelaCadastroFornecedores, placeholder_text="Código", width=300, corner_radius=5, font=("Century Gothic bold", 20))
+        self.codigoCRT.place(x=450, y=330)
+
+        # Telefone
+        self.labelTelefone = ctk.CTkLabel(self.frameTelaCadastroFornecedores, width=100, text="Telefone", font=("Century Gothic bold", 15), anchor="w")
+        self.labelTelefone.place(x=800, y=300)
+        self.telefone = ctk.CTkEntry(self.frameTelaCadastroFornecedores, placeholder_text="Telefone", width=300, corner_radius=5, font=("Century Gothic bold", 20))
+        self.telefone.place(x=800, y=330)
+
+        
+
+
+
+        # voltar
+        self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroFornecedores, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameTelaCadastroFornecedores.destroy)
+        self.botaoVoltar.place(x=200, y=600)
+        
+        # registra no bd
+        self.botaoCadastrarUsuario = ctk.CTkButton(self.frameTelaCadastroFornecedores, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=self.registraFornecedorNoBanco)
+        self.botaoCadastrarUsuario.place(x=800, y=600)
 
 
 
@@ -315,6 +469,92 @@ class App(ctk.CTk):
             messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
             self.frameTelaCadastroFuncionario.destroy()
    
+
+
+
+    # é chamado quando se cadastra um novo fornecedor
+    def registraFornecedorNoBanco(self):
+        # primeiro tem que pegar os checkbox
+        ativo = self.checkboxAtivo.get()
+        inativo = self.checkboxInativo.get()
+        CPFfornecedor = self.checkboxCPF.get()
+        PJfornecedor = self.checkboxPJ.get()
+        nacional = self.checkboxNacional.get()
+        estrangeira = self.checkboxEstrangeira.get()
+        fabricante = self.checkboxFabricante.get()
+        naoFabricante = self.checkboxNaoFabricante.get()
+        recebeEmail = self.checkboxRecebeEmail.get()
+        naoRecebeEmail = self.checkboxNaoRecebeEmail.get()
+
+        nomeReal = self.nomeFornecedor.get()
+        nomeFantasia = self.nomeFantasia.get()
+        inscricaoestadual = self.inscriçãoEstadual.get()
+        CRT = self.codigoCRT.get()
+        telefone = self.telefone.get()
+
+        if(ativo or inativo) and (CPFfornecedor or PJfornecedor) and (nacional or estrangeira) and (fabricante or naoFabricante) and (recebeEmail or naoFabricante) and (naoRecebeEmail or recebeEmail) and nomeReal and nomeFantasia and inscricaoestadual and CRT and telefone:
+            colunas = []
+            valores = []
+            if self.checkboxAtivo.get():
+                colunas.append("ativo")
+                valores.append("'Sim'")
+            if self.checkboxInativo.get():
+                colunas.append("ativo")
+                valores.append("'Não'")
+            if self.checkboxCPF.get():
+                colunas.append("tipo")
+                valores.append("'CPF'")
+            if self.checkboxPJ.get():
+                colunas.append("tipo")
+                valores.append("'CNPJ'")
+            if self.checkboxNacional.get():
+                colunas.append("origem")
+                valores.append("'Nacional'")
+            if self.checkboxEstrangeira.get():
+                colunas.append("origem")
+                valores.append("'Estrangeira'")
+            if self.checkboxFabricante.get():
+                colunas.append("fabricante")
+                valores.append("'Sim'")
+            if self.checkboxNaoFabricante.get():
+                colunas.append("fabricante")
+                valores.append("'Não'")
+            if self.checkboxRecebeEmail.get():
+                colunas.append("recebe_email")
+                valores.append("'Sim'")
+            if self.checkboxNaoRecebeEmail.get():
+                colunas.append("recebe_email")
+                valores.append("'Não'")
+            if self.nomeFornecedor.get():
+                colunas.append("nome_real")
+                valores.append(f"'{self.nomeFornecedor.get()}'")
+            if self.nomeFantasia.get():
+                colunas.append("nome_fantasia")
+                valores.append(f"'{self.nomeFantasia.get()}'")
+            if self.inscriçãoEstadual.get():
+                colunas.append("inscricao_estadual")
+                valores.append(f"'{self.inscriçãoEstadual.get()}'")
+            if self.codigoCRT.get():
+                colunas.append("CRT")
+                valores.append(f"'{self.codigoCRT.get()}'")
+            if self.telefone.get():
+                colunas.append("telefone")
+                valores.append(f"'{self.telefone.get()}'")
+
+            query = f"INSERT INTO fornecedores ({', '.join(colunas)}) VALUES ({', '.join(valores)})"
+            print("Query gerada:", query)
+        
+            db.cursor.execute(query)
+            db.conn.commit()
+        
+        else:
+            messagebox.showerror("erro", "valores estão em branco")
+
+            
+            
+
+
+        
     # é chamado quando se cadastra um novo usuário
     def registraProdutoNoBanco(self):
         nome = self.nomeProduto.get()
