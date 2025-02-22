@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import db
 from tkinter import messagebox
+import gc
 # import messagebox
 
 
@@ -350,13 +351,14 @@ class App(ctk.CTk):
                     case 10:
                         if hasattr(self, "emailFornecedor"):
                             self.emailFornecedor.destroy()
+                            gc.collect()
 
                         if hasattr(self, "labelEmailFornecedor"):
                             self.labelEmailFornecedor.destroy()
+                            gc.collect()
 
                         self.checkboxRecebeEmail.deselect()
                         return 10
-        
 
         self.frameTelaCadastroFornecedores = ctk.CTkFrame(self, height=700, width=1200, corner_radius=5)
         self.frameTelaCadastroFornecedores.place(x=40, y=100)      
@@ -437,9 +439,6 @@ class App(ctk.CTk):
         self.telefone.place(x=800, y=330)
 
         
-
-
-
         # voltar
         self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroFornecedores, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameTelaCadastroFornecedores.destroy)
         self.botaoVoltar.place(x=200, y=600)
@@ -469,9 +468,6 @@ class App(ctk.CTk):
             messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
             self.frameTelaCadastroFuncionario.destroy()
    
-
-
-
     # é chamado quando se cadastra um novo fornecedor
     def registraFornecedorNoBanco(self):
         # primeiro tem que pegar os checkbox
@@ -486,13 +482,15 @@ class App(ctk.CTk):
         recebeEmail = self.checkboxRecebeEmail.get()
         naoRecebeEmail = self.checkboxNaoRecebeEmail.get()
 
+        if hasattr(self, "emailFornecedor"):
+            emailFornecedor = self.emailFornecedor.get()
         nomeReal = self.nomeFornecedor.get()
         nomeFantasia = self.nomeFantasia.get()
         inscricaoestadual = self.inscriçãoEstadual.get()
         CRT = self.codigoCRT.get()
         telefone = self.telefone.get()
 
-        if(ativo or inativo) and (CPFfornecedor or PJfornecedor) and (nacional or estrangeira) and (fabricante or naoFabricante) and (recebeEmail or naoFabricante) and (naoRecebeEmail or recebeEmail) and nomeReal and nomeFantasia and inscricaoestadual and CRT and telefone:
+        if(ativo or inativo) and (CPFfornecedor or PJfornecedor) and (nacional or estrangeira) and (fabricante or naoFabricante) and (naoRecebeEmail or recebeEmail) and emailFornecedor and nomeReal and nomeFantasia and inscricaoestadual and CRT and telefone:
             colunas = []
             valores = []
             if self.checkboxAtivo.get():
@@ -525,6 +523,10 @@ class App(ctk.CTk):
             if self.checkboxNaoRecebeEmail.get():
                 colunas.append("recebe_email")
                 valores.append("'Não'")
+                if hasattr(self, "emailFornecedor"):
+                    if self.emailFornecedor.get():
+                        colunas.append("email")
+                        valores.append(f"{self.self.emailFornecedor.get()}")
             if self.nomeFornecedor.get():
                 colunas.append("nome_real")
                 valores.append(f"'{self.nomeFornecedor.get()}'")
@@ -550,11 +552,6 @@ class App(ctk.CTk):
         else:
             messagebox.showerror("erro", "valores estão em branco")
 
-            
-            
-
-
-        
     # é chamado quando se cadastra um novo usuário
     def registraProdutoNoBanco(self):
         nome = self.nomeProduto.get()
@@ -605,9 +602,6 @@ class App(ctk.CTk):
             self.frameUsuarioNaoCadastrado.place(relx=0.5, y=600, anchor="center")
             self.usuarioNaoCadastrado = ctk.CTkLabel(self.frameUsuarioNaoCadastrado,  text="Esse usuário não foi encontrado.", font=("Arial", 18))
             self.usuarioNaoCadastrado.place(x=20, y=35)
-
-
-
 
 
 if __name__ == "__main__":
