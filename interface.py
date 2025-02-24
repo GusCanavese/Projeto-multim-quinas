@@ -32,12 +32,11 @@ class App(ctk.CTk):
         alturaTela = 900
         larguraTela = 1280
         self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
-        self.telaCadastroTransportadoras()
+        self.telaLogin()
 
 
 
-
-# ! fazer a tela do cadastro de fornecedores
+    #? ===================== TELAS ===================== #
 
     # tela de login inicial
     def telaLogin(self):
@@ -128,6 +127,7 @@ class App(ctk.CTk):
         # botão de trocar usuário 
         self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Trocar usuário", width=200, corner_radius=5, font=("Arial", 18), command=self.frameTelaAcoes.destroy)
         self.botaoGerarOrcamento.place(relx=0.33, y=650, anchor="center")
+
 
 
     #? ===================== FUNÇÕES DAS TELAS DE CADASTRO ===================== #
@@ -579,6 +579,7 @@ class App(ctk.CTk):
         self.botaoCadastrarUsuario.place(x=800, y=600)
 
 
+
     #? ===================== FUNÇÕES DO BANCO DE DADOS ===================== #
 
     # é chamado quando é cadastrado um novo usuário
@@ -842,7 +843,7 @@ class App(ctk.CTk):
                 colunas.append("telefone")
                 valores.append(f"'{self.telefoneTransportadora.get()}'")
 
-            query = f"INSERT INTO fornecedores ({', '.join(colunas)}) VALUES ({', '.join(valores)})"
+            query = f"INSERT INTO transportadoras ({', '.join(colunas)}) VALUES ({', '.join(valores)})"
             print(query)
 
             db.cursor.execute(query)
