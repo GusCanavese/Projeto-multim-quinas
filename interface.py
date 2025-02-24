@@ -32,7 +32,7 @@ class App(ctk.CTk):
         alturaTela = 900
         larguraTela = 1280
         self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
-        self.telaLogin()
+        self.telaCadastroTransportadoras()
 
 
 
@@ -314,21 +314,25 @@ class App(ctk.CTk):
                         return 2
                     case 3:
                         self.checkboxPJ.deselect()
-                        self.labelCNPJFornecedor = ctk.CTkLabel(self.frameTelaCadastroFornecedores, text="Insira o CNPJ", font=("Century Gothic bold", 15))
-                        self.labelCNPJFornecedor.place(x=800, y=200)
-                        self.CNPJFornecedor = ctk.CTkEntry(self.frameTelaCadastroFornecedores, placeholder_text="CNPJ", width=300, corner_radius=5, font=("Century Gothic bold", 20))
-                        self.CNPJFornecedor.place(x=800, y=230)
-                        if hasattr(self, "CPFFornecedor"):
-                            self.CNPJFornecedor.destroy()
-                        return 3
-                    case 4:
-                        self.checkboxCPF.deselect()
                         self.labelCPFfornecedor = ctk.CTkLabel(self.frameTelaCadastroFornecedores, width=100, text="Insira o CPF", font=("Century Gothic bold", 15), anchor="w")
                         self.labelCPFfornecedor.place(x=800, y=200)
                         self.CPFfornecedor = ctk.CTkEntry(self.frameTelaCadastroFornecedores, placeholder_text="CPF", width=300, corner_radius=5, font=("Century Gothic bold", 20))
                         self.CPFfornecedor.place(x=800, y=230)
                         if hasattr(self, "CNPJFornecedor"):
                             self.CNPJFornecedor.destroy()
+                            del self.CNPJFornecedor
+                            gc.collect
+                        return 3
+                    case 4:
+                        self.checkboxCPF.deselect()
+                        self.labelCNPJFornecedor = ctk.CTkLabel(self.frameTelaCadastroFornecedores, text="Insira o CNPJ", font=("Century Gothic bold", 15))
+                        self.labelCNPJFornecedor.place(x=800, y=200)
+                        self.CNPJFornecedor = ctk.CTkEntry(self.frameTelaCadastroFornecedores, placeholder_text="CNPJ", width=300, corner_radius=5, font=("Century Gothic bold", 20))
+                        self.CNPJFornecedor.place(x=800, y=230)
+                        if hasattr(self, "CPFfornecedor"):
+                            self.CPFfornecedor.destroy()
+                            del self.CPFfornecedor
+                            gc.collect
                         return 4
                     case 5:
                         self.checkboxEstrangeira.deselect()
@@ -352,10 +356,12 @@ class App(ctk.CTk):
                     case 10:
                         if hasattr(self, "emailFornecedor"):
                             self.emailFornecedor.destroy()
+                            del self.emailFornecedor
                             gc.collect()
 
                         if hasattr(self, "labelEmailFornecedor"):
                             self.labelEmailFornecedor.destroy()
+                            del self.labelEmailFornecedor
                             gc.collect()
 
                         self.checkboxRecebeEmail.deselect()
@@ -470,6 +476,7 @@ class App(ctk.CTk):
                     self.CPFTransportadora.place(x=800, y=230)
                     if hasattr(self, "CNPJTransportadora"):
                         self.CNPJTransportadora.destroy()
+                        del self.CNPJTransportadora
                         gc.collect()
                     return 3
                 case 4:
@@ -480,6 +487,7 @@ class App(ctk.CTk):
                     self.CNPJTransportadora.place(x=800, y=230)
                     if hasattr(self, "CPFTransportadora"):
                         self.CPFTransportadora.destroy()
+                        del self.CPFTransportadora
                         gc.collect()
                     return 4
                 case 5:
@@ -492,10 +500,12 @@ class App(ctk.CTk):
                 case 6:
                     if hasattr(self, "emailTransportadora"):
                         self.emailTransportadora.destroy()
+                        del self.emailTransportadora
                         gc.collect()
 
                     if hasattr(self, "labelEmailTransportadora"):
                         self.labelEmailTransportadora.destroy()
+                        del self.labelEmailTransportadora
                         gc.collect()
 
                     self.checkboxRecebeEmailTransportadora.deselect()
@@ -565,7 +575,7 @@ class App(ctk.CTk):
         self.botaoVoltar.place(x=200, y=600)
         
         # registra no bd
-        self.botaoCadastrarUsuario = ctk.CTkButton(self.frameTelaCadastroTransportadoras, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=self)
+        self.botaoCadastrarUsuario = ctk.CTkButton(self.frameTelaCadastroTransportadoras, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=self.registraTransportadoraNoBanco)
         self.botaoCadastrarUsuario.place(x=800, y=600)
 
 
@@ -602,15 +612,45 @@ class App(ctk.CTk):
         recebeEmail = self.checkboxRecebeEmail.get()
         naoRecebeEmail = self.checkboxNaoRecebeEmail.get()
 
-        if hasattr(self, "emailFornecedor"):
-            emailFornecedor = self.emailFornecedor.get()
         nomeReal = self.nomeFornecedor.get()
         nomeFantasia = self.nomeFantasia.get()
         inscricaoestadual = self.inscriçãoEstadual.get()
         CRT = self.codigoCRT.get()
         telefone = self.telefone.get()
+        
+        #! coloca a checkbox esteja em branco
 
-        if(ativo or inativo) and (CPFfornecedor or PJfornecedor) and (nacional or estrangeira) and (fabricante or naoFabricante) and (naoRecebeEmail or recebeEmail) and emailFornecedor and nomeReal and nomeFantasia and inscricaoestadual and CRT and telefone:
+
+        if hasattr(self, "CNPJFornecedor"):
+            print("tem cnpj")
+            cnpjfornecedor = self.CNPJFornecedor.get()
+            print(cnpjfornecedor)
+            if hasattr(self, "emailFornecedor"):
+                emailFornecedor = self.emailFornecedor.get()
+                if emailFornecedor:
+                    condicaoEmailFornecedor = (ativo or inativo) and (CPFfornecedor or PJfornecedor) and (nacional or estrangeira) and (fabricante or naoFabricante) and (naoRecebeEmail or recebeEmail) and cnpjfornecedor and emailFornecedor and nomeReal and nomeFantasia and inscricaoestadual and CRT and telefone
+                else:
+                    messagebox.showerror("erro", "valores estão em branco")
+            else:
+                condicaoEmailFornecedor = (ativo or inativo) and (CPFfornecedor or PJfornecedor) and (nacional or estrangeira) and (fabricante or naoFabricante) and (naoRecebeEmail or recebeEmail) and nomeReal and nomeFantasia and inscricaoestadual and CRT and telefone
+        
+        elif hasattr(self, "CPFfornecedor") and self.CPFfornecedor:
+            print("tem cpf")
+            cpffornecedor = self.CPFfornecedor.get()
+            print(cpffornecedor)
+            if hasattr(self, "emailFornecedor"):
+                emailFornecedor = self.emailFornecedor.get()
+                if emailFornecedor:
+                    condicaoEmailFornecedor = (ativo or inativo) and (CPFfornecedor or PJfornecedor) and (nacional or estrangeira) and (fabricante or naoFabricante) and (naoRecebeEmail or recebeEmail) and cpffornecedor and emailFornecedor and nomeReal and nomeFantasia and inscricaoestadual and CRT and telefone
+                else:
+                    messagebox.showerror("erro", "valores estão em branco")
+            else:
+                condicaoEmailFornecedor = (ativo or inativo) and (CPFfornecedor or PJfornecedor) and (nacional or estrangeira) and (fabricante or naoFabricante) and (naoRecebeEmail or recebeEmail) and nomeReal and nomeFantasia and inscricaoestadual and CRT and telefone
+        else:
+            messagebox.showerror("erro", "valores estão em branco")
+
+
+        if condicaoEmailFornecedor:
             colunas = []
             valores = []
             if self.checkboxAtivo.get():
@@ -622,9 +662,15 @@ class App(ctk.CTk):
             if self.checkboxCPF.get():
                 colunas.append("tipo")
                 valores.append("'CPF'")
+                if self.CPFfornecedor.get():
+                    colunas.append("CPF")
+                    valores.append(f"'{self.CPFfornecedor.get()}'")
             if self.checkboxPJ.get():
                 colunas.append("tipo")
                 valores.append("'CNPJ'")
+                if self.CNPJFornecedor.get():
+                    colunas.append("CNPJ")
+                    valores.append(f"'{self.CNPJFornecedor.get()}'")
             if self.checkboxNacional.get():
                 colunas.append("origem")
                 valores.append("'Nacional'")
@@ -640,13 +686,14 @@ class App(ctk.CTk):
             if self.checkboxRecebeEmail.get():
                 colunas.append("recebe_email")
                 valores.append("'Sim'")
-            if self.checkboxNaoRecebeEmail.get():
-                colunas.append("recebe_email")
-                valores.append("'Não'")
                 if hasattr(self, "emailFornecedor"):
                     if self.emailFornecedor.get():
                         colunas.append("email")
-                        valores.append(f"{self.self.emailFornecedor.get()}")
+                        valores.append(f"'{self.emailFornecedor.get()}'")
+            if self.checkboxNaoRecebeEmail.get():
+                colunas.append("recebe_email")
+                valores.append("'Não'")
+                print("email nao existe")
             if self.nomeFornecedor.get():
                 colunas.append("nome_real")
                 valores.append(f"'{self.nomeFornecedor.get()}'")
@@ -668,11 +715,17 @@ class App(ctk.CTk):
         
             db.cursor.execute(query)
             db.conn.commit()
+
+            messagebox.showinfo("Sucesso", "O fornecedor foi cadastrado com sucesso!")
+            self.frameTelaCadastroFornecedores.destroy()
+            gc.collect()
+
+
         
         else:
             messagebox.showerror("erro", "valores estão em branco")
 
-    # é chamado quando se cadastra um novo usuário
+    # é chamado quando se cadastra um novo produto
     def registraProdutoNoBanco(self):
         nome = self.nomeProduto.get()
         valorCusto = self.ValorCusto.get()
@@ -697,6 +750,111 @@ class App(ctk.CTk):
             db.conn.commit()
             messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
             self.frameTelaCadastroProduto.destroy()
+
+    # é chamado ao cadastrar uma transportadora 
+    def registraTransportadoraNoBanco(self):
+        # pegando checkbox
+        ativoTransportadora   = self.checkboxAtivoTransportadora.get()
+        inativoTransportadora = self.checkboxInativoTransportadora.get()
+        varCPFTransportadora = self.checkboxCPFTransportadora.get()
+        PJTransportadora = self.checkboxPJTransportadora.get()
+        recebeEmailTransportadora = self.checkboxRecebeEmailTransportadora.get()
+        naoRecebeEmailTransportadora = self.checkboxNaoRecebeEmailTransportadora.get()
+
+        # pegando entradas
+        nomeTransportadora = self.nomeTransportadora.get()
+        nomeFantasiaTranportadora = self.nomeFantasiaTransportadora.get()
+        inscricaoEstadualtransportadora = self.inscriçãoEstadualTransportadora.get()
+        telefoneTransportadora = self.telefoneTransportadora.get()
+        descricaoTransportadora = self.descricaoTransportadora.get()
+
+        if hasattr(self, "CNPJTransportadora") and self.CNPJTransportadora:
+            print("tem cnpj")
+            cnpjTransportadora = self.CNPJTransportadora.get()
+            if hasattr(self, "emailTransportadora"):
+                print("tem email")
+                varEmailTransportadora = self.emailTransportadora.get()
+                if varEmailTransportadora:
+                    condicaoQueryTransportadora = (ativoTransportadora or inativoTransportadora) and (varCPFTransportadora or PJTransportadora) and (recebeEmailTransportadora or naoRecebeEmailTransportadora) and nomeTransportadora and nomeFantasiaTranportadora and inscricaoEstadualtransportadora and telefoneTransportadora and descricaoTransportadora and cnpjTransportadora and varEmailTransportadora
+                else:
+                    messagebox.showerror("erro", "campos estão em branco")
+            else:
+                condicaoQueryTransportadora = (ativoTransportadora or inativoTransportadora) and (varCPFTransportadora or PJTransportadora) and (recebeEmailTransportadora or naoRecebeEmailTransportadora) and nomeTransportadora and nomeFantasiaTranportadora and inscricaoEstadualtransportadora and telefoneTransportadora and descricaoTransportadora and cnpjTransportadora
+
+        elif hasattr(self, "CPFTransportadora") and self.CPFTransportadora:
+            print("tem cpf")
+            cpfTransportadora = self.CPFTransportadora.get()
+            if hasattr(self, "emailTransportadora"):
+                print("tem email")
+                varEmailTransportadora = self.emailTransportadra.get()
+                if varEmailTransportadora:
+                    condicaoQueryTransportadora = (ativoTransportadora or inativoTransportadora) and (varCPFTransportadora or PJTransportadora) and (recebeEmailTransportadora or naoRecebeEmailTransportadora) and nomeTransportadora and nomeFantasiaTranportadora and inscricaoEstadualtransportadora and telefoneTransportadora and descricaoTransportadora and cpfTransportadora and varEmailTransportadora
+                else:
+                    messagebox.showerror("erro", "campos estão em branco")
+            else:
+                condicaoQueryTransportadora = (ativoTransportadora or inativoTransportadora) and (varCPFTransportadora or PJTransportadora) and (recebeEmailTransportadora or naoRecebeEmailTransportadora) and nomeTransportadora and nomeFantasiaTranportadora and inscricaoEstadualtransportadora and telefoneTransportadora and descricaoTransportadora and cpfTransportadora
+        else:
+            messagebox.showerror("Erro", "campos estão em branco")
+                    
+
+        if condicaoQueryTransportadora:
+            colunas = []
+            valores = []
+            if self.checkboxAtivoTransportadora.get():
+                colunas.append("ativo")
+                valores.append("'Sim'")
+            if self.checkboxInativoTransportadora.get():
+                colunas.append("ativo")
+                valores.append("'Não'")
+            if self.checkboxCPFTransportadora.get():
+                colunas.append("tipo")
+                valores.append("'CPF'")
+                if self.CPFTransportadora.get():
+                    colunas.append("CPF")
+                    valores.append(f"'{self.CPFTransportadora.get()}'")
+            if self.checkboxPJTransportadora.get():
+                colunas.append("tipo")
+                valores.append("'CNPJ'")
+                if self.CNPJTransportadora.get():
+                    colunas.append("CNPJ")
+                    valores.append(f"'{self.CNPJTransportadora.get()}'")
+            if self.checkboxRecebeEmailTransportadora.get():
+                colunas.append("recebe_email")
+                valores.append("'Sim'")
+                if hasattr(self, "emailTransportadora"):
+                    if self.emailTransportadora.get():
+                        colunas.append("email")
+                        valores.append(f"'{self.emailTransportadora.get()}'")
+            if self.checkboxNaoRecebeEmailTransportadora.get():
+                colunas.append("recebe_email")
+                valores.append("'Não'")
+                print("email nao existe")
+            if self.nomeTransportadora.get():
+                colunas.append("nome_real")
+                valores.append(f"'{self.nomeTransportadora.get()}'")
+            if self.nomeFantasiaTransportadora.get():
+                colunas.append("nome_fantasia")
+                valores.append(f"'{self.nomeFantasiaTransportadora.get()}'")
+            if self.inscriçãoEstadualTransportadora.get():
+                colunas.append("inscricao_estadual")
+                valores.append(f"'{self.inscriçãoEstadualTransportadora.get()}'")
+            if self.telefoneTransportadora.get():
+                colunas.append("telefone")
+                valores.append(f"'{self.telefoneTransportadora.get()}'")
+
+            query = f"INSERT INTO fornecedores ({', '.join(colunas)}) VALUES ({', '.join(valores)})"
+            print(query)
+
+            db.cursor.execute(query)
+            db.conn.commit()
+
+            messagebox.showinfo("Sucesso", "A transportadora foi cadastrado com sucesso!")
+            self.frameTelaCadastroTransportadoras.destroy()
+            gc.collect()
+        
+        
+        else:
+            messagebox.showerror("erro", "valores estão em branco")
 
     # é chamado quando estamos entrando no sistema
     def consultarUsuarioCadastrado(self):

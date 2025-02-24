@@ -39,6 +39,7 @@ ANOTAÇÕES
 - sumir com a mensagem de campos obrigatorios do cadastro de produtos
 - fazer com que a mensagem de usuario nao cadastrado apareça somente quando nao encontrar o usuário que procurou
 - colocar numero de série no produto
+- tornar o campo CPF ou CNPJ de fornecedor, obrigatório
 
 
 
