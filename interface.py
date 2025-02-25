@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import db
 from tkinter import messagebox
+import datetime
 import gc
 # import messagebox
 
@@ -32,8 +33,7 @@ class App(ctk.CTk):
         alturaTela = 900
         larguraTela = 1280
         self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
-        self.telaLogin()
-
+        self.telaGerarPedido()
 
 
     #? ===================== TELAS ===================== #
@@ -85,7 +85,7 @@ class App(ctk.CTk):
             self.botaoRelatorioDeVendas.place(relx=0.66, y=200, anchor="center")
 
             # botão de gerar pedidos # ! ainda não está ativo nem possui uma tela criada para ele
-            self.botaogGerarPedido = ctk.CTkButton(self.frameTelaAcoes, text="Gerar pedido", width=300, corner_radius=5, font=("Arial", 18), command=self)
+            self.botaogGerarPedido = ctk.CTkButton(self.frameTelaAcoes, text="Gerar pedido", width=300, corner_radius=5, font=("Arial", 18), command=self.telaDefineCnpjDoProduto)
             self.botaogGerarPedido.place(relx=0.33, y=250, anchor="center")
 
             # botão de consultar estoque # ! ainda não está ativo nem possui uma tela criada para ele 
@@ -96,7 +96,7 @@ class App(ctk.CTk):
             self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Gerar orçamento", width=300, corner_radius=5, font=("Arial", 18), command=self)
             self.botaoGerarOrcamento.place(relx=0.33, y=200, anchor="center") 
         else:
-            # botão do cadastro de funcionarios
+            # botão do cada
             self.botaoCadastro = ctk.CTkButton(self.frameTelaAcoes, text="Cadastros", width=300, corner_radius=5, font=("Arial", 18), command=self.telaCadastros)
             self.botaoCadastro.place(relx=0.33, y=200, anchor="center")
 
@@ -105,7 +105,7 @@ class App(ctk.CTk):
             self.botaoRelatorioDeVendas.place(relx=0.66, y=200, anchor="center")
 
             # botão de gerar pedidos # ! ainda não está ativo nem possui uma tela criada para ele
-            self.botaogGerarPedido = ctk.CTkButton(self.frameTelaAcoes, text="Gerar pedido", width=300, corner_radius=5, font=("Arial", 18), command=self)
+            self.botaogGerarPedido = ctk.CTkButton(self.frameTelaAcoes, text="Gerar pedido", width=300, corner_radius=5, font=("Arial", 18), command=self.telaDefineCnpjDoProduto)
             self.botaogGerarPedido.place(relx=0.33, y=250, anchor="center")
 
             # botão de contas a pagar e a receber da loja # ! ainda não está ativo nem possui uma tela criada para ele 
@@ -231,14 +231,14 @@ class App(ctk.CTk):
         self.OrigemCST.place(x=100, y=330)
         
         # descrição
-        self.labelDescricao = ctk.CTkLabel(self.frameTelaCadastroProduto, text="Descrição", font=("Century Gothic bold", 15))
+        self.labelFuncionaria = ctk.CTkLabel(self.frameTelaCadastroProduto, text="Descrição", font=("Century Gothic bold", 15))
         self.labelDescricao.place(x=435, y=300)
         opcoesDescricao = ["Nenhum","Uso consumo", "Mercadoria para revenda", "Peças para reposição"]
         self.Descricao = ctk.CTkComboBox(self.frameTelaCadastroProduto, width=310, corner_radius=5, font=("Century Gothic bold", 20), values=opcoesDescricao)
         self.Descricao.place(x=435, y=330)
         
         # código interno
-        self.labelCNPJ = ctk.CTkLabel(self.frameTelaCadastroProduto, text="Origem (CST A)", font=("Century Gothic bold", 15))
+        self.labelCNPJ = ctk.CTkLabel(self.frameTelaCadastroProduto, text="CNPJ", font=("Century Gothic bold", 15))
         self.labelCNPJ.place(x=770, y=300)
         opcoesCNPJ = ["Nenhum","Multimáquinas", "Polimáquinas", "Refrimaquinas"]
         self.CNPJ = ctk.CTkComboBox(self.frameTelaCadastroProduto, width=310, corner_radius=5, font=("Century Gothic bold", 20), values=opcoesCNPJ)
@@ -395,7 +395,7 @@ class App(ctk.CTk):
         self.checkboxNacional = ctk.CTkCheckBox(self.frameTelaCadastroFornecedores, text="Nacional", command=lambda: self.after(10, lambda: meDesmarque(5)))
         self.checkboxNacional.place(x=540, y=120, anchor="center")
         self.checkboxEstrangeira = ctk.CTkCheckBox(self.frameTelaCadastroFornecedores, text="Estrangeira", command=lambda: self.after(10, lambda: meDesmarque(6)))
-        self.checkboxEstrangeira.place(x=630, y=120, anchor="center")
+        self.checkboxEstrangeira.place(x=9, y=120, anchor="center")
         self.checkboxOrigemLabel = ctk.CTkLabel(self.frameTelaCadastroFornecedores, height=0, text="ORIGEM", font=("Century Gothic bold", 14))
         self.checkboxOrigemLabel.place(x=520, y=90, anchor="center")
 
@@ -512,8 +512,8 @@ class App(ctk.CTk):
                     return 6
 
         # titulo
-        self.textoCadastroFornecedores = ctk.CTkLabel(self.frameTelaCadastroTransportadoras, height=0, text="Cadastrar Transportadoras", font=("Century Gothic bold", 30))
-        self.textoCadastroFornecedores.place(relx=0.5, y=40, anchor="center")
+        self.tituloCadastroTransportadora = ctk.CTkLabel(self.frameTelaCadastroTransportadoras, height=0, text="Cadastrar Transportadoras", font=("Century Gothic bold", 30))
+        self.tituloCadastroTransportadora.place(relx=0.5, y=40, anchor="center")
 
         # checkbox ATIVO
         self.checkboxAtivoTransportadora = ctk.CTkCheckBox(self.frameTelaCadastroTransportadoras, text="Sim", command=lambda: self.after(10, lambda: meDesmarqueTransportadora(1)))
@@ -578,6 +578,92 @@ class App(ctk.CTk):
         self.botaoCadastrarUsuario = ctk.CTkButton(self.frameTelaCadastroTransportadoras, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=self.registraTransportadoraNoBanco)
         self.botaoCadastrarUsuario.place(x=800, y=600)
 
+
+
+
+
+    #? ===================== FUNÇÕES DA TELA DE GERAR PEDIDO ===================== #
+
+    def telaDefineCnpjDoProduto(self):
+        self.frameDefineCnpjDoProduto = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
+        self.frameDefineCnpjDoProduto.place(x=140, y=100)     
+        self.frameDefineCnpjDoProduto.grid_propagate(False)
+        
+        def confereCNPJpreenchido():
+            if self.consultaCNPJ.get() != "Nenhum":
+                self.telaGerarPedido()
+            else:
+                if hasattr(self, "labelCNPJNaoPreenchido"):
+                    del self.labelCNPJNaoPreenchido
+                    gc.collect
+                self.labelCNPJNaoPreenchido = ctk.CTkLabel(self.frameDefineCnpjDoProduto, text="Nenhum CNPJ selecionado", text_color="red", font=("Century Gothic bold", 15))
+                self.labelCNPJNaoPreenchido.place(relx=0.5, y=400, anchor="center")
+
+        # título
+        self.tituloDefineCnpj = ctk.CTkLabel(self.frameDefineCnpjDoProduto, height=0, text="Escolha o cnpj para a venda", font=("Century Gothic bold", 30))
+        self.tituloDefineCnpj.place(relx=0.5, y=40, anchor="center")
+
+        # cnpj que será a consulta no banco de dados
+        self.labelConsultaCNPJ = ctk.CTkLabel(self.frameDefineCnpjDoProduto, text="Digite o cnpj que a venda será efetuada", font=("Century Gothic bold", 15))
+        self.labelConsultaCNPJ.place(relx=0.5, y=300, anchor="center")
+        opcoesCNPJ = ["Nenhum","Multimáquinas", "Polimáquinas", "Refrimaquinas"]
+        self.consultaCNPJ = ctk.CTkComboBox(self.frameDefineCnpjDoProduto, width=310, corner_radius=5, font=("Century Gothic bold", 20), values=opcoesCNPJ)
+        self.consultaCNPJ.place(relx=0.5, y=330, anchor="center")
+
+        # voltar
+        self.botaoVoltar = ctk.CTkButton(self.frameDefineCnpjDoProduto, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameDefineCnpjDoProduto.destroy)
+        self.botaoVoltar.place(x=200, y=600)
+        
+        # ir para gerar pedido
+        self.botaoCadastrarUsuario = ctk.CTkButton(self.frameDefineCnpjDoProduto, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=confereCNPJpreenchido)
+        self.botaoCadastrarUsuario.place(x=600, y=600)
+
+        
+
+
+
+
+
+    def telaGerarPedido(self):
+        self.frameTelaGerarPedido = ctk.CTkFrame(self, height=700, width=1200, corner_radius=5)
+        self.frameTelaGerarPedido.place(x=40, y=100)      
+        self.frameTelaGerarPedido.grid_propagate(False)
+
+        # título
+        self.textoGerarPedido = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Gerar pedido", font=("Century Gothic bold", 30))
+        self.textoGerarPedido.place(relx=0.5, y=40, anchor="center")
+
+        # entrada da do número da venda #!seria bom ser auto increment
+        self.labelDataCriacao = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Número da venda", font=("Century Gothic bold", 14))
+        self.labelDataCriacao.place(x=30, y=75)
+        self.dataDeCriacao = ctk.CTkEntry(self.frameTelaGerarPedido, placeholder_text="Número", width=180, corner_radius=5, font=("Arial", 15))
+        self.dataDeCriacao.place(x=30, y=100)
+
+        # entrada da data da criação do pedido
+        self.labelDataDeCriacao = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Data de criação", font=("Century Gothic bold", 14))
+        self.labelDataDeCriacao.place(x=250, y=75)
+        self.dataDeCriacao = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=ctk.StringVar(value=datetime.datetime.now().strftime("%d/%m/%y")), width=180, corner_radius=5, font=("Arial", 15))
+        self.dataDeCriacao.place(x=250, y=100)
+
+        # entrada da data da venda
+        self.labelDataDaVenda = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Data da venda", font=("Century Gothic bold", 14))
+        self.labelDataDaVenda.place(x=470, y=75)
+        self.dataDaVenda = ctk.CTkEntry(self.frameTelaGerarPedido, placeholder_text="DD/MM/AAAA",  width=180, corner_radius=5, font=("Arial", 15))
+        self.dataDaVenda.place(x=470, y=100)
+
+        # Status da venda
+        self.variavelEmAbertoFechado = "Em aberto"
+        self.labelStatusDoPedido = ctk.CTkLabel(self.frameTelaGerarPedido, text="Status", font=("Century Gothic bold", 14))
+        self.labelStatusDoPedido.place(x=690, y=75)
+        self.statusDoPedido = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=ctk.StringVar(value=self.variavelEmAbertoFechado), placeholder_text="DD/MM/AAAA", width=180, corner_radius=5, font=("Arial", 15))
+        self.statusDoPedido.place(x=690, y=100)
+
+        # qual funcionaria ta fazendo a venda?
+        self.labelFuncionaria = ctk.CTkLabel(self.frameTelaGerarPedido, text="Vendedor(a)", font=("Century Gothic bold", 15))
+        self.labelFuncionaria.place(x=910, y=75)
+        opcoesFuncionaria = ["Nenhum","Bruna", "Camila", "Vânia", "Yara", "Mauricio", "Ana Flávia"]
+        self.funcionariaPedido = ctk.CTkComboBox(self.frameTelaGerarPedido, width=180, corner_radius=5, font=("Century Gothic bold", 15), values=opcoesFuncionaria)
+        self.funcionariaPedido.place(x=910, y=100)
 
 
     #? ===================== FUNÇÕES DO BANCO DE DADOS ===================== #
@@ -743,7 +829,7 @@ class App(ctk.CTk):
 
         if not(nome and valorCusto and valorVenda and quantidade and codigoInterno and NCM and CFOP and CEST and origemCST and descricao and CNPJ):
             self.frameProdutoNaoCadastrado = ctk.CTkFrame(self, height=60, width=300, corner_radius=5, border_width=2, border_color="red",fg_color="transparent")
-            self.frameProdutoNaoCadastrado.place(relx=0.5, y=600, anchor="center")
+            self.frameProdutoNaoCadastrado.place(relx=0.5, y=600, )
             self.ProdutoNaoCadastrado = ctk.CTkLabel(self.frameProdutoNaoCadastrado,  text="Prencha os campos obrigatórios", font=("Arial", 18))
             self.ProdutoNaoCadastrado.place(relx=0.5, y=30, anchor="center")
         else:

@@ -1,5 +1,6 @@
 import requests
 import customtkinter as ctk
+import db
 
 # Função para buscar o CEP e preencher os campos
 def buscar_cep():
@@ -64,3 +65,56 @@ entry_endereco.pack(pady=5)
 
 # Iniciar loop da interface
 root.mainloop()
+
+
+
+
+
+
+
+# Configuração do CustomTkinter
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
+
+# Conectar ao MySQL
+
+
+# Função para buscar produto no banco de dados
+def buscar_produto():
+    termo = entry_busca.get()
+    
+    if not termo.strip():
+        resultado_label.configure(text="Digite um nome ou código!")
+        return
+
+    query = "SELECT id, nome, preco FROM produtos WHERE nome LIKE %s OR id = %s"
+    db.cursor.execute(query, (f"%{termo}%", termo if termo.isdigit() else None))
+
+    resultados = db.cursor.fetchall()
+
+    if resultados:
+        texto_resultado = "\n".join([f"ID: {r[0]} | Nome: {r[1]} | Preço: R$ {r[2]:.2f}" for r in resultados])
+    else:
+        texto_resultado = "Produto não encontrado."
+
+    resultado_label.configure(text=texto_resultado)
+
+# Criar a Janela Principal
+janela = ctk.CTk()
+janela.geometry("500x400")
+janela.title("Busca de Produtos")
+
+# Campo de Busca
+entry_busca = ctk.CTkEntry(janela, placeholder_text="Digite um nome ou código")
+entry_busca.pack(pady=20)
+
+# Botão de Buscar
+botao_buscar = ctk.CTkButton(janela, text="Buscar", command=buscar_produto)
+botao_buscar.pack()
+
+# Label para Mostrar Resultados
+resultado_label = ctk.CTkLabel(janela, text="")
+resultado_label.pack(pady=20)
+
+# Rodar a aplicação
+janela.mainloop()
