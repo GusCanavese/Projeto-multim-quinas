@@ -3,6 +3,7 @@ import db
 from tkinter import messagebox
 import datetime
 import gc
+from PIL import Image
 # import messagebox
 
 
@@ -232,7 +233,7 @@ class App(ctk.CTk):
         
         # descrição
         self.labelFuncionaria = ctk.CTkLabel(self.frameTelaCadastroProduto, text="Descrição", font=("Century Gothic bold", 15))
-        self.labelDescricao.place(x=435, y=300)
+        self.labelFuncionaria.place(x=435, y=300)
         opcoesDescricao = ["Nenhum","Uso consumo", "Mercadoria para revenda", "Peças para reposição"]
         self.Descricao = ctk.CTkComboBox(self.frameTelaCadastroProduto, width=310, corner_radius=5, font=("Century Gothic bold", 20), values=opcoesDescricao)
         self.Descricao.place(x=435, y=330)
@@ -445,7 +446,6 @@ class App(ctk.CTk):
         self.telefone = ctk.CTkEntry(self.frameTelaCadastroFornecedores, placeholder_text="Telefone", width=300, corner_radius=5, font=("Century Gothic bold", 20))
         self.telefone.place(x=800, y=330)
 
-        
         # voltar
         self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroFornecedores, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameTelaCadastroFornecedores.destroy)
         self.botaoVoltar.place(x=200, y=600)
@@ -644,13 +644,9 @@ class App(ctk.CTk):
         self.botaoCadastrarUsuario = ctk.CTkButton(self.frameDefineCnpjDoProduto, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=confereCNPJpreenchido)
         self.botaoCadastrarUsuario.place(x=600, y=600)
 
-        
-
-
-
-
-
     def telaGerarPedido(self):
+
+
         self.frameTelaGerarPedido = ctk.CTkFrame(self, height=700, width=1200, corner_radius=5)
         self.frameTelaGerarPedido.place(x=40, y=100)      
         self.frameTelaGerarPedido.grid_propagate(False)
@@ -660,10 +656,10 @@ class App(ctk.CTk):
         self.textoGerarPedido.place(relx=0.5, y=40, anchor="center")
 
         # entrada da do número da venda #!seria bom ser auto increment
-        self.labelDataCriacao = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Número da venda", font=("Century Gothic bold", 14))
-        self.labelDataCriacao.place(x=30, y=75)
-        self.dataDeCriacao = ctk.CTkEntry(self.frameTelaGerarPedido, placeholder_text="Número", width=180, corner_radius=5, font=("Arial", 15))
-        self.dataDeCriacao.place(x=30, y=100)
+        self.labelNumeroDataVenda = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Número da venda", font=("Century Gothic bold", 14))
+        self.labelNumeroDataVenda.place(x=30, y=75)
+        self.numeroDeVenda = ctk.CTkEntry(self.frameTelaGerarPedido, placeholder_text="Número", width=180, corner_radius=5, font=("Arial", 15))
+        self.numeroDeVenda.place(x=30, y=100)
 
         # entrada da data da criação do pedido
         self.labelDataDeCriacao = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Data de criação", font=("Century Gothic bold", 14))
@@ -684,13 +680,67 @@ class App(ctk.CTk):
         self.statusDoPedido = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=ctk.StringVar(value=self.variavelEmAbertoFechado), placeholder_text="DD/MM/AAAA", width=180, corner_radius=5, font=("Arial", 15))
         self.statusDoPedido.place(x=690, y=100)
 
-        # qual funcionaria ta fazendo a venda?
+        # qual funcionaria ta fazendo a venda? #! PEGAR O USUÁRIO QUE ESTÁ LOGADO
         self.labelFuncionaria = ctk.CTkLabel(self.frameTelaGerarPedido, text="Vendedor(a)", font=("Century Gothic bold", 15))
         self.labelFuncionaria.place(x=910, y=75)
         opcoesFuncionaria = ["Nenhum","Bruna", "Camila", "Vânia", "Yara", "Mauricio", "Ana Flávia"]
         self.funcionariaPedido = ctk.CTkComboBox(self.frameTelaGerarPedido, width=180, corner_radius=5, font=("Century Gothic bold", 15), values=opcoesFuncionaria)
         self.funcionariaPedido.place(x=910, y=100)
 
+
+        # pesquisa que fica aparecendo e sumindo os valores que estou pesquisando
+
+
+        def buscaCliente(event=None):
+            nomeDoCliente = self.nomeDoClienteBuscado.get()
+            queryBuscaCliente = "SELECT nome FROM clientes WHERE nome LIKE %s"
+            db.cursor.execute(queryBuscaCliente, (f"%{nomeDoCliente}%",))
+            resultado = db.cursor.fetchall()
+
+            if hasattr(self, 'resultadoLabels'):
+                for label in self.resultadoLabels: 
+                    label.destroy()
+
+            self.resultadoLabels = []
+
+            yNovo = 230  
+            for i, row in enumerate(resultado):
+                if i>=5:
+                    break
+                label = ctk.CTkButton(self.frameTelaGerarPedido, width=280, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda value=row[0]: selecionaCliente(value))
+                label.place(x=30, y=yNovo)
+                self.resultadoLabels.append(label)  
+                yNovo += 30
+
+
+            def selecionaCliente(valor):
+                self.nomeDoClienteBuscado.delete(0, "end")
+                self.nomeDoClienteBuscado.insert(0, valor)
+                for label in self.resultadoLabels: 
+                    label.destroy()
+
+
+
+        iconeLupa = ctk.CTkImage(light_image=Image.open("search.png"), size=(20, 20))
+        labelIcone = ctk.CTkButton(self.frameTelaGerarPedido, image=iconeLupa, fg_color="#38343c", width=30, corner_radius=5, command=buscaCliente)
+        labelIcone.place(x=30, y=200)
+        self.labelNomeDoCliente = ctk.CTkLabel(self.frameTelaGerarPedido, text="Nome do cliente", font=("Century Gothic", 14))
+        self.labelNomeDoCliente.place(x=30, y=170)
+        self.nomeDoClienteBuscado = ctk.CTkEntry(self.frameTelaGerarPedido, placeholder_text="Nome do Cliente", width=250, corner_radius=5, font=("Arial", 15))
+        self.nomeDoClienteBuscado.place(x=60, y=200)
+        self.nomeDoClienteBuscado.bind("<KeyRelease>", buscaCliente)  # Chama a busca ao digitar
+
+
+
+
+
+        #* vai para testes
+        # CNPJ, deixar o cnpj que será feita a venda
+        self.variavelEmAbertoFechado = "Em aberto"
+        self.labelStatusDoPedido = ctk.CTkLabel(self.frameTelaGerarPedido, text="Status", font=("Century Gothic bold", 14))
+        self.labelStatusDoPedido.place(x=600, y=175)
+        self.statusDoPedido = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=ctk.StringVar(value=self.variavelEmAbertoFechado), placeholder_text="DD/MM/AAAA", width=180, corner_radius=5, font=("Arial", 15))
+        self.statusDoPedido.place(x=600, y=200)
 
     #? ===================== FUNÇÕES DO BANCO DE DADOS ===================== #
 
