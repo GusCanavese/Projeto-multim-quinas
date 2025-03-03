@@ -645,11 +645,348 @@ class App(ctk.CTk):
         self.botaoCadastrarUsuario.place(x=600, y=600)
 
     def telaGerarPedido(self):
+        self.variavelCnpjBuscado = None
+        self.variavelCtkEntry = ctk.StringVar() #esses 2 só inicializam para conseguir usar fora da função
+        self.variavelIndiceDoProduto = ctk.StringVar()
+        self.quantidadeMaximaPermitida = ctk.StringVar()
+        self.variavelDefinidaDePorcentagem = ctk.StringVar()
+        self.variavelDefinidaDeReal = ctk.StringVar()
+        self.variavelDefinidaDeAcrescimo = ctk.StringVar()
+        self.variavelDefinidaDeSubtotal = ctk.StringVar()
+        self.variavelDefinidaDeUnidadeDeMedida = ctk.StringVar()
 
-
+        self.variavelSubtotal = 0.00
+        self.variavelSubtotalAux = 0.00
+        
+        # criação do frame
         self.frameTelaGerarPedido = ctk.CTkFrame(self, height=700, width=1200, corner_radius=5)
         self.frameTelaGerarPedido.place(x=40, y=100)      
         self.frameTelaGerarPedido.grid_propagate(False)
+
+        # pesquisa que fica aparecendo e sumindo os valores que estou pesquisando
+        def buscaCliente(event=None): 
+            nomeDoCliente = self.nomeDoClienteBuscado.get()
+            queryBuscaCliente = "SELECT nome, cpf_cnpj FROM clientes WHERE nome LIKE %s"
+            db.cursor.execute(queryBuscaCliente, (f"%{nomeDoCliente}%",))
+            resultado = db.cursor.fetchall()
+
+            if hasattr(self, 'resultadoLabels'):
+                for label in self.resultadoLabels: 
+                    label.destroy()
+
+            self.resultadoLabels = []
+            
+            yNovo = 230  
+            for i, row in enumerate(resultado):
+                if i >= 3:
+                    break
+                label = ctk.CTkButton(self.frameTelaGerarPedido, width=280, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda  nome=row[0], cnpj=row[1]: selecionaCliente(nome, cnpj))
+                label.place(x=30, y=yNovo)
+                self.resultadoLabels.append(label)  
+                yNovo += 30
+
+        # seleciona o nome e o cpf/cnpj 
+        def selecionaCliente(nome, cnpj):
+            self.nomeDoClienteBuscado.delete(0, "end")
+            self.nomeDoClienteBuscado.insert(0, nome)
+            self.variavelCnpjBuscado = cnpj
+            if cnpj:
+                self.variavelCtkEntry.set(self.variavelCnpjBuscado)
+            else:
+                self.variavelCtkEntry.set("sem valores")
+            for label in self.resultadoLabels: 
+                label.destroy()
+
+        # pesquisa que fica aparecendo quando digitamos algo no campo do produto
+        def buscaProduto(event=None):
+            nomeDoProduto = self.entradaProdutoPesquisado.get()
+            queryBuscaProduto = "SELECT nome_do_produto, valor_de_venda, quantidade FROM produtos WHERE nome_do_produto LIKE %s"
+            db.cursor.execute(queryBuscaProduto, (f"%{nomeDoProduto}%",))
+            resultado = db.cursor.fetchall()
+            print(resultado)
+
+            if hasattr(self, "resultadoLabelsProduto"):
+                for label in self.resultadoLabelsProduto:
+                    label.destroy()
+
+            self.resultadoLabelsProduto = []
+            yNovo = 362
+            
+            for i, row in enumerate(resultado):
+                if i >=3: break
+                label = ctk.CTkButton(self.frameTelaGerarPedido, width=300, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda nome = row[0], valor = row[1], quantidade=row[2]: selecionaProduto(nome, valor, quantidade))
+                label.place(x=82, y=yNovo)
+                self.resultadoLabelsProduto.append(label)
+                yNovo += 29
+
+            # ações realizadas quando digitamos em cada campo
+            self.entradaQuantdadeItem.bind("<KeyRelease>", lambda event: verificaQuantidadeMaxima(self.quantidadeMaximaAtual))
+            self.entradaAcrescimo.bind("<KeyRelease>", lambda event: calcularAlteracoes())
+            self.entradaPreco.bind("<KeyRelease>", lambda event: calcularAlteracoes())
+            self.entradaDescontosReal.bind("<FocusIn>", lambda event: limparCampo(event, self.entradaDescontosPorcentagem))
+            self.entradaDescontosReal.bind("<KeyRelease>", lambda event: calcularAlteracoes())
+            self.entradaDescontosPorcentagem.bind("<FocusIn>", lambda event: limparCampo(event, self.entradaDescontosReal))
+            self.entradaDescontosPorcentagem.bind("<KeyRelease>", lambda event: calcularAlteracoes())
+
+        # chamado somente para deixar o campo "desconto" em branco
+        def limparCampo(event, campo):
+            campo.delete(0, "end")
+
+        # ao selecionar o produto é chamada
+        def selecionaProduto(nome, valor, quantidade):
+            self.entradaProdutoPesquisado.delete(0, "end")
+            self.entradaProdutoPesquisado.insert(0, nome)
+            
+            self.entradaQuantdadeItem.delete(0, "end")
+            self.entradaQuantdadeItem.insert(0, 1)
+
+            self.entradaPreco.delete(0,"end")
+            self.entradaPreco.insert(0, valor)
+
+            self.entradaUnidadeMedida.delete(0, "end")
+            self.entradaUnidadeMedida.insert(0, "UN")
+
+            self.variavelDefinidaDeAcrescimo.set(0.00)
+            calcularAlteracoes()
+
+            self.quantidadeMaximaAtual = quantidade 
+            
+            for label in self.resultadoLabelsProduto: 
+                label.destroy()
+
+        # toda alteração realizada o subtotal precisa ser atualizado
+        def calcularAlteracoes():
+            preco = float(self.entradaPreco.get() or 0)
+            acrescimo = float(self.entradaAcrescimo.get() or 0)
+            descontoReal = float(self.entradaDescontosReal.get() or 0)      
+            descontoPorcentagem = float(self.entradaDescontosPorcentagem.get() or 0)
+            if descontoReal:
+                self.variavelSubtotal = ((preco * int(self.entradaQuantdadeItem.get())) + acrescimo) - descontoReal
+                self.variavelDefinidaDeSubtotal.set(self.variavelSubtotal)
+            else:
+                descontoPorcentagem = descontoPorcentagem/100
+                self.variavelSubtotal = ((preco * int(self.entradaQuantdadeItem.get())) + acrescimo)
+                self.variavelSubtotalAux = self.variavelSubtotal
+                self.variavelSubtotal = ((preco * int(self.entradaQuantdadeItem.get())) + acrescimo) * descontoPorcentagem
+                print(self.variavelSubtotalAux)
+                print(self.variavelSubtotal)
+                self.variavelSubtotalAux = self.variavelSubtotalAux - self.variavelSubtotal
+                print(self.variavelSubtotalAux)
+                self.variavelDefinidaDeSubtotal.set(self.variavelSubtotalAux)
+
+        # verifica se a quantidade sendo vendida é menor do que a quantidade existente no depósito
+        def verificaQuantidadeMaxima(quantidade):
+            if quantidade is not None and int(self.entradaQuantdadeItem.get()) > quantidade:
+                self.quantidadeMaximaPermitida.set(quantidade)
+                labelValorQuanrtidadeMax = ctk.CTkLabel(self, text="poode nao man", fg_color="red", text_color="white", corner_radius=5)
+                labelValorQuanrtidadeMax.pack(pady=10)
+                self.after(3000, labelValorQuanrtidadeMax.destroy)
+                calcularAlteracoes()
+
+            else:
+                calcularAlteracoes()
+                print(self.variavelSubtotal)
+                print("Menor, tá de boa")
+
+        # remove cada item, e o coloca novamente no seu lugar e no seu index na lista
+        def removerItem(index):
+            if 0 <= index < len(self.itensCriados):  
+                for widget in self.itensCriados[index]:
+                    if widget:  
+                        widget.destroy()  
+                self.itensCriados.pop(index)  
+
+                
+                for i in range(index, len(self.itensCriados)):
+                    y_pos = self.yInicial + (i * self.yFuturoBotao)
+                    self.itensCriados[i][0].place(y=y_pos)
+                    for widget in self.itensCriados[i][1:]:  
+                        if widget:
+                            widget.place(y=y_pos)
+
+                
+                if self.itensCriados:
+                    ultimoItem = self.itensCriados[-1]
+                    if ultimoItem[-1] is None:  
+                        botaoRemover = ctk.CTkButton(
+                            self.frameTelaGerarPedido, text="X", width=30, height=30, fg_color="red", 
+                            corner_radius=5, command=lambda idx=len(self.itensCriados) - 1: removerItem(idx)
+                        )
+                        botaoRemover.place(x=1140, y=self.yInicial + ((len(self.itensCriados) - 1) * self.yFuturoBotao))
+                        ultimoItem[-1] = botaoRemover  
+                self.yAtualBotao -= self.yFuturoBotao
+                self.botaoAdicionarItem.place(x=1011, y=self.yAtualBotao + 40)
+       
+        def adicionarItem():
+            if self.itensCriados:
+                ultimoItem = self.itensCriados[-1]
+                camposObrigatorios = [
+                    ultimoItem[1].get(),  
+                    ultimoItem[2].get(),  
+                    ultimoItem[3].get(),  
+                    ultimoItem[4].get()   
+                ]
+
+                if any(campo == "" for campo in camposObrigatorios):
+                    labelValorPreenchaCampos = ctk.CTkLabel(self, text="Preencha todos os campos", fg_color="red", text_color="white", corner_radius=5)
+                    labelValorPreenchaCampos.pack(pady=10)
+                    self.after(3000, labelValorPreenchaCampos.destroy)
+                    return  
+
+            numeroItem = len(self.itensCriados) + 1
+
+            labelNumeroItem = ctk.CTkLabel(self.frameTelaGerarPedido, text=f"{numeroItem+1}", fg_color="#38343c", height=30, width=50, corner_radius=0)
+            labelNumeroItem.place(x=30, y=self.yAtualBotao)
+
+            entradaProdutoPesquisado = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=200, corner_radius=0)
+            entradaProdutoPesquisado.place(x=82, y=self.yAtualBotao)
+
+            entradaPreco = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaPreco.place(x=284, y=self.yAtualBotao)
+
+            entradaQuantidade = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaQuantidade.place(x=406, y=self.yAtualBotao)
+
+            entradaUnidadeMedida = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaUnidadeMedida.place(x=528, y=self.yAtualBotao)
+
+            entradaDescontosReal = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaDescontosReal.place(x=650, y=self.yAtualBotao)
+
+            entradaDescontosPorcentagem = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaDescontosPorcentagem.place(x=772, y=self.yAtualBotao)
+
+            entradaAcrescimo = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaAcrescimo.place(x=894, y=self.yAtualBotao)
+
+            entradaSubtotal = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaSubtotal.place(x=1016, y=self.yAtualBotao)
+
+            botaoRemover = ctk.CTkButton(
+                self.frameTelaGerarPedido, text="X", width=30, height=30, fg_color="red", 
+                corner_radius=5, command=lambda idx=len(self.itensCriados): removerItem(idx)
+            )
+            botaoRemover.place(x=1140, y=self.yAtualBotao)
+
+            if self.itensCriados:
+                ultimoItem = self.itensCriados[-1]
+                if ultimoItem[-1]: 
+                    ultimoItem[-1].destroy() 
+                    ultimoItem[-1] = None 
+
+            self.itensCriados.append([
+                labelNumeroItem, entradaProdutoPesquisado, entradaPreco, entradaQuantidade, entradaUnidadeMedida,
+                entradaDescontosReal, entradaDescontosPorcentagem, entradaAcrescimo, entradaSubtotal, botaoRemover
+            ])
+
+            calcularAlteracoesParaItem(numeroItem - 1)
+
+            self.yAtualBotao += self.yFuturoBotao
+            self.botaoAdicionarItem.place(x=1011, y=self.yAtualBotao + 20)
+
+            entradaProdutoPesquisado.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: buscaProdutoParaItem(idx))
+            entradaPreco.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: calcularAlteracoesParaItem(idx))
+            entradaQuantidade.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: verificaQuantidadeMaximaParaItem(self.quantidadeMaximaAtual, idx))
+            entradaDescontosReal.bind("<FocusIn>", lambda event, idx=len(self.itensCriados) - 1: limparCampo(event, self.itensCriados[idx][6]))
+            entradaDescontosReal.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: calcularAlteracoesParaItem(idx))
+            entradaDescontosPorcentagem.bind("<FocusIn>", lambda event, idx=len(self.itensCriados) - 1: limparCampo(event, self.itensCriados[idx][5]))
+            entradaDescontosPorcentagem.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: calcularAlteracoesParaItem(idx))
+            entradaAcrescimo.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: calcularAlteracoesParaItem(idx))
+
+        def buscaProdutoParaItem(index):
+            nomeDoProduto = self.itensCriados[index][1].get()
+            queryBuscaProduto = "SELECT nome_do_produto, valor_de_venda, quantidade FROM produtos WHERE nome_do_produto LIKE %s"
+            db.cursor.execute(queryBuscaProduto, (f"%{nomeDoProduto}%",))
+            resultado = db.cursor.fetchall()
+            print(resultado)
+
+            if hasattr(self, "resultadoLabelsProduto"):
+                for label in self.resultadoLabelsProduto:
+                    label.destroy()
+
+            self.resultadoLabelsProduto = []
+            yNovo = 394 + (index*32)
+            
+            for i, row in enumerate(resultado):
+                if i >= 3: break
+                label = ctk.CTkButton(self.frameTelaGerarPedido, width=300, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda nome=row[0], valor=row[1], quantidade=row[2]: selecionaProdutoParaItem(nome, valor, quantidade, index))
+                label.place(x=82, y=yNovo)
+                self.resultadoLabelsProduto.append(label)
+                yNovo += 29
+
+        def selecionaProdutoParaItem(nome, valor, quantidade, index):
+            self.itensCriados[index][1].delete(0, "end")
+            self.itensCriados[index][1].insert(0, nome)
+            
+            self.itensCriados[index][3].delete(0, "end")
+            self.itensCriados[index][3].insert(0, 1)
+
+            self.itensCriados[index][2].delete(0, "end")
+            self.itensCriados[index][2].insert(0, valor)
+
+            self.itensCriados[index][4].delete(0, "end")
+            self.itensCriados[index][4].insert(0, "UN")
+
+            self.itensCriados[index][7].delete(0, "end")
+            self.itensCriados[index][7].insert(0, 0.00)
+
+            self.quantidadeMaximaAtual = quantidade
+
+            calcularAlteracoesParaItem(index)
+
+            for label in self.resultadoLabelsProduto:
+                label.destroy()
+
+        def calcularAlteracoesParaItem(index):
+            preco = float(self.itensCriados[index][2].get() or 0)
+            quantidade = int(self.itensCriados[index][3].get() or 0)
+            acrescimo = float(self.itensCriados[index][7].get() or 0)
+            descontoReal = float(self.itensCriados[index][5].get() or 0)
+            descontoPorcentagem = float(self.itensCriados[index][6].get() or 0)
+
+            if descontoReal:
+                subtotal = ((preco * quantidade) + acrescimo) - descontoReal
+            else:
+                descontoPorcentagem = descontoPorcentagem / 100
+                subtotal = ((preco * quantidade) + acrescimo)
+                subtotalAux = subtotal
+                subtotal = ((preco * quantidade) + acrescimo) * descontoPorcentagem
+                subtotalAux = subtotalAux - subtotal
+                subtotal = subtotalAux
+
+            self.itensCriados[index][8].delete(0, "end")
+            self.itensCriados[index][8].insert(0, f"{subtotal:.2f}")
+
+        def verificaQuantidadeMaximaParaItem(quantidade, index):
+            quantidadeDigitada = int(self.itensCriados[index][3].get() or 0)
+
+            if quantidade is not None and quantidadeDigitada > quantidade:
+                self.itensCriados[index][3].delete(0, "end")  
+                self.itensCriados[index][3].insert(0, str(quantidade))  
+
+                labelValorQuantidadeMax = ctk.CTkLabel(self, text="Quantidade excede o estoque", fg_color="red", text_color="white", corner_radius=5)
+                labelValorQuantidadeMax.pack(pady=10)
+                self.after(3000, labelValorQuantidadeMax.destroy)  
+
+                calcularAlteracoesParaItem(index)
+            else:
+                calcularAlteracoesParaItem(index)
+                print("Quantidade válida")
+    
+        self.yAtualBotao = 364
+        self.yFuturoBotao = 32
+        self.yInicial = 364
+        self.itensCriados = []
+
+        self.botaoAdicionarItem = ctk.CTkButton(self.frameTelaGerarPedido, text="Adicionar Item", width=130, height=20, corner_radius=5, font=("Arial", 15), command=adicionarItem)
+        self.botaoAdicionarItem.place(x=1011, y=380)
+
+
+
+
+
+
+
 
         # título
         self.textoGerarPedido = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Gerar pedido", font=("Century Gothic bold", 30))
@@ -688,59 +1025,87 @@ class App(ctk.CTk):
         self.funcionariaPedido.place(x=910, y=100)
 
 
-        # pesquisa que fica aparecendo e sumindo os valores que estou pesquisando
-
-
-        def buscaCliente(event=None):
-            nomeDoCliente = self.nomeDoClienteBuscado.get()
-            queryBuscaCliente = "SELECT nome FROM clientes WHERE nome LIKE %s"
-            db.cursor.execute(queryBuscaCliente, (f"%{nomeDoCliente}%",))
-            resultado = db.cursor.fetchall()
-
-            if hasattr(self, 'resultadoLabels'):
-                for label in self.resultadoLabels: 
-                    label.destroy()
-
-            self.resultadoLabels = []
-
-            yNovo = 230  
-            for i, row in enumerate(resultado):
-                if i>=5:
-                    break
-                label = ctk.CTkButton(self.frameTelaGerarPedido, width=280, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda value=row[0]: selecionaCliente(value))
-                label.place(x=30, y=yNovo)
-                self.resultadoLabels.append(label)  
-                yNovo += 30
-
-
-            def selecionaCliente(valor):
-                self.nomeDoClienteBuscado.delete(0, "end")
-                self.nomeDoClienteBuscado.insert(0, valor)
-                for label in self.resultadoLabels: 
-                    label.destroy()
-
-
 
         iconeLupa = ctk.CTkImage(light_image=Image.open("search.png"), size=(20, 20))
         labelIcone = ctk.CTkButton(self.frameTelaGerarPedido, image=iconeLupa, fg_color="#38343c", width=30, corner_radius=5, command=buscaCliente)
         labelIcone.place(x=30, y=200)
         self.labelNomeDoCliente = ctk.CTkLabel(self.frameTelaGerarPedido, text="Nome do cliente", font=("Century Gothic", 14))
         self.labelNomeDoCliente.place(x=30, y=170)
-        self.nomeDoClienteBuscado = ctk.CTkEntry(self.frameTelaGerarPedido, placeholder_text="Nome do Cliente", width=250, corner_radius=5, font=("Arial", 15))
+        self.nomeDoClienteBuscado = ctk.CTkEntry(self.frameTelaGerarPedido,  placeholder_text="Nome do Cliente", width=250, corner_radius=5, font=("Arial", 15))
         self.nomeDoClienteBuscado.place(x=60, y=200)
         self.nomeDoClienteBuscado.bind("<KeyRelease>", buscaCliente)  # Chama a busca ao digitar
+        self.frameTelaGerarPedido.bind("<Button-1>", lambda event: [label.destroy() for label in getattr(self, 'resultadoLabels', [])]) # exclui os valores da pesquisa de nome de usuário quando clicar em outro lgar no frame
+
+    
+        self.labelStatusDoPedido = ctk.CTkLabel(self.frameTelaGerarPedido,  text="CPF/CNPJ", font=("Century Gothic bold", 14))
+        self.labelStatusDoPedido.place(x=350, y=175)
+        self.statusDoPedido = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelCtkEntry, width=180, corner_radius=5, font=("Arial", 15))
+        self.statusDoPedido.place(x=350, y=200)
+
+
+        # item
+        self.labelNumeroItem = ctk.CTkLabel(self.frameTelaGerarPedido, text="Item", fg_color="#38343c",  height=30, width=50, corner_radius=0)
+        self.labelNumeroItem.place(x=30, y=300)
+        self.NumeroItem = ctk.CTkLabel(self.frameTelaGerarPedido, text="1", fg_color="#38343c",  height=30, width=50, corner_radius=0)
+        self.NumeroItem.place(x=30, y=332)
+
+        # produto
+        self.LabelProdutoPesquisado = ctk.CTkLabel(self.frameTelaGerarPedido, text="Produto", fg_color="#38343c",  height=30, width=200, corner_radius=0)
+        self.LabelProdutoPesquisado.place(x=82, y=300)
+        self.entradaProdutoPesquisado = ctk.CTkEntry(self.frameTelaGerarPedido,  height=30, width=200, corner_radius=0)
+        self.entradaProdutoPesquisado.place(x=82, y=332)
+        self.entradaProdutoPesquisado.bind("<KeyRelease>", buscaProduto)
+        self.frameTelaGerarPedido.bind("<Button-1>", lambda event: [label.destroy() for label in getattr(self, 'resultadoLabelsProduto', [])]) # exclui os valores da pesquisa de nome de usuário quando clicar em outro lgar no frame
+
+
+        # detalhes
+        self.labelPreco = ctk.CTkLabel(self.frameTelaGerarPedido, text="Preço", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelPreco.place(x=284, y=300)
+        self.entradaPreco = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+        self.entradaPreco.place(x=284, y=332)
+
+        # Quantidade
+        self.labelQuantdadeItem = ctk.CTkLabel(self.frameTelaGerarPedido, text="Quantidade", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelQuantdadeItem.place(x=406, y=300)
+        self.entradaQuantdadeItem = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.quantidadeMaximaPermitida, height=30, width=120, corner_radius=0)
+        self.entradaQuantdadeItem.place(x=406, y=332)
+
+
+        # Unidade de Medida
+        self.labelUnidadeMedida = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Unidade de medida", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelUnidadeMedida.place(x=528, y=300)
+        # valoresUnidadeDeMedida = [""]
+        self.entradaUnidadeMedida = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+        self.entradaUnidadeMedida.place(x=528, y=332)
+
+        # Desconto Real
+        self.labelDescontosReal = ctk.CTkLabel(self.frameTelaGerarPedido, text="Desconto($)", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelDescontosReal.place(x=650, y=300)
+        self.entradaDescontosReal = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelDefinidaDeReal, height=30, width=120, corner_radius=0)
+        self.entradaDescontosReal.place(x=650, y=332)
+
+        # Desconto porcentagem
+        self.labelDescontosPorcentagem = ctk.CTkLabel(self.frameTelaGerarPedido, text="Desconto(%)", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelDescontosPorcentagem.place(x=772, y=300)
+        self.entradaDescontosPorcentagem = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelDefinidaDePorcentagem, height=30, width=120, corner_radius=0)
+        self.entradaDescontosPorcentagem.place(x=772, y=332)
+
+        # Acrescimo
+        self.labelAcrescimo = ctk.CTkLabel(self.frameTelaGerarPedido, text="Acrescimo", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelAcrescimo.place(x=894, y=300)
+        self.entradaAcrescimo = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelDefinidaDeAcrescimo, height=30, width=120, corner_radius=0)
+        self.entradaAcrescimo.place(x=894, y=332)
+
+        # Subtotal
+        self.labelSubtotal = ctk.CTkLabel(self.frameTelaGerarPedido, text="Subtotal", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelSubtotal.place(x=1016, y=300)
+        self.entradaSubtotal = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelDefinidaDeSubtotal, height=30, width=120, corner_radius=0)
+        self.entradaSubtotal.place(x=1016, y=332)
 
 
 
 
-
-        #* vai para testes
-        # CNPJ, deixar o cnpj que será feita a venda
-        self.variavelEmAbertoFechado = "Em aberto"
-        self.labelStatusDoPedido = ctk.CTkLabel(self.frameTelaGerarPedido, text="Status", font=("Century Gothic bold", 14))
-        self.labelStatusDoPedido.place(x=600, y=175)
-        self.statusDoPedido = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=ctk.StringVar(value=self.variavelEmAbertoFechado), placeholder_text="DD/MM/AAAA", width=180, corner_radius=5, font=("Arial", 15))
-        self.statusDoPedido.place(x=600, y=200)
+ 
 
     #? ===================== FUNÇÕES DO BANCO DE DADOS ===================== #
 
