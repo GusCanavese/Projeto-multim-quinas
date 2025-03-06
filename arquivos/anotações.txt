@@ -1,24 +1,66 @@
 1 - tela de login pra criação de perfis ✅
 2 - relatório de vendas podendo selecionar a vendedora, e o período ✅
 3 - estoque geral e fiscal (não representável no protótipo)
-4 - tela de saída seleção de produtos e criação de nota *em produção*
-    4.1 - nota fiscal pode ter a opção de ser dada a entrada pelo arquivo XML
+4 - tela de saída seleção de produtos e criação de nota *em produção* 
+    4.1 - nota fiscal pode ter a opção de ser dada a entrada pelo arquivo XML ✅
 
 5 - tela de cadastros
     5.1 - clientes
-        5.1.1 - nome
-        5.1.2 - cpf/cnpj
-        5.1.3 - inscrição estadual
-        5.1.4 - RG
-        5.1.5 - endereço
-        5.1.6 - cep
-        5.1.7 - número
-        5.1.8 - bairro
-        5.1.9 - cidade
+        5.1.1 - nome                ✅    
+        5.1.2 - cpf/cnpj            ✅
+        5.1.3 - inscrição estadual  ✅
+        5.1.4 - RG                  ✅
+        5.1.5 - endereço            ✅
+        5.1.6 - cep                 ✅
+        5.1.7 - número              ✅
+        5.1.8 - bairro              ✅
+        5.1.9 - cidade              ✅
 
     5.2 - produtos
-        5.2.1 - nome do produto
-        5.2.2 - Código do produto
-        5.2.3 - valor de custo
-        5.2.4 - valor de venda
+        5.2.1 - nome do produto       ✅
+        5.2.2 - Código do produto     ✅
+        5.2.3 - valor de custo        ✅
+        5.2.4 - valor de venda        ✅
+        5.2.5 - codigo ncm, cfop cest ✅
+
+
+
+
+ANOTAÇÕES
+- VENDEDOR INTERNO ainda poderá cadastrar outras coisas
+
+- fazer entrar com enter na tela de login 
+- tornar senha obrigatopria na tela de login                 ✅
+- fazer um perfil persistente, onde você não se disconecta   ✅
+- economia de memoria destruindo as telas                    ✅
+- COINECTAR ao banco de dados a tela de cadastro de produtos ✅
+
+- corrigir erro de quando dermarcar o "sim" do receber email, a entry também precisa sair
+- sumir com a mensagem de campos obrigatorios do cadastro de produtos
+- fazer com que a mensagem de usuario nao cadastrado apareça somente quando nao encontrar o usuário que procurou
+- colocar numero de série no produto
+- tornar o campo CPF ou CNPJ de fornecedor, obrigatório
+- fazer com que o vendedor na tela de gerar pedido seja buscado pelo usuário que ta fazendo a venda 
+- definir um vaor limite para os descontos na tela de gerar pedido
+- corrigir calculo do desconto total porcentagem da tela de gerar pedido
+- fazer com que o produto seja referente ao cpf
+
+
+
+
+USUÁRIO BLOQUEADO(Yara): userbloq 123
+USUÁRIO SEMIBLOQUEADO(vendedor interno) semibloq 123
+ADM: adm 123
+ 
+
+
+
+
+
+
+
+
+
+
+
     

@@ -4,7 +4,10 @@ from tkinter import messagebox
 import datetime
 import gc
 from PIL import Image
-# import messagebox
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import Table, TableStyle
 
 
 # ctk.set_appearance_mode("system")  
@@ -34,7 +37,7 @@ class App(ctk.CTk):
         alturaTela = 900
         larguraTela = 1280
         self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
-        self.telaLogin()
+        self.telaGerarPedido()
 
 
     #? ===================== TELAS ===================== #
@@ -609,7 +612,7 @@ class App(ctk.CTk):
 
 
     #? ===================== FUNÇÕES DA TELA DE GERAR PEDIDO ===================== #
-
+    # define em qual loja será chamado o produto
     def telaDefineCnpjDoProduto(self):
         self.frameDefineCnpjDoProduto = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
         self.frameDefineCnpjDoProduto.place(x=140, y=100)     
@@ -644,6 +647,7 @@ class App(ctk.CTk):
         self.botaoCadastrarUsuario = ctk.CTkButton(self.frameDefineCnpjDoProduto, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=confereCNPJpreenchido)
         self.botaoCadastrarUsuario.place(x=600, y=600)
 
+    # insere os dados do pedido
     def telaGerarPedido(self):
         self.variavelCnpjBuscado = None
         self.variavelCtkEntry = ctk.StringVar() #esses 2 só inicializam para conseguir usar fora da função
@@ -692,7 +696,7 @@ class App(ctk.CTk):
         self.frameValorFinal = ctk.CTkFrame(self.frameTelaGerarPedido, width=200, height=150)
         self.frameValorFinal.place(x=950, y=600)
 
-    
+        # soma tudo, de todos os itens
         def calcularTotais():
             # Reinicia os totais antes de recalcular
             self.totalPreco = 0.0
@@ -846,7 +850,7 @@ class App(ctk.CTk):
             for label in self.resultadoLabelsProduto: 
                 label.destroy()
             
-            
+
 
         # toda alteração realizada o subtotal precisa ser atualizado
         def calcularAlteracoes():
@@ -908,6 +912,7 @@ class App(ctk.CTk):
                 self.yAtualBotao -= self.yFuturoBotao
                 self.botaoAdicionarItem.place(x=1011, y=self.yAtualBotao + 40)
        
+        # adiciona uma nova linha para adicionar produtos    
         def adicionarItem():
             if self.itensCriados:
                 ultimoItem = self.itensCriados[-1]
@@ -982,6 +987,7 @@ class App(ctk.CTk):
             entradaAcrescimo.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: calcularAlteracoesParaItem(idx))
             calcularTotais()
 
+        # busca o produto no banco de dados
         def buscaProdutoParaItem(index):
             nomeDoProduto = self.itensCriados[index][1].get()
             queryBuscaProduto = "SELECT nome_do_produto, valor_de_venda, quantidade FROM produtos WHERE nome_do_produto LIKE %s"
@@ -1004,6 +1010,7 @@ class App(ctk.CTk):
                 yNovo += 29
             calcularTotais()
 
+        # ao clicar no item, serão preenchido os campos
         def selecionaProdutoParaItem(nome, valor, quantidade, index):
             self.itensCriados[index][1].delete(0, "end")
             self.itensCriados[index][1].insert(0, nome)
@@ -1027,6 +1034,7 @@ class App(ctk.CTk):
             for label in self.resultadoLabelsProduto:
                 label.destroy()
 
+        # sempre que o campo for alterado, serão realizadas operações para modificar seu subtotal
         def calcularAlteracoesParaItem(index):
             preco = float(self.itensCriados[index][2].get() or 0)
             quantidade = int(self.itensCriados[index][3].get() or 0)
@@ -1048,7 +1056,7 @@ class App(ctk.CTk):
             self.itensCriados[index][8].insert(0, f"{subtotal:.2f}")
             calcularTotais()
 
-
+        # verifica se a quantidade da venda é maior que a presente do estoque
         def verificaQuantidadeMaximaParaItem(quantidade, index):
             quantidadeDigitada = int(self.itensCriados[index][3].get() or 0)
 
@@ -1114,7 +1122,7 @@ class App(ctk.CTk):
 
 
 
-        iconeLupa = ctk.CTkImage(light_image=Image.open("search.png"), size=(20, 20))
+        iconeLupa = ctk.CTkImage(light_image=Image.open("arquivos/search.png"), size=(20, 20))
         labelIcone = ctk.CTkButton(self.frameTelaGerarPedido, image=iconeLupa, fg_color="#38343c", width=30, corner_radius=5, command=buscaCliente)
         labelIcone.place(x=30, y=200)
 
@@ -1243,15 +1251,9 @@ class App(ctk.CTk):
         self.botaoGerarPedido = ctk.CTkButton(self.frameTelaGerarPedido, text="Gerar pedido", width=200, corner_radius=5, font=("Arial", 15), command=self)
         self.botaoGerarPedido.place(x=260, y=760)
 
-
-
-        
-        
-
-
-
-
- 
+    # gera o pedido
+    def telaImprimirPedido():
+        pass
 
     #? ===================== FUNÇÕES DO BANCO DE DADOS ===================== #
 
@@ -1271,7 +1273,7 @@ class App(ctk.CTk):
             db.conn.commit()
             messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
             self.frameTelaCadastroFuncionario.destroy()
-   
+        
     # é chamado quando se cadastra um novo fornecedor
     def registraFornecedorNoBanco(self):
         # primeiro tem que pegar os checkbox
