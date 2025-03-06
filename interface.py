@@ -34,7 +34,7 @@ class App(ctk.CTk):
         alturaTela = 900
         larguraTela = 1280
         self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
-        self.telaGerarPedido()
+        self.telaLogin()
 
 
     #? ===================== TELAS ===================== #
@@ -654,17 +654,102 @@ class App(ctk.CTk):
         self.variavelDefinidaDeAcrescimo = ctk.StringVar()
         self.variavelDefinidaDeSubtotal = ctk.StringVar()
         self.variavelDefinidaDeUnidadeDeMedida = ctk.StringVar()
+        
+        self.variavelTotalDescontoReal = ctk.StringVar()
+        self.variavelTotalDescontoPorcentagem = ctk.StringVar()
+        self.variavelTotalAcrescimo = ctk.StringVar()
+        self.variavelTotalSubtotal = ctk.StringVar()
+
+        self.totalPreco = 0.0
+        self.totalQuantidade = 0
+        self.totalDescontoReal = 0.0
+        self.totalDescontoPorcentagem = 0.0
+        self.totalAcrescimo = 0.0
+        self.totalSubtotal = 0.0
 
         self.variavelSubtotal = 0.00
         self.variavelSubtotalAux = 0.00
         
         # criação do frame
-        self.frameTelaGerarPedido = ctk.CTkFrame(self, height=700, width=1200, corner_radius=5)
-        self.frameTelaGerarPedido.place(x=40, y=100)      
-        self.frameTelaGerarPedido.grid_propagate(False)
+        self.frameTelaGerarPedido = ctk.CTkFrame(self, height=800, width=1200, corner_radius=5)
+        self.frameTelaGerarPedido.place(x=40, y=50)      
+
+        # criar canva para itens adicionados
+        self.frameParaItens = ctk.CTkScrollableFrame(self.frameTelaGerarPedido, width=1150, height=200, orientation="vertical")
+        self.frameParaItens.place(relx=0.5, y=450, anchor="center")
+
+        self.container = ctk.CTkFrame(self.frameParaItens, height=1500)
+        self.container.pack(fill="x", padx=1, pady=1)
+
+        self.frameParaItensNoFrame = ctk.CTkFrame(self.frameParaItens, width=1250, height=1500)
+        self.frameParaItensNoFrame.place(x=-25, y=-280)
+
+        # frame para calcular os totais no final da pagina
+        self.frameTotais = ctk.CTkFrame(self.frameTelaGerarPedido, width=250, height=150)
+        self.frameTotais.place(x=650, y=600)
+
+        # frame valor final para finalizar o preço de tudo
+        self.frameValorFinal = ctk.CTkFrame(self.frameTelaGerarPedido, width=200, height=150)
+        self.frameValorFinal.place(x=950, y=600)
+
+    
+        def calcularTotais():
+            # Reinicia os totais antes de recalcular
+            self.totalPreco = 0.0
+            self.totalQuantidade = 0
+            self.totalDescontoReal = 0.0
+            self.totalDescontoPorcentagem = 0.0
+            self.totalAcrescimo = 0.0
+            self.totalSubtotal = 0.0
+
+            primeiroCampoDescontoReal = float(self.entradaDescontosReal.get() or 0)  
+            self.totalDescontoReal += primeiroCampoDescontoReal  
+
+            primeiroCampoDescontoPorcentagem = float(self.entradaDescontosPorcentagem.get() or 0)  
+            self.totalDescontoPorcentagem += primeiroCampoDescontoPorcentagem  
+
+            primeiroCampoAcrescimo = float(self.entradaAcrescimo.get() or 0)  
+            self.totalAcrescimo += primeiroCampoAcrescimo  
+
+            primeiroCampoSubtotal = float(self.entradaSubtotal.get() or 0)  
+            self.totalSubtotal += primeiroCampoSubtotal  
+
+            for item in self.itensCriados:
+                preco = float(item[2].get() or 0)  # entradaPreco
+                quantidade = int(item[3].get() or 0)  # entradaQuantidade
+                descontoReal = float(item[5].get() or 0)  # entradaDescontosReal
+                descontoPorcentagem = float(item[6].get() or 0)  # entradaDescontosPorcentagem
+                acrescimo = float(item[7].get() or 0)  # entradaAcrescimo
+                subtotal = float(item[8].get() or 0)  # entradaSubtotal
+
+                subtotalCalculado = (preco * quantidade) + acrescimo - descontoReal
+
+                item[8].delete(0, "end")
+                item[8].insert(0, f"{subtotalCalculado:.2f}")
+
+                self.totalPreco += preco
+                self.totalQuantidade += quantidade
+                self.totalDescontoReal += descontoReal
+                self.totalDescontoPorcentagem += descontoPorcentagem
+                self.totalAcrescimo += acrescimo
+                self.totalSubtotal += subtotalCalculado
+
+            self.variavelTotalDescontoReal.set(round(self.totalDescontoReal, 2))
+            self.variavelTotalAcrescimo.set(round(self.totalAcrescimo, 2))
+            self.variavelTotalDescontoPorcentagem.set(round(self.totalDescontoPorcentagem, 2))
+            self.variavelTotalSubtotal.set(round(self.totalSubtotal, 2))
+
+            print("Total Preço:", self.totalPreco)
+            print("Total Quantidade:", self.totalQuantidade)
+            print("Total Desconto Real:", self.totalDescontoReal)
+            print("Total Desconto Porcentagem:", self.totalDescontoPorcentagem)
+            print("Total Acréscimo:", self.totalAcrescimo)
+            print("Total Subtotal:", self.totalSubtotal)
+        
 
         # pesquisa que fica aparecendo e sumindo os valores que estou pesquisando
         def buscaCliente(event=None): 
+            calcularTotais()
             nomeDoCliente = self.nomeDoClienteBuscado.get()
             queryBuscaCliente = "SELECT nome, cpf_cnpj FROM clientes WHERE nome LIKE %s"
             db.cursor.execute(queryBuscaCliente, (f"%{nomeDoCliente}%",))
@@ -697,8 +782,11 @@ class App(ctk.CTk):
             for label in self.resultadoLabels: 
                 label.destroy()
 
+
+
         # pesquisa que fica aparecendo quando digitamos algo no campo do produto
         def buscaProduto(event=None):
+            calcularTotais()
             nomeDoProduto = self.entradaProdutoPesquisado.get()
             queryBuscaProduto = "SELECT nome_do_produto, valor_de_venda, quantidade FROM produtos WHERE nome_do_produto LIKE %s"
             db.cursor.execute(queryBuscaProduto, (f"%{nomeDoProduto}%",))
@@ -714,7 +802,7 @@ class App(ctk.CTk):
             
             for i, row in enumerate(resultado):
                 if i >=3: break
-                label = ctk.CTkButton(self.frameTelaGerarPedido, width=300, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda nome = row[0], valor = row[1], quantidade=row[2]: selecionaProduto(nome, valor, quantidade))
+                label = ctk.CTkButton(self.frameParaItensNoFrame, width=300, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda nome = row[0], valor = row[1], quantidade=row[2]: selecionaProduto(nome, valor, quantidade))
                 label.place(x=82, y=yNovo)
                 self.resultadoLabelsProduto.append(label)
                 yNovo += 29
@@ -727,13 +815,18 @@ class App(ctk.CTk):
             self.entradaDescontosReal.bind("<KeyRelease>", lambda event: calcularAlteracoes())
             self.entradaDescontosPorcentagem.bind("<FocusIn>", lambda event: limparCampo(event, self.entradaDescontosReal))
             self.entradaDescontosPorcentagem.bind("<KeyRelease>", lambda event: calcularAlteracoes())
-
+            self.entradaAcrescimo.bind("<KeyRelease>", lambda event: calcularTotais())
+            self.entradaDescontosPorcentagem.bind("<KeyRelease>", lambda event: calcularTotais())
+            self.entradaDescontosReal.bind("<KeyRelease>", lambda event: calcularTotais())
+            self.entradaSubtotal.bind("<KeyRelease>", lambda event: calcularTotais())
+            
         # chamado somente para deixar o campo "desconto" em branco
         def limparCampo(event, campo):
             campo.delete(0, "end")
 
         # ao selecionar o produto é chamada
         def selecionaProduto(nome, valor, quantidade):
+            calcularTotais()
             self.entradaProdutoPesquisado.delete(0, "end")
             self.entradaProdutoPesquisado.insert(0, nome)
             
@@ -747,12 +840,13 @@ class App(ctk.CTk):
             self.entradaUnidadeMedida.insert(0, "UN")
 
             self.variavelDefinidaDeAcrescimo.set(0.00)
-            calcularAlteracoes()
-
             self.quantidadeMaximaAtual = quantidade 
-            
+
+            calcularAlteracoes()
             for label in self.resultadoLabelsProduto: 
                 label.destroy()
+            
+            
 
         # toda alteração realizada o subtotal precisa ser atualizado
         def calcularAlteracoes():
@@ -768,10 +862,7 @@ class App(ctk.CTk):
                 self.variavelSubtotal = ((preco * int(self.entradaQuantdadeItem.get())) + acrescimo)
                 self.variavelSubtotalAux = self.variavelSubtotal
                 self.variavelSubtotal = ((preco * int(self.entradaQuantdadeItem.get())) + acrescimo) * descontoPorcentagem
-                print(self.variavelSubtotalAux)
-                print(self.variavelSubtotal)
                 self.variavelSubtotalAux = self.variavelSubtotalAux - self.variavelSubtotal
-                print(self.variavelSubtotalAux)
                 self.variavelDefinidaDeSubtotal.set(self.variavelSubtotalAux)
 
         # verifica se a quantidade sendo vendida é menor do que a quantidade existente no depósito
@@ -809,7 +900,7 @@ class App(ctk.CTk):
                     ultimoItem = self.itensCriados[-1]
                     if ultimoItem[-1] is None:  
                         botaoRemover = ctk.CTkButton(
-                            self.frameTelaGerarPedido, text="X", width=30, height=30, fg_color="red", 
+                            self.frameParaItensNoFrame, text="X", width=30, height=30, fg_color="red", 
                             corner_radius=5, command=lambda idx=len(self.itensCriados) - 1: removerItem(idx)
                         )
                         botaoRemover.place(x=1140, y=self.yInicial + ((len(self.itensCriados) - 1) * self.yFuturoBotao))
@@ -835,37 +926,34 @@ class App(ctk.CTk):
 
             numeroItem = len(self.itensCriados) + 1
 
-            labelNumeroItem = ctk.CTkLabel(self.frameTelaGerarPedido, text=f"{numeroItem+1}", fg_color="#38343c", height=30, width=50, corner_radius=0)
+            labelNumeroItem = ctk.CTkLabel(self.frameParaItensNoFrame, text=f"{numeroItem+1}", fg_color="#38343c", height=30, width=50, corner_radius=0)
             labelNumeroItem.place(x=30, y=self.yAtualBotao)
 
-            entradaProdutoPesquisado = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=200, corner_radius=0)
+            entradaProdutoPesquisado = ctk.CTkEntry(self.frameParaItensNoFrame, height=30, width=200, corner_radius=0)
             entradaProdutoPesquisado.place(x=82, y=self.yAtualBotao)
 
-            entradaPreco = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaPreco = ctk.CTkEntry(self.frameParaItensNoFrame, height=30, width=120, corner_radius=0)
             entradaPreco.place(x=284, y=self.yAtualBotao)
 
-            entradaQuantidade = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaQuantidade = ctk.CTkEntry(self.frameParaItensNoFrame, height=30, width=120, corner_radius=0)
             entradaQuantidade.place(x=406, y=self.yAtualBotao)
 
-            entradaUnidadeMedida = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaUnidadeMedida = ctk.CTkEntry(self.frameParaItensNoFrame, height=30, width=120, corner_radius=0)
             entradaUnidadeMedida.place(x=528, y=self.yAtualBotao)
 
-            entradaDescontosReal = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaDescontosReal = ctk.CTkEntry(self.frameParaItensNoFrame, height=30, width=120, corner_radius=0)
             entradaDescontosReal.place(x=650, y=self.yAtualBotao)
 
-            entradaDescontosPorcentagem = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaDescontosPorcentagem = ctk.CTkEntry(self.frameParaItensNoFrame, height=30, width=120, corner_radius=0)
             entradaDescontosPorcentagem.place(x=772, y=self.yAtualBotao)
 
-            entradaAcrescimo = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaAcrescimo = ctk.CTkEntry(self.frameParaItensNoFrame, height=30, width=120, corner_radius=0)
             entradaAcrescimo.place(x=894, y=self.yAtualBotao)
 
-            entradaSubtotal = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+            entradaSubtotal = ctk.CTkEntry(self.frameParaItensNoFrame, height=30, width=120, corner_radius=0)
             entradaSubtotal.place(x=1016, y=self.yAtualBotao)
 
-            botaoRemover = ctk.CTkButton(
-                self.frameTelaGerarPedido, text="X", width=30, height=30, fg_color="red", 
-                corner_radius=5, command=lambda idx=len(self.itensCriados): removerItem(idx)
-            )
+            botaoRemover = ctk.CTkButton(self.frameParaItensNoFrame, text="X", width=30, height=30, fg_color="red", corner_radius=5, command=lambda idx=len(self.itensCriados): removerItem(idx))
             botaoRemover.place(x=1140, y=self.yAtualBotao)
 
             if self.itensCriados:
@@ -892,6 +980,7 @@ class App(ctk.CTk):
             entradaDescontosPorcentagem.bind("<FocusIn>", lambda event, idx=len(self.itensCriados) - 1: limparCampo(event, self.itensCriados[idx][5]))
             entradaDescontosPorcentagem.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: calcularAlteracoesParaItem(idx))
             entradaAcrescimo.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: calcularAlteracoesParaItem(idx))
+            calcularTotais()
 
         def buscaProdutoParaItem(index):
             nomeDoProduto = self.itensCriados[index][1].get()
@@ -909,10 +998,11 @@ class App(ctk.CTk):
             
             for i, row in enumerate(resultado):
                 if i >= 3: break
-                label = ctk.CTkButton(self.frameTelaGerarPedido, width=300, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda nome=row[0], valor=row[1], quantidade=row[2]: selecionaProdutoParaItem(nome, valor, quantidade, index))
+                label = ctk.CTkButton(self.frameParaItensNoFrame, width=300, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda nome=row[0], valor=row[1], quantidade=row[2]: selecionaProdutoParaItem(nome, valor, quantidade, index))
                 label.place(x=82, y=yNovo)
                 self.resultadoLabelsProduto.append(label)
                 yNovo += 29
+            calcularTotais()
 
         def selecionaProdutoParaItem(nome, valor, quantidade, index):
             self.itensCriados[index][1].delete(0, "end")
@@ -956,6 +1046,8 @@ class App(ctk.CTk):
 
             self.itensCriados[index][8].delete(0, "end")
             self.itensCriados[index][8].insert(0, f"{subtotal:.2f}")
+            calcularTotais()
+
 
         def verificaQuantidadeMaximaParaItem(quantidade, index):
             quantidadeDigitada = int(self.itensCriados[index][3].get() or 0)
@@ -978,12 +1070,8 @@ class App(ctk.CTk):
         self.yInicial = 364
         self.itensCriados = []
 
-        self.botaoAdicionarItem = ctk.CTkButton(self.frameTelaGerarPedido, text="Adicionar Item", width=130, height=20, corner_radius=5, font=("Arial", 15), command=adicionarItem)
+        self.botaoAdicionarItem = ctk.CTkButton(self.frameParaItensNoFrame, text="Adicionar Item", width=130, height=20, corner_radius=5, font=("Arial", 15), command=adicionarItem)
         self.botaoAdicionarItem.place(x=1011, y=380)
-
-
-
-
 
 
 
@@ -1029,78 +1117,136 @@ class App(ctk.CTk):
         iconeLupa = ctk.CTkImage(light_image=Image.open("search.png"), size=(20, 20))
         labelIcone = ctk.CTkButton(self.frameTelaGerarPedido, image=iconeLupa, fg_color="#38343c", width=30, corner_radius=5, command=buscaCliente)
         labelIcone.place(x=30, y=200)
+
+        # nome do cliente
         self.labelNomeDoCliente = ctk.CTkLabel(self.frameTelaGerarPedido, text="Nome do cliente", font=("Century Gothic", 14))
         self.labelNomeDoCliente.place(x=30, y=170)
-        self.nomeDoClienteBuscado = ctk.CTkEntry(self.frameTelaGerarPedido,  placeholder_text="Nome do Cliente", width=250, corner_radius=5, font=("Arial", 15))
+        self.nomeDoClienteBuscado = ctk.CTkEntry(self.frameTelaGerarPedido,  placeholder_text="Nome do Cliente", width=370, corner_radius=5, font=("Arial", 15))
         self.nomeDoClienteBuscado.place(x=60, y=200)
         self.nomeDoClienteBuscado.bind("<KeyRelease>", buscaCliente)  # Chama a busca ao digitar
         self.frameTelaGerarPedido.bind("<Button-1>", lambda event: [label.destroy() for label in getattr(self, 'resultadoLabels', [])]) # exclui os valores da pesquisa de nome de usuário quando clicar em outro lgar no frame
 
     
-        self.labelStatusDoPedido = ctk.CTkLabel(self.frameTelaGerarPedido,  text="CPF/CNPJ", font=("Century Gothic bold", 14))
-        self.labelStatusDoPedido.place(x=350, y=175)
-        self.statusDoPedido = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelCtkEntry, width=180, corner_radius=5, font=("Arial", 15))
-        self.statusDoPedido.place(x=350, y=200)
+        self.labelCPFCliente = ctk.CTkLabel(self.frameTelaGerarPedido,  text="CPF/CNPJ", font=("Century Gothic bold", 14))
+        self.labelCPFCliente.place(x=470, y=175)
+        self.CPFCliente = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelCtkEntry, width=180, corner_radius=5, font=("Arial", 15))
+        self.CPFCliente.place(x=470, y=200)
 
 
         # item
-        self.labelNumeroItem = ctk.CTkLabel(self.frameTelaGerarPedido, text="Item", fg_color="#38343c",  height=30, width=50, corner_radius=0)
+        self.labelNumeroItem = ctk.CTkLabel(self.frameParaItensNoFrame, text="Item", fg_color="#38343c",  height=30, width=50, corner_radius=0)
         self.labelNumeroItem.place(x=30, y=300)
-        self.NumeroItem = ctk.CTkLabel(self.frameTelaGerarPedido, text="1", fg_color="#38343c",  height=30, width=50, corner_radius=0)
+        self.NumeroItem = ctk.CTkLabel(self.frameParaItensNoFrame, text="1", fg_color="#38343c",  height=30, width=50, corner_radius=0)
         self.NumeroItem.place(x=30, y=332)
 
         # produto
-        self.LabelProdutoPesquisado = ctk.CTkLabel(self.frameTelaGerarPedido, text="Produto", fg_color="#38343c",  height=30, width=200, corner_radius=0)
+        self.LabelProdutoPesquisado = ctk.CTkLabel(self.frameParaItensNoFrame, text="Produto", fg_color="#38343c",  height=30, width=200, corner_radius=0)
         self.LabelProdutoPesquisado.place(x=82, y=300)
-        self.entradaProdutoPesquisado = ctk.CTkEntry(self.frameTelaGerarPedido,  height=30, width=200, corner_radius=0)
+        self.entradaProdutoPesquisado = ctk.CTkEntry(self.frameParaItensNoFrame,  height=30, width=200, corner_radius=0)
         self.entradaProdutoPesquisado.place(x=82, y=332)
         self.entradaProdutoPesquisado.bind("<KeyRelease>", buscaProduto)
         self.frameTelaGerarPedido.bind("<Button-1>", lambda event: [label.destroy() for label in getattr(self, 'resultadoLabelsProduto', [])]) # exclui os valores da pesquisa de nome de usuário quando clicar em outro lgar no frame
 
 
         # detalhes
-        self.labelPreco = ctk.CTkLabel(self.frameTelaGerarPedido, text="Preço", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelPreco = ctk.CTkLabel(self.frameParaItensNoFrame, text="Preço", fg_color="#38343c",  height=30, width=120, corner_radius=0)
         self.labelPreco.place(x=284, y=300)
-        self.entradaPreco = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+        self.entradaPreco = ctk.CTkEntry(self.frameParaItensNoFrame, height=30, width=120, corner_radius=0)
         self.entradaPreco.place(x=284, y=332)
 
         # Quantidade
-        self.labelQuantdadeItem = ctk.CTkLabel(self.frameTelaGerarPedido, text="Quantidade", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelQuantdadeItem = ctk.CTkLabel(self.frameParaItensNoFrame, text="Quantidade", fg_color="#38343c",  height=30, width=120, corner_radius=0)
         self.labelQuantdadeItem.place(x=406, y=300)
-        self.entradaQuantdadeItem = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.quantidadeMaximaPermitida, height=30, width=120, corner_radius=0)
+        self.entradaQuantdadeItem = ctk.CTkEntry(self.frameParaItensNoFrame, textvariable=self.quantidadeMaximaPermitida, height=30, width=120, corner_radius=0)
         self.entradaQuantdadeItem.place(x=406, y=332)
 
 
         # Unidade de Medida
-        self.labelUnidadeMedida = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Unidade de medida", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelUnidadeMedida = ctk.CTkLabel(self.frameParaItensNoFrame,  text="Unidade de medida", fg_color="#38343c",  height=30, width=120, corner_radius=0)
         self.labelUnidadeMedida.place(x=528, y=300)
-        # valoresUnidadeDeMedida = [""]
-        self.entradaUnidadeMedida = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
+        self.entradaUnidadeMedida = ctk.CTkEntry(self.frameParaItensNoFrame, height=30, width=120, corner_radius=0)
         self.entradaUnidadeMedida.place(x=528, y=332)
 
         # Desconto Real
-        self.labelDescontosReal = ctk.CTkLabel(self.frameTelaGerarPedido, text="Desconto($)", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelDescontosReal = ctk.CTkLabel(self.frameParaItensNoFrame, text="Desconto($)", fg_color="#38343c",  height=30, width=120, corner_radius=0)
         self.labelDescontosReal.place(x=650, y=300)
-        self.entradaDescontosReal = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelDefinidaDeReal, height=30, width=120, corner_radius=0)
+        self.entradaDescontosReal = ctk.CTkEntry(self.frameParaItensNoFrame, textvariable=self.variavelDefinidaDeReal, height=30, width=120, corner_radius=0)
         self.entradaDescontosReal.place(x=650, y=332)
 
         # Desconto porcentagem
-        self.labelDescontosPorcentagem = ctk.CTkLabel(self.frameTelaGerarPedido, text="Desconto(%)", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelDescontosPorcentagem = ctk.CTkLabel(self.frameParaItensNoFrame, text="Desconto(%)", fg_color="#38343c",  height=30, width=120, corner_radius=0)
         self.labelDescontosPorcentagem.place(x=772, y=300)
-        self.entradaDescontosPorcentagem = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelDefinidaDePorcentagem, height=30, width=120, corner_radius=0)
+        self.entradaDescontosPorcentagem = ctk.CTkEntry(self.frameParaItensNoFrame, textvariable=self.variavelDefinidaDePorcentagem, height=30, width=120, corner_radius=0)
         self.entradaDescontosPorcentagem.place(x=772, y=332)
 
         # Acrescimo
-        self.labelAcrescimo = ctk.CTkLabel(self.frameTelaGerarPedido, text="Acrescimo", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelAcrescimo = ctk.CTkLabel(self.frameParaItensNoFrame, text="Acrescimo", fg_color="#38343c",  height=30, width=120, corner_radius=0)
         self.labelAcrescimo.place(x=894, y=300)
-        self.entradaAcrescimo = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelDefinidaDeAcrescimo, height=30, width=120, corner_radius=0)
+        self.entradaAcrescimo = ctk.CTkEntry(self.frameParaItensNoFrame, textvariable=self.variavelDefinidaDeAcrescimo, height=30, width=120, corner_radius=0)
         self.entradaAcrescimo.place(x=894, y=332)
 
         # Subtotal
-        self.labelSubtotal = ctk.CTkLabel(self.frameTelaGerarPedido, text="Subtotal", fg_color="#38343c",  height=30, width=120, corner_radius=0)
+        self.labelSubtotal = ctk.CTkLabel(self.frameParaItensNoFrame, text="Subtotal", fg_color="#38343c",  height=30, width=120, corner_radius=0)
         self.labelSubtotal.place(x=1016, y=300)
-        self.entradaSubtotal = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelDefinidaDeSubtotal, height=30, width=120, corner_radius=0)
+        self.entradaSubtotal = ctk.CTkEntry(self.frameParaItensNoFrame, textvariable=self.variavelDefinidaDeSubtotal, height=30, width=120, corner_radius=0)
         self.entradaSubtotal.place(x=1016, y=332)
+
+
+        # área de texto observações
+        self.labelAreaTexto = ctk.CTkLabel(self.frameTelaGerarPedido, text="Observações", height=30, font=("Century Gothic", 15))
+        self.labelAreaTexto.place(x=30, y=570)
+        self.textArea = ctk.CTkTextbox(self.frameTelaGerarPedido, width=300, height=150, corner_radius=8, wrap="word")
+        self.textArea.insert("0.0","É necessário a apresentação do recibo de venda para que a vendedora abra a assistência técnica, se necessário. Não devolvemos dinheiro. \n\nCONDIÇÃO DE PAGAMENTO:\nTROCA: \nENTREGA:")
+        self.textArea.place(x=30, y=600)
+
+        # área de texto enrtrega
+        self.labelAreaTexto = ctk.CTkLabel(self.frameTelaGerarPedido, text="Observações da entrega", height=30, font=("Century Gothic", 15))
+        self.labelAreaTexto.place(x=360, y=570)
+        self.textArea = ctk.CTkTextbox(self.frameTelaGerarPedido, width=250, height=150, corner_radius=8, wrap="word")
+        self.textArea.insert("0.0","Referências de endereço, localização, etc")
+        self.textArea.place(x=360, y=600)
+
+        # área de totais
+        self.labelAreaTotais = ctk.CTkLabel(self.frameTelaGerarPedido, text="Totais", font=("Century Gothic", 15))
+        self.labelAreaTotais.place(x=650, y=570)
+
+        self.labelDescontoTotalPorcento = ctk.CTkLabel(self.frameTotais, text="Desconto total(%)", font=("Century Gothic", 11))
+        self.labelDescontoTotalPorcento.place(x=10, y=-3)
+        self.descontoTotalPorcento = ctk.CTkEntry(self.frameTotais, state="readonly", textvariable=self.variavelTotalDescontoPorcentagem, height=20, width=100, corner_radius=0)
+        self.descontoTotalPorcento.place(x=10, y=20)
+
+        self.labelDescontoTotalReal = ctk.CTkLabel(self.frameTotais, text="Desconto total($)", font=("Century Gothic", 11))
+        self.labelDescontoTotalReal.place(x=140, y=-3)
+        self.descontoTotalReal = ctk.CTkEntry(self.frameTotais, state="readonly", textvariable=self.variavelTotalDescontoReal, height=20, width=100, corner_radius=0)
+        self.descontoTotalReal.place(x=140, y=20)
+
+        self.labelDescontoTotalPorcento = ctk.CTkLabel(self.frameTotais, text="Acréscimo total",  font=("Century Gothic", 11))
+        self.labelDescontoTotalPorcento.place(x=10, y=43)
+        self.descontoTotalPorcento = ctk.CTkEntry(self.frameTotais, state="readonly", textvariable=self.variavelTotalAcrescimo, height=20, width=100, corner_radius=0)
+        self.descontoTotalPorcento.place(x=10, y=65)
+
+        self.labelValorFrete = ctk.CTkLabel(self.frameTotais, text="Valor frete",  font=("Century Gothic", 11))
+        self.labelValorFrete.place(x=140, y=43)
+        self.valorFrete = ctk.CTkEntry(self.frameTotais, height=20, width=100, corner_radius=0)
+        self.valorFrete.place(x=140, y=65)
+
+        self.labelValorFinal = ctk.CTkLabel(self.frameValorFinal, text="TOTAL:", font=("Century Gothic", 20))
+        self.labelValorFinal.place(x=0, y=0)
+        self.valorFinal = ctk.CTkEntry(self.frameValorFinal, textvariable=self.variavelTotalSubtotal, corner_radius=0, height=40, width=180)
+        self.valorFinal.place(x=10, y=50)
+
+        # voltar
+        self.botaoVoltarTelaGerarPedido = ctk.CTkButton(self.frameTelaGerarPedido, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameTelaGerarPedido.destroy)
+        self.botaoVoltarTelaGerarPedido.place(x=30, y=760)
+
+        # gerar pedido
+        self.botaoGerarPedido = ctk.CTkButton(self.frameTelaGerarPedido, text="Gerar pedido", width=200, corner_radius=5, font=("Arial", 15), command=self)
+        self.botaoGerarPedido.place(x=260, y=760)
+
+
+
+        
+        
 
 
 

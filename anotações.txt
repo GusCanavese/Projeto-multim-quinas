@@ -42,6 +42,7 @@ ANOTAÇÕES
 - tornar o campo CPF ou CNPJ de fornecedor, obrigatório
 - fazer com que o vendedor na tela de gerar pedido seja buscado pelo usuário que ta fazendo a venda 
 - definir um vaor limite para os descontos na tela de gerar pedido
+- corrigir calculo do desconto total porcentagem da tela de gerar pedido
 
 
 

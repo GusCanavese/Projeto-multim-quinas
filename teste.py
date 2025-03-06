@@ -121,273 +121,66 @@ ctk.set_default_color_theme("blue")
 
 
 
-# import customtkinter as ctk
-
-# class App(ctk.CTk):
-#     def __init__(self):
-#         super().__init__()
-
-#         self.title("Gerar Pedido")
-#         self.geometry("1200x600")
-
-#         self.frameTelaGerarPedido = ctk.CTkFrame(self, width=1100, height=500)
-#         self.frameTelaGerarPedido.pack(pady=20)
-
-#         self.y_atual = 300  # Posição inicial para o primeiro item
-#         self.y_incremento = 40  # Espaço entre os itens
-
-#         self.statusDoPedido = ctk.CTkButton(
-#             self.frameTelaGerarPedido,
-#             text="Adicionar Item",
-#             width=130, height=30,
-#             corner_radius=5,
-#             font=("Arial", 15),
-#             command=self.adicionar_item
-#         )
-#         self.statusDoPedido.place(x=30, y=self.y_atual + 80)  # Posicionamento inicial
-
-#     def adicionar_item(self):
-#         """Adiciona um novo item na interface e move o botão para baixo."""
-#         # Criando o índice do item
-#         labelNumeroItem = ctk.CTkLabel(
-#             self.frameTelaGerarPedido, text=f"{(self.y_atual - 260) // self.y_incremento + 1}",
-#             fg_color="#38343c", height=30, width=50, corner_radius=0
-#         )
-#         labelNumeroItem.place(x=30, y=self.y_atual)
-
-#         # Campo do produto
-#         entradaProdutoPesquisado = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=200, corner_radius=0)
-#         entradaProdutoPesquisado.place(x=82, y=self.y_atual)
-
-#         # Preço
-#         entradaPreco = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaPreco.place(x=284, y=self.y_atual)
-
-#         # Quantidade
-#         entradaQuantidade = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaQuantidade.place(x=406, y=self.y_atual)
-
-#         # Unidade de Medida
-#         entradaUnidadeMedida = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaUnidadeMedida.place(x=528, y=self.y_atual)
-
-#         # Desconto em Real
-#         entradaDescontosReal = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaDescontosReal.place(x=650, y=self.y_atual)
-
-#         # Desconto em Porcentagem
-#         entradaDescontosPorcentagem = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaDescontosPorcentagem.place(x=772, y=self.y_atual)
-
-#         # Acréscimo
-#         entradaAcrescimo = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaAcrescimo.place(x=894, y=self.y_atual)
-
-#         # Subtotal
-#         entradaSubtotal = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaSubtotal.place(x=1016, y=self.y_atual)
-
-#         # Atualiza a posição Y e move o botão para baixo
-#         self.y_atual += self.y_incremento
-#         self.statusDoPedido.place(x=30, y=self.y_atual + 40)
-
-# # Inicializa a aplicação
-# app = App()
-# app.mainloop()
-
-
-
 
 # import customtkinter as ctk
-# import tkinter as tk  # Para o Scrollbar
 
-# class App(ctk.CTk):
-#     def __init__(self):
-#         super().__init__()
+# # Criando a janela principal
+# janela = ctk.CTk()
+# janela.geometry("500x300")
+# janela.title("Text Area - CustomTkinter")
 
-#         self.title("Gerar Pedido")
-#         self.geometry("1200x600")
+# # Criando a TextArea (CTkTextbox)
+# text_area = ctk.CTkTextbox(janela, width=400, height=150, corner_radius=8, wrap="word")
+# text_area.pack(padx=20, pady=20, fill="both", expand=True)
 
-#         # Frame principal
-#         container = ctk.CTkFrame(self, width=1100, height=500)
-#         container.pack(pady=20, padx=20, fill="both", expand=True)
+# # Adicionando texto inicial
+# text_area.insert("0.0", "Digite seu texto aqui...\n\nEssa é uma área de texto personalizada usando CustomTkinter.")
 
-#         # Canvas para rolagem
-#         self.canvas = tk.Canvas(container, bg="#2b2b2b", highlightthickness=0)
-#         self.canvas.pack(side="left", fill="both", expand=True)
+# # Criando um botão para capturar o texto digitado
+# def obter_texto():
+#     texto = text_area.get("0.0", "end")  # Pegando o conteúdo da caixa de texto
+#     print("Texto digitado:\n", texto)
 
-#         # Barra de rolagem
-#         scrollbar = ctk.CTkScrollbar(container, command=self.canvas.yview)
-#         scrollbar.pack(side="right", fill="y")
-#         self.canvas.configure(yscrollcommand=scrollbar.set)
+# botao = ctk.CTkButton(janela, text="Obter Texto", command=obter_texto)
+# botao.pack(pady=10)
 
-#         # Frame dentro do canvas (onde os widgets serão adicionados)
-#         self.frameTelaGerarPedido = ctk.CTkFrame(self.canvas, width=1080, fg_color="transparent")
-#         self.window = self.canvas.create_window((0, 0), window=self.frameTelaGerarPedido, anchor="nw")
-
-#         # Variáveis de controle do layout
-#         self.y_atual = 10  # Posição inicial para o primeiro item
-#         self.y_incremento = 40  # Espaço entre os itens
-
-#         # Botão para adicionar itens
-#         self.statusDoPedido = ctk.CTkButton(
-#             self.frameTelaGerarPedido,
-#             text="Adicionar Item",
-#             width=130, height=30,
-#             corner_radius=5,
-#             font=("Arial", 15),
-#             command=self.adicionar_item
-#         )
-#         self.statusDoPedido.place(x=30, y=self.y_atual + 80)
-
-#         # Ajustar rolagem
-#         self.frameTelaGerarPedido.bind("<Configure>", self.on_frame_configure)
-
-#     def adicionar_item(self):
-#         """Adiciona um novo item e ajusta a rolagem."""
-#         # Criando o índice do item
-#         labelNumeroItem = ctk.CTkLabel(
-#             self.frameTelaGerarPedido, text=f"{(self.y_atual - 10) // self.y_incremento + 1}",
-#             fg_color="#38343c", height=30, width=50, corner_radius=0
-#         )
-#         labelNumeroItem.place(x=30, y=self.y_atual)
-
-#         # Campo do produto
-#         entradaProdutoPesquisado = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=200, corner_radius=0)
-#         entradaProdutoPesquisado.place(x=82, y=self.y_atual)
-
-#         # Preço
-#         entradaPreco = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaPreco.place(x=284, y=self.y_atual)
-
-#         # Quantidade
-#         entradaQuantidade = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaQuantidade.place(x=406, y=self.y_atual)
-
-#         # Unidade de Medida
-#         entradaUnidadeMedida = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaUnidadeMedida.place(x=528, y=self.y_atual)
-
-#         # Desconto em Real
-#         entradaDescontosReal = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaDescontosReal.place(x=650, y=self.y_atual)
-
-#         # Desconto em Porcentagem
-#         entradaDescontosPorcentagem = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaDescontosPorcentagem.place(x=772, y=self.y_atual)
-
-#         # Acréscimo
-#         entradaAcrescimo = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaAcrescimo.place(x=894, y=self.y_atual)
-
-#         # Subtotal
-#         entradaSubtotal = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-#         entradaSubtotal.place(x=1016, y=self.y_atual)
-
-#         # Atualiza a posição Y e move o botão para baixo
-#         self.y_atual += self.y_incremento
-#         self.statusDoPedido.place(x=30, y=self.y_atual + 40)
-
-#         # Atualizar área rolável
-#         self.frameTelaGerarPedido.update_idletasks()
-#         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
-#     def on_frame_configure(self, event):
-#         """Ajusta o tamanho do canvas conforme o conteúdo cresce."""
-#         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
-# # Inicializa a aplicação
-# app = App()
-# app.mainloop()
+# # Rodando a aplicação
+# janela.mainloop()
 
 
+self.totalPreco = 0.0
+self.totalQuantidade = 0
+self.totalDescontoReal = 0.0
+self.totalDescontoPorcentagem = 0.0
+self.totalAcrescimo = 0.0
+self.totalSubtotal = 0.0
 
-import customtkinter as ctk
 
-class Aplicacao:
-    def __init__(self, root):
-        self.root = root
-        self.root.geometry("1200x700")
-        
-        # Frame principal
-        self.frameTelaGerarPedido = ctk.CTkFrame(self.root, width=1200, height=700)
-        self.frameTelaGerarPedido.pack(fill="both", expand=True)
+def calcularTotais():
+            self.totalPreco = 0.0
+            self.totalQuantidade = 0
+            self.totalDescontoReal = 0.0
+            self.totalDescontoPorcentagem = 0.0
+            self.totalAcrescimo = 0.0
+            self.totalSubtotal = 0.0
 
-        self.yAtualBotao = 364
-        self.yFuturoBotao = 32
+            for item in self.itensCriados:
+                preco = float(item[2].get() or 0)  # entradaPreco
+                quantidade = int(item[3].get() or 0)  # entradaQuantidade
+                descontoReal = float(item[5].get() or 0)  # entradaDescontosReal
+                descontoPorcentagem = float(item[6].get() or 0)  # entradaDescontosPorcentagem
+                acrescimo = float(item[7].get() or 0)  # entradaAcrescimo
+                subtotal = float(item[8].get() or 0)  # entradaSubtotal
 
-        # Lista para armazenar os itens adicionados
-        self.itensCriados = []
+                self.totalPreco += preco
+                self.totalQuantidade += quantidade
+                self.totalDescontoReal += descontoReal
+                self.totalDescontoPorcentagem += descontoPorcentagem
+                self.totalAcrescimo += acrescimo
+                self.totalSubtotal += subtotal
 
-        # Botão para adicionar item
-        self.botaoAdicionar = ctk.CTkButton(self.frameTelaGerarPedido, text="Adicionar Item", width=130, height=20,
-                                            corner_radius=5, font=("Arial", 15), command=self.adicionarItem)
-        self.botaoAdicionar.place(x=1011, y=380)
+self.labelDescontoTotalReal = ctk.CTkLabel(self.frameTotais, text="Desconto total($)", font=("Century Gothic", 11))
+self.labelDescontoTotalReal.place(x=140, y=-3)
+self.descontoTotalReal = ctk.CTkEntry(self.frameTotais, textvariable=ctk.StringVar(value=self.totalDescontoReal), height=20, width=100, corner_radius=0)
+self.descontoTotalReal.place(x=140, y=20)
 
-    def adicionarItem(self):
-        """ Adiciona um novo item na interface """
-        numero_item = len(self.itensCriados) + 1
-
-        labelNumeroItem = ctk.CTkLabel(self.frameTelaGerarPedido, text=f"{numero_item}", fg_color="#38343c", height=30, width=50, corner_radius=0)
-        labelNumeroItem.place(x=30, y=self.yAtualBotao)
-
-        entradaProdutoPesquisado = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=200, corner_radius=0)
-        entradaProdutoPesquisado.place(x=82, y=self.yAtualBotao)
-
-        entradaPreco = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-        entradaPreco.place(x=284, y=self.yAtualBotao)
-
-        entradaQuantidade = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-        entradaQuantidade.place(x=406, y=self.yAtualBotao)
-
-        entradaUnidadeMedida = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-        entradaUnidadeMedida.place(x=528, y=self.yAtualBotao)
-
-        entradaDescontosReal = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-        entradaDescontosReal.place(x=650, y=self.yAtualBotao)
-
-        entradaDescontosPorcentagem = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-        entradaDescontosPorcentagem.place(x=772, y=self.yAtualBotao)
-
-        entradaAcrescimo = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-        entradaAcrescimo.place(x=894, y=self.yAtualBotao)
-
-        entradaSubtotal = ctk.CTkEntry(self.frameTelaGerarPedido, height=30, width=120, corner_radius=0)
-        entradaSubtotal.place(x=1016, y=self.yAtualBotao)
-
-        # Botão de Remover Item
-        botaoRemover = ctk.CTkButton(self.frameTelaGerarPedido, text="X", width=30, height=30, fg_color="red",
-                                     corner_radius=5, command=lambda: self.removerItem(numero_item - 1))
-        botaoRemover.place(x=1140, y=self.yAtualBotao)
-
-        # Adiciona os widgets na lista
-        self.itensCriados.append((labelNumeroItem, entradaProdutoPesquisado, entradaPreco, entradaQuantidade,
-                                  entradaUnidadeMedida, entradaDescontosReal, entradaDescontosPorcentagem,
-                                  entradaAcrescimo, entradaSubtotal, botaoRemover))
-
-        # Atualiza a posição Y e move o botão para baixo
-        self.yAtualBotao += self.yFuturoBotao
-        self.botaoAdicionar.place(x=1011, y=self.yAtualBotao + 40)
-
-    def removerItem(self, index):
-        """ Remove um item da interface """
-        if 0 <= index < len(self.itensCriados):
-            # Apaga todos os widgets do item correspondente
-            for widget in self.itensCriados[index]:
-                widget.destroy()
-
-            # Remove o item da lista
-            del self.itensCriados[index]
-
-            # Atualiza os números dos itens restantes
-            for i in range(index, len(self.itensCriados)):
-                self.itensCriados[i][0].configure(text=str(i + 1))
-            
-            # Atualiza a posição Y do botão de adicionar
-            self.yAtualBotao -= self.yFuturoBotao
-            self.botaoAdicionar.place(x=1011, y=self.yAtualBotao + 40)
-
-if __name__ == "__main__":
-    root = ctk.CTk()
-    app = Aplicacao(root)
-    root.mainloop()
