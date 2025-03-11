@@ -898,8 +898,9 @@ class App(ctk.CTk):
                     for widget in self.itensCriados[i][1:]:  
                         if widget:
                             widget.place(y=y_pos)
+            if index > 0:  
+                self.itensCriados[index - 1][3].configure(state="normal")       
 
-                
                 if self.itensCriados:
                     ultimoItem = self.itensCriados[-1]
                     if ultimoItem[-1] is None:  
@@ -914,6 +915,7 @@ class App(ctk.CTk):
        
         # adiciona uma nova linha para adicionar produtos    
         def adicionarItem():
+            
             if self.itensCriados:
                 ultimoItem = self.itensCriados[-1]
                 camposObrigatorios = [
@@ -922,6 +924,12 @@ class App(ctk.CTk):
                     ultimoItem[3].get(),  
                     ultimoItem[4].get()   
                 ]
+
+            index = len(self.itensCriados) 
+
+            
+            if index > 0:
+                self.itensCriados[index - 1][3].configure(state="disabled")
 
                 if any(campo == "" for campo in camposObrigatorios):
                     labelValorPreenchaCampos = ctk.CTkLabel(self, text="Preencha todos os campos", fg_color="red", text_color="white", corner_radius=5)
@@ -1013,14 +1021,14 @@ class App(ctk.CTk):
                 yNovo += 29
             calcularTotais()
 
+        #        
         def selecionaProdutoParaItem(nome, valor, quantidade, index):
-            # quantidade_atual = self.itensCriados[
 
             self.itensCriados[index][1].delete(0, "end")
             self.itensCriados[index][1].insert(0, nome)
 
             self.itensCriados[index][3].delete(0, "end")
-            self.itensCriados[index][3].insert(0, quantidade_atual)
+            self.itensCriados[index][3].insert(0, 1)
 
             self.itensCriados[index][2].delete(0, "end")
             self.itensCriados[index][2].insert(0, valor)
@@ -1031,9 +1039,9 @@ class App(ctk.CTk):
             self.itensCriados[index][7].delete(0, "end")
             self.itensCriados[index][7].insert(0, 0.00)
 
-            print(self.itensCriados[index][7])
-
             self.quantidadeMaximaAtualItem = quantidade
+
+            print(quantidade)
 
             calcularAlteracoesParaItem(index)
 
