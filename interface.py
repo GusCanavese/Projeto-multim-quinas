@@ -695,6 +695,7 @@ class App(ctk.CTk):
         # frame valor final para finalizar o preço de tudo
         self.frameValorFinal = ctk.CTkFrame(self.frameTelaGerarPedido, width=200, height=150)
         self.frameValorFinal.place(x=950, y=600)
+        self.quantidades = []
 
         # soma tudo, de todos os itens
         def calcularTotais():
@@ -743,13 +744,14 @@ class App(ctk.CTk):
             self.variavelTotalDescontoPorcentagem.set(round(self.totalDescontoPorcentagem, 2))
             self.variavelTotalSubtotal.set(round(self.totalSubtotal, 2))
 
-            print("Total Preço:", self.totalPreco)
-            print("Total Quantidade:", self.totalQuantidade)
-            print("Total Desconto Real:", self.totalDescontoReal)
-            print("Total Desconto Porcentagem:", self.totalDescontoPorcentagem)
-            print("Total Acréscimo:", self.totalAcrescimo)
-            print("Total Subtotal:", self.totalSubtotal)
+            # print("Total Preço:", self.totalPreco)
+            # print("Total Quantidade:", self.totalQuantidade)
+            # print("Total Desconto Real:", self.totalDescontoReal)
+            # print("Total Desconto Porcentagem:", self.totalDescontoPorcentagem)
+            # print("Total Acréscimo:", self.totalAcrescimo)
+            # print("Total Subtotal:", self.totalSubtotal)
         
+            print(self.quantidades)
 
         # pesquisa que fica aparecendo e sumindo os valores que estou pesquisando
         def buscaCliente(event=None): 
@@ -786,8 +788,6 @@ class App(ctk.CTk):
             for label in self.resultadoLabels: 
                 label.destroy()
 
-
-
         # pesquisa que fica aparecendo quando digitamos algo no campo do produto
         def buscaProduto(event=None):
             calcularTotais()
@@ -812,7 +812,7 @@ class App(ctk.CTk):
                 yNovo += 29
 
             # ações realizadas quando digitamos em cada campo
-            self.entradaQuantdadeItem.bind("<KeyRelease>", lambda event: verificaQuantidadeMaxima(self.quantidadeMaximaAtual))
+            self.entradaQuantdadeItem.bind("<KeyRelease>", lambda event: verificaQuantidadeMaxima(self.quantidadeMaximaAtualOriginal))
             self.entradaAcrescimo.bind("<KeyRelease>", lambda event: calcularAlteracoes())
             self.entradaPreco.bind("<KeyRelease>", lambda event: calcularAlteracoes())
             self.entradaDescontosReal.bind("<FocusIn>", lambda event: limparCampo(event, self.entradaDescontosPorcentagem))
@@ -830,7 +830,7 @@ class App(ctk.CTk):
 
         # ao selecionar o produto é chamada
         def selecionaProduto(nome, valor, quantidade):
-            calcularTotais()
+            
             self.entradaProdutoPesquisado.delete(0, "end")
             self.entradaProdutoPesquisado.insert(0, nome)
             
@@ -844,14 +844,14 @@ class App(ctk.CTk):
             self.entradaUnidadeMedida.insert(0, "UN")
 
             self.variavelDefinidaDeAcrescimo.set(0.00)
-            self.quantidadeMaximaAtual = quantidade 
+            self.quantidadeMaximaAtualOriginal = quantidade 
 
             calcularAlteracoes()
             for label in self.resultadoLabelsProduto: 
                 label.destroy()
+                
+            calcularTotais()
             
-
-
         # toda alteração realizada o subtotal precisa ser atualizado
         def calcularAlteracoes():
             preco = float(self.entradaPreco.get() or 0)
@@ -979,7 +979,7 @@ class App(ctk.CTk):
 
             entradaProdutoPesquisado.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: buscaProdutoParaItem(idx))
             entradaPreco.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: calcularAlteracoesParaItem(idx))
-            entradaQuantidade.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: verificaQuantidadeMaximaParaItem(self.quantidadeMaximaAtual, idx))
+            entradaQuantidade.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: verificaQuantidadeMaximaParaItem(self.quantidadeMaximaAtualItem, idx))
             entradaDescontosReal.bind("<FocusIn>", lambda event, idx=len(self.itensCriados) - 1: limparCampo(event, self.itensCriados[idx][6]))
             entradaDescontosReal.bind("<KeyRelease>", lambda event, idx=len(self.itensCriados) - 1: calcularAlteracoesParaItem(idx))
             entradaDescontosPorcentagem.bind("<FocusIn>", lambda event, idx=len(self.itensCriados) - 1: limparCampo(event, self.itensCriados[idx][5]))
@@ -1000,23 +1000,27 @@ class App(ctk.CTk):
                     label.destroy()
 
             self.resultadoLabelsProduto = []
+
             yNovo = 394 + (index*32)
             
             for i, row in enumerate(resultado):
                 if i >= 3: break
                 label = ctk.CTkButton(self.frameParaItensNoFrame, width=300, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda nome=row[0], valor=row[1], quantidade=row[2]: selecionaProdutoParaItem(nome, valor, quantidade, index))
                 label.place(x=82, y=yNovo)
+                self.quantidades.append(row[2])
+
                 self.resultadoLabelsProduto.append(label)
                 yNovo += 29
             calcularTotais()
 
-        # ao clicar no item, serão preenchido os campos
         def selecionaProdutoParaItem(nome, valor, quantidade, index):
+            # quantidade_atual = self.itensCriados[
+
             self.itensCriados[index][1].delete(0, "end")
             self.itensCriados[index][1].insert(0, nome)
-            
+
             self.itensCriados[index][3].delete(0, "end")
-            self.itensCriados[index][3].insert(0, 1)
+            self.itensCriados[index][3].insert(0, quantidade_atual)
 
             self.itensCriados[index][2].delete(0, "end")
             self.itensCriados[index][2].insert(0, valor)
@@ -1027,12 +1031,16 @@ class App(ctk.CTk):
             self.itensCriados[index][7].delete(0, "end")
             self.itensCriados[index][7].insert(0, 0.00)
 
-            self.quantidadeMaximaAtual = quantidade
+            print(self.itensCriados[index][7])
+
+            self.quantidadeMaximaAtualItem = quantidade
 
             calcularAlteracoesParaItem(index)
 
             for label in self.resultadoLabelsProduto:
                 label.destroy()
+
+            calcularTotais()
 
         # sempre que o campo for alterado, serão realizadas operações para modificar seu subtotal
         def calcularAlteracoesParaItem(index):
@@ -1070,6 +1078,7 @@ class App(ctk.CTk):
 
                 calcularAlteracoesParaItem(index)
             else:
+                self.quantidades.clear()
                 calcularAlteracoesParaItem(index)
                 print("Quantidade válida")
     
@@ -1248,12 +1257,14 @@ class App(ctk.CTk):
         self.botaoVoltarTelaGerarPedido.place(x=30, y=760)
 
         # gerar pedido
-        self.botaoGerarPedido = ctk.CTkButton(self.frameTelaGerarPedido, text="Gerar pedido", width=200, corner_radius=5, font=("Arial", 15), command=self)
+        self.botaoGerarPedido = ctk.CTkButton(self.frameTelaGerarPedido, text="Gerar pedido", width=200, corner_radius=5, font=("Arial", 15), command=self.telaImprimirPedido)
         self.botaoGerarPedido.place(x=260, y=760)
 
     # gera o pedido
-    def telaImprimirPedido():
-        pass
+    def telaImprimirPedido(self):
+        self.dados = [self.totalSubtotal]
+        print(self.dados)
+        
 
     #? ===================== FUNÇÕES DO BANCO DE DADOS ===================== #
 
