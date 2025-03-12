@@ -356,9 +356,6 @@ dados_exemplo = {
     #     "subtotal": "3.500,00"
     # }
 ],
-"observacoes": "É necessário a apresentação do recibo para assistência técnica. Não devolvemos dinheiro.",
-"condicao_pagamento": "À VISTA",
-"entrega": "ENTREGAR"
 }
     
 gerar_recibo("recibo_venda.pdf", dados_exemplo)

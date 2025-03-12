@@ -4,10 +4,8 @@ from tkinter import messagebox
 import datetime
 import gc
 from PIL import Image
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle
+import geradorDePedido
+# import random
 
 
 # ctk.set_appearance_mode("system")  
@@ -37,7 +35,7 @@ class App(ctk.CTk):
         alturaTela = 900
         larguraTela = 1280
         self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
-        self.telaGerarPedido()
+        self.telaLogin()
 
 
     #? ===================== TELAS ===================== #
@@ -108,7 +106,7 @@ class App(ctk.CTk):
             self.botaoRelatorioDeVendas = ctk.CTkButton(self.frameTelaAcoes, text="Relatório de vendas", width=300, corner_radius=5, font=("Arial", 18), command=self)
             self.botaoRelatorioDeVendas.place(relx=0.66, y=200, anchor="center")
 
-            # botão de gerar pedidos # ! ainda não está ativo nem possui uma tela criada para ele
+            # botão de gerar pedidos
             self.botaogGerarPedido = ctk.CTkButton(self.frameTelaAcoes, text="Gerar pedido", width=300, corner_radius=5, font=("Arial", 18), command=self.telaDefineCnpjDoProduto)
             self.botaogGerarPedido.place(relx=0.33, y=250, anchor="center")
 
@@ -658,12 +656,16 @@ class App(ctk.CTk):
         self.variavelDefinidaDeAcrescimo = ctk.StringVar()
         self.variavelDefinidaDeSubtotal = ctk.StringVar()
         self.variavelDefinidaDeUnidadeDeMedida = ctk.StringVar()
+        self.variavelFuncionarioAtual = ctk.StringVar()
         
         self.variavelTotalDescontoReal = ctk.StringVar()
         self.variavelTotalDescontoPorcentagem = ctk.StringVar()
         self.variavelTotalAcrescimo = ctk.StringVar()
         self.variavelTotalSubtotal = ctk.StringVar()
+        self.variavelnumeroDoPedido = ctk.StringVar()
 
+        usuarioLogado = self.login.get()
+        self.numeroDoPedido = 0
         self.totalPreco = 0.0
         self.totalQuantidade = 0
         self.totalDescontoReal = 0.0
@@ -671,11 +673,31 @@ class App(ctk.CTk):
         self.totalAcrescimo = 0.0
         self.totalSubtotal = 0.0
 
+        self.variavelFuncionarioAtual.set(usuarioLogado)
+
         self.variavelSubtotal = 0.00
         self.variavelSubtotalAux = 0.00
         
+        def geraNumeroPedido():
+            self.numeroDoPedido += 1
+
+            queryInserirNumeroDaVenda = "SELECT MAX(id_pedido) AS maior_numero FROM pedidos"
+            db.cursor.execute(queryInserirNumeroDaVenda)
+            resultado = db.cursor.fetchone()
+            maiorNumro = resultado[0]
+            if maiorNumro == None:
+                maiorNumro = 0 
+            numeroDoPedidoSendoCriado = maiorNumro+1
+            self.variavelnumeroDoPedido.set(numeroDoPedidoSendoCriado)
+
+
+
+
+
+
         # criação do frame
         self.frameTelaGerarPedido = ctk.CTkFrame(self, height=800, width=1200, corner_radius=5)
+       
         self.frameTelaGerarPedido.place(x=40, y=50)      
 
         # criar canva para itens adicionados
@@ -696,6 +718,33 @@ class App(ctk.CTk):
         self.frameValorFinal = ctk.CTkFrame(self.frameTelaGerarPedido, width=200, height=150)
         self.frameValorFinal.place(x=950, y=600)
         self.quantidades = []
+
+        # def salvarValoresDosItens():
+        #     valoresDosItens = []
+            
+        #     for item in self.itensCriados:
+        #         valoresItem = {
+        #             "produto": item[1].get(),
+        #             "preco": float(item[2].get() or 0),
+        #             "quantidade": int(item[3].get() or 0),
+        #             "unidade_medida": item[4].get(),
+        #             "desconto_real": float(item[5].get() or 0),
+        #             "desconto_porcentagem": float(item[6].get() or 0),
+        #             "acrescimo": float(item[7].get() or 0),
+        #             "subtotal": float(item[8].get() or 0)
+        #         }
+        #         valoresDosItens.append(valoresItem)
+            
+        #     totais = {
+        #         "total_preco": self.totalPreco,
+        #         "total_quantidade": self.totalQuantidade,
+        #         "total_desconto_real": self.totalDescontoReal,
+        #         "total_desconto_porcentagem": self.totalDescontoPorcentagem,
+        #         "total_acrescimo": self.totalAcrescimo,
+        #         "total_subtotal": self.totalSubtotal
+        #     }
+            
+        #     print(valoresDosItens)
 
         # soma tudo, de todos os itens
         def calcularTotais():
@@ -1021,7 +1070,7 @@ class App(ctk.CTk):
                 yNovo += 29
             calcularTotais()
 
-        #        
+        # ao clicar no produto ele é selecionado 
         def selecionaProdutoParaItem(nome, valor, quantidade, index):
 
             self.itensCriados[index][1].delete(0, "end")
@@ -1098,17 +1147,15 @@ class App(ctk.CTk):
         self.botaoAdicionarItem = ctk.CTkButton(self.frameParaItensNoFrame, text="Adicionar Item", width=130, height=20, corner_radius=5, font=("Arial", 15), command=adicionarItem)
         self.botaoAdicionarItem.place(x=1011, y=380)
 
-
-
-
         # título
+        geraNumeroPedido()
         self.textoGerarPedido = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Gerar pedido", font=("Century Gothic bold", 30))
         self.textoGerarPedido.place(relx=0.5, y=40, anchor="center")
 
         # entrada da do número da venda #!seria bom ser auto increment
         self.labelNumeroDataVenda = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Número da venda", font=("Century Gothic bold", 14))
         self.labelNumeroDataVenda.place(x=30, y=75)
-        self.numeroDeVenda = ctk.CTkEntry(self.frameTelaGerarPedido, placeholder_text="Número", width=180, corner_radius=5, font=("Arial", 15))
+        self.numeroDeVenda = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable = self.variavelnumeroDoPedido, placeholder_text="Número", width=180, corner_radius=5, font=("Arial", 15))
         self.numeroDeVenda.place(x=30, y=100)
 
         # entrada da data da criação do pedido
@@ -1133,8 +1180,7 @@ class App(ctk.CTk):
         # qual funcionaria ta fazendo a venda? #! PEGAR O USUÁRIO QUE ESTÁ LOGADO
         self.labelFuncionaria = ctk.CTkLabel(self.frameTelaGerarPedido, text="Vendedor(a)", font=("Century Gothic bold", 15))
         self.labelFuncionaria.place(x=910, y=75)
-        opcoesFuncionaria = ["Nenhum","Bruna", "Camila", "Vânia", "Yara", "Mauricio", "Ana Flávia"]
-        self.funcionariaPedido = ctk.CTkComboBox(self.frameTelaGerarPedido, width=180, corner_radius=5, font=("Century Gothic bold", 15), values=opcoesFuncionaria)
+        self.funcionariaPedido = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelFuncionarioAtual, width=180, corner_radius=5, font=("Century Gothic bold", 15))
         self.funcionariaPedido.place(x=910, y=100)
 
 
@@ -1270,8 +1316,18 @@ class App(ctk.CTk):
 
     # gera o pedido
     def telaImprimirPedido(self):
-        self.dados = [self.totalSubtotal]
+        dataAgora = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        usuarioAtual = self.login.get()
+        print(usuarioAtual)
+        
+        self.dados = {
+            "numero_recibo":self.numeroDeVenda.get(),
+            "data_emissao":dataAgora,
+            "subtotal": self.totalSubtotal,
+        }
         print(self.dados)
+
+        geradorDePedido.gerar_recibo("Pedido", self.dados)
         
 
     #? ===================== FUNÇÕES DO BANCO DE DADOS ===================== #
