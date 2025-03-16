@@ -5,6 +5,8 @@ import datetime
 import gc
 from PIL import Image
 import geradorDePedido
+from consultas.select import Buscas
+from consultas.insert import Insere
 # import random
 
 
@@ -30,7 +32,7 @@ class App(ctk.CTk):
 
     # define as propriedades da janela
     def janela(self):
-        self.criaFrames()
+        # self.criaFrames()
         self.resizable(False, False)
         alturaTela = 900
         larguraTela = 1280
@@ -65,23 +67,21 @@ class App(ctk.CTk):
 
     # tela que define os botões que vão levar para as outras funcionalidades
     def telaAcoes(self):
-        self.criaFrames()# reseta o endereço de memória de todos os frames para None novamente, e em seguida cria o atual
-        usuarioBloqueado = self.login.get()
-        queryConsultaUsuarioBloqueado = "SELECT cargo FROM funcionarios WHERE login = %s;"
-        db.cursor.execute(queryConsultaUsuarioBloqueado, (usuarioBloqueado,))
-        cargoUsuarioBloqueado = db.cursor.fetchall()
 
-        
         self.frameTelaAcoes = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
-        self.frameTelaAcoes.place(x=140, y=100)     # colocando no lugar
+        self.frameTelaAcoes.place(x=140, y=100)     
         self.frameTelaAcoes.grid_propagate(False)
+        usuarioBloqueado = self.login.get()
+        cargo = Buscas.buscaCargoUsuarioBloqueado(usuarioBloqueado)
+
+
         
         # título
         self.Acoes = ctk.CTkLabel(self.frameTelaAcoes, width=950, height=0, text="Ações", font=("Century Gothic bold", 30))
         self.Acoes.place(relx=0.5, y=50, anchor="center")
 
         # condição que bloqueia o acesso dos vendedores externos
-        if cargoUsuarioBloqueado == (('Vendedor(a) externo',),):
+        if cargo == (('Vendedor(a) externo',),):
             # botão de relatório de vendas # ! ainda não está ativo nem possui uma tela criada para ele 
             self.botaoRelatorioDeVendas = ctk.CTkButton(self.frameTelaAcoes, text="Relatório de vendas", width=300, corner_radius=5, font=("Arial", 18), command=self)
             self.botaoRelatorioDeVendas.place(relx=0.66, y=200, anchor="center")
@@ -664,7 +664,7 @@ class App(ctk.CTk):
         self.variavelTotalSubtotal = ctk.StringVar()
         self.variavelnumeroDoPedido = ctk.StringVar()
 
-        usuarioLogado = self.login.get()
+        # usuarioLogado = self.login.get()
         self.numeroDoPedido = 0
         self.totalPreco = 0.0
         self.totalQuantidade = 0
@@ -673,21 +673,17 @@ class App(ctk.CTk):
         self.totalAcrescimo = 0.0
         self.totalSubtotal = 0.0
 
-        self.variavelFuncionarioAtual.set(usuarioLogado)
+        # self.variavelFuncionarioAtual.set(usuarioLogado)
 
         self.variavelSubtotal = 0.00
         self.variavelSubtotalAux = 0.00
         
         def geraNumeroPedido():
             self.numeroDoPedido += 1
-
-            queryInserirNumeroDaVenda = "SELECT MAX(id_pedido) AS maior_numero FROM pedidos"
-            db.cursor.execute(queryInserirNumeroDaVenda)
-            resultado = db.cursor.fetchone()
-            maiorNumro = resultado[0]
-            if maiorNumro == None:
-                maiorNumro = 0 
-            numeroDoPedidoSendoCriado = maiorNumro+1
+            maiorNumero = Buscas.selecionaNumeroPedido()[0]
+            if maiorNumero == None:
+                maiorNumero = 0 
+            numeroDoPedidoSendoCriado = maiorNumero+1
             self.variavelnumeroDoPedido.set(numeroDoPedidoSendoCriado)
 
 
@@ -746,9 +742,8 @@ class App(ctk.CTk):
             
         #     print(valoresDosItens)
 
-        # soma tudo, de todos os itens
+
         def calcularTotais():
-            # Reinicia os totais antes de recalcular
             self.totalPreco = 0.0
             self.totalQuantidade = 0
             self.totalDescontoReal = 0.0
@@ -806,9 +801,7 @@ class App(ctk.CTk):
         def buscaCliente(event=None): 
             calcularTotais()
             nomeDoCliente = self.nomeDoClienteBuscado.get()
-            queryBuscaCliente = "SELECT nome, cpf_cnpj FROM clientes WHERE nome LIKE %s"
-            db.cursor.execute(queryBuscaCliente, (f"%{nomeDoCliente}%",))
-            resultado = db.cursor.fetchall()
+            dadosCliente = Buscas.buscaDadosCliente(nomeDoCliente)
 
             if hasattr(self, 'resultadoLabels'):
                 for label in self.resultadoLabels: 
@@ -817,7 +810,7 @@ class App(ctk.CTk):
             self.resultadoLabels = []
             
             yNovo = 230  
-            for i, row in enumerate(resultado):
+            for i, row in enumerate(dadosCliente):
                 if i >= 3:
                     break
                 label = ctk.CTkButton(self.frameTelaGerarPedido, width=280, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda  nome=row[0], cnpj=row[1]: selecionaCliente(nome, cnpj))
@@ -841,10 +834,8 @@ class App(ctk.CTk):
         def buscaProduto(event=None):
             calcularTotais()
             nomeDoProduto = self.entradaProdutoPesquisado.get()
-            queryBuscaProduto = "SELECT nome_do_produto, valor_de_venda, quantidade FROM produtos WHERE nome_do_produto LIKE %s"
-            db.cursor.execute(queryBuscaProduto, (f"%{nomeDoProduto}%",))
-            resultado = db.cursor.fetchall()
-            print(resultado)
+            Buscas.buscaProduto(nomeDoProduto)
+            print(Buscas.buscaProduto(nomeDoProduto))
 
             if hasattr(self, "resultadoLabelsProduto"):
                 for label in self.resultadoLabelsProduto:
@@ -853,7 +844,7 @@ class App(ctk.CTk):
             self.resultadoLabelsProduto = []
             yNovo = 362
             
-            for i, row in enumerate(resultado):
+            for i, row in enumerate(Buscas.buscaProduto(nomeDoProduto)):
                 if i >=3: break
                 label = ctk.CTkButton(self.frameParaItensNoFrame, width=300, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda nome = row[0], valor = row[1], quantidade=row[2]: selecionaProduto(nome, valor, quantidade))
                 label.place(x=82, y=yNovo)
@@ -1047,10 +1038,9 @@ class App(ctk.CTk):
         # busca o produto no banco de dados
         def buscaProdutoParaItem(index):
             nomeDoProduto = self.itensCriados[index][1].get()
-            queryBuscaProduto = "SELECT nome_do_produto, valor_de_venda, quantidade FROM produtos WHERE nome_do_produto LIKE %s"
-            db.cursor.execute(queryBuscaProduto, (f"%{nomeDoProduto}%",))
-            resultado = db.cursor.fetchall()
-            print(resultado)
+            Buscas.buscaProduto(nomeDoProduto)
+            print(Buscas.buscaProduto(nomeDoProduto))
+
 
             if hasattr(self, "resultadoLabelsProduto"):
                 for label in self.resultadoLabelsProduto:
@@ -1060,7 +1050,7 @@ class App(ctk.CTk):
 
             yNovo = 394 + (index*32)
             
-            for i, row in enumerate(resultado):
+            for i, row in enumerate(Buscas.buscaProduto(nomeDoProduto)):
                 if i >= 3: break
                 label = ctk.CTkButton(self.frameParaItensNoFrame, width=300, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda nome=row[0], valor=row[1], quantidade=row[2]: selecionaProdutoParaItem(nome, valor, quantidade, index))
                 label.place(x=82, y=yNovo)
@@ -1317,14 +1307,18 @@ class App(ctk.CTk):
     # gera o pedido
     def telaImprimirPedido(self):
         dataAgora = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        usuarioAtual = self.login.get()
-        print(usuarioAtual)
+        dataConfirmacaoVenda = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        #!para o destinatario do cliente é necessário fazer ma query para consultar o endereço, mas para isso, antes, deixe o código modular
+        # usuarioAtual = self.login.get()
+        # print(usuarioAtual)
         
-        self.dados = {
-            "numero_recibo":self.numeroDeVenda.get(),
-            "data_emissao":dataAgora,
-            "subtotal": self.totalSubtotal,
-        }
+        # self.dados = {
+        #     "destinatario": ,
+        #     "data_confirmacao":self.dataDaVenda.get() ,
+        #     "numero_recibo":self.numeroDeVenda.get(),
+        #     "data_emissao":dataAgora,
+        #     "subtotal": self.totalSubtotal,
+        # }
         print(self.dados)
 
         geradorDePedido.gerar_recibo("Pedido", self.dados)
@@ -1339,19 +1333,17 @@ class App(ctk.CTk):
         login = self.loginFuncionario.get()
         senha = self.senhaFuncionario.get()
 
-        queryInserirFuncionario = "INSERT INTO funcionarios(nome, cargo, login, senha) VALUES(%s, %s, %s, %s);"
+        
 
         if not nome or not login or not senha : 
             messagebox.showinfo(title="Registro falhou", message="Campos obrigatórios não podem estar em branco")
         else:
-            db.cursor.execute(queryInserirFuncionario, (nome, cargo, login, senha,))
-            db.conn.commit()
-            messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
+            # cata da classe insere, a query que ta sendo feitra la
+            Insere.insereUsuarioNoBanco(nome, cargo, login, senha)
             self.frameTelaCadastroFuncionario.destroy()
         
     # é chamado quando se cadastra um novo fornecedor
     def registraFornecedorNoBanco(self):
-        # primeiro tem que pegar os checkbox
         ativo = self.checkboxAtivo.get()
         inativo = self.checkboxInativo.get()
         CPFfornecedor = self.checkboxCPF.get()
@@ -1489,7 +1481,7 @@ class App(ctk.CTk):
         origemCST = self.OrigemCST.get()
         descricao = self.Descricao.get()
         CNPJ = self.CNPJ.get()
-        queryInserirProdutos = "INSERT INTO produtos(nome_do_produto, valor_de_custo, valor_de_venda, quantidade, codigo_interno, codigo_ncm, codigo_cfop, codigo_cest, origem_cst, descricao, CNPJ) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+
 
         if not(nome and valorCusto and valorVenda and quantidade and codigoInterno and NCM and CFOP and CEST and origemCST and descricao and CNPJ):
             self.frameProdutoNaoCadastrado = ctk.CTkFrame(self, height=60, width=300, corner_radius=5, border_width=2, border_color="red",fg_color="transparent")
@@ -1497,9 +1489,7 @@ class App(ctk.CTk):
             self.ProdutoNaoCadastrado = ctk.CTkLabel(self.frameProdutoNaoCadastrado,  text="Prencha os campos obrigatórios", font=("Arial", 18))
             self.ProdutoNaoCadastrado.place(relx=0.5, y=30, anchor="center")
         else:
-            db.cursor.execute(queryInserirProdutos, (nome, valorCusto, valorVenda, quantidade, codigoInterno, NCM, CFOP, CEST, origemCST, descricao, CNPJ,))
-            db.conn.commit()
-            messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
+            Insere.insereProdutosNoBanco(nome, valorCusto, valorVenda, quantidade, codigoInterno, NCM, CFOP, CEST, origemCST, descricao, CNPJ)
             self.frameTelaCadastroProduto.destroy()
 
     # é chamado ao cadastrar uma transportadora 
@@ -1531,19 +1521,20 @@ class App(ctk.CTk):
                     messagebox.showerror("erro", "campos estão em branco")
             else:
                 condicaoQueryTransportadora = (ativoTransportadora or inativoTransportadora) and (varCPFTransportadora or PJTransportadora) and (recebeEmailTransportadora or naoRecebeEmailTransportadora) and nomeTransportadora and nomeFantasiaTranportadora and inscricaoEstadualtransportadora and telefoneTransportadora and descricaoTransportadora and cnpjTransportadora
-
+        
         elif hasattr(self, "CPFTransportadora") and self.CPFTransportadora:
             print("tem cpf")
             cpfTransportadora = self.CPFTransportadora.get()
             if hasattr(self, "emailTransportadora"):
                 print("tem email")
-                varEmailTransportadora = self.emailTransportadra.get()
+                varEmailTransportadora = self.emailTransportadora.get()
                 if varEmailTransportadora:
                     condicaoQueryTransportadora = (ativoTransportadora or inativoTransportadora) and (varCPFTransportadora or PJTransportadora) and (recebeEmailTransportadora or naoRecebeEmailTransportadora) and nomeTransportadora and nomeFantasiaTranportadora and inscricaoEstadualtransportadora and telefoneTransportadora and descricaoTransportadora and cpfTransportadora and varEmailTransportadora
                 else:
                     messagebox.showerror("erro", "campos estão em branco")
             else:
                 condicaoQueryTransportadora = (ativoTransportadora or inativoTransportadora) and (varCPFTransportadora or PJTransportadora) and (recebeEmailTransportadora or naoRecebeEmailTransportadora) and nomeTransportadora and nomeFantasiaTranportadora and inscricaoEstadualtransportadora and telefoneTransportadora and descricaoTransportadora and cpfTransportadora
+       
         else:
             messagebox.showerror("Erro", "campos estão em branco")
                     
@@ -1593,16 +1584,10 @@ class App(ctk.CTk):
                 colunas.append("telefone")
                 valores.append(f"'{self.telefoneTransportadora.get()}'")
 
-            query = f"INSERT INTO transportadoras ({', '.join(colunas)}) VALUES ({', '.join(valores)})"
-            print(query)
-
-            db.cursor.execute(query)
-            db.conn.commit()
-
-            messagebox.showinfo("Sucesso", "A transportadora foi cadastrado com sucesso!")
+            Insere.insereTransportadoraNoBanco(colunas, valores)
             self.frameTelaCadastroTransportadoras.destroy()
             gc.collect()
-        
+
         
         else:
             messagebox.showerror("erro", "valores estão em branco")
@@ -1611,26 +1596,20 @@ class App(ctk.CTk):
     def consultarUsuarioCadastrado(self):
         login = self.login.get()
         senha = self.senha.get()
-        queryConsultarLogin = "SELECT cargo FROM funcionarios WHERE login = %s AND senha= %s;"
-        db.cursor.execute(queryConsultarLogin, (login, senha,))
-        resultados = db.cursor.fetchall()
-        print(resultados)
+        usuarioLogando = Buscas.consultaUsuario(login, senha)
+        print(usuarioLogando)
 
-        if senha and login:
-            if resultados:
-                self.telaAcoes()
-            if(self.frameUsuarioNaoCadastrado == None):
-                pass
-            else:
-                self.frameUsuarioNaoCadastrado.destroy()
-
-        
-                
-        else:
+        if not usuarioLogando:
             self.frameUsuarioNaoCadastrado = ctk.CTkFrame(self, height=100, width=300, corner_radius=5, border_width=2, border_color="red",fg_color="transparent")
             self.frameUsuarioNaoCadastrado.place(relx=0.5, y=600, anchor="center")
             self.usuarioNaoCadastrado = ctk.CTkLabel(self.frameUsuarioNaoCadastrado,  text="Esse usuário não foi encontrado.", font=("Arial", 18))
             self.usuarioNaoCadastrado.place(x=20, y=35)
+            self.after(3000, self.frameUsuarioNaoCadastrado.destroy)
+            gc.collect
+
+        else:
+            self.telaAcoes()
+                
 
 
 if __name__ == "__main__":
