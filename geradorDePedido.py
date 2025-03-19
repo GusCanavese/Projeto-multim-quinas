@@ -81,17 +81,12 @@ def gerar_recibo(nome_arquivo, dados):
 
 
     c.rect(20, altura - 250, 570, 40, stroke=1, fill=0)
-    c.line(20, altura - 230, 500, altura - 230)
+    # c.line(20, altura - 230, 500, altura - 230)
 
     c.setFont("Times-Bold", 8)
-    c.drawString(22, altura - 218, "CIDADE")
+    c.drawString(22, altura - 218, "REFERENCIA")
     c.setFont("Times-Roman", 8)
-    c.drawString(22, altura - 228, f"Endereço: {dados['endereco']}")
-
-    c.setFont("Times-Bold", 8)
-    c.drawString(22, altura - 238, "REFERÊNCIA")
-    c.setFont("Times-Roman", 8)
-    c.drawString(22, altura - 248, f"Endereço: {dados['referencia']}")
+    c.drawString(22, altura - 228, f"Endereço: {dados['referencia']}")
 
     # Tabela de itens
     c.line(20, altura - 275, 575+15, altura - 275)
@@ -172,7 +167,7 @@ def gerar_recibo(nome_arquivo, dados):
     c.setFont("Times-Bold", 8)
     c.drawString(155, altura_item, "TOTAL DE MERCADORIAS")
     c.drawString(300, altura_item, f"{dados['total_quantidade']}")
-    c.drawString(345, altura_item, f"{dados['total_valor_unitario']}")
+    # c.drawString(345, altura_item, f"{dados['total_valor_unitario']}")
     c.drawString(405, altura_item, f"{dados['total_desc_porc']}")
     c.drawString(450, altura_item, f"{dados['total_desc_real']}")
     c.drawString(490, altura_item, f"{dados['total_acrescimo']}")
@@ -201,7 +196,7 @@ def gerar_recibo(nome_arquivo, dados):
     c.drawString(353, altura_item -100, "FRETE")
 
 
-    c.drawString(485, altura_item -40, f"{dados['total_valor_unitario']}")
+    # c.drawString(485, altura_item -40, f"{dados['total_valor_unitario']}")
     c.drawString(485, altura_item -55, f"{dados['total_desc_porc']}")
     c.drawString(485, altura_item -70, f"{dados['total_desc_real']}")
     c.drawString(485, altura_item -85, f"{dados['total_subtotal']}")
@@ -249,7 +244,7 @@ def gerar_recibo(nome_arquivo, dados):
 dados_exemplo = {
 "numero_recibo": "0001206970",
 "total_quantidade": "pass",
-"total_valor_unitario": "pass",
+# "total_valor_unitario": "pass",
 "total_desc_porc": "pass",
 "total_desc_real": "pass",
 "total_acrescimo": "pass",

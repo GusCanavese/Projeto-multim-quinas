@@ -1,4 +1,6 @@
 import customtkinter as ctk
+
+import requests
 import db
 from tkinter import messagebox
 import datetime
@@ -37,7 +39,7 @@ class App(ctk.CTk):
         alturaTela = 900
         larguraTela = 1280
         self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
-        self.telaLogin()
+        self.telaGerarPedido()
 
 
     #? ===================== TELAS ===================== #
@@ -686,11 +688,6 @@ class App(ctk.CTk):
             numeroDoPedidoSendoCriado = maiorNumero+1
             self.variavelnumeroDoPedido.set(numeroDoPedidoSendoCriado)
 
-
-
-
-
-
         # criação do frame
         self.frameTelaGerarPedido = ctk.CTkFrame(self, height=800, width=1200, corner_radius=5)
        
@@ -715,32 +712,50 @@ class App(ctk.CTk):
         self.frameValorFinal.place(x=950, y=600)
         self.quantidades = []
 
-        # def salvarValoresDosItens():
-        #     valoresDosItens = []
-            
-        #     for item in self.itensCriados:
-        #         valoresItem = {
-        #             "produto": item[1].get(),
-        #             "preco": float(item[2].get() or 0),
-        #             "quantidade": int(item[3].get() or 0),
-        #             "unidade_medida": item[4].get(),
-        #             "desconto_real": float(item[5].get() or 0),
-        #             "desconto_porcentagem": float(item[6].get() or 0),
-        #             "acrescimo": float(item[7].get() or 0),
-        #             "subtotal": float(item[8].get() or 0)
-        #         }
-        #         valoresDosItens.append(valoresItem)
-            
-        #     totais = {
-        #         "total_preco": self.totalPreco,
-        #         "total_quantidade": self.totalQuantidade,
-        #         "total_desconto_real": self.totalDescontoReal,
-        #         "total_desconto_porcentagem": self.totalDescontoPorcentagem,
-        #         "total_acrescimo": self.totalAcrescimo,
-        #         "total_subtotal": self.totalSubtotal
-        #     }
-            
-        #     print(valoresDosItens)
+        self.valoresDosItens = []
+        self.totaisDosItens = []
+
+        def salvarValoresDosItens():
+            self.valoresDosItens = []
+
+            # Adiciona os valores originais (campos que dão origem aos itens)
+              # Verifica se os campos originais existem
+            valoresItem = {
+                "produto": self.entradaProdutoPesquisado.get(),
+                "preco": self.entradaPreco.get() or 0,
+                "quantidade": self.entradaQuantdadeItem.get() or 0,
+                "unidade_medida": self.entradaUnidadeMedida.get(),
+                "desconto_real": self.descontoTotalReal.get() or 0,
+                "desconto_porcentagem": self.descontoTotalPorcento.get() or 0,
+                "acrescimo": self.entradaAcrescimo.get() or 0,
+                "subtotal": self.entradaSubtotal.get() or 0
+            }
+            self.valoresDosItens.append(valoresItem)
+
+            # Adiciona os valores dos itens já criados
+            for item in self.itensCriados:
+                valoresItem = {
+                    "produto": item[1].get(),
+                    "preco": float(item[2].get() or 0),
+                    "quantidade": int(item[3].get() or 0),
+                    "unidade_medida": item[4].get(),
+                    "desconto_real": float(item[5].get() or 0),
+                    "desconto_porcentagem": float(item[6].get() or 0),
+                    "acrescimo": float(item[7].get() or 0),
+                    "subtotal": float(item[8].get() or 0)
+                }
+                self.valoresDosItens.append(valoresItem)
+
+            self.totaisDosItens = {
+                "total_preco": self.totalPreco,
+                "total_quantidade": self.totalQuantidade,
+                "total_desconto_real": self.totalDescontoReal,
+                "total_desconto_porcentagem": self.totalDescontoPorcentagem,
+                "total_acrescimo": self.totalAcrescimo,
+                "total_subtotal": self.totalSubtotal
+            }
+
+            # print(self.valoresDosItens)
 
 
         def calcularTotais():
@@ -787,13 +802,7 @@ class App(ctk.CTk):
             self.variavelTotalAcrescimo.set(round(self.totalAcrescimo, 2))
             self.variavelTotalDescontoPorcentagem.set(round(self.totalDescontoPorcentagem, 2))
             self.variavelTotalSubtotal.set(round(self.totalSubtotal, 2))
-
-            # print("Total Preço:", self.totalPreco)
-            # print("Total Quantidade:", self.totalQuantidade)
-            # print("Total Desconto Real:", self.totalDescontoReal)
-            # print("Total Desconto Porcentagem:", self.totalDescontoPorcentagem)
-            # print("Total Acréscimo:", self.totalAcrescimo)
-            # print("Total Subtotal:", self.totalSubtotal)
+            salvarValoresDosItens()
         
             print(self.quantidades)
 
@@ -835,7 +844,7 @@ class App(ctk.CTk):
             calcularTotais()
             nomeDoProduto = self.entradaProdutoPesquisado.get()
             Buscas.buscaProduto(nomeDoProduto)
-            print(Buscas.buscaProduto(nomeDoProduto))
+            # print(Buscas.buscaProduto(nomeDoProduto))
 
             if hasattr(self, "resultadoLabelsProduto"):
                 for label in self.resultadoLabelsProduto:
@@ -938,9 +947,8 @@ class App(ctk.CTk):
                     for widget in self.itensCriados[i][1:]:  
                         if widget:
                             widget.place(y=y_pos)
-            if index > 0:  
-                self.itensCriados[index - 1][3].configure(state="normal")       
 
+                
                 if self.itensCriados:
                     ultimoItem = self.itensCriados[-1]
                     if ultimoItem[-1] is None:  
@@ -953,9 +961,7 @@ class App(ctk.CTk):
                 self.yAtualBotao -= self.yFuturoBotao
                 self.botaoAdicionarItem.place(x=1011, y=self.yAtualBotao + 40)
        
-        # adiciona uma nova linha para adicionar produtos    
         def adicionarItem():
-            
             if self.itensCriados:
                 ultimoItem = self.itensCriados[-1]
                 camposObrigatorios = [
@@ -964,12 +970,6 @@ class App(ctk.CTk):
                     ultimoItem[3].get(),  
                     ultimoItem[4].get()   
                 ]
-
-            index = len(self.itensCriados) 
-
-            
-            if index > 0:
-                self.itensCriados[index - 1][3].configure(state="disabled")
 
                 if any(campo == "" for campo in camposObrigatorios):
                     labelValorPreenchaCampos = ctk.CTkLabel(self, text="Preencha todos os campos", fg_color="red", text_color="white", corner_radius=5)
@@ -1129,6 +1129,21 @@ class App(ctk.CTk):
                 calcularAlteracoesParaItem(index)
                 print("Quantidade válida")
     
+        def buscaCep(cepPassado, numero):
+            url = f"https://cep.awesomeapi.com.br/json/{cepPassado}"
+            response = requests.get(url)
+            if response.status_code == 200:
+                dados = response.json()
+                endereco_completo = f"{dados.get('address', '')} - {numero} - {dados.get('district', '')} - {dados.get('city', '')} - {dados.get('state', '')}"
+                if numero == '':
+                    messagebox.showerror(title="Não encontrado", message="Campo 'Número não deve ficar em branco'")
+                else:
+                    self.entradaEnderecoNoPedido.delete(0, ctk.END)
+                    self.entradaEnderecoNoPedido.insert(0, endereco_completo)
+            else:
+                messagebox.showerror(title="Não encontrado", message="CEP não foi encontrado")
+        
+
         self.yAtualBotao = 364
         self.yFuturoBotao = 32
         self.yInicial = 364
@@ -1173,25 +1188,57 @@ class App(ctk.CTk):
         self.funcionariaPedido = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelFuncionarioAtual, width=180, corner_radius=5, font=("Century Gothic bold", 15))
         self.funcionariaPedido.place(x=910, y=100)
 
-
-
         iconeLupa = ctk.CTkImage(light_image=Image.open("arquivos/search.png"), size=(20, 20))
         labelIcone = ctk.CTkButton(self.frameTelaGerarPedido, image=iconeLupa, fg_color="#38343c", width=30, corner_radius=5, command=buscaCliente)
-        labelIcone.place(x=30, y=200)
+        labelIcone.place(x=30, y=180)
 
         # nome do cliente
         self.labelNomeDoCliente = ctk.CTkLabel(self.frameTelaGerarPedido, text="Nome do cliente", font=("Century Gothic", 14))
-        self.labelNomeDoCliente.place(x=30, y=170)
+        self.labelNomeDoCliente.place(x=30, y=150)
         self.nomeDoClienteBuscado = ctk.CTkEntry(self.frameTelaGerarPedido,  placeholder_text="Nome do Cliente", width=370, corner_radius=5, font=("Arial", 15))
-        self.nomeDoClienteBuscado.place(x=60, y=200)
+        self.nomeDoClienteBuscado.place(x=60, y=180)
         self.nomeDoClienteBuscado.bind("<KeyRelease>", buscaCliente)  # Chama a busca ao digitar
         self.frameTelaGerarPedido.bind("<Button-1>", lambda event: [label.destroy() for label in getattr(self, 'resultadoLabels', [])]) # exclui os valores da pesquisa de nome de usuário quando clicar em outro lgar no frame
 
-    
+        # cpf ou cnpj do cliente
         self.labelCPFCliente = ctk.CTkLabel(self.frameTelaGerarPedido,  text="CPF/CNPJ", font=("Century Gothic bold", 14))
-        self.labelCPFCliente.place(x=470, y=175)
+        self.labelCPFCliente.place(x=470, y=150)
         self.CPFCliente = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelCtkEntry, width=180, corner_radius=5, font=("Arial", 15))
-        self.CPFCliente.place(x=470, y=200)
+        self.CPFCliente.place(x=470, y=180)
+
+        # cep paraa buscar endereço
+        self.labelCEP = ctk.CTkLabel(self.frameTelaGerarPedido, text="CEP", font=("Century Gothic bold", 14))
+        self.labelCEP.place(x=690, y=150)
+        self.entradaCEP = ctk.CTkEntry(self.frameTelaGerarPedido, width=180, corner_radius=5, font=("Arial", 15))
+        self.entradaCEP.place(x=690, y=180)
+
+        self.labelNumero = ctk.CTkLabel(self.frameTelaGerarPedido, text="Nº", font=("Century Gothic bold", 14))
+        self.labelNumero.place(x=910, y=150)
+        self.entradaNumero = ctk.CTkEntry(self.frameTelaGerarPedido, width=60, corner_radius=5, font=("Arial", 15))
+        self.entradaNumero.place(x=910, y=180)
+
+        # cep paraa buscar endereço
+        self.labelEnderecoNoPedido = ctk.CTkLabel(self.frameTelaGerarPedido, text="Endereço", font=("Century Gothic bold", 14))
+        self.labelEnderecoNoPedido.place(x=470, y=235)
+        self.entradaEnderecoNoPedido = ctk.CTkEntry(self.frameTelaGerarPedido, width=400, corner_radius=5, font=("Arial", 13))
+        self.entradaEnderecoNoPedido.place(x=470, y=260)
+
+
+        # REFERENCIA    
+        self.labelReferenciaEnderecoEntrega = ctk.CTkLabel(self.frameTelaGerarPedido, text="Referencia", font=("Century Gothic bold", 14))
+        self.labelReferenciaEnderecoEntrega.place(x=910, y=235)
+        self.entradaReferenciaEnderecoEntrega = ctk.CTkEntry(self.frameTelaGerarPedido, width=180, corner_radius=5, font=("Arial", 13))
+        self.entradaReferenciaEnderecoEntrega.place(x=910, y=260)
+
+
+
+            
+
+        # botão buscacep
+        self.botaoBuscaCEP = ctk.CTkButton(self.frameTelaGerarPedido, text="Buscar CEP", width=30, corner_radius=5, command=lambda:buscaCep(self.entradaCEP.get(), self.entradaNumero.get()))
+        self.botaoBuscaCEP.place(x=1015, y=180)
+
+
 
 
         # item
@@ -1302,24 +1349,38 @@ class App(ctk.CTk):
 
         # gerar pedido
         self.botaoGerarPedido = ctk.CTkButton(self.frameTelaGerarPedido, text="Gerar pedido", width=200, corner_radius=5, font=("Arial", 15), command=self.telaImprimirPedido)
-        self.botaoGerarPedido.place(x=260, y=760)
+        self.botaoGerarPedido.place(x=950, y=760)
 
     # gera o pedido
     def telaImprimirPedido(self):
         dataAgora = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        dataConfirmacaoVenda = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # dataConfirmacaoVenda = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        
+        resultados = Buscas.buscaDadosCliente(self.nomeDoClienteBuscado.get())
+        for i, row in enumerate(resultados):
+            telefone = row[2]
         #!para o destinatario do cliente é necessário fazer ma query para consultar o endereço, mas para isso, antes, deixe o código modular
+        # destinatario = Buscas.consultaEnderecoCliente(self.)
         # usuarioAtual = self.login.get()
         # print(usuarioAtual)
-        
-        # self.dados = {
-        #     "destinatario": ,
-        #     "data_confirmacao":self.dataDaVenda.get() ,
-        #     "numero_recibo":self.numeroDeVenda.get(),
-        #     "data_emissao":dataAgora,
-        #     "subtotal": self.totalSubtotal,
-        # }
-        print(self.dados)
+        print(self.valoresDosItens)
+        self.dados = {
+            "total_desc_proc":self.variavelTotalDescontoPorcentagem,
+            "total_quantidade": self.totalQuantidade,
+            "itens": self.valoresDosItens,
+            "referencia": self.entradaReferenciaEnderecoEntrega.get(),
+            "endereco": self.entradaEnderecoNoPedido.get(),
+            "cep": self.entradaCEP.get(),
+            "telefone": telefone,
+            "cnpj": self.CPFCliente.get(),
+            "cpf": self.CPFCliente.get(),
+            "destinatario": self.entradaEnderecoNoPedido.get(),
+            "data_confirmacao":self.dataDaVenda.get() ,
+            "numero_recibo":self.numeroDeVenda.get(),
+            "data_emissao":dataAgora,
+            "subtotal": self.totalSubtotal,
+        }
+        # print(self.dados)
 
         geradorDePedido.gerar_recibo("Pedido", self.dados)
         
@@ -1332,8 +1393,6 @@ class App(ctk.CTk):
         cargo = self.cargo.get()
         login = self.loginFuncionario.get()
         senha = self.senhaFuncionario.get()
-
-        
 
         if not nome or not login or not senha : 
             messagebox.showinfo(title="Registro falhou", message="Campos obrigatórios não podem estar em branco")
@@ -1453,13 +1512,7 @@ class App(ctk.CTk):
                 colunas.append("telefone")
                 valores.append(f"'{self.telefone.get()}'")
 
-            query = f"INSERT INTO fornecedores ({', '.join(colunas)}) VALUES ({', '.join(valores)})"
-            print("Query gerada:", query)
-        
-            db.cursor.execute(query)
-            db.conn.commit()
-
-            messagebox.showinfo("Sucesso", "O fornecedor foi cadastrado com sucesso!")
+            Insere.registraFornecedorNoBanco(colunas, valores)
             self.frameTelaCadastroFornecedores.destroy()
             gc.collect()
 
