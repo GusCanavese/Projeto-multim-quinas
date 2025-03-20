@@ -6,7 +6,7 @@ from tkinter import messagebox
 import datetime
 import gc
 from PIL import Image
-import geradorDePedido
+from geradorDePedido import gerar_recibo
 from consultas.select import Buscas
 from consultas.insert import Insere
 # import random
@@ -39,7 +39,7 @@ class App(ctk.CTk):
         alturaTela = 900
         larguraTela = 1280
         self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
-        self.telaGerarPedido()
+        self.telaLogin()
 
 
     #? ===================== TELAS ===================== #
@@ -721,10 +721,11 @@ class App(ctk.CTk):
             # Adiciona os valores originais (campos que dão origem aos itens)
               # Verifica se os campos originais existem
             valoresItem = {
-                "produto": self.entradaProdutoPesquisado.get(),
-                "preco": self.entradaPreco.get() or 0,
+                "codigo": 1,
+                "descricao": self.entradaProdutoPesquisado.get(),
+                "valor_unitario": self.entradaPreco.get() or 0,
                 "quantidade": self.entradaQuantdadeItem.get() or 0,
-                "unidade_medida": self.entradaUnidadeMedida.get(),
+                "unidade": self.entradaUnidadeMedida.get(),
                 "desconto_real": self.descontoTotalReal.get() or 0,
                 "desconto_porcentagem": self.descontoTotalPorcento.get() or 0,
                 "acrescimo": self.entradaAcrescimo.get() or 0,
@@ -733,12 +734,15 @@ class App(ctk.CTk):
             self.valoresDosItens.append(valoresItem)
 
             # Adiciona os valores dos itens já criados
+            i=1
             for item in self.itensCriados:
+                i+=1
                 valoresItem = {
-                    "produto": item[1].get(),
-                    "preco": float(item[2].get() or 0),
+                    "codigo": 1,
+                    "descricao": item[1].get(),
+                    "valor_unitario": float(item[2].get() or 0),
+                    "unidade": item[4].get(),
                     "quantidade": int(item[3].get() or 0),
-                    "unidade_medida": item[4].get(),
                     "desconto_real": float(item[5].get() or 0),
                     "desconto_porcentagem": float(item[6].get() or 0),
                     "acrescimo": float(item[7].get() or 0),
@@ -1354,18 +1358,17 @@ class App(ctk.CTk):
     # gera o pedido
     def telaImprimirPedido(self):
         dataAgora = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        # dataConfirmacaoVenda = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        
         resultados = Buscas.buscaDadosCliente(self.nomeDoClienteBuscado.get())
         for i, row in enumerate(resultados):
             telefone = row[2]
-        #!para o destinatario do cliente é necessário fazer ma query para consultar o endereço, mas para isso, antes, deixe o código modular
-        # destinatario = Buscas.consultaEnderecoCliente(self.)
-        # usuarioAtual = self.login.get()
-        # print(usuarioAtual)
         print(self.valoresDosItens)
         self.dados = {
-            "total_desc_proc":self.variavelTotalDescontoPorcentagem,
+            "frete":self.valorFrete,
+            "valor_total": self.valorFinal,
+            "total_subtotal":self.totalSubtotal,
+            "total_acrescimo":self.totalAcrescimo,
+            "total_desc_real":self.variavelTotalDescontoReal,
+            "total_desc_porc":self.variavelTotalDescontoPorcentagem,
             "total_quantidade": self.totalQuantidade,
             "itens": self.valoresDosItens,
             "referencia": self.entradaReferenciaEnderecoEntrega.get(),
@@ -1380,9 +1383,8 @@ class App(ctk.CTk):
             "data_emissao":dataAgora,
             "subtotal": self.totalSubtotal,
         }
-        # print(self.dados)
 
-        geradorDePedido.gerar_recibo("Pedido", self.dados)
+        gerar_recibo("Pedido.pdf", self.dados)
         
 
     #? ===================== FUNÇÕES DO BANCO DE DADOS ===================== #

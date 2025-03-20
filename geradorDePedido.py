@@ -244,7 +244,6 @@ def gerar_recibo(nome_arquivo, dados):
 dados_exemplo = {
 "numero_recibo": "0001206970",
 "total_quantidade": "pass",
-# "total_valor_unitario": "pass",
 "total_desc_porc": "pass",
 "total_desc_real": "pass",
 "total_acrescimo": "pass",
