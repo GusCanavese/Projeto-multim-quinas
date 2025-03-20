@@ -18,11 +18,11 @@ def telaCadastros(self):
     self.Acoes = ctk.CTkLabel(self.frameTelaCadastros, width=950, height=0, text="Cadastros", font=("Century Gothic bold", 30))
     self.Acoes.place(relx=0.5, y=50, anchor="center")
     
-    # botão do cadastro de funcionarios # ! ainda não está ativo nem possui uma tela criada para ele
-    self.botaoCadastro = ctk.CTkButton(self.frameTelaCadastros, text="Produtos", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastroProdutos(self))
-    self.botaoCadastro.place(relx=0.33, y=200, anchor="center")
+    # botão do cadastro de funcionarios
+    self.botaoCadastroProdutos = ctk.CTkButton(self.frameTelaCadastros, text="Produtos", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastroProdutos(self))
+    self.botaoCadastroProdutos.place(relx=0.33, y=200, anchor="center")
 
-    # botão de cadastrar clientes # ! ainda não está ativo nem possui uma tela criada para ele 
+    # botão de cadastrar clientes
     self.botaoCadastroClientes = ctk.CTkButton(self.frameTelaCadastros, text="Clientes", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastroClientes(self))
     self.botaoCadastroClientes.place(relx=0.66, y=200, anchor="center")
 
