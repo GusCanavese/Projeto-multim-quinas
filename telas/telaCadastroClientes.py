@@ -30,4 +30,4 @@ def telaCadastroClientes(self):
     self.labelRGcliente = ctk.CTkLabel(self.frameTelaCadastroClientes, text="Insira o RG", font=("Century Gothic bold", 15))
     self.labelRGcliente.place(x=100, y=240)
     self.RGcliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="RG", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-    self.RGcliente.place(x=100, y=270)
+    self.RGcliente.place(x=100, y=270) 

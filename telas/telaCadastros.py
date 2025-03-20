@@ -23,16 +23,16 @@ def telaCadastros(self):
     self.botaoCadastro.place(relx=0.33, y=200, anchor="center")
 
     # botão de cadastrar clientes # ! ainda não está ativo nem possui uma tela criada para ele 
-    self.botaoRelatorioDeVendas = ctk.CTkButton(self.frameTelaCadastros, text="Clientes", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastroClientes(self))
-    self.botaoRelatorioDeVendas.place(relx=0.66, y=200, anchor="center")
+    self.botaoCadastroClientes = ctk.CTkButton(self.frameTelaCadastros, text="Clientes", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastroClientes(self))
+    self.botaoCadastroClientes.place(relx=0.66, y=200, anchor="center")
 
     # botão de cadastrar fornecedores
-    self.botaogGerarPedido = ctk.CTkButton(self.frameTelaCadastros, text="Fornecedores", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastroFornecedores(self))
-    self.botaogGerarPedido.place(relx=0.33, y=250, anchor="center")
+    self.botaoCadastroFornecedores = ctk.CTkButton(self.frameTelaCadastros, text="Fornecedores", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastroFornecedores(self))
+    self.botaoCadastroFornecedores.place(relx=0.33, y=250, anchor="center")
 
     # botão de cadastrar funcionários
-    self.botaoContasPagarReceber = ctk.CTkButton(self.frameTelaCadastros, text="Funcionários", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastroFuncionario(self))
-    self.botaoContasPagarReceber.place(relx=0.66, y=250, anchor="center")
+    self.botaoCadastroFuncionarios = ctk.CTkButton(self.frameTelaCadastros, text="Funcionários", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastroFuncionario(self))
+    self.botaoCadastroFuncionarios.place(relx=0.66, y=250, anchor="center")
 
     # botão cadastrar transportadoras  
     self.botaoGerarFaturamento = ctk.CTkButton(self.frameTelaCadastros, text="Transportadoras", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastroTransportadoras(self))
