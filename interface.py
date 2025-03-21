@@ -4,6 +4,7 @@ from funcoesTerceiras.geradorDePedido import gerar_recibo
 import telas 
 from consultas.select import Buscas
 import telas.telaAcoes
+import telas.telaCadastroClientes
 import telas.telaCadastroFuncionario
 import telas.telaCadastros
 import telas.telaLogin
@@ -23,12 +24,12 @@ class App(ctk.CTk):
         self.resizable(False, False)
         alturaTela = 900
         larguraTela = 1280
-        self.geometry(f"{larguraTela}x{alturaTela}+-1500+0")
+        self.geometry(f"{larguraTela}x{alturaTela}")
         self.telas()
 
 
     def telas(self):
-        telas.telaLogin.telaLogin(self)
+        telas.telaCadastroClientes.telaCadastroClientes(self)
 
            
 
