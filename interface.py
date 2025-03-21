@@ -7,6 +7,7 @@ import telas.telaAcoes
 import telas.telaCadastroClientes
 import telas.telaCadastroFuncionario
 import telas.telaCadastros
+import telas.telaGerarPedido
 import telas.telaLogin
 # import random
 
@@ -29,7 +30,7 @@ class App(ctk.CTk):
 
 
     def telas(self):
-        telas.telaCadastroClientes.telaCadastroClientes(self)
+        telas.telaGerarPedido.telaGerarPedido(self)
 
            
 

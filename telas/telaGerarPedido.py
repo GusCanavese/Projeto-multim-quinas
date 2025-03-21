@@ -63,6 +63,60 @@ def telaGerarPedido(self):
     self.frameParaItens = ctk.CTkScrollableFrame(self.frameTelaGerarPedido, width=1150, height=200, orientation="vertical")
     self.frameParaItens.place(relx=0.5, y=450, anchor="center")
 
+    def calcularTotais():
+        self.totalPreco = 0.0
+        self.totalQuantidade = 0
+        self.totalDescontoReal = 0.0
+        self.totalDescontoPorcentagem = 0.0
+        self.totalAcrescimo = 0.0
+        self.totalSubtotal = 0.0
+
+        primeiroCampoDescontoReal = float(self.entradaDescontosReal.get() or 0)  
+        self.totalDescontoReal += primeiroCampoDescontoReal  
+
+        primeiroCampoDescontoPorcentagem = float(self.entradaDescontosPorcentagem.get() or 0)  
+        self.totalDescontoPorcentagem += primeiroCampoDescontoPorcentagem  
+
+        primeiroCampoAcrescimo = float(self.entradaAcrescimo.get() or 0)  
+        self.totalAcrescimo += primeiroCampoAcrescimo  
+
+        primeiroCampoSubtotal = float(self.entradaSubtotal.get() or 0)  
+        self.totalSubtotal += primeiroCampoSubtotal  
+
+        for item in self.itensCriados:
+            preco = float(item[2].get() or 0)  # entradaPreco
+            quantidade = int(item[3].get() or 0)  # entradaQuantidade
+            descontoReal = float(item[5].get() or 0)  # entradaDescontosReal
+            descontoPorcentagem = float(item[6].get() or 0)  # entradaDescontosPorcentagem
+            acrescimo = float(item[7].get() or 0)  # entradaAcrescimo
+            subtotal = float(item[8].get() or 0)  # entradaSubtotal
+
+            subtotalCalculado = (preco * quantidade) + acrescimo - descontoReal
+
+            item[8].delete(0, "end")
+            item[8].insert(0, f"{subtotalCalculado:.2f}")
+
+            self.totalPreco += preco
+            self.totalQuantidade += quantidade
+            self.totalDescontoReal += descontoReal
+            self.totalDescontoPorcentagem += descontoPorcentagem
+            self.totalAcrescimo += acrescimo
+            self.totalSubtotal += subtotalCalculado
+
+        self.variavelTotalDescontoReal.set(round(self.totalDescontoReal, 2))
+        self.variavelTotalAcrescimo.set(round(self.totalAcrescimo, 2))
+        self.variavelTotalDescontoPorcentagem.set(round(self.totalDescontoPorcentagem, 2))
+        self.variavelTotalSubtotal.set(round(self.totalSubtotal, 2))
+
+        print(self.variavelTotalDescontoPorcentagem)
+        print(self.totalDescontoPorcentagem)
+        print(round(self.totalDescontoPorcentagem))
+
+        
+        salvarValoresDosItens()
+    
+        print(self.quantidades)
+    
     self.container = ctk.CTkFrame(self.frameParaItens, height=1500)
     self.container.pack(fill="x", padx=1, pady=1)
 
@@ -128,53 +182,6 @@ def telaGerarPedido(self):
         # print(self.valoresDosItens)
 
 
-    def calcularTotais():
-        self.totalPreco = 0.0
-        self.totalQuantidade = 0
-        self.totalDescontoReal = 0.0
-        self.totalDescontoPorcentagem = 0.0
-        self.totalAcrescimo = 0.0
-        self.totalSubtotal = 0.0
-
-        primeiroCampoDescontoReal = float(self.entradaDescontosReal.get() or 0)  
-        self.totalDescontoReal += primeiroCampoDescontoReal  
-
-        primeiroCampoDescontoPorcentagem = float(self.entradaDescontosPorcentagem.get() or 0)  
-        self.totalDescontoPorcentagem += primeiroCampoDescontoPorcentagem  
-
-        primeiroCampoAcrescimo = float(self.entradaAcrescimo.get() or 0)  
-        self.totalAcrescimo += primeiroCampoAcrescimo  
-
-        primeiroCampoSubtotal = float(self.entradaSubtotal.get() or 0)  
-        self.totalSubtotal += primeiroCampoSubtotal  
-
-        for item in self.itensCriados:
-            preco = float(item[2].get() or 0)  # entradaPreco
-            quantidade = int(item[3].get() or 0)  # entradaQuantidade
-            descontoReal = float(item[5].get() or 0)  # entradaDescontosReal
-            descontoPorcentagem = float(item[6].get() or 0)  # entradaDescontosPorcentagem
-            acrescimo = float(item[7].get() or 0)  # entradaAcrescimo
-            subtotal = float(item[8].get() or 0)  # entradaSubtotal
-
-            subtotalCalculado = (preco * quantidade) + acrescimo - descontoReal
-
-            item[8].delete(0, "end")
-            item[8].insert(0, f"{subtotalCalculado:.2f}")
-
-            self.totalPreco += preco
-            self.totalQuantidade += quantidade
-            self.totalDescontoReal += descontoReal
-            self.totalDescontoPorcentagem += descontoPorcentagem
-            self.totalAcrescimo += acrescimo
-            self.totalSubtotal += subtotalCalculado
-
-        self.variavelTotalDescontoReal.set(round(self.totalDescontoReal, 2))
-        self.variavelTotalAcrescimo.set(round(self.totalAcrescimo, 2))
-        self.variavelTotalDescontoPorcentagem.set(round(self.totalDescontoPorcentagem, 2))
-        self.variavelTotalSubtotal.set(round(self.totalSubtotal, 2))
-        salvarValoresDosItens()
-    
-        print(self.quantidades)
 
     # pesquisa que fica aparecendo e sumindo os valores que estou pesquisando
     def buscaCliente(event=None): 
@@ -720,3 +727,4 @@ def telaGerarPedido(self):
     # gerar pedido
     self.botaoGerarPedido = ctk.CTkButton(self.frameTelaGerarPedido, text="Gerar pedido", width=200, corner_radius=5, font=("Arial", 15), command=lambda:telaImprimirPedido(self))
     self.botaoGerarPedido.place(x=950, y=760)
+    calcularTotais()

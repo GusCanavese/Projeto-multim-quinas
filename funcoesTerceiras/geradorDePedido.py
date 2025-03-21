@@ -197,9 +197,9 @@ def gerar_recibo(nome_arquivo, dados):
 
 
     # c.drawString(485, altura_item -40, f"{dados['total_valor_unitario']}")
-    c.drawString(485, altura_item -55, f"{dados['total_desc_porc']}")
-    c.drawString(485, altura_item -70, f"{dados['total_desc_real']}")
-    c.drawString(485, altura_item -85, f"{dados['total_subtotal']}")
+    c.drawString(485, altura_item -55, f"{dados['total_desc_real']}")
+    c.drawString(485, altura_item -70, f"{dados['total_desc_porc']}")
+    c.drawString(485, altura_item -85, f"{dados['total_acrescimo']}")
     c.drawString(485, altura_item -100, f"{dados['frete']}")
 
 
@@ -352,4 +352,4 @@ dados_exemplo = {
 ],
 }
     
-gerar_recibo("recibo_venda.pdf", dados_exemplo)
+# gerar_recibo("recibo_venda.pdf", dados_exemplo)

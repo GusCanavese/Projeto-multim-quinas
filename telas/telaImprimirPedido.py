@@ -12,12 +12,12 @@ def telaImprimirPedido(self):
         telefone = row[2]
     print(self.valoresDosItens)
     self.dados = {
-        "frete":self.valorFrete,
-        "valor_total": self.valorFinal,
+        "frete":self.valorFrete.get() or 0.0,
+        "valor_total": self.totalSubtotal,
         "total_subtotal":self.totalSubtotal,
         "total_acrescimo":self.totalAcrescimo,
-        "total_desc_real":self.variavelTotalDescontoReal,
-        "total_desc_porc":self.variavelTotalDescontoPorcentagem,
+        "total_desc_real":self.totalDescontoReal,
+        "total_desc_porc":self.totalDescontoPorcentagem,
         "total_quantidade": self.totalQuantidade,
         "itens": self.valoresDosItens,
         "referencia": self.entradaReferenciaEnderecoEntrega.get(),
@@ -26,7 +26,7 @@ def telaImprimirPedido(self):
         "telefone": telefone,
         "cnpj": self.CPFCliente.get(),
         "cpf": self.CPFCliente.get(),
-        "destinatario": self.entradaEnderecoNoPedido.get(),
+        "destinatario": self.nomeDoClienteBuscado.get(),
         "data_confirmacao":self.dataDaVenda.get() ,
         "numero_recibo":self.numeroDeVenda.get(),
         "data_emissao":dataAgora,
