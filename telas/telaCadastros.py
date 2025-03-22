@@ -35,9 +35,9 @@ def telaCadastros(self):
     self.botaoCadastroFuncionarios.place(relx=0.66, y=250, anchor="center")
 
     # botão cadastrar transportadoras  
-    self.botaoGerarFaturamento = ctk.CTkButton(self.frameTelaCadastros, text="Transportadoras", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastroTransportadoras(self))
-    self.botaoGerarFaturamento.place(relx=0.33, y=300, anchor="center")
+    self.botaoCadastroTransportadoras = ctk.CTkButton(self.frameTelaCadastros, text="Transportadoras", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastroTransportadoras(self))
+    self.botaoCadastroTransportadoras.place(relx=0.33, y=300, anchor="center")
 
     # botão para voltar para a tela
-    self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaCadastros, text="Voltar", width=200, corner_radius=5, font=("Arial", 18), command=self.frameTelaCadastros.destroy)
-    self.botaoGerarOrcamento.place(relx=0.33, y=650, anchor="center")
+    self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastros, text="Voltar", width=200, corner_radius=5, font=("Arial", 18), command=self.frameTelaCadastros.destroy)
+    self.botaoVoltar.place(relx=0.33, y=650, anchor="center")

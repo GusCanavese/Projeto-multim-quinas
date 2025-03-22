@@ -30,7 +30,7 @@ class App(ctk.CTk):
 
 
     def telas(self):
-        telas.telaGerarPedido.telaGerarPedido(self)
+        telas.telaCadastroClientes.telaCadastroClientes(self)
 
            
 

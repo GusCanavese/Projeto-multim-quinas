@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
-
+from funcoesTerceiras.registraClienteNoBanco import registraClienteNoBanco
 
 def telaCadastroClientes(self):
     self.frameTelaCadastroClientes = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
@@ -47,8 +47,8 @@ def telaCadastroClientes(self):
     #CEP
     self.labelCEPCliente = ctk.CTkLabel(self.frameTelaCadastroClientes, text="CEP", font=("Century Gothic bold", 15))
     self.labelCEPCliente.place(x=500, y=170)
-    self.CEPCliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="CEP", width=190, corner_radius=5, font=("Century Gothic bold", 20))
-    self.CEPCliente.place(x=500, y=200)
+    self.CEPcliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="CEP", width=190, corner_radius=5, font=("Century Gothic bold", 20))
+    self.CEPcliente.place(x=500, y=200)
 
     #Número
     self.labelNumeroCliente = ctk.CTkLabel(self.frameTelaCadastroClientes, text="Número", font=("Century Gothic bold", 15))
@@ -68,6 +68,12 @@ def telaCadastroClientes(self):
     self.cidadeCliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="Cidade", width=260, corner_radius=5, font=("Century Gothic bold", 20))
     self.cidadeCliente.place(x=500, y=270)
 
+    # ================ Botões =====================#
+
     # botão para voltar para a tela
     self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroClientes, text="Voltar", width=200, corner_radius=5, font=("Arial", 18), command=self.frameTelaCadastroClientes.destroy)
     self.botaoVoltar.place(relx=0.33, y=650, anchor="center")
+
+    # registra no bd
+    self.botaoCadastrarCliente = ctk.CTkButton(self.frameTelaCadastroClientes, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=lambda:registraClienteNoBanco(self))
+    self.botaoCadastrarCliente.place(x=650, y=650, anchor="center")
