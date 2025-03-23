@@ -1,8 +1,6 @@
 import customtkinter as ctk
-import datetime
 from funcoesTerceiras.geradorDePedido import gerar_recibo
 import telas 
-from consultas.select import Buscas
 import telas.telaAcoes
 import telas.telaCadastroClientes
 import telas.telaCadastroFuncionario
@@ -14,6 +12,7 @@ import telas.telaLogin
 # ctk.set_appearance_mode("system")  
 ctk.set_default_color_theme("blue")
 
+
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -23,14 +22,15 @@ class App(ctk.CTk):
     # define as propriedades da janela
     def janela(self):
         self.resizable(False, False)
-        alturaTela = 900
-        larguraTela = 1280
-        self.geometry(f"{larguraTela}x{alturaTela}")
+        self.alturaTela = 900
+        self.larguraTela = 1280
+        self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+0")
         self.telas()
 
 
     def telas(self):
-        telas.telaGerarPedido.telaGerarPedido(self)
+        telas.telaLogin.telaLogin(self)
+
 
            
 
