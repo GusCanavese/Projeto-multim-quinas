@@ -37,3 +37,9 @@ class Insere():
         db.cursor.execute(query)
         db.conn.commit()
         messagebox.showinfo("Sucesso", "O fornecedor foi cadastrado com sucesso!")
+
+    def insereClienteNoBanco(nome, CPF_CNPJ, IE, RG, endereco, CEP, numero, bairro, cidade):
+        queryInserirCliente = "INSERT INTO clientes(Nome_do_cliente, CPF_CNPJ, Inscricao_estadual, RG, Endereco, CEP, Numero, Bairro, Cidade_do_endereco) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        db.cursor.execute(queryInserirCliente, (nome, CPF_CNPJ, IE, RG, endereco, CEP, numero, bairro, cidade,))
+        db.conn.commit()
+        messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
