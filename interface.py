@@ -29,7 +29,7 @@ class App(ctk.CTk):
 
 
     def telas(self):
-        telas.telaLogin.telaLogin(self)
+        telas.telaGerarPedido.telaGerarPedido(self)
 
 
            

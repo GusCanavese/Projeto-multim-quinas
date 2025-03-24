@@ -191,12 +191,12 @@ def telaGerarPedido(self):
 
         self.resultadoLabels = []
         
-        yNovo = 230  
+        yNovo = 210  
         for i, row in enumerate(dadosCliente):
-            if i >= 3:
+            if i >= 5:
                 break
-            label = ctk.CTkButton(self.frameTelaGerarPedido, width=280, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda  nome=row[0], cnpj=row[1]: selecionaCliente(nome, cnpj))
-            label.place(x=30, y=yNovo)
+            label = ctk.CTkButton(self.frameTelaGerarPedido, width=370, text=row[0], fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda  nome=row[0], cnpj=row[1]: selecionaCliente(nome, cnpj))
+            label.place(x=60, y=yNovo)
             self.resultadoLabels.append(label)  
             yNovo += 30
 
@@ -566,7 +566,7 @@ def telaGerarPedido(self):
     labelIcone.place(x=30, y=180)
 
     # nome do cliente
-    self.labelNomeDoCliente = ctk.CTkLabel(self.frameTelaGerarPedido, text="Nome do cliente", font=("Century Gothic", 14))
+    self.labelNomeDoCliente = ctk.CTkLabel(self.frameTelaGerarPedido, text="Nome do cliente *", font=("Century Gothic", 14))
     self.labelNomeDoCliente.place(x=30, y=150)
     self.nomeDoClienteBuscado = ctk.CTkEntry(self.frameTelaGerarPedido,  placeholder_text="Nome do Cliente", width=370, corner_radius=5, font=("Arial", 15))
     self.nomeDoClienteBuscado.place(x=60, y=180)
@@ -574,31 +574,31 @@ def telaGerarPedido(self):
     self.frameTelaGerarPedido.bind("<Button-1>", lambda event: [label.destroy() for label in getattr(self, 'resultadoLabels', [])]) # exclui os valores da pesquisa de nome de usuário quando clicar em outro lgar no frame
 
     # cpf ou cnpj do cliente
-    self.labelCPFCliente = ctk.CTkLabel(self.frameTelaGerarPedido,  text="CPF/CNPJ", font=("Century Gothic bold", 14))
+    self.labelCPFCliente = ctk.CTkLabel(self.frameTelaGerarPedido,  text="CPF/CNPJ *", font=("Century Gothic bold", 14))
     self.labelCPFCliente.place(x=470, y=150)
     self.CPFCliente = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelCtkEntry, width=180, corner_radius=5, font=("Arial", 15))
     self.CPFCliente.place(x=470, y=180)
 
     # cep paraa buscar endereço
-    self.labelCEP = ctk.CTkLabel(self.frameTelaGerarPedido, text="CEP", font=("Century Gothic bold", 14))
+    self.labelCEP = ctk.CTkLabel(self.frameTelaGerarPedido, text="CEP *", font=("Century Gothic bold", 14))
     self.labelCEP.place(x=690, y=150)
     self.entradaCEP = ctk.CTkEntry(self.frameTelaGerarPedido, width=180, corner_radius=5, font=("Arial", 15))
     self.entradaCEP.place(x=690, y=180)
 
-    self.labelNumero = ctk.CTkLabel(self.frameTelaGerarPedido, text="Nº", font=("Century Gothic bold", 14))
+    self.labelNumero = ctk.CTkLabel(self.frameTelaGerarPedido, text="Nº *", font=("Century Gothic bold", 14))
     self.labelNumero.place(x=910, y=150)
     self.entradaNumero = ctk.CTkEntry(self.frameTelaGerarPedido, width=60, corner_radius=5, font=("Arial", 15))
     self.entradaNumero.place(x=910, y=180)
 
     # cep paraa buscar endereço
-    self.labelEnderecoNoPedido = ctk.CTkLabel(self.frameTelaGerarPedido, text="Endereço", font=("Century Gothic bold", 14))
+    self.labelEnderecoNoPedido = ctk.CTkLabel(self.frameTelaGerarPedido, text="Endereço *", font=("Century Gothic bold", 14))
     self.labelEnderecoNoPedido.place(x=470, y=235)
     self.entradaEnderecoNoPedido = ctk.CTkEntry(self.frameTelaGerarPedido, width=400, corner_radius=5, font=("Arial", 13))
     self.entradaEnderecoNoPedido.place(x=470, y=260)
 
 
     # REFERENCIA    
-    self.labelReferenciaEnderecoEntrega = ctk.CTkLabel(self.frameTelaGerarPedido, text="Referencia", font=("Century Gothic bold", 14))
+    self.labelReferenciaEnderecoEntrega = ctk.CTkLabel(self.frameTelaGerarPedido, text="Referencia *", font=("Century Gothic bold", 14))
     self.labelReferenciaEnderecoEntrega.place(x=910, y=235)
     self.entradaReferenciaEnderecoEntrega = ctk.CTkEntry(self.frameTelaGerarPedido, width=180, corner_radius=5, font=("Arial", 13))
     self.entradaReferenciaEnderecoEntrega.place(x=910, y=260)
@@ -676,16 +676,16 @@ def telaGerarPedido(self):
     # área de texto observações
     self.labelAreaTexto = ctk.CTkLabel(self.frameTelaGerarPedido, text="Observações", height=30, font=("Century Gothic", 15))
     self.labelAreaTexto.place(x=30, y=570)
-    self.textArea = ctk.CTkTextbox(self.frameTelaGerarPedido, width=300, height=150, corner_radius=8, wrap="word")
-    self.textArea.insert("0.0","É necessário a apresentação do recibo de venda para que a vendedora abra a assistência técnica, se necessário. Não devolvemos dinheiro. \n\nCONDIÇÃO DE PAGAMENTO:\nTROCA: \nENTREGA:")
-    self.textArea.place(x=30, y=600)
+    self.textArea1 = ctk.CTkTextbox(self.frameTelaGerarPedido, width=300, height=150, corner_radius=8, wrap="word")
+    self.textArea1.insert("0.0","É necessário a apresentação do recibo de venda para que a vendedora abra \na assistência técnica, se necessário. Não devolvemos dinheiro. \n\nCONDIÇÃO DE PAGAMENTO:\nTROCA: \nENTREGA:")
+    self.textArea1.place(x=30, y=600)
 
     # área de texto enrtrega
     self.labelAreaTexto = ctk.CTkLabel(self.frameTelaGerarPedido, text="Observações da entrega", height=30, font=("Century Gothic", 15))
     self.labelAreaTexto.place(x=360, y=570)
-    self.textArea = ctk.CTkTextbox(self.frameTelaGerarPedido, width=250, height=150, corner_radius=8, wrap="word")
-    self.textArea.insert("0.0","Referências de endereço, localização, etc")
-    self.textArea.place(x=360, y=600)
+    self.textArea2 = ctk.CTkTextbox(self.frameTelaGerarPedido, width=250, height=150, corner_radius=8, wrap="word")
+    self.textArea2.insert("0.0","Dados financeiros pertinentes")
+    self.textArea2.place(x=360, y=600)
 
     # área de totais
     self.labelAreaTotais = ctk.CTkLabel(self.frameTelaGerarPedido, text="Totais", font=("Century Gothic", 15))

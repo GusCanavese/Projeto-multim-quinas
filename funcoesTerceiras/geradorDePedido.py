@@ -210,6 +210,21 @@ def gerar_recibo(nome_arquivo, dados):
     c.setFont("Times-Bold", 9)
     c.drawString(23, altura_item -140, "OBSERVAÇÕES DO PEDIDO")
     c.drawString(450, altura_item -140, "FECHAMENTO FINANCEIRO")
+    
+    c.setFont("Times-Roman", 9)
+    texto = c.beginText(23, altura_item - 160)  
+    texto.setFont("Times-Roman", 9)
+    for linha in dados['observacoes1'].split('\n'):
+        texto.textLine(linha)  
+    c.drawText(texto)
+
+
+    texto2 = c.beginText(322, altura_item - 203)  
+    texto2.setFont("Times-Roman", 9)
+    for linha in dados['observacoes2'].split('\n'):
+        texto2.textLine(linha)  
+    c.drawText(texto2)
+   
 
     c.setFont("Times-Roman", 7)
 
@@ -260,6 +275,8 @@ dados_exemplo = {
 "endereco": "Rua Padre Antônio, 89 - Conceição da Barra de Minas/MG",
 "referencia": "Rua Padre antônio",
 "telefone": "(32) 3375-1182",
+"observacoes1": "teste",
+"observacoes2": "teste",
 "itens": [
     {
         "codigo": "2087118514612",
@@ -352,4 +369,4 @@ dados_exemplo = {
 ],
 }
     
-# gerar_recibo("recibo_venda.pdf", dados_exemplo)
+gerar_recibo("recibo_venda.pdf", dados_exemplo)
