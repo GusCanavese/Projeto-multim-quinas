@@ -77,7 +77,10 @@ def telaGerarPedido(self):
         self.totalAcrescimo += primeiroCampoAcrescimo  
 
         primeiroCampoSubtotal = float(self.entradaSubtotal.get() or 0)  
-        self.totalSubtotal += primeiroCampoSubtotal  
+        self.totalSubtotal += primeiroCampoSubtotal
+
+        primeiroCampoQuantidade = float(self.entradaQuantdadeItem.get() or 0)
+        self.totalQuantidade += primeiroCampoQuantidade
 
         for item in self.itensCriados:
             preco = float(item[2].get() or 0)  # entradaPreco
@@ -85,9 +88,9 @@ def telaGerarPedido(self):
             descontoReal = float(item[5].get() or 0)  # entradaDescontosReal
             descontoPorcentagem = float(item[6].get() or 0)  # entradaDescontosPorcentagem
             acrescimo = float(item[7].get() or 0)  # entradaAcrescimo
-            subtotal = float(item[8].get() or 0)  # entradaSubtotal
 
             subtotalCalculado = (preco * quantidade) + acrescimo - descontoReal
+            if subtotalCalculado<0:subtotalCalculado=0
 
             item[8].delete(0, "end")
             item[8].insert(0, f"{subtotalCalculado:.2f}")
@@ -99,14 +102,13 @@ def telaGerarPedido(self):
             self.totalAcrescimo += acrescimo
             self.totalSubtotal += subtotalCalculado
 
+
         self.variavelTotalDescontoReal.set(round(self.totalDescontoReal, 2))
         self.variavelTotalAcrescimo.set(round(self.totalAcrescimo, 2))
         self.variavelTotalDescontoPorcentagem.set(round(self.totalDescontoPorcentagem, 2))
         self.variavelTotalSubtotal.set(round(self.totalSubtotal, 2))
 
-        print(self.variavelTotalDescontoPorcentagem)
-        print(self.totalDescontoPorcentagem)
-        print(round(self.totalDescontoPorcentagem))
+        
 
         
         salvarValoresDosItens()
@@ -131,13 +133,15 @@ def telaGerarPedido(self):
     self.valoresDosItens = []
     self.totaisDosItens = []
 
+    self.codigoItem = 0
+
+
     def salvarValoresDosItens():
         self.valoresDosItens = []
 
         # Adiciona os valores originais (campos que dão origem aos itens)
-            # Verifica se os campos originais existem
         valoresItem = {
-            "codigo": 1,
+            "codigo": "Modelo",
             "descricao": self.entradaProdutoPesquisado.get(),
             "valor_unitario": self.entradaPreco.get() or 0,
             "quantidade": self.entradaQuantdadeItem.get() or 0,
@@ -154,7 +158,7 @@ def telaGerarPedido(self):
         for item in self.itensCriados:
             i+=1
             valoresItem = {
-                "codigo": 1,
+                "codigo": "Modelo",
                 "descricao": item[1].get(),
                 "valor_unitario": float(item[2].get() or 0),
                 "unidade": item[4].get(),
@@ -166,16 +170,7 @@ def telaGerarPedido(self):
             }
             self.valoresDosItens.append(valoresItem)
 
-        self.totaisDosItens = {
-            "total_preco": self.totalPreco,
-            "total_quantidade": self.totalQuantidade,
-            "total_desconto_real": self.totalDescontoReal,
-            "total_desconto_porcentagem": self.totalDescontoPorcentagem,
-            "total_acrescimo": self.totalAcrescimo,
-            "total_subtotal": self.totalSubtotal
-        }
 
-        # print(self.valoresDosItens)
 
 
 
@@ -724,3 +719,4 @@ def telaGerarPedido(self):
     self.botaoGerarPedido = ctk.CTkButton(self.frameTelaGerarPedido, text="Gerar pedido", width=200, corner_radius=5, font=("Arial", 15), command=lambda:PassaDadosParaPedido(self))
     self.botaoGerarPedido.place(x=950, y=760)
     calcularTotais()
+

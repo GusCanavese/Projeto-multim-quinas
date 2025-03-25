@@ -1,5 +1,6 @@
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase.pdfmetrics import stringWidth
 
 def gerar_recibo(nome_arquivo, dados):
     c = canvas.Canvas(nome_arquivo, pagesize=letter)
@@ -248,11 +249,20 @@ def gerar_recibo(nome_arquivo, dados):
 
     c.rect((width - 20)/2 + 18, altura_item - 143, (width - 50)/2 - 5, -200, stroke=1, fill=0)
     c.line(width/2-100, altura_item-390, width/2 + 100, altura_item-390)
-    c.drawString(width/2-65, altura_item -400, f"{dados['destinatario']}")
-    c.drawString(width/2-30, altura_item -415, f"{dados['cpf']}")
+    destinatario_text = f"{dados['destinatario']}"
+
+    font_name = "Helvetica"
+    font_size = 9
+    c.setFont(font_name, font_size)
+    text_width = stringWidth(destinatario_text, font_name, font_size)
+
+    x_pos = (width - text_width) / 2
+
+    c.drawString(x_pos, altura_item - 400, destinatario_text)
+
+    c.drawString(width/2 - 30, altura_item - 415, f"{dados['cpf']}")
 
     
-
 
     c.save()
 
@@ -278,61 +288,61 @@ dados_exemplo = {
 "observacoes1": "teste",
 "observacoes2": "teste",
 "itens": [
-    {
-        "codigo": "2087118514612",
-        "descricao": "ILHA PARA CONGELADOS LIGHT 2.00M - POLAR",
-        "unidade": "UN",
-        "quantidade": 2,
-        "valor_unitario": "7.076,00",
-        "desconto_real": "0,00",
-        "desconto_porcentagem": "0,00",
-        "acrescimo": "0,00",
-        "subtotal": "14.152,00"
-    },
-    {
-        "codigo": "2087118514612",
-        "descricao": "ILHA PARA CONGELADOS LIGHT 2.00M - POLAR",
-        "unidade": "UN",
-        "quantidade": 2,
-        "valor_unitario": "7.076,00",
-        "desconto_real": "0,00",
-        "desconto_porcentagem": "0,00",
-        "acrescimo": "0,00",
-        "subtotal": "14.152,00"
-    },
-    {
-        "codigo": "2087118514613",
-        "descricao": "FREEZER VERTICAL 500L - POLAR",
-        "unidade": "UN",
-        "quantidade": 1,
-        "valor_unitario": "3.500,00",
-        "desconto_real": "0,00",
-        "desconto_porcentagem": "0,00",
-        "acrescimo": "0,00",
-        "subtotal": "3.500,00"
-    },
-    {
-        "codigo": "2087118514612",
-        "descricao": "ILHA PARA CONGELADOS LIGHT 2.00M - POLAR",
-        "unidade": "UN",
-        "quantidade": 2,
-        "valor_unitario": "7.076,00",
-        "desconto_real": "0,00",
-        "desconto_porcentagem": "0,00",
-        "acrescimo": "0,00",
-        "subtotal": "14.152,00"
-    },
-    {
-        "codigo": "2087118514613",
-        "descricao": "FREEZER VERTICAL 500L - POLAR",
-        "unidade": "UN",
-        "quantidade": 1,
-        "valor_unitario": "3.500,00",
-        "desconto_real": "0,00",
-        "desconto_porcentagem": "0,00",
-        "acrescimo": "0,00",
-        "subtotal": "3.500,00"
-    },
+    # {
+    #     "codigo": "2087118514612",
+    #     "descricao": "ILHA PARA CONGELADOS LIGHT 2.00M - POLAR",
+    #     "unidade": "UN",
+    #     "quantidade": 2,
+    #     "valor_unitario": "7.076,00",
+    #     "desconto_real": "0,00",
+    #     "desconto_porcentagem": "0,00",
+    #     "acrescimo": "0,00",
+    #     "subtotal": "14.152,00"
+    # },
+    # {
+    #     "codigo": "2087118514612",
+    #     "descricao": "ILHA PARA CONGELADOS LIGHT 2.00M - POLAR",
+    #     "unidade": "UN",
+    #     "quantidade": 2,
+    #     "valor_unitario": "7.076,00",
+    #     "desconto_real": "0,00",
+    #     "desconto_porcentagem": "0,00",
+    #     "acrescimo": "0,00",
+    #     "subtotal": "14.152,00"
+    # },
+    # {
+    #     "codigo": "2087118514613",
+    #     "descricao": "FREEZER VERTICAL 500L - POLAR",
+    #     "unidade": "UN",
+    #     "quantidade": 1,
+    #     "valor_unitario": "3.500,00",
+    #     "desconto_real": "0,00",
+    #     "desconto_porcentagem": "0,00",
+    #     "acrescimo": "0,00",
+    #     "subtotal": "3.500,00"
+    # },
+    # {
+    #     "codigo": "2087118514612",
+    #     "descricao": "ILHA PARA CONGELADOS LIGHT 2.00M - POLAR",
+    #     "unidade": "UN",
+    #     "quantidade": 2,
+    #     "valor_unitario": "7.076,00",
+    #     "desconto_real": "0,00",
+    #     "desconto_porcentagem": "0,00",
+    #     "acrescimo": "0,00",
+    #     "subtotal": "14.152,00"
+    # },
+    # {
+    #     "codigo": "2087118514613",
+    #     "descricao": "FREEZER VERTICAL 500L - POLAR",
+    #     "unidade": "UN",
+    #     "quantidade": 1,
+    #     "valor_unitario": "3.500,00",
+    #     "desconto_real": "0,00",
+    #     "desconto_porcentagem": "0,00",
+    #     "acrescimo": "0,00",
+    #     "subtotal": "3.500,00"
+    # },
     {
         "codigo": "2087118514612",
         "descricao": "ILHA PARA CONGELADOS LIGHT 2.00M - POLAR",
