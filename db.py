@@ -1,4 +1,9 @@
 import MySQLdb
+# host     = "ballast.proxy.rlwy.net"
+# user     = "root"
+# password = "cUxQKiTNIHZUlBQhphYhiESVTcrCJTGO"
+# db       = "railway"
+# port     =  15192
 host     = "localhost"
 user     = "loja"
 password = "loja0909!"
@@ -10,4 +15,4 @@ cursor = conn.cursor()
 
 # cursor.execute("""
 # DROP table teste
-# """)
+# """)mysql://root:cUxQKiTNIHZUlBQhphYhiESVTcrCJTGO@ballast.proxy.rlwy.net:15192/railway

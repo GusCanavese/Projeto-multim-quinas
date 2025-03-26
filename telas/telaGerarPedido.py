@@ -7,7 +7,7 @@ from tkinter import messagebox
 import requests
 from PIL import Image
 import datetime
-from funcoesTerceiras.PassaDadosParaPedido import PassaDadosParaPedido
+from funcoesTerceiras.verificaSeQuerSalvarPedido import salvarPedido
 
 
 def telaGerarPedido(self):
@@ -716,7 +716,7 @@ def telaGerarPedido(self):
     self.botaoVoltarTelaGerarPedido.place(x=30, y=760)
 
     # gerar pedido
-    self.botaoGerarPedido = ctk.CTkButton(self.frameTelaGerarPedido, text="Gerar pedido", width=200, corner_radius=5, font=("Arial", 15), command=lambda:PassaDadosParaPedido(self))
+    self.botaoGerarPedido = ctk.CTkButton(self.frameTelaGerarPedido, text="Gerar pedido", width=200, corner_radius=5, font=("Arial", 15), command=lambda:salvarPedido(self))
     self.botaoGerarPedido.place(x=950, y=760)
     calcularTotais()
 

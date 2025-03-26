@@ -2,6 +2,7 @@ import customtkinter as ctk
 from funcoesTerceiras.geradorDePedido import gerar_recibo
 import telas 
 import telas.telaAcoes
+import telas.telaApresentadorDePdf
 import telas.telaCadastroClientes
 import telas.telaCadastroFuncionario
 import telas.telaCadastros
@@ -33,7 +34,6 @@ class App(ctk.CTk):
 
 
            
-
 
 if __name__ == "__main__":
     app = App()

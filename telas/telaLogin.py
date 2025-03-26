@@ -2,8 +2,6 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
-from consultas.select import Buscas
-from consultas.insert import Insere
 from funcoesTerceiras.consultarUsuarioCadastrado import consultarUsuarioCadastrado
 
 
