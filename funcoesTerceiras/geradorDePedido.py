@@ -165,6 +165,8 @@ def gerar_recibo(nome_arquivo, dados):
         altura_linha -= 15
         altura_item -= 15
 
+
+
     c.setFont("Times-Bold", 8)
     c.drawString(155, altura_item, "TOTAL DE MERCADORIAS")
     c.drawString(300, altura_item, f"{dados['total_quantidade']}")
@@ -208,63 +210,140 @@ def gerar_recibo(nome_arquivo, dados):
     c.rect(20, altura_item - 30, 570, -90, stroke=1, fill=0)
     c.line(20, altura_item - 105, 575+15, altura_item - 105)
 
-    c.setFont("Times-Bold", 9)
-    c.drawString(23, altura_item -140, "OBSERVAÇÕES DO PEDIDO")
-    c.drawString(450, altura_item -140, "FECHAMENTO FINANCEIRO")
+
+
+    novaAltura = 480
+
+    if altura_item < 422:
+        print("aopa")
     
-    c.setFont("Times-Roman", 9)
-    texto = c.beginText(23, altura_item - 160)  
-    texto.setFont("Times-Roman", 9)
-    for linha in dados['observacoes1'].split('\n'):
-        texto.textLine(linha)  
-    c.drawText(texto)
+        
+        c.showPage()
 
 
-    texto2 = c.beginText(322, altura_item - 203)  
-    texto2.setFont("Times-Roman", 9)
-    for linha in dados['observacoes2'].split('\n'):
-        texto2.textLine(linha)  
-    c.drawText(texto2)
-   
-
-    c.setFont("Times-Roman", 7)
-
-    c.drawString(338, altura_item -160, "PAGO")
-    c.rect(322, altura_item - 165, 15, 15, stroke=1, fill=0)
-
-    c.drawString(388, altura_item -160, "A VISTA")
-    c.rect(372, altura_item - 165, 15, 15, stroke=1, fill=0)
-
-    c.drawString(450, altura_item -160, "A PRAZO")
-    c.rect(434, altura_item - 165, 15, 15, stroke=1, fill=0)
-
-    c.drawString(510, altura_item -160, "RECEBER NA ENTREGA")
-    c.rect(494, altura_item - 165, 15, 15, stroke=1, fill=0)
-
-    c.setFont("Times-Bold", 9)
-    c.drawString(322, altura_item -183, "FINANCEIRO")
-    c.rect(20, altura_item - 143, (width - 50)/2 -5, -200, stroke=1, fill=0)
-    c.line(314, altura_item - 175, 590, altura_item - 175)
+        c.setFont("Times-Bold", 9)
+        c.drawString(23, altura_item -140 + novaAltura, "OBSERVAÇÕES DO PEDIDO")
+        c.drawString(450, altura_item -140 + novaAltura, "FECHAMENTO FINANCEIRO")
+        
+        c.setFont("Times-Roman", 9)
+        texto = c.beginText(23, altura_item - 160 + novaAltura)  
+        texto.setFont("Times-Roman", 9)
+        for linha in dados['observacoes1'].split('\n'):
+            texto.textLine(linha)  
+        c.drawText(texto)
 
 
-    c.rect((width - 20)/2 + 18, altura_item - 143, (width - 50)/2 - 5, -200, stroke=1, fill=0)
-    c.line(width/2-100, altura_item-390, width/2 + 100, altura_item-390)
-    destinatario_text = f"{dados['destinatario']}"
-
-    font_name = "Helvetica"
-    font_size = 9
-    c.setFont(font_name, font_size)
-    text_width = stringWidth(destinatario_text, font_name, font_size)
-
-    x_pos = (width - text_width) / 2
-
-    c.drawString(x_pos, altura_item - 400, destinatario_text)
-
-    c.drawString(width/2 - 30, altura_item - 415, f"{dados['cpf']}")
-
+        texto2 = c.beginText(322, altura_item - 203 + novaAltura)  
+        texto2.setFont("Times-Roman", 9)
+        for linha in dados['observacoes2'].split('\n'):
+            texto2.textLine(linha)  
+        c.drawText(texto2)
     
+
+        c.setFont("Times-Roman", 7)
+
+        c.drawString(338, altura_item -160 + novaAltura, "PAGO")
+        c.rect(322, altura_item - 165 + novaAltura, 15, 15, stroke=1, fill=0)
+
+        c.drawString(388, altura_item -160 + novaAltura, "A VISTA")
+        c.rect(372, altura_item - 165 + novaAltura, 15, 15, stroke=1, fill=0)
+
+        c.drawString(450, altura_item -160 + novaAltura, "A PRAZO")
+        c.rect(434, altura_item - 165 + novaAltura, 15, 15, stroke=1, fill=0)
+
+        c.drawString(510, altura_item -160 + novaAltura, "RECEBER NA ENTREGA")
+        c.rect(494, altura_item - 165 + novaAltura, 15, 15, stroke=1, fill=0)
+
+        c.setFont("Times-Bold", 9)
+        c.drawString(322, altura_item -183 + novaAltura, "FINANCEIRO")
+        c.rect(20, altura_item - 143 + novaAltura, (width - 50)/2 -5, -200, stroke=1, fill=0)
+        c.line(314, altura_item - 175 + novaAltura, 590, altura_item - 175 + novaAltura)
+
+        print(altura_item)
+        c.rect((width - 20)/2 + 18, altura_item - 143 + novaAltura, (width - 50)/2 - 5, -200, stroke=1, fill=0)
+        
+        c.setFont("Helvetica", 9) 
+        
+        c.line(width/2-100, altura_item-410  + novaAltura, width/2 + 100, altura_item-410  + novaAltura)
+
+        destinatario_text = f"{dados['destinatario']}"
+        font_name = "Helvetica"
+        font_size = 9
+        text_width = stringWidth(destinatario_text, font_name, font_size)
+        x_pos = (width - text_width) / 2
+
+        c.drawString(x_pos, altura_item - 440  + novaAltura, destinatario_text)
+        c.drawString(width/2 - 30, altura_item - 455  + novaAltura, f"{dados['cpf']}")
+
+        
+
+    elif altura_item >= 422:
+        c.setFont("Times-Bold", 9)
+        c.drawString(23, altura_item -140, "OBSERVAÇÕES DO PEDIDO")
+        c.drawString(450, altura_item -140, "FECHAMENTO FINANCEIRO")
+        
+        c.setFont("Times-Roman", 9)
+        texto = c.beginText(23, altura_item - 160)  
+        texto.setFont("Times-Roman", 9)
+        for linha in dados['observacoes1'].split('\n'):
+            texto.textLine(linha)  
+        c.drawText(texto)
+
+
+        texto2 = c.beginText(322, altura_item - 203)  
+        texto2.setFont("Times-Roman", 9)
+        for linha in dados['observacoes2'].split('\n'):
+            texto2.textLine(linha)  
+        c.drawText(texto2)
+    
+
+        c.setFont("Times-Roman", 7)
+
+        c.drawString(338, altura_item -160, "PAGO")
+        c.rect(322, altura_item - 165, 15, 15, stroke=1, fill=0)
+
+        c.drawString(388, altura_item -160, "A VISTA")
+        c.rect(372, altura_item - 165, 15, 15, stroke=1, fill=0)
+
+        c.drawString(450, altura_item -160, "A PRAZO")
+        c.rect(434, altura_item - 165, 15, 15, stroke=1, fill=0)
+
+        c.drawString(510, altura_item -160, "RECEBER NA ENTREGA")
+        c.rect(494, altura_item - 165, 15, 15, stroke=1, fill=0)
+
+        c.setFont("Times-Bold", 9)
+        c.drawString(322, altura_item -183, "FINANCEIRO")
+        c.rect(20, altura_item - 143, (width - 50)/2 -5, -200, stroke=1, fill=0)
+        c.line(314, altura_item - 175, 590, altura_item - 175)
+
+        print(altura_item)
+        c.rect((width - 20)/2 + 18, altura_item - 143, (width - 50)/2 - 5, -200, stroke=1, fill=0)
+
+        c.rect((width - 20)/2 + 18, altura_item - 143, (width - 50)/2 - 5, -200, stroke=1, fill=0)
+        
+        
+        
+        
+        c.setFont("Helvetica", 9) 
+
+        c.line(width/2-100, altura_item-390, width/2 + 100, altura_item-390)
+        destinatario_text = f"{dados['destinatario']}"
+
+        print(altura_item)
+
+        font_name = "Helvetica"
+        font_size = 9
+        c.setFont(font_name, font_size)
+        text_width = stringWidth(destinatario_text, font_name, font_size)
+
+        x_pos = (width - text_width) / 2
+
+        c.drawString(x_pos, altura_item - 400, destinatario_text)
+
+        c.drawString(width/2 - 30, altura_item - 415, f"{dados['cpf']}")
 
     c.save()
+    
 
 dados_exemplo = {
 "numero_recibo": "0001206970",
@@ -288,28 +367,20 @@ dados_exemplo = {
 "observacoes1": "teste",
 "observacoes2": "teste",
 "itens": [
-    # {
-    #     "codigo": "2087118514612",
-    #     "descricao": "ILHA PARA CONGELADOS LIGHT 2.00M - POLAR",
-    #     "unidade": "UN",
-    #     "quantidade": 2,
-    #     "valor_unitario": "7.076,00",
-    #     "desconto_real": "0,00",
-    #     "desconto_porcentagem": "0,00",
-    #     "acrescimo": "0,00",
-    #     "subtotal": "14.152,00"
-    # },
-    # {
-    #     "codigo": "2087118514612",
-    #     "descricao": "ILHA PARA CONGELADOS LIGHT 2.00M - POLAR",
-    #     "unidade": "UN",
-    #     "quantidade": 2,
-    #     "valor_unitario": "7.076,00",
-    #     "desconto_real": "0,00",
-    #     "desconto_porcentagem": "0,00",
-    #     "acrescimo": "0,00",
-    #     "subtotal": "14.152,00"
-    # },
+    {
+        "codigo": "2087118514612",
+        "descricao": "ILHA PARA CONGELADOS LIGHT 2.00M - POLAR",
+        "unidade": "UN",
+        "quantidade": 2,
+        "valor_unitario": "7.076,00",
+        "desconto_real": "0,00",
+        "desconto_porcentagem": "0,00",
+        "acrescimo": "0,00",
+        "subtotal": "14.152,00"
+    },
+
+
+
     # {
     #     "codigo": "2087118514613",
     #     "descricao": "FREEZER VERTICAL 500L - POLAR",
@@ -331,6 +402,18 @@ dados_exemplo = {
     #     "desconto_porcentagem": "0,00",
     #     "acrescimo": "0,00",
     #     "subtotal": "14.152,00"
+    # },
+    # {
+    #     "codigo": "2087118514612",
+    #     "descricao": "ILHA PARA CONGELADOS LIGHT 2.00M - POLAR",
+    #     "unidade": "UN",
+    #     "quantidade": 2,
+    #     "valor_unitario": "7.076,00",
+    #     "desconto_real": "0,00",
+    #     "desconto_porcentagem": "0,00",
+    #     "acrescimo": "0,00",
+    #     "subtotal": "14.152,00"
+
     # },
     # {
     #     "codigo": "2087118514613",

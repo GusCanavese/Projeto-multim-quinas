@@ -17,6 +17,7 @@ def telaApresentarPDF(self, caminhoPdf):
     self.textoSobnreSalvamentoNoBD = ctk.CTkLabel(self.frameApresentarPedido, wraplength=300, text="Seu pedido foi cadastrado com sucesso no banco de dados! Para acessar ele, vá na aba 'Consultar pedidos' ou clique no botão abaixo", width=100, font=("Arial", 22))
     self.textoSobnreSalvamentoNoBD.place(relx=0.27, y=220, anchor="center")
 
+
     documentoPdf = fitz.open(caminhoPdf)
     pagina = documentoPdf.load_page(0)  # Carrega a primeira página (índice 0)
     pixmap = pagina.get_pixmap()  # Converte a página em uma imagem (pixmap)
