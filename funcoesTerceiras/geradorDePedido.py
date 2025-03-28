@@ -215,7 +215,7 @@ def gerar_recibo(nome_arquivo, dados):
     novaAltura = 480
 
     if altura_item < 422:
-        print("aopa")
+       
     
         
         c.showPage()
@@ -259,7 +259,6 @@ def gerar_recibo(nome_arquivo, dados):
         c.rect(20, altura_item - 143 + novaAltura, (width - 50)/2 -5, -200, stroke=1, fill=0)
         c.line(314, altura_item - 175 + novaAltura, 590, altura_item - 175 + novaAltura)
 
-        print(altura_item)
         c.rect((width - 20)/2 + 18, altura_item - 143 + novaAltura, (width - 50)/2 - 5, -200, stroke=1, fill=0)
         
         c.setFont("Helvetica", 9) 
@@ -316,7 +315,6 @@ def gerar_recibo(nome_arquivo, dados):
         c.rect(20, altura_item - 143, (width - 50)/2 -5, -200, stroke=1, fill=0)
         c.line(314, altura_item - 175, 590, altura_item - 175)
 
-        print(altura_item)
         c.rect((width - 20)/2 + 18, altura_item - 143, (width - 50)/2 - 5, -200, stroke=1, fill=0)
 
         c.rect((width - 20)/2 + 18, altura_item - 143, (width - 50)/2 - 5, -200, stroke=1, fill=0)
@@ -329,7 +327,6 @@ def gerar_recibo(nome_arquivo, dados):
         c.line(width/2-100, altura_item-390, width/2 + 100, altura_item-390)
         destinatario_text = f"{dados['destinatario']}"
 
-        print(altura_item)
 
         font_name = "Helvetica"
         font_size = 9
@@ -462,4 +459,4 @@ dados_exemplo = {
 ],
 }
     
-gerar_recibo("recibo_venda.pdf", dados_exemplo)
+# gerar_recibo("recibo_venda.pdf", dados_exemplo)

@@ -16,10 +16,56 @@ def telaApresentarPDF(self, caminhoPdf):
 
     self.textoSobnreSalvamentoNoBD = ctk.CTkLabel(self.frameApresentarPedido, wraplength=300, text="Seu pedido foi cadastrado com sucesso no banco de dados! Para acessar ele, vá na aba 'Consultar pedidos' ou clique no botão abaixo", width=100, font=("Arial", 22))
     self.textoSobnreSalvamentoNoBD.place(relx=0.27, y=220, anchor="center")
-
-
+    
     documentoPdf = fitz.open(caminhoPdf)
-    pagina = documentoPdf.load_page(0)  # Carrega a primeira página (índice 0)
+    self.numeroPagina = 1
+    
+    def soma():
+        print("nao entrou ainda")
+        if self.numeroPagina < documentoPdf.page_count:
+            self.numeroPagina += 1
+            print("entrou")
+            self.textoPaginaN.configure(text=f"Página {self.numeroPagina}")
+        pagina = documentoPdf.load_page(self.numeroPagina-1)  # Carrega a primeira página (índice 0)
+        pixmap = pagina.get_pixmap()  # Converte a página em uma imagem (pixmap)
+        imagemPdf = Image.frombytes("RGB", [pixmap.width, pixmap.height], pixmap.samples)
+
+        imagemPdf = imagemPdf.resize((551, 779))  # Ajuste o tamanho conforme necessário
+        imagemTk = ImageTk.PhotoImage(imagemPdf)
+
+        labelPdf = ctk.CTkLabel(self.frameApresentarPedido, image=imagemTk, text="")
+        labelPdf.place(x=650, y=35)
+
+    def subtracao():
+        if self.numeroPagina > 1:
+            self.numeroPagina -= 1
+            self.textoPaginaN.configure(text=f"Página {self.numeroPagina}")
+        pagina = documentoPdf.load_page(self.numeroPagina-1)  # Carrega a primeira página (índice 0)
+        pixmap = pagina.get_pixmap()  # Converte a página em uma imagem (pixmap)
+        imagemPdf = Image.frombytes("RGB", [pixmap.width, pixmap.height], pixmap.samples)
+
+        imagemPdf = imagemPdf.resize((551, 779))  # Ajuste o tamanho conforme necessário
+        imagemTk = ImageTk.PhotoImage(imagemPdf)
+
+        labelPdf = ctk.CTkLabel(self.frameApresentarPedido, image=imagemTk, text="")
+        labelPdf.place(x=650, y=35)
+            
+
+
+
+    
+
+    iconeDireita = ctk.CTkImage(light_image=Image.open("arquivos/direita.png"), size=(20, 20))
+    iconeEsquerda = ctk.CTkImage(light_image=Image.open("arquivos/esquerda.png"), size=(20, 20))
+    self.botaopagina1 = ctk.CTkButton(self.frameApresentarPedido, text="", image=iconeDireita, fg_color="#38343c", width=30, corner_radius=5 , command=soma)
+    self.botaopagina1.place(x=980, y=820)
+    self.textoPaginaN = ctk.CTkLabel(self.frameApresentarPedido, text=f"Página {self.numeroPagina}", width=100, font=("Arial", 16))
+    self.textoPaginaN.place(x=883, y=820)
+    self.botaopagina2 = ctk.CTkButton(self.frameApresentarPedido, text="", image=iconeEsquerda, fg_color="#38343c", width=30, corner_radius=5, command=subtracao)
+    self.botaopagina2.place(x=850, y=820)
+
+    
+    pagina = documentoPdf.load_page(self.numeroPagina-1)  # Carrega a primeira página (índice 0)
     pixmap = pagina.get_pixmap()  # Converte a página em uma imagem (pixmap)
     imagemPdf = Image.frombytes("RGB", [pixmap.width, pixmap.height], pixmap.samples)
 
@@ -27,7 +73,6 @@ def telaApresentarPDF(self, caminhoPdf):
     imagemTk = ImageTk.PhotoImage(imagemPdf)
 
     labelPdf = ctk.CTkLabel(self.frameApresentarPedido, image=imagemTk, text="")
-    labelPdf.image = imagemTk  # Mantém uma referência para evitar garbage collection
     labelPdf.place(x=650, y=35)
 
     # voltar
