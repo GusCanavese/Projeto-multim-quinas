@@ -22,7 +22,7 @@ def filtrarPedidos(self, vendedor, numero):
             pedido[3]   
         ]
         
-        
+        # 
         for colNum, valor in enumerate(dados):
             dado = ctk.CTkLabel(self.frameParaVendasNoRelatorio, text=valor, width=150, fg_color="#38343c", anchor="center")
             dado.grid(row=rowPedido, column=colNum, padx=2, pady=2)
