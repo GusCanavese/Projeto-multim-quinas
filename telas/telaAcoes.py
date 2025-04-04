@@ -5,6 +5,7 @@ import customtkinter as ctk
 from consultas.select import Buscas
 from telas.telaCadastros import telaCadastros
 from telas.telaDefineCnpjDoProduto import telaDefineCnpjDoProduto
+from telas.telaRelatorioDeVendas import telaRelatorioDeVendas
 
 def telaAcoes(self):
     self.frameTelaAcoes = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
@@ -22,7 +23,7 @@ def telaAcoes(self):
     # condição que bloqueia o acesso dos vendedores externos
     if cargo == (('Vendedor(a) externo',),):
         # botão de relatório de vendas # ! ainda não está ativo nem possui uma tela criada para ele 
-        self.botaoRelatorioDeVendas = ctk.CTkButton(self.frameTelaAcoes, text="Relatório de vendas", width=300, corner_radius=5, font=("Arial", 18), command=self)
+        self.botaoRelatorioDeVendas = ctk.CTkButton(self.frameTelaAcoes, text="Relatório de vendas", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaRelatorioDeVendas(self))
         self.botaoRelatorioDeVendas.place(relx=0.66, y=200, anchor="center")
 
         # botão de gerar pedidos # ! ainda não está ativo nem possui uma tela criada para ele
@@ -41,8 +42,8 @@ def telaAcoes(self):
         self.botaoCadastro = ctk.CTkButton(self.frameTelaAcoes, text="Cadastros", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastros(self))
         self.botaoCadastro.place(relx=0.33, y=200, anchor="center")
 
-        # botão de relatório de vendas # ! ainda não está ativo nem possui uma tela criada para ele 
-        self.botaoRelatorioDeVendas = ctk.CTkButton(self.frameTelaAcoes, text="Relatório de vendas", width=300, corner_radius=5, font=("Arial", 18), command=self)
+        # botão de relatório de vendas 
+        self.botaoRelatorioDeVendas = ctk.CTkButton(self.frameTelaAcoes, text="Relatório de vendas", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaRelatorioDeVendas(self))
         self.botaoRelatorioDeVendas.place(relx=0.66, y=200, anchor="center")
 
         # botão de gerar pedidos

@@ -15,7 +15,7 @@ def PassaDadosParaPedido(self):
     for i, row in enumerate(resultados):
         telefone = row[2]
         if telefone == "":
-            telefone = "Cliente nao possui telefone para contato"
+            telefone = "N/A"
 
 
     if self.entradaEnderecoNoPedido.get() =="" or self.entradaReferenciaEnderecoEntrega.get()=="" or self.entradaNumero.get() =="" or self.CPFCliente.get()=="" or self.nomeDoClienteBuscado.get()=="":
@@ -25,6 +25,7 @@ def PassaDadosParaPedido(self):
 
     else:
         self.dados = {
+            "vendedor":self.funcionariaPedido.get(),
             "frete":self.valorFrete.get() or 0.0,
             "valor_total": self.totalSubtotal,
             "total_subtotal":self.totalSubtotal,

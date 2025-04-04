@@ -25,7 +25,7 @@ class Buscas:
         return resultados
     
     def selecionaNumeroPedido():
-        queryInserirNumeroDaVenda = "SELECT MAX(id) AS maior_numero FROM pedidos"
+        queryInserirNumeroDaVenda = "SELECT MAX(numero_recibo) AS maior_numero FROM pedidos"
         db.cursor.execute(queryInserirNumeroDaVenda)
         resultado = db.cursor.fetchone()
         return resultado
@@ -36,5 +36,10 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
     
+    def buscaPedidos():
+        queryBuscaPedidos = "SELECT numero_recibo, data_emissao, vendedor, subtotal FROM pedidos"
+        db.cursor.execute(queryBuscaPedidos)
+        resultado = db.cursor.fetchall()
+        return resultado
 
 

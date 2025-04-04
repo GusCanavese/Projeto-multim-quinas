@@ -8,6 +8,8 @@ import telas.telaCadastroFuncionario
 import telas.telaCadastros
 import telas.telaGerarPedido
 import telas.telaLogin
+import telas.telaRelatorioDeVendas
+import telas.telaVerPedidos
 # import random
 
 # ctk.set_appearance_mode("system")  
@@ -25,12 +27,13 @@ class App(ctk.CTk):
         self.resizable(False, False)
         self.alturaTela = 900
         self.larguraTela = 1280
-        self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+0")
+        self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+100")
         self.telas()
 
 
     def telas(self):
-        telas.telaGerarPedido.telaGerarPedido(self)
+        telas.telaRelatorioDeVendas.telaRelatorioDeVendas(self)
+        # telas.telaGerarPedido.telaGerarPedido(self)
 
 
            

@@ -43,11 +43,15 @@ def telaGerarPedido(self):
     self.variavelSubtotalAux = 0.00
     
     def geraNumeroPedido():
-        self.numeroDoPedido += 1
+        # self.numeroDoPedido += 1
         maiorNumero = Buscas.selecionaNumeroPedido()[0]
+        
+        print(maiorNumero)
         if maiorNumero == None:
-            maiorNumero = 0 
-        numeroDoPedidoSendoCriado = maiorNumero+1
+            maiorNumero = 1
+        else:
+            maiorNumero += 1
+        numeroDoPedidoSendoCriado = maiorNumero
         self.variavelnumeroDoPedido.set(numeroDoPedidoSendoCriado)
 
     # criação do frame

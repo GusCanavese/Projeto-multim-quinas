@@ -2,6 +2,7 @@ import customtkinter as ctk
 from PIL import Image, ImageTk
 import fitz 
 from funcoesTerceiras.imprimirPDF import imprimirPdf
+from telas.telaVerPedidos import telaVerPedidos
 
 def telaApresentarPDF(self, caminhoPdf):
     # Cria o frame principal
@@ -65,11 +66,11 @@ def telaApresentarPDF(self, caminhoPdf):
     self.botaopagina2.place(x=850, y=820)
 
     
-    pagina = documentoPdf.load_page(self.numeroPagina-1)  # Carrega a primeira página (índice 0)
-    pixmap = pagina.get_pixmap()  # Converte a página em uma imagem (pixmap)
+    pagina = documentoPdf.load_page(self.numeroPagina-1)
+    pixmap = pagina.get_pixmap()
     imagemPdf = Image.frombytes("RGB", [pixmap.width, pixmap.height], pixmap.samples)
 
-    imagemPdf = imagemPdf.resize((551, 779))  # Ajuste o tamanho conforme necessário
+    imagemPdf = imagemPdf.resize((551, 779))
     imagemTk = ImageTk.PhotoImage(imagemPdf)
 
     labelPdf = ctk.CTkLabel(self.frameApresentarPedido, image=imagemTk, text="")
@@ -84,5 +85,5 @@ def telaApresentarPDF(self, caminhoPdf):
     self.botaoImprimePedido.place(x=350, y=800)
 
     # consulta pedidos
-    self.botaoConsultaPedidos = ctk.CTkButton(self.frameApresentarPedido, text="Consultar pedidos", width=200, corner_radius=5, font=("Arial", 15), command= lambda:self)
+    self.botaoConsultaPedidos = ctk.CTkButton(self.frameApresentarPedido, text="Consultar pedidos", width=200, corner_radius=5, font=("Arial", 15), command=lambda:telaVerPedidos(self))
     self.botaoConsultaPedidos.place(relx=0.27, y=350, anchor="center")

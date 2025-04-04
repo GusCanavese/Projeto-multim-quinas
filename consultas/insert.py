@@ -50,11 +50,11 @@ class Insere():
         itens_json = json.dumps(dadosPedido['itens'])
         db.cursor.execute("""INSERT INTO pedidos (
                 numero_recibo, data_emissao, data_confirmacao, destinatario,
-                cpf, cnpj, telefone, endereco, referencia, cep,
+                cpf, cnpj, telefone, endereco, referencia, cep, vendedor,
                 frete, valor_total, total_subtotal, total_acrescimo,
                 total_desc_real, total_desc_porc, total_quantidade,
                 subtotal, itens
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", 
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", 
             (
             dadosPedido['numero_recibo'],
             dadosPedido['data_emissao'],
@@ -66,6 +66,7 @@ class Insere():
             dadosPedido['endereco'],
             dadosPedido.get('referencia', ''),
             dadosPedido.get('cep', ''),
+            dadosPedido.get('vendedor',''),
             float(dadosPedido.get('frete', 0.0)),
             float(dadosPedido['valor_total']),
             float(dadosPedido['total_subtotal']),

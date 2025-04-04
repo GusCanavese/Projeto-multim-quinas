@@ -135,55 +135,55 @@
 
 
 
+maiorNumero = Buscas.selecionaNumeroPedido()[0]
 
 
-
-    if altura_item < 407:
-        print("aopa")
+    # if altura_item < 407:
+    #     print("aopa")
         
-        c.line(10, 10, 10, altura_item)
+    #     c.line(10, 10, 10, altura_item)
         
-        c.showPage()
+    #     c.showPage()
         
-        c.setFont("Helvetica", 9) 
-        altura_item = height - 50  
+    #     c.setFont("Helvetica", 9) 
+    #     altura_item = height - 50  
         
-        c.line(width/2-100, altura_item-50, width/2 + 100, altura_item-50)
+    #     c.line(width/2-100, altura_item-50, width/2 + 100, altura_item-50)
 
-        destinatario_text = f"{dados['destinatario']}"
-        font_name = "Helvetica"
-        font_size = 9
-        text_width = stringWidth(destinatario_text, font_name, font_size)
-        x_pos = (width - text_width) / 2
+    #     destinatario_text = f"{dados['destinatario']}"
+    #     font_name = "Helvetica"
+    #     font_size = 9
+    #     text_width = stringWidth(destinatario_text, font_name, font_size)
+    #     x_pos = (width - text_width) / 2
 
-        c.drawString(x_pos, altura_item - 70, destinatario_text)
-        c.drawString(width/2 - 30, altura_item - 85, f"{dados['cpf']}")
+    #     c.drawString(x_pos, altura_item - 70, destinatario_text)
+    #     c.drawString(width/2 - 30, altura_item - 85, f"{dados['cpf']}")
 
-    c.save()
-
-
+    # c.save()
 
 
 
 
 
-    c.rect((width - 20)/2 + 18, altura_item - 143, (width - 50)/2 - 5, -200, stroke=1, fill=0)
-    c.line(width/2-100, altura_item-390, width/2 + 100, altura_item-390)
-    destinatario_text = f"{dados['destinatario']}"
 
-    print(altura_item)
 
-    font_name = "Helvetica"
-    font_size = 9
-    c.setFont(font_name, font_size)
-    text_width = stringWidth(destinatario_text, font_name, font_size)
+    # c.rect((width - 20)/2 + 18, altura_item - 143, (width - 50)/2 - 5, -200, stroke=1, fill=0)
+    # c.line(width/2-100, altura_item-390, width/2 + 100, altura_item-390)
+    # destinatario_text = f"{dados['destinatario']}"
 
-    x_pos = (width - text_width) / 2
+    # print(altura_item)
 
-    c.drawString(x_pos, altura_item - 400, destinatario_text)
+    # font_name = "Helvetica"
+    # font_size = 9
+    # c.setFont(font_name, font_size)
+    # text_width = stringWidth(destinatario_text, font_name, font_size)
 
-    c.drawString(width/2 - 30, altura_item - 415, f"{dados['cpf']}")
+    # x_pos = (width - text_width) / 2
+
+    # c.drawString(x_pos, altura_item - 400, destinatario_text)
+
+    # c.drawString(width/2 - 30, altura_item - 415, f"{dados['cpf']}")
 
     
 
-    c.save()
+    # c.save()

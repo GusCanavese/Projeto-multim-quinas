@@ -33,7 +33,7 @@ def gerar_recibo(nome_arquivo, dados):
 
     # Dados da venda e do vendedor, dentro do quadrado
     c.drawString(425, altura - 65, f"Nº {dados['numero_recibo']}")
-    # c.drawString(425, altura - 75, f"Vendedor: {dados['vendedor']}")
+    c.drawString(425, altura - 75, f"Vendedor: {dados['vendedor']}")
     c.drawString(425, altura - 85, f"Data de Confirmação: {dados['data_confirmacao']}")
     c.drawString(425, altura - 95, f"Data de Emissão: {dados['data_emissao']}")
     c.drawString(425, altura - 105, "Página 1 de 1")
