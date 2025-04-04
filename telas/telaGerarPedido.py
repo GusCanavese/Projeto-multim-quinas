@@ -529,7 +529,7 @@ def telaGerarPedido(self):
     self.textoGerarPedido = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Gerar pedido", font=("Century Gothic bold", 30))
     self.textoGerarPedido.place(relx=0.5, y=40, anchor="center")
 
-    # entrada da do número da venda #!seria bom ser auto increment
+    # entrada da do número da venda
     self.labelNumeroDataVenda = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Número da venda", font=("Century Gothic bold", 14))
     self.labelNumeroDataVenda.place(x=30, y=75)
     self.numeroDeVenda = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable = self.variavelnumeroDoPedido, placeholder_text="Número", width=180, corner_radius=5, font=("Arial", 15))

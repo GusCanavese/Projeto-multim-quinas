@@ -37,6 +37,10 @@ class Buscas:
         return resultado
     
     def buscaPedidos():
+
+        # busca entre período
+        # SELECT * FROM pedidos WHERE data_pedido BETWEEN '2023-01-01' AND '2023-01-31';
+
         queryBuscaPedidos = "SELECT numero_recibo, data_emissao, vendedor, subtotal FROM pedidos"
         db.cursor.execute(queryBuscaPedidos)
         resultado = db.cursor.fetchall()
