@@ -21,7 +21,6 @@ def filtrarPedidos(self, vendedor, numero):
             pedido[1],
             pedido[3]   
         ]
-        # 
         
         for colNum, valor in enumerate(dados):
             dado = ctk.CTkLabel(self.frameParaVendasNoRelatorio, text=valor, width=150, fg_color="#38343c", anchor="center")
