@@ -29,15 +29,9 @@ def filtrarPedidos(self, vendedor, numero, inicio, fim, checkbox):
             pedido[1],
             pedido[3]   
         ]
-<<<<<<< HEAD
-        for colNum, valor in enumerate(dados):
-            dado = ctk.CTkLabel(self.frameParaVendasNoRelatorio, text=valor, width=150, fg_color="#38343c", anchor="center")
-            dado.grid(row=rowPedido, column=colNum, padx=2, pady=2)
-=======
 
         for colNum, valor in enumerate(self.valores):
             self.labelDadosPedido = ctk.CTkLabel(self.frameParaVendasNoRelatorio, text=valor, width=150, fg_color="#38343c", anchor="center")
             self.labelDadosPedido.grid(row=rowPedido, column=colNum, padx=2, pady=2)
             self.dados.append(self.labelDadosPedido)
             
->>>>>>> e96a87f (alterações na tela de relatorio de vendas)
