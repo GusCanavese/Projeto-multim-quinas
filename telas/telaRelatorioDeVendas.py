@@ -5,7 +5,7 @@ import customtkinter as ctk
 from consultas.select import Buscas 
 import tkinter as tk
 from tkcalendar import DateEntry
-from funcoesTerceiras import filtrarPedidos
+from funcoesTerceiras import filtrarPedidos, verificaSeQuerFiltrarPorPeriodo
 
 def telaRelatorioDeVendas(self):
     self.frameTelaRelatorioDeVendas = ctk.CTkFrame(self, corner_radius=5)
@@ -29,39 +29,15 @@ def telaRelatorioDeVendas(self):
     self.filtrarPorVendedor = ctk.CTkComboBox(self.frameTelaRelatorioDeVendas, font=("Century Gothic bold", 20), values=opcoes)
     self.filtrarPorVendedor.place(relx=0.03, rely=0.19, relwidth=0.22, anchor="nw")
 
-    self.labelfiltrarPorPeriodo = ctk.CTkLabel(self.frameTelaRelatorioDeVendas, text="Filtrar por perído", font=("Century Gothic bold", 15))
-    self.labelfiltrarPorPeriodo.place(relx=0.03, rely=0.27, anchor="nw")
+    self.selecionarPeriodo = ctk.CTkCheckBox(self.frameTelaRelatorioDeVendas, text="Selecionar período")
+    self.selecionarPeriodo.place(relx=0.03, rely=0.27, anchor="nw")
 
-    # Data Inicial
-    self.labelDataInicio = ctk.CTkLabel(self.frameTelaRelatorioDeVendas, text="Data Inicial:")
-    self.labelDataInicio.place(relx=0.03, rely=0.31, anchor="nw")
-
-    self.datePickerInicio = DateEntry(self.frameTelaRelatorioDeVendas, width=12, date_pattern="dd/MM/yyyy")
-    self.datePickerInicio.place(relx=0.03, rely=0.35, anchor="nw")
-
-    # Data Final
-    self.labelDataFim = ctk.CTkLabel(self.frameTelaRelatorioDeVendas, text="Data Final:")
-    self.labelDataFim.place(relx=0.14, rely=0.31, anchor="nw")
-
-    self.datePickerFim = DateEntry(self.frameTelaRelatorioDeVendas, width=12, date_pattern="dd/MM/yyyy")
-    self.datePickerFim.place(relx=0.14, rely=0.35, anchor="nw")
-
-    self.todoOPeriodo = ctk.CTkCheckBox(self.frameTelaRelatorioDeVendas, text="todo o período")
-    self.todoOPeriodo.place(relx=0.07, rely=0.39, anchor="nw")
+    
+    self.selecionarPeriodo.bind("<Button-1>", command=lambda event: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodo(self, self.selecionarPeriodo.get(), event))
+    
 
     # Botões
-    self.botaoFiltrarPedidos = ctk.CTkButton(
-        self.frameTelaRelatorioDeVendas,
-        text="Buscar",
-        command=lambda: filtrarPedidos.filtrarPedidos(
-            self,
-            self.filtrarPorVendedor.get(),
-            self.filtrarPorNumero.get(),
-            self.datePickerInicio.get(),
-            self.datePickerFim.get(),
-            self.todoOPeriodo.get()
-        )
-    )
+    self.botaoFiltrarPedidos = ctk.CTkButton(self.frameTelaRelatorioDeVendas,text="Buscar",command=lambda: filtrarPedidos.filtrarPedidos( self, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(), self.datePickerInicio.get() if hasattr(self, "datePickerInicio") else None, self.datePickerFim.get() if hasattr(self, "datePickerFim") else None, self.selecionarPeriodo.get()))
     self.botaoFiltrarPedidos.place(relx=0.05, rely=0.55, relwidth=0.15, anchor="nw")
 
     self.botaoLimpar = ctk.CTkButton(self.frameTelaRelatorioDeVendas, text="Limpar", command=lambda: print("Limpar"))
@@ -71,7 +47,8 @@ def telaRelatorioDeVendas(self):
     self.botaoVoltar.place(relx=0.79, rely=0.94, relwidth=0.15, anchor="nw")
 
     # Cabeçalhos da tabela
-    colunas = ["Pedido", "Vendedor", "Data de emissão", "Subtotal"]
+    colunas = ["Pedido", "Vendedor", "Data de emissão", "Subtotal", "Confirmação da venda"]
     for i, coluna in enumerate(colunas):
-        label = ctk.CTkLabel(self.frameParaVendasNoRelatorio, text=coluna, width=150, fg_color="green", anchor="center")
+        label = ctk.CTkLabel(self.frameParaVendasNoRelatorio, text=coluna, width=150, fg_color="#2C3E50", anchor="center")
         label.grid(row=0, column=i, padx=2, pady=5)
+        label.grid_columnconfigure(0, minsize=20)

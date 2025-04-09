@@ -37,7 +37,7 @@ class Buscas:
         return resultado
     
     def buscaPedidos(vendedor, numero, inicio, fim, checkbox):
-        queryBuscaPedidos = "SELECT numero_recibo, data_emissao, vendedor, subtotal FROM pedidos WHERE 1=1"
+        queryBuscaPedidos = "SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao FROM pedidos WHERE 1=1"
         parametros = []
 
         if vendedor !="Nenhum":
@@ -66,7 +66,3 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
     
-
-# busca entre período
-# SELECT * FROM pedidos WHERE data_pedido BETWEEN '2023-01-01' AND '2023-01-31';
-
