@@ -39,10 +39,14 @@ def telaRelatorioDeVendas(self):
     self.datePickerFim = DateEntry(self.frameTelaRelatorioDeVendas, width=12, date_pattern="dd/MM/yyyy")
     self.datePickerFim.place(x=150, y=300)
 
+    self.todoOPeriodo = ctk.CTkCheckBox(self.frameTelaRelatorioDeVendas, text="todo o período")
+    self.todoOPeriodo.place(x=200, y=300)
 
-
-    self.botaoFiltrarPedidos = ctk.CTkButton(self.frameTelaRelatorioDeVendas, text="Buscar", width=150, command=lambda:filtrarPedidos.filtrarPedidos(self, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get()))
+    self.botaoFiltrarPedidos = ctk.CTkButton(self.frameTelaRelatorioDeVendas, text="Buscar", width=150, command=lambda:filtrarPedidos.filtrarPedidos(self, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(),self.datePickerInicio.get() , self.datePickerFim.get(), self.todoOPeriodo.get()))
     self.botaoFiltrarPedidos.place(x=100, y=500)
+
+    self.botaoFiltrarPedidos = ctk.CTkButton(self.frameTelaRelatorioDeVendas, text="limpar", width=150, command=lambda:print())
+    self.botaoFiltrarPedidos.place(x=100, y=600)
 
     self.botaoVoltar = ctk.CTkButton(self.frameTelaRelatorioDeVendas, text="Voltar", width=150, command=self.frameTelaRelatorioDeVendas.destroy)
     self.botaoVoltar.place(x=950, y=760)

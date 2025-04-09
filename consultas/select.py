@@ -36,14 +36,37 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
     
-    def buscaPedidos():
+    def buscaPedidos(vendedor, numero, inicio, fim, checkbox):
+        queryBuscaPedidos = "SELECT numero_recibo, data_emissao, vendedor, subtotal FROM pedidos WHERE 1=1"
+        parametros = []
 
-        # busca entre período
-        # SELECT * FROM pedidos WHERE data_pedido BETWEEN '2023-01-01' AND '2023-01-31';
+        if vendedor !="Nenhum":
+            queryBuscaPedidos += " AND vendedor LIKE %s"
+            parametros.append(f'%{vendedor}%')
+            print("entrou em 1")
+            print(parametros)
 
-        queryBuscaPedidos = "SELECT numero_recibo, data_emissao, vendedor, subtotal FROM pedidos"
-        db.cursor.execute(queryBuscaPedidos)
+        if numero != '':
+            queryBuscaPedidos += " AND numero_recibo LIKE %s"
+            parametros.append(f'%{numero}%')
+            print("entrou em 2")
+            print(parametros)
+
+        if not checkbox:
+            print()
+            pass
+
+        elif (inicio and fim):
+            queryBuscaPedidos += " AND data_emissao BETWEEN %s AND %s"
+            parametros.extend([inicio, fim])
+
+
+        print(parametros)
+        db.cursor.execute(queryBuscaPedidos, parametros)
         resultado = db.cursor.fetchall()
         return resultado
+    
 
+# busca entre período
+# SELECT * FROM pedidos WHERE data_pedido BETWEEN '2023-01-01' AND '2023-01-31';
 
