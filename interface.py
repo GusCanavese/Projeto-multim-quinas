@@ -27,8 +27,10 @@ class App(ctk.CTk):
         self.resizable(False, False)
         self.alturaTela = 900
         self.larguraTela = 1280
-        self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+100")
+        # self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+100")
+        self.geometry(f"{self.larguraTela}x{self.alturaTela}")
         self.telas()
+
 
 
     def telas(self):
