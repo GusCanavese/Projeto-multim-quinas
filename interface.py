@@ -24,7 +24,7 @@ class App(ctk.CTk):
 
     # define as propriedades da janela
     def janela(self):
-        self.resizable(False, False)
+        self.resizable(True, True)
         self.alturaTela = 900
         self.larguraTela = 1280
         # self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+100")
@@ -35,6 +35,7 @@ class App(ctk.CTk):
 
     def telas(self):
         telas.telaRelatorioDeVendas.telaRelatorioDeVendas(self)
+        # telas.telaLogin.telaLogin(self)
         # telas.telaGerarPedido.telaGerarPedido(self)
 
 
