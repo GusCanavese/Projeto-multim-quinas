@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from PIL import Image, ImageTk
-import fitz 
+import fitz
 from funcoesTerceiras.imprimirPDF import imprimirPdf
 from telas.telaVerPedidos import telaVerPedidos
 
