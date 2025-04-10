@@ -30,7 +30,8 @@ def filtrarPedidos(self, vendedor, numero, inicio, fim, checkbox):
         # Cria botão na última coluna (coluna 5)
         def botaoVerDadosPedido(p=dadosPedido):
             print("Pedido selecionado:", p)
-            telaVerPedidos(self)
+            telaVerPedidos(self, p)
+            
             
 
         botao = ctk.CTkButton( self.frameParaVendasNoRelatorio, text="Ver", width=60, command=botaoVerDadosPedido)
