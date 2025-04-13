@@ -216,7 +216,6 @@ def telaGerarPedido(self):
         calcularTotais()
         nomeDoProduto = self.entradaProdutoPesquisado.get()
         Buscas.buscaProduto(nomeDoProduto)
-        # print(Buscas.buscaProduto(nomeDoProduto))
 
         if hasattr(self, "resultadoLabelsProduto"):
             for label in self.resultadoLabelsProduto:

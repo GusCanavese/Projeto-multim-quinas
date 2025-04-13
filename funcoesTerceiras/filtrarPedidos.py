@@ -5,6 +5,7 @@ import customtkinter as ctk
 from consultas.select import Buscas 
 import tkinter as tk
 from telas.telaVerPedidos import telaVerPedidos
+import json
 
 def filtrarPedidos(self, vendedor, numero, inicio, fim, checkbox):
     pedidos = Buscas.buscaPedidos(vendedor, numero, inicio, fim, checkbox)
@@ -20,6 +21,9 @@ def filtrarPedidos(self, vendedor, numero, inicio, fim, checkbox):
         status = pedido[4] if pedido[4] != "" else "Não confirmado"
 
         dadosPedido = [pedido[0], pedido[2], pedido[1], pedido[3], status]
+        dadosExtras = [pedido[5], pedido[6], pedido[7]]
+        dadosDoProdutoDoPedido = json.loads(pedido[8])
+        dadosDoProdutoDoPedidoLista = [dadosDoProdutoDoPedido[0]['descricao']]
 
         # Cria os labels com os dados do pedido
         for colNum, valor in enumerate(dadosPedido):
@@ -28,9 +32,9 @@ def filtrarPedidos(self, vendedor, numero, inicio, fim, checkbox):
             self.dados.append(label)
 
         # Cria botão na última coluna (coluna 5)
-        def botaoVerDadosPedido(p=dadosPedido):
+        def botaoVerDadosPedido(p=dadosPedido, d=dadosExtras, dl=dadosDoProdutoDoPedidoLista):
             print("Pedido selecionado:", p)
-            telaVerPedidos(self, p)
+            telaVerPedidos(self, p, d, dl)
             
             
 

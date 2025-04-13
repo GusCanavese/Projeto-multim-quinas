@@ -37,7 +37,7 @@ class Buscas:
         return resultado
     
     def buscaPedidos(vendedor, numero, inicio, fim, checkbox):
-        queryBuscaPedidos = "SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao FROM pedidos WHERE 1=1"
+        queryBuscaPedidos = "SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao, destinatario, cpf, endereco, itens FROM pedidos WHERE 1=1"
         parametros = []
 
         if vendedor !="Nenhum":
