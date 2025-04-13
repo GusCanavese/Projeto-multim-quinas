@@ -1,4 +1,3 @@
-import tkinter as tk
 from tkinter import messagebox
 from funcoesTerceiras.PassaDadosParaPedido import PassaDadosParaPedido
 

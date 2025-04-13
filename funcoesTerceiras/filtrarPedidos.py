@@ -11,25 +11,30 @@ def filtrarPedidos(self, vendedor, numero, inicio, fim, checkbox):
     pedidos = Buscas.buscaPedidos(vendedor, numero, inicio, fim, checkbox)
 
     # Remove dados anteriores da tabela
-    if hasattr(self, "dados"):
-        for item in self.dados:
+    if hasattr(self, "dadosTelaVerPedidos"):
+        for item in self.dadosTelaVerPedidos:
             item.destroy()
-    self.dados = []
+    # else:
+    #     pass
+    self.dadosTelaVerPedidos = []
 
     for rowPedido, pedido in enumerate(pedidos, start=1):
         corDeFundo = "#196F3D" if pedido[4] != "" else "#922B21"
         status = pedido[4] if pedido[4] != "" else "Não confirmado"
-
         dadosPedido = [pedido[0], pedido[2], pedido[1], pedido[3], status]
         dadosExtras = [pedido[5], pedido[6], pedido[7]]
         dadosDoProdutoDoPedido = json.loads(pedido[8])
+        print(pedido[8])
         dadosDoProdutoDoPedidoLista = [dadosDoProdutoDoPedido[0]['descricao']]
+
+        # print(dadosDoProdutoDoPedidoLista)
+        
 
         # Cria os labels com os dados do pedido
         for colNum, valor in enumerate(dadosPedido):
             label = ctk.CTkLabel( self.frameParaVendasNoRelatorio, text=valor, width=150, fg_color=corDeFundo, anchor="center" )
             label.grid(row=rowPedido, column=colNum, padx=2, pady=2)
-            self.dados.append(label)
+            self.dadosTelaVerPedidos.append(label)
 
         # Cria botão na última coluna (coluna 5)
         def botaoVerDadosPedido(p=dadosPedido, d=dadosExtras, dl=dadosDoProdutoDoPedidoLista):
@@ -40,4 +45,4 @@ def filtrarPedidos(self, vendedor, numero, inicio, fim, checkbox):
 
         botao = ctk.CTkButton( self.frameParaVendasNoRelatorio, text="Ver", width=60, command=botaoVerDadosPedido)
         botao.grid(row=rowPedido, column=len(dadosPedido), padx=2, pady=2)
-        self.dados.append(botao)
+        self.dadosTelaVerPedidos.append(botao)
