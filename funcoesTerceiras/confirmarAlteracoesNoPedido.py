@@ -2,11 +2,12 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from tkinter import messagebox
+from consultas.update import Atualiza
 
 
-def confirmarAlteracoesNoPedido(self, dataConfirmacao):
+def confirmarAlteracoesNoPedido(self, dataConfirmacao, identificador):
     if dataConfirmacao=='':
-        messagebox.ERROR("A data de confirmação deve ser preenchida no modelo dd/mm/aa")
+        messagebox.showerror('a',"A data de confirmação deve ser preenchida no modelo dd/mm/aa")
     else:
         resposta = messagebox.askquestion(
             "Confirmação",
@@ -14,5 +15,5 @@ def confirmarAlteracoesNoPedido(self, dataConfirmacao):
             icon='question'
         )
         if resposta == "yes":
-            pass
+            Atualiza.atualizaPedido(identificador)
             

@@ -19,15 +19,21 @@ def filtrarPedidos(self, vendedor, numero, inicio, fim, checkbox):
     self.dadosTelaVerPedidos = []
 
     for rowPedido, pedido in enumerate(pedidos, start=1):
-        corDeFundo = "#196F3D" if pedido[4] != "" else "#922B21"
-        status = pedido[4] if pedido[4] != "" else "Não confirmado"
-        dadosPedido = [pedido[0], pedido[2], pedido[1], pedido[3], status]
+        if pedido[4] != "":
+            corDeFundo = "#196F3D" 
+            self.status = pedido[4]
+
+        else:
+            corDeFundo="#922B21"
+            self.status="Não confirmado"
+
+
+
+        dadosPedido = [pedido[0], pedido[2], pedido[1], pedido[3], self.status]
         dadosExtras = [pedido[5], pedido[6], pedido[7]]
         dadosDoProdutoDoPedido = json.loads(pedido[8])
-        print(pedido[8])
         dadosDoProdutoDoPedidoLista = [dadosDoProdutoDoPedido[0]['descricao']]
 
-        # print(dadosDoProdutoDoPedidoLista)
         
 
         # Cria os labels com os dados do pedido

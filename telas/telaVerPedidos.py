@@ -6,10 +6,21 @@ from consultas.select import Buscas
 from funcoesTerceiras.confirmarAlteracoesNoPedido import confirmarAlteracoesNoPedido
 
 def telaVerPedidos(self, p, d, dl):
-    print(dl)    
-
     self.frameTelaVerPedidos = ctk.CTkFrame(self)
     self.frameTelaVerPedidos.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
+
+    print(p[4])
+    if p[4] == "Não confirmado":
+        self.status = "Venda em aberto"
+        dataDaVendaTelaVerPedidos = ''
+        self.statusDoPedidoTelaVerPedido = ctk.CTkButton(self.frameTelaVerPedidos, text='Confirmar venda', width=180, corner_radius=5, font=("Arial", 15), command=lambda:confirmarAlteracoesNoPedido(self, self.dataDaVendaTelaVerPedidos.get(), p[0]))
+        self.statusDoPedidoTelaVerPedido.place(relx=0.61, rely=0.1)
+    else: 
+        self.statusDoPedidoTelaVerPedido = ctk.CTkButton(self.frameTelaVerPedidos, text='Venda confirmada', fg_color='green', width=180, corner_radius=5, font=("Arial", 15))
+        self.statusDoPedidoTelaVerPedido.place(relx=0.61, rely=0.1)
+        self.status = "Confirmado"
+        dataDaVendaTelaVerPedidos = p[4]
+
 
     # Primeira linha (relx espaçado em 0.2, rely em 0.05 e 0.1)
     self.labelNumeroDataVenda = ctk.CTkLabel(self.frameTelaVerPedidos, text="Número da venda", font=("Century Gothic bold", 14))
@@ -24,13 +35,14 @@ def telaVerPedidos(self, p, d, dl):
 
     self.labelDataDaVendaTelaVerPedidos = ctk.CTkLabel(self.frameTelaVerPedidos, text="Data da venda", font=("Century Gothic bold", 14))
     self.labelDataDaVendaTelaVerPedidos.place(relx=0.42, rely=0.05)
-    self.dataDaVendaTelaVerPedidos = ctk.CTkEntry(self.frameTelaVerPedidos, placeholder_text="DD/MM/AAAA", width=180, corner_radius=5, font=("Arial", 15))
+    self.dataDaVendaTelaVerPedidos = ctk.CTkEntry(self.frameTelaVerPedidos, textvariable=ctk.StringVar(value=dataDaVendaTelaVerPedidos), placeholder_text="DD/MM/AAAA", width=180, corner_radius=5, font=("Arial", 15))
     self.dataDaVendaTelaVerPedidos.place(relx=0.42, rely=0.1)
 
-    self.labelStatusDoPedidoTelaVerPedido = ctk.CTkLabel(self.frameTelaVerPedidos, text="Status", font=("Century Gothic bold", 14))
+    self.labelStatusDoPedidoTelaVerPedido = ctk.CTkLabel(self.frameTelaVerPedidos, text="Status: ", font=("Century Gothic bold", 14))
     self.labelStatusDoPedidoTelaVerPedido.place(relx=0.62, rely=0.05)
-    self.statusDoPedidoTelaVerPedido = ctk.CTkLabel(self.frameTelaVerPedidos, width=180, corner_radius=5, font=("Arial", 15))
-    self.statusDoPedidoTelaVerPedido.place(relx=0.62, rely=0.1)
+    # self.statusDoPedidoTelaVerPedido = ctk.CTkLabel(self.frameTelaVerPedidos, text=self.status, width=80, corner_radius=5, font=("Arial", 14))
+    # self.statusDoPedidoTelaVerPedido.place(relx=0.66, rely=0.05)
+
 
     self.labelFuncionaria = ctk.CTkLabel(self.frameTelaVerPedidos, text="Vendedor(a)", font=("Century Gothic bold", 15))
     self.labelFuncionaria.place(relx=0.79, rely=0.05)
@@ -46,11 +58,11 @@ def telaVerPedidos(self, p, d, dl):
     self.labelCPFCliente = ctk.CTkLabel(self.frameTelaVerPedidos, text="CPF/CNPJ *", font=("Century Gothic bold", 14))
     self.labelCPFCliente.place(relx=0.42, rely=0.2)
     self.CPFCliente = ctk.CTkLabel(self.frameTelaVerPedidos, width=180, textvariable=ctk.StringVar(value=d[1]), fg_color="#38343c", corner_radius=5, font=("Arial", 15))
-    self.CPFCliente.place(relx=0.389, rely=0.25)
+    self.CPFCliente.place(relx=0.42, rely=0.25)
 
     # Terceira linha (rely 0.35 e 0.4)
     self.labelEnderecoNoPedido = ctk.CTkLabel(self.frameTelaVerPedidos, text="Endereço *",  font=("Century Gothic bold", 14))
-    self.labelEnderecoNoPedido.place(relx=0.62, rely=0.2)
+    self.labelEnderecoNoPedido.place(relx=0.61, rely=0.2)
     self.entradaEnderecoNoPedido = ctk.CTkLabel(self.frameTelaVerPedidos, textvariable=ctk.StringVar(value=d[2]), fg_color="#38343c", width=400, corner_radius=5, font=("Arial", 13))
     self.entradaEnderecoNoPedido.place(relx=0.61, rely=0.25)
 
