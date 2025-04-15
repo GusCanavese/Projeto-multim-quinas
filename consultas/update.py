@@ -8,7 +8,8 @@ class Atualiza():
     def atualizaPedido(identificador):
         print(identificador)
         dataHoje = date.today()
-
-        queryAtualizaPedido = "UPDATE pedidos SET data_confirmacao = %s WHERE numero_recibo = %s"
+        queryAtualizaPedido = "UPDATE pedidos SET data_confirmacao = %s WHERE numero_recibo = %s LIMIT 1"
         db.cursor.execute(queryAtualizaPedido, (dataHoje.strftime("%d/%m/%Y") ,identificador,))
-        print("atualizado com sucesso")
+        db.conn.commit()
+
+

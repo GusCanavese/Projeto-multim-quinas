@@ -8,14 +8,13 @@ from telas.telaVerPedidos import telaVerPedidos
 import json
 
 def filtrarPedidos(self, vendedor, numero, inicio, fim, checkbox):
+
     pedidos = Buscas.buscaPedidos(vendedor, numero, inicio, fim, checkbox)
 
     # Remove dados anteriores da tabela
     if hasattr(self, "dadosTelaVerPedidos"):
         for item in self.dadosTelaVerPedidos:
             item.destroy()
-    # else:
-    #     pass
     self.dadosTelaVerPedidos = []
 
     for rowPedido, pedido in enumerate(pedidos, start=1):

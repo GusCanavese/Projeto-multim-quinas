@@ -2,13 +2,14 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
-from consultas.select import Buscas 
-import tkinter as tk
-from tkcalendar import DateEntry
 from funcoesTerceiras import filtrarPedidos, verificaSeQuerFiltrarPorPeriodo
 
-def telaRelatorioDeVendas(self):
 
+
+def telaRelatorioDeVendas(self):
+    if hasattr(self, "frameTelaRelatorioDeVendas"):
+        self.frameTelaRelatorioDeVendas.destroy()
+        telaRelatorioDeVendas(self)
 
     self.frameTelaRelatorioDeVendas = ctk.CTkFrame(self, corner_radius=5)
     self.frameTelaRelatorioDeVendas.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
@@ -42,7 +43,7 @@ def telaRelatorioDeVendas(self):
     self.botaoFiltrarPedidos = ctk.CTkButton(self.frameTelaRelatorioDeVendas,text="Buscar",command=lambda: filtrarPedidos.filtrarPedidos( self, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(), self.datePickerInicio.get() if hasattr(self, "datePickerInicio") else None, self.datePickerFim.get() if hasattr(self, "datePickerFim") else None, self.selecionarPeriodo.get()))
     self.botaoFiltrarPedidos.place(relx=0.05, rely=0.55, relwidth=0.15, anchor="nw")
 
-    self.botaoLimpar = ctk.CTkButton(self.frameTelaRelatorioDeVendas, text="Limpar", command=lambda: print("Limpar"))
+    self.botaoLimpar = ctk.CTkButton(self.frameTelaRelatorioDeVendas, text="Atualizar", command=lambda: filtrarPedidos.filtrarPedidos( self, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(), self.datePickerInicio.get() if hasattr(self, "datePickerInicio") else None, self.datePickerFim.get() if hasattr(self, "datePickerFim") else None, self.selecionarPeriodo.get()))
     self.botaoLimpar.place(relx=0.05, rely=0.63, relwidth=0.15, anchor="nw")
 
     self.botaoVoltar = ctk.CTkButton(self.frameTelaRelatorioDeVendas, text="Voltar", command=self.frameTelaRelatorioDeVendas.destroy)

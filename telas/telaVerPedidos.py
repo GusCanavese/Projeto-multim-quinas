@@ -63,7 +63,7 @@ def telaVerPedidos(self, p, d, dl):
     # Terceira linha (rely 0.35 e 0.4)
     self.labelEnderecoNoPedido = ctk.CTkLabel(self.frameTelaVerPedidos, text="Endereço *",  font=("Century Gothic bold", 14))
     self.labelEnderecoNoPedido.place(relx=0.61, rely=0.2)
-    self.entradaEnderecoNoPedido = ctk.CTkLabel(self.frameTelaVerPedidos, textvariable=ctk.StringVar(value=d[2]), fg_color="#38343c", width=400, corner_radius=5, font=("Arial", 13))
+    self.entradaEnderecoNoPedido = ctk.CTkLabel(self.frameTelaVerPedidos, textvariable=ctk.StringVar(value=d[2]), fg_color="#38343c", width=400, corner_radius=5, font=("Arial", 13)) 
     self.entradaEnderecoNoPedido.place(relx=0.61, rely=0.25)
 
     # Terceira linha (rely 0.35 e 0.4)
@@ -78,9 +78,8 @@ def telaVerPedidos(self, p, d, dl):
 
 
 
-
     # Botão centralizado na parte inferior
-    self.botaoVoltar = ctk.CTkButton(self.frameTelaVerPedidos, text="Gerar pedido", width=200, corner_radius=5, font=("Arial", 15), command=self.frameTelaVerPedidos.destroy)
+    self.botaoVoltar = ctk.CTkButton(self.frameTelaVerPedidos, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameTelaVerPedidos.destroy) 
     self.botaoVoltar.place(relx=0.08, rely=0.9) 
 
     # Botão centralizado na parte inferior
