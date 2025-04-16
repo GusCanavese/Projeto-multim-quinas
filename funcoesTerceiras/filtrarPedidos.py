@@ -31,7 +31,10 @@ def filtrarPedidos(self, vendedor, numero, inicio, fim, checkbox):
         dadosPedido = [pedido[0], pedido[2], pedido[1], pedido[3], self.status]
         dadosExtras = [pedido[5], pedido[6], pedido[7]]
         dadosDoProdutoDoPedido = json.loads(pedido[8])
-        dadosDoProdutoDoPedidoLista = [dadosDoProdutoDoPedido[0]['descricao']]
+        descricaoProdutos = [produto["descricao"] for produto in dadosDoProdutoDoPedido]
+        
+            
+        
 
         
 
@@ -42,9 +45,9 @@ def filtrarPedidos(self, vendedor, numero, inicio, fim, checkbox):
             self.dadosTelaVerPedidos.append(label)
 
         # Cria botão na última coluna (coluna 5)
-        def botaoVerDadosPedido(p=dadosPedido, d=dadosExtras, dl=dadosDoProdutoDoPedidoLista):
+        def botaoVerDadosPedido(p=dadosPedido, d=dadosExtras, desc=descricaoProdutos):
             print("Pedido selecionado:", p)
-            telaVerPedidos(self, p, d, dl)
+            telaVerPedidos(self, p, d, desc)
             
             
 

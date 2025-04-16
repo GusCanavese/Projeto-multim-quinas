@@ -5,7 +5,10 @@ import customtkinter as ctk
 from consultas.select import Buscas
 from funcoesTerceiras.confirmarAlteracoesNoPedido import confirmarAlteracoesNoPedido
 
-def telaVerPedidos(self, p, d, dl):
+def telaVerPedidos(self, p, d, desc):
+    for i in desc:
+        print(i)
+
     self.frameTelaVerPedidos = ctk.CTkFrame(self)
     self.frameTelaVerPedidos.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
 
@@ -70,7 +73,7 @@ def telaVerPedidos(self, p, d, dl):
     self.labelProdutoTelaVerPedido = ctk.CTkLabel(self.frameTelaVerPedidos, width=50, text="Produto", font=("Century Gothic bold", 14))
     self.labelProdutoTelaVerPedido.place(relx=0.02, rely=0.35)
     # for produtos in enumerate()
-    self.entradaProdutoTelaVerPedido = ctk.CTkEntry(self.frameTelaVerPedidos, textvariable=ctk.StringVar(value=dl[0]),  width=300, corner_radius=5, font=("Arial", 13))
+    self.entradaProdutoTelaVerPedido = ctk.CTkEntry(self.frameTelaVerPedidos, textvariable=ctk.StringVar(value=desc[1]),  width=300, corner_radius=5, font=("Arial", 13))
     self.entradaProdutoTelaVerPedido.place(relx=0, rely=0.4)
     # self.entradaProdutoTelaVerPedido.bind("<KeyRelease>", buscaProduto)
 
