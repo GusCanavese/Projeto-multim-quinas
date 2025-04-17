@@ -53,7 +53,6 @@ class Buscas:
             print(parametros)
 
         if not checkbox:
-            print()
             pass
 
         elif (inicio and fim):

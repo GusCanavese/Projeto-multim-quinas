@@ -2,21 +2,19 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
-from consultas.select import Buscas
-from funcoesTerceiras.confirmarAlteracoesNoPedido import confirmarAlteracoesNoPedido
+from funcoesTerceiras import confirmarAlteracoesNoPedido
 
 def telaVerPedidos(self, p, d, desc):
     for i in desc:
-        print(i)
+        print(i.rsplit(' ', 1))
 
     self.frameTelaVerPedidos = ctk.CTkFrame(self)
     self.frameTelaVerPedidos.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
 
-    print(p[4])
     if p[4] == "Não confirmado":
         self.status = "Venda em aberto"
         dataDaVendaTelaVerPedidos = ''
-        self.statusDoPedidoTelaVerPedido = ctk.CTkButton(self.frameTelaVerPedidos, text='Confirmar venda', width=180, corner_radius=5, font=("Arial", 15), command=lambda:confirmarAlteracoesNoPedido(self, self.dataDaVendaTelaVerPedidos.get(), p[0]))
+        self.statusDoPedidoTelaVerPedido = ctk.CTkButton(self.frameTelaVerPedidos, text='Confirmar venda', width=180, corner_radius=5, font=("Arial", 15), command=lambda:confirmarAlteracoesNoPedido.confirmarHoje(self, p[0]))
         self.statusDoPedidoTelaVerPedido.place(relx=0.61, rely=0.1)
     else: 
         self.statusDoPedidoTelaVerPedido = ctk.CTkButton(self.frameTelaVerPedidos, text='Venda confirmada', fg_color='green', width=180, corner_radius=5, font=("Arial", 15))
@@ -69,13 +67,10 @@ def telaVerPedidos(self, p, d, desc):
     self.entradaEnderecoNoPedido = ctk.CTkLabel(self.frameTelaVerPedidos, textvariable=ctk.StringVar(value=d[2]), fg_color="#38343c", width=400, corner_radius=5, font=("Arial", 13)) 
     self.entradaEnderecoNoPedido.place(relx=0.61, rely=0.25)
 
-    # Terceira linha (rely 0.35 e 0.4)
     self.labelProdutoTelaVerPedido = ctk.CTkLabel(self.frameTelaVerPedidos, width=50, text="Produto", font=("Century Gothic bold", 14))
     self.labelProdutoTelaVerPedido.place(relx=0.02, rely=0.35)
-    # for produtos in enumerate()
-    self.entradaProdutoTelaVerPedido = ctk.CTkEntry(self.frameTelaVerPedidos, textvariable=ctk.StringVar(value=desc[1]),  width=300, corner_radius=5, font=("Arial", 13))
+    self.entradaProdutoTelaVerPedido = ctk.CTkEntry(self.frameTelaVerPedidos, textvariable=ctk.StringVar(value=desc[0]),  width=300, corner_radius=5, font=("Arial", 13))
     self.entradaProdutoTelaVerPedido.place(relx=0, rely=0.4)
-    # self.entradaProdutoTelaVerPedido.bind("<KeyRelease>", buscaProduto)
 
 
 
@@ -86,5 +81,5 @@ def telaVerPedidos(self, p, d, desc):
     self.botaoVoltar.place(relx=0.08, rely=0.9) 
 
     # Botão centralizado na parte inferior
-    self.botaoVoltar = ctk.CTkButton(self.frameTelaVerPedidos, text="Confirmar alterações", width=200, corner_radius=5, font=("Arial", 15), command=lambda:confirmarAlteracoesNoPedido(self, self.dataDaVendaTelaVerPedidos.get()))
+    self.botaoVoltar = ctk.CTkButton(self.frameTelaVerPedidos, text="Confirmar alterações", width=200, corner_radius=5, font=("Arial", 15), command=lambda:confirmarAlteracoesNoPedido.confirmarAlteracoesNoPedido(self, self.dataDaVendaTelaVerPedidos.get(), p[0]))
     self.botaoVoltar.place(relx=0.25, rely=0.9) 
