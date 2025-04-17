@@ -6,6 +6,7 @@ import telas.telaApresentadorDePdf
 import telas.telaCadastroClientes
 import telas.telaCadastroFuncionario
 import telas.telaCadastros
+import telas.telaCalculaVendas
 import telas.telaGerarPedido
 import telas.telaLogin
 import telas.telaRelatorioDeVendas
@@ -27,18 +28,19 @@ class App(ctk.CTk):
         self.resizable(True, True)
         self.alturaTela = 900
         self.larguraTela = 1280
-        self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+100")
+        #self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+100")
         # self.geometry(f"{self.larguraTela}x{self.alturaTela}+1900+100") 
-        # self.geometry(f"{self.larguraTela}x{self.alturaTela}") 
+        self.geometry(f"{self.larguraTela}x{self.alturaTela}") 
         self.telas()
 
 
 
     def telas(self):
         telas.telaRelatorioDeVendas.telaRelatorioDeVendas(self)
-        # telas.telaLogin.telaLogin(self)
-        # telas.telaGerarPedido.telaGerarPedido(self)
+        #telas.telaLogin.telaLogin(self)
+        #telas.telaGerarPedido.telaGerarPedido(self)
         # telas.telaVerPedidos.telaVerPedidos(self)
+        #telas.telaCalculaVendas.telaCalculaVendas(self)
 
 
            
