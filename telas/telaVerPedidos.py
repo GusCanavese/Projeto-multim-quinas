@@ -7,6 +7,7 @@ from funcoesTerceiras import confirmarAlteracoesNoPedido
 def telaVerPedidos(self, p, d, desc):
     for i in desc:
         print(i.rsplit(' ', 1))
+        print(i.rsplit(' ', 1))
 
     self.frameTelaVerPedidos = ctk.CTkFrame(self)
     self.frameTelaVerPedidos.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)

@@ -22,10 +22,8 @@ def telaApresentarPDF(self, caminhoPdf):
     self.numeroPagina = 1
     
     def soma():
-        print("nao entrou ainda")
         if self.numeroPagina < documentoPdf.page_count:
             self.numeroPagina += 1
-            print("entrou")
             self.textoPaginaN.configure(text=f"Página {self.numeroPagina}")
         pagina = documentoPdf.load_page(self.numeroPagina-1)  # Carrega a primeira página (índice 0)
         pixmap = pagina.get_pixmap()  # Converte a página em uma imagem (pixmap)

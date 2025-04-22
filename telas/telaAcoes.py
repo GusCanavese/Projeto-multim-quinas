@@ -5,6 +5,7 @@ import customtkinter as ctk
 from consultas.select import Buscas
 from telas.telaCadastros import telaCadastros
 from telas.telaDefineCnpjDoProduto import telaDefineCnpjDoProduto
+from telas.telaGerarPedido import telaGerarPedido
 from telas.telaRelatorioDeVendas import telaRelatorioDeVendas
 
 def telaAcoes(self):
@@ -27,7 +28,7 @@ def telaAcoes(self):
         self.botaoRelatorioDeVendas.place(relx=0.66, y=200, anchor="center")
 
         # botão de gerar pedidos # ! ainda não está ativo nem possui uma tela criada para ele
-        self.botaogGerarPedido = ctk.CTkButton(self.frameTelaAcoes, text="Gerar pedido", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaDefineCnpjDoProduto(self))
+        self.botaogGerarPedido = ctk.CTkButton(self.frameTelaAcoes, text="Gerar pedido", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaGerarPedido(self))
         self.botaogGerarPedido.place(relx=0.33, y=250, anchor="center")
 
         # botão de consultar estoque # ! ainda não está ativo nem possui uma tela criada para ele 
@@ -47,7 +48,7 @@ def telaAcoes(self):
         self.botaoRelatorioDeVendas.place(relx=0.66, y=200, anchor="center")
 
         # botão de gerar pedidos
-        self.botaogGerarPedido = ctk.CTkButton(self.frameTelaAcoes, text="Gerar pedido", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaDefineCnpjDoProduto(self))
+        self.botaogGerarPedido = ctk.CTkButton(self.frameTelaAcoes, text="Gerar pedido", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaGerarPedido(self))
         self.botaogGerarPedido.place(relx=0.33, y=250, anchor="center")
 
         # botão de contas a pagar e a receber da loja # ! ainda não está ativo nem possui uma tela criada para ele 

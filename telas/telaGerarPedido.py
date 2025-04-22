@@ -291,9 +291,10 @@ def telaGerarPedido(self):
 
     # verifica se a quantidade sendo vendida é menor do que a quantidade existente no depósito
     def verificaQuantidadeMaxima(quantidade):
-        if quantidade is not None and int(self.entradaQuantdadeItem.get()) > quantidade:
+        if quantidade is not None and int(self.entradaQuantdadeItem.get()) > quantidade or int(self.entradaQuantdadeItem.get())<0 :
             self.quantidadeMaximaPermitida.set(quantidade)
-            labelValorQuanrtidadeMax = ctk.CTkLabel(self, text="poode nao man", fg_color="red", text_color="white", corner_radius=5)
+            print(quantidade)
+            labelValorQuanrtidadeMax = ctk.CTkLabel(self, text="Quantidade excede o estoque", fg_color="red", text_color="white", corner_radius=5)
             labelValorQuanrtidadeMax.pack(pady=10)
             self.after(3000, labelValorQuanrtidadeMax.destroy)
             calcularAlteracoes()
@@ -486,7 +487,7 @@ def telaGerarPedido(self):
     def verificaQuantidadeMaximaParaItem(quantidade, index):
         quantidadeDigitada = int(self.itensCriados[index][3].get() or 0)
 
-        if quantidade is not None and quantidadeDigitada > quantidade:
+        if quantidade is not None and quantidadeDigitada > quantidade or quantidadeDigitada < 0:
             self.itensCriados[index][3].delete(0, "end")  
             self.itensCriados[index][3].insert(0, str(quantidade))  
 

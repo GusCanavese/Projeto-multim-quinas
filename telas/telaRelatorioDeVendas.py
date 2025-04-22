@@ -7,9 +7,6 @@ from funcoesTerceiras import filtrarPedidos, verificaSeQuerFiltrarPorPeriodo
 
 
 def telaRelatorioDeVendas(self):
-    if hasattr(self, "frameTelaRelatorioDeVendas"):
-        self.frameTelaRelatorioDeVendas.destroy()
-        telaRelatorioDeVendas(self)
 
     self.frameTelaRelatorioDeVendas = ctk.CTkFrame(self, corner_radius=5)
     self.frameTelaRelatorioDeVendas.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)

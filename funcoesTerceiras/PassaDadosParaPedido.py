@@ -60,6 +60,7 @@ def PassaDadosParaPedido(self):
             descricaoProdutos = [f"{produto['descricao']} {produto['quantidade']}" for produto in dadosDoProdutoDoPedido]
             print(descricaoProdutos)
 
+            print(descricaoProdutos)
             Atualiza.removeUnidadesDeProdutos(desc=descricaoProdutos)
         
 

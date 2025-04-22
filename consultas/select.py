@@ -43,14 +43,10 @@ class Buscas:
         if vendedor !="Nenhum":
             queryBuscaPedidos += " AND vendedor LIKE %s"
             parametros.append(f'%{vendedor}%')
-            print("entrou em 1")
-            print(parametros)
 
         if numero != '':
             queryBuscaPedidos += " AND numero_recibo LIKE %s"
             parametros.append(f'%{numero}%')
-            print("entrou em 2")
-            print(parametros)
 
         if not checkbox:
             pass
