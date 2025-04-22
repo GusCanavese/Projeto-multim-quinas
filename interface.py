@@ -6,6 +6,7 @@ import telas.telaApresentadorDePdf
 import telas.telaCadastroClientes
 import telas.telaCadastroFuncionario
 import telas.telaCadastros
+import telas.telaCalculaVendas
 import telas.telaGerarPedido
 import telas.telaLogin
 import telas.telaRelatorioDeVendas
@@ -39,6 +40,7 @@ class App(ctk.CTk):
         telas.telaLogin.telaLogin(self)
         # telas.telaGerarPedido.telaGerarPedido(self)
         # telas.telaVerPedidos.telaVerPedidos(self)
+        #telas.telaCalculaVendas.telaCalculaVendas(self)
 
 
            
