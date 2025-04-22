@@ -166,7 +166,7 @@ def telaGerarPedido(self):
                 "descricao": item[1].get(),
                 "valor_unitario": float(item[2].get() or 0),
                 "unidade": item[4].get(),
-                "quantidade": int(item[3].get()),
+                "quantidade": int(item[3].get() or 0),
                 "desconto_real": float(item[5].get() or 0),
                 "desconto_porcentagem": float(item[6].get() or 0),
                 "acrescimo": float(item[7].get() or 0),
@@ -255,7 +255,7 @@ def telaGerarPedido(self):
         self.entradaProdutoPesquisado.insert(0, nome)
         
         self.entradaQuantdadeItem.delete(0, "end")
-        self.entradaQuantdadeItem.insert(0, 1)
+        self.entradaQuantdadeItem.insert(0, 0)
 
         self.entradaPreco.delete(0,"end")
         self.entradaPreco.insert(0, valor)
@@ -439,7 +439,7 @@ def telaGerarPedido(self):
         self.itensCriados[index][1].insert(0, nome)
 
         self.itensCriados[index][3].delete(0, "end")
-        self.itensCriados[index][3].insert(0, 1)
+        self.itensCriados[index][3].insert(0, 0)
 
         self.itensCriados[index][2].delete(0, "end")
         self.itensCriados[index][2].insert(0, valor)

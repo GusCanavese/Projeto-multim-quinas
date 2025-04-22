@@ -29,7 +29,7 @@ class App(ctk.CTk):
         self.alturaTela = 900
         self.larguraTela = 1280
         # self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+100")
-        self.geometry(f"{self.larguraTela}x{self.alturaTela}+2000+0") 
+        # self.geometry(f"{self.larguraTela}x{self.alturaTela}+2000+0") 
         self.geometry(f"{self.larguraTela}x{self.alturaTela}") 
         self.telas()
 
@@ -39,6 +39,7 @@ class App(ctk.CTk):
         # telas.telaRelatorioDeVendas.telaRelatorioDeVendas(self)
         telas.telaLogin.telaLogin(self)
         # telas.telaGerarPedido.telaGerarPedido(self)
+        # telas.telaApresentadorDePdf.telaApresentarPDF(self, "Pedido.pdf")
         # telas.telaVerPedidos.telaVerPedidos(self)
         #telas.telaCalculaVendas.telaCalculaVendas(self)
 

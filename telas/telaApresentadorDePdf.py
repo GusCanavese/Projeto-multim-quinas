@@ -74,10 +74,15 @@ def telaApresentarPDF(self, caminhoPdf):
     labelPdf = ctk.CTkLabel(self.frameApresentarPedido, image=imagemTk, text="")
     labelPdf.place(x=650, y=35)
 
-    # voltar
-    self.botaoVoltar = ctk.CTkButton(self.frameApresentarPedido, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameApresentarPedido.destroy)
-    self.botaoVoltar.place(x=100, y=800)
     
+    def fecharPaginas():
+        self.frameApresentarPedido.destroy()
+        self.frameTelaGerarPedido.destroy()
+
+    # voltar
+    self.botaoVoltar = ctk.CTkButton(self.frameApresentarPedido, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=fecharPaginas)
+    self.botaoVoltar.place(x=100, y=800)
+
     # imprime o pdf
     self.botaoImprimePedido = ctk.CTkButton(self.frameApresentarPedido, text="Imprimir", width=200, corner_radius=5, font=("Arial", 15), command= lambda:imprimirPdf("Pedido.pdf"))
     self.botaoImprimePedido.place(x=350, y=800)

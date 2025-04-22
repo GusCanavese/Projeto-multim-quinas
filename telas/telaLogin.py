@@ -7,24 +7,24 @@ from funcoesTerceiras.consultarUsuarioCadastrado import consultarUsuarioCadastra
 
 def telaLogin(self):
     self.title("login")
+
+    # Frame centralizado com place(relx, rely)
     self.frameTelaLogin = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
-    self.frameTelaLogin.place(x=140, y=100)     # colocando no lugar
-    self.frameTelaLogin.grid_propagate(False)   # evita ela de se configurar automaticamente
+    self.frameTelaLogin.place(relx=0.5, rely=0.5, anchor="center")  # Centraliza o frame
+    self.frameTelaLogin.grid_propagate(False)
 
-    # titulo
+    # Título
     self.texto = ctk.CTkLabel(self.frameTelaLogin, width=1000, height=100, text="Fazer Login", font=("Century Gothic bold", 35))
-    self.texto.place(relx=0.5, y=200, anchor="center")
+    self.texto.place(relx=0.5, rely=0.2857, anchor="center")
 
-    # input de login
+    # Input de login
     self.login = ctk.CTkEntry(self.frameTelaLogin, placeholder_text="Login", width=400, corner_radius=5, font=("Century Gothic bold", 25))
-    self.login.place(relx=0.5, y=300, anchor="center")
+    self.login.place(relx=0.5, rely=0.4286, anchor="center")
 
-    # input de senha
+    # Input de senha
     self.senha = ctk.CTkEntry(self.frameTelaLogin, placeholder_text="Senha", width=400, corner_radius=5, font=("Century Gothic bold", 25), show="*")
-    self.senha.place(relx=0.5, y=350, anchor="center")
+    self.senha.place(relx=0.5, rely=0.5, anchor="center")
 
-    # botão para entrar
+    # Botão para entrar
     self.botaoEntrar = ctk.CTkButton(self.frameTelaLogin, text="Entrar", width=200, corner_radius=5, font=("Arial", 20), command=lambda:consultarUsuarioCadastrado(self))
-    self.botaoEntrar.place(relx=0.5, y=420, anchor="center")
-
-
+    self.botaoEntrar.place(relx=0.5, rely=0.6, anchor="center")
