@@ -148,7 +148,7 @@ def telaGerarPedido(self):
             "codigo": "Modelo",
             "descricao": self.entradaProdutoPesquisado.get(),
             "valor_unitario": self.entradaPreco.get() or 0,
-            "quantidade": self.entradaQuantdadeItem.get() or 0,
+            "quantidade": self.entradaQuantdadeItem.get(),
             "unidade": self.entradaUnidadeMedida.get(),
             "desconto_real": self.descontoTotalReal.get() or 0,
             "desconto_porcentagem": self.descontoTotalPorcento.get() or 0,
@@ -166,7 +166,7 @@ def telaGerarPedido(self):
                 "descricao": item[1].get(),
                 "valor_unitario": float(item[2].get() or 0),
                 "unidade": item[4].get(),
-                "quantidade": int(item[3].get() or 0),
+                "quantidade": int(item[3].get()),
                 "desconto_real": float(item[5].get() or 0),
                 "desconto_porcentagem": float(item[6].get() or 0),
                 "acrescimo": float(item[7].get() or 0),
@@ -291,7 +291,7 @@ def telaGerarPedido(self):
 
     # verifica se a quantidade sendo vendida é menor do que a quantidade existente no depósito
     def verificaQuantidadeMaxima(quantidade):
-        if quantidade is not None and int(self.entradaQuantdadeItem.get()) > quantidade or int(self.entradaQuantdadeItem.get())<0 :
+        if quantidade is not None and int(self.entradaQuantdadeItem.get()) >= quantidade or int(self.entradaQuantdadeItem.get())<=0 :
             self.quantidadeMaximaPermitida.set(quantidade)
             print(quantidade)
             labelValorQuanrtidadeMax = ctk.CTkLabel(self, text="Quantidade excede o estoque", fg_color="red", text_color="white", corner_radius=5)
