@@ -7,7 +7,7 @@ import json
 
 
 
-class Insere():
+class Insere:
 
 
     def insereTransportadoraNoBanco(colunas, valores):

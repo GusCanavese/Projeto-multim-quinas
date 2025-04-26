@@ -3,6 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras import confirmarAlteracoesNoPedido
+# from consultas.delete import deleta
 
 def telaVerPedidos(self, p, d, desc):
     for i in desc:
@@ -42,9 +43,6 @@ def telaVerPedidos(self, p, d, desc):
 
     self.labelStatusDoPedidoTelaVerPedido = ctk.CTkLabel(self.frameTelaVerPedidos, text="Status: ", font=("Century Gothic bold", 14))
     self.labelStatusDoPedidoTelaVerPedido.place(relx=0.62, rely=0.05)
-    # self.statusDoPedidoTelaVerPedido = ctk.CTkLabel(self.frameTelaVerPedidos, text=self.status, width=80, corner_radius=5, font=("Arial", 14))
-    # self.statusDoPedidoTelaVerPedido.place(relx=0.66, rely=0.05)
-
 
     self.labelFuncionaria = ctk.CTkLabel(self.frameTelaVerPedidos, text="Vendedor(a)", font=("Century Gothic bold", 15))
     self.labelFuncionaria.place(relx=0.79, rely=0.05)
@@ -84,3 +82,7 @@ def telaVerPedidos(self, p, d, desc):
     # Botão centralizado na parte inferior
     self.botaoVoltar = ctk.CTkButton(self.frameTelaVerPedidos, text="Confirmar alterações", width=200, corner_radius=5, font=("Arial", 15), command=lambda:confirmarAlteracoesNoPedido.confirmarAlteracoesNoPedido(self, self.dataDaVendaTelaVerPedidos.get(), p[0]))
     self.botaoVoltar.place(relx=0.25, rely=0.9) 
+
+    # Botão centralizado na parte inferior
+    self.botaoVoltar = ctk.CTkButton(self.frameTelaVerPedidos, text="Cancelar/Excluir pedido", fg_color="#8B0000", width=200, corner_radius=5, font=("Arial", 15), command=lambda:deleta.deletarPedidos)
+    self.botaoVoltar.place(relx=0.42, rely=0.9) 
