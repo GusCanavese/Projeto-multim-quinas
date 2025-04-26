@@ -8,9 +8,10 @@ def salvarPedido(self):
         icon='question'
     )
     
-    if resposta == 'yes':
-        PassaDadosParaPedido(self)
+    if resposta == 'no':
+        return
+        
 
     else:
-        return
+        PassaDadosParaPedido(self)
 

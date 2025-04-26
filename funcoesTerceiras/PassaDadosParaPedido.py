@@ -57,9 +57,9 @@ def PassaDadosParaPedido(self):
 
         for rowPedido, pedido in enumerate(pedidos, start=1):
             dadosDoProdutoDoPedido = json.loads(pedido[8])
+
             descricaoProdutos = [f"{produto['descricao']} {produto['quantidade']}" for produto in dadosDoProdutoDoPedido]
             print(descricaoProdutos)
-
             print(descricaoProdutos)
             Atualiza.removeUnidadesDeProdutos(desc=descricaoProdutos)
         

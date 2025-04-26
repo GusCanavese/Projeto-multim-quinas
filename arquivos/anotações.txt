@@ -48,6 +48,12 @@ ANOTAÇÕES
 - corrigir o campo quantidade quando adicionado um novo item da tela de pedido
 
 
+# ========================================================================================================================================================================================= #
+-ao gerar pedido, colocar um valor de quantidade, salvar pedido, clicar em "nao confirmar" e mudar a quantidade, o pedido vai ou com o valor digitado primeiro, ou vai com 0, corrigir isso
+# ========================================================================================================================================================================================= #
+
+
+
 
 
 USUÁRIO BLOQUEADO(Yara): userbloq 123

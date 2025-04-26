@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras import confirmarAlteracoesNoPedido
-# from consultas.delete import deleta
+from funcoesTerceiras import confirmarExclusaoDoPedido
 
 def telaVerPedidos(self, p, d, desc):
     for i in desc:
@@ -84,5 +84,5 @@ def telaVerPedidos(self, p, d, desc):
     self.botaoVoltar.place(relx=0.25, rely=0.9) 
 
     # Botão centralizado na parte inferior
-    self.botaoVoltar = ctk.CTkButton(self.frameTelaVerPedidos, text="Cancelar/Excluir pedido", fg_color="#8B0000", width=200, corner_radius=5, font=("Arial", 15), command=lambda:deleta.deletarPedidos)
+    self.botaoVoltar = ctk.CTkButton(self.frameTelaVerPedidos, text="Cancelar/Excluir pedido", fg_color="#8B0000", width=200, corner_radius=5, font=("Arial", 15), command=lambda:confirmarExclusaoDoPedido.confirmarExclusaoNoPedido(self, p[0], desc))
     self.botaoVoltar.place(relx=0.42, rely=0.9) 

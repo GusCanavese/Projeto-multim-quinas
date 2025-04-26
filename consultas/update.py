@@ -23,3 +23,15 @@ class Atualiza:
         db.conn.commit()
 
 
+    def retornaProdutoParaOEstoque(desc):
+        print(desc)
+        for i in desc:
+            partes = i.rsplit(' ', 1)
+            quantidade = partes[1]
+            nomeDoProduto = partes[0]
+
+        queryRemoveProduto = "UPDATE produtos SET quantidade = quantidade + %s WHERE nome_do_produto LIKE %s"
+        db.cursor.execute(queryRemoveProduto, (quantidade, nomeDoProduto,))
+        db.conn.commit()
+
+
