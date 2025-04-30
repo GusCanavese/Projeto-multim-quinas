@@ -6,7 +6,6 @@ from funcoesTerceiras.buscarProdutos import buscarProdutos
 
 
 def telaEstoque(self):
-
     self.frameTelaEstoque = ctk.CTkFrame(self, corner_radius=5)
     self.frameTelaEstoque.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
 
@@ -25,6 +24,12 @@ def telaEstoque(self):
     self.buscarPorNome = ctk.CTkEntry(self.frameTelaEstoque, corner_radius=5, font=("Century Gothic bold", 20))
     self.buscarPorNome.place(relx=0.03, rely=0.17, relwidth=0.22, anchor="nw")
 
+    opcoes = ["Multimáquinas", "Nutrigel", "Polimáquinas", "Usados"]
+    self.labelfiltrarPorVendedor = ctk.CTkLabel(self.frameTelaEstoque, text="Filtrar por vendedor(a)", font=("Century Gothic bold", 15))
+    self.labelfiltrarPorVendedor.place(relx=0.03, rely=0.25, anchor="nw")
+    self.filtrarPorVendedor = ctk.CTkComboBox(self.frameTelaEstoque, font=("Century Gothic bold", 20), values=opcoes)
+    self.filtrarPorVendedor.place(relx=0.03, rely=0.29, relwidth=0.22, anchor="nw")
+
     # Botões
     self.botaoBuscarProdutos = ctk.CTkButton(self.frameTelaEstoque,text="Buscar",command=lambda:buscarProdutos(self, self.buscarPorNome.get(), self.buscarPorCodigo.get(), 1))
     self.botaoBuscarProdutos.place(relx=0.05, rely=0.55, relwidth=0.15, anchor="nw")
@@ -36,12 +41,14 @@ def telaEstoque(self):
     self.botaoVoltar.place(relx=0.79, rely=0.94, relwidth=0.15, anchor="nw")
 
     # Cabeçalhos da tabela
-    colunas = ["QTD", "Produto", "Preço", "CNPJ"]
+    colunas = ["QTD", "Produto", "Código", "Preço venda", "CNPJ"]
     for i, coluna in enumerate(colunas):
         if coluna == "QTD":
             label = ctk.CTkLabel(self.frameProdutosNoEstoque, text=coluna, width=50, fg_color="#2C3E50", anchor="center")
         elif coluna == "Produto":
-            label = ctk.CTkLabel(self.frameProdutosNoEstoque, text=coluna, width=250, fg_color="#2C3E50", anchor="center")
+            label = ctk.CTkLabel(self.frameProdutosNoEstoque, text=coluna, width=400, fg_color="#2C3E50", anchor="center")
+        elif coluna == "Código" or coluna=="Preço venda":
+            label = ctk.CTkLabel(self.frameProdutosNoEstoque, text=coluna, width=100, fg_color="#2C3E50", anchor="center")
         else:
             label = ctk.CTkLabel(self.frameProdutosNoEstoque, text=coluna, width=150, fg_color="#2C3E50", anchor="center")
         label.grid(row=0, column=i, padx=1.5, pady=5)

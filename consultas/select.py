@@ -61,9 +61,19 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
     
-    def buscaEstoqueProdutos(nome):
-        queryBuscaProdutosEstoque = "SELECT quantidade, descricao, valor_de_custo, valor_de_venda FROM produtos WHERE descricao LIKE %s"
-        db.cursor.execute(queryBuscaProdutosEstoque, (nome,))
+    def buscaEstoqueProdutos(nome, codigo):
+        queryBuscaProdutosEstoque = "SELECT quantidade, descricao, codigo_interno, valor_de_venda FROM produtos WHERE 1=1"
+        parametros = []
+        if nome is not None:
+            queryBuscaProdutosEstoque += " AND descricao LIKE %s"
+            parametros.append(f'%{nome}%')
+
+        elif codigo is not None:
+            queryBuscaProdutosEstoque += " AND codigo_interno LIKE %s"
+            parametros.append(f'%{codigo}%')
+        queryBuscaProdutosEstoque += " ORDER BY descricao ASC"
+        db.cursor.execute(queryBuscaProdutosEstoque, parametros)
         resultado = db.cursor.fetchall()
+
         return resultado
     

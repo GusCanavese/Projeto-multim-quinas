@@ -71,10 +71,6 @@ def telaVerPedidos(self, p, d, desc):
     self.entradaProdutoTelaVerPedido = ctk.CTkEntry(self.frameTelaVerPedidos, textvariable=ctk.StringVar(value=desc[0]),  width=300, corner_radius=5, font=("Arial", 13))
     self.entradaProdutoTelaVerPedido.place(relx=0, rely=0.4)
 
-
-
-
-
     # Botão centralizado na parte inferior
     self.botaoVoltar = ctk.CTkButton(self.frameTelaVerPedidos, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameTelaVerPedidos.destroy) 
     self.botaoVoltar.place(relx=0.08, rely=0.9) 

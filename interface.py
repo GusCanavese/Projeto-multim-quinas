@@ -37,8 +37,8 @@ class App(ctk.CTk):
 
 
     def telas(self):
-        telas.telaEstoque.telaEstoque(self)
-        # telas.telaLogin.telaLogin(self)
+        # telas.telaEstoque.telaEstoque(self)
+        telas.telaLogin.telaLogin(self)
 
 
 

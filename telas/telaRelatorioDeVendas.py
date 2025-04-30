@@ -25,7 +25,6 @@ def telaRelatorioDeVendas(self):
     opcoes = ["Nenhum", "Yara", "Camila", "Jenifer", "Bruna", "Ana Flávia", "Maurício"]
     self.labelfiltrarPorVendedor = ctk.CTkLabel(self.frameTelaRelatorioDeVendas, text="Filtrar por vendedor(a)", font=("Century Gothic bold", 15))
     self.labelfiltrarPorVendedor.place(relx=0.03, rely=0.14, anchor="nw")
-
     self.filtrarPorVendedor = ctk.CTkComboBox(self.frameTelaRelatorioDeVendas, font=("Century Gothic bold", 20), values=opcoes)
     self.filtrarPorVendedor.place(relx=0.03, rely=0.19, relwidth=0.22, anchor="nw")
 
