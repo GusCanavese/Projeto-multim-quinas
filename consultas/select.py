@@ -61,3 +61,9 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
     
+    def buscaEstoqueProdutos(nome):
+        queryBuscaProdutosEstoque = "SELECT quantidade, descricao, valor_de_custo, valor_de_venda FROM produtos WHERE descricao LIKE %s"
+        db.cursor.execute(queryBuscaProdutosEstoque, (nome,))
+        resultado = db.cursor.fetchall()
+        return resultado
+    

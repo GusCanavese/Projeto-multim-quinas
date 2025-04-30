@@ -7,10 +7,11 @@ from telas.telaCadastros import telaCadastros
 from telas.telaDefineCnpjDoProduto import telaDefineCnpjDoProduto
 from telas.telaGerarPedido import telaGerarPedido
 from telas.telaRelatorioDeVendas import telaRelatorioDeVendas
+from telas.telaEstoque import telaEstoque
 
 def telaAcoes(self):
     self.frameTelaAcoes = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
-    self.frameTelaAcoes.place(relx=0.5, rely=0.5, anchor="center")  # Centraliza
+    self.frameTelaAcoes.place(relx=0.5, rely=0.5, anchor="center")  
     self.frameTelaAcoes.grid_propagate(False)
 
     usuarioBloqueado = self.login.get()
@@ -27,7 +28,7 @@ def telaAcoes(self):
         self.botaogGerarPedido = ctk.CTkButton(self.frameTelaAcoes, text="Gerar pedido", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaGerarPedido(self))
         self.botaogGerarPedido.place(relx=0.33, y=250, anchor="center")
 
-        self.botaoConsultarEstoque = ctk.CTkButton(self.frameTelaAcoes, text="Consultar estoque", width=300, corner_radius=5, font=("Arial", 18), command=self)
+        self.botaoConsultarEstoque = ctk.CTkButton(self.frameTelaAcoes, text="Consultar estoque", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaEstoque(self))
         self.botaoConsultarEstoque.place(relx=0.66, y=250, anchor="center")
 
         self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Gerar orçamento", width=300, corner_radius=5, font=("Arial", 18), command=self)
@@ -48,7 +49,7 @@ def telaAcoes(self):
         self.botaoGerarFaturamento = ctk.CTkButton(self.frameTelaAcoes, text="Gerar faturamento", width=300, corner_radius=5, font=("Arial", 18), command=self)
         self.botaoGerarFaturamento.place(relx=0.33, y=300, anchor="center")
 
-        self.botaoConsultarEstoque = ctk.CTkButton(self.frameTelaAcoes, text="Consultar estoque", width=300, corner_radius=5, font=("Arial", 18), command=self)
+        self.botaoConsultarEstoque = ctk.CTkButton(self.frameTelaAcoes, text="Consultar estoque", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaEstoque(self))
         self.botaoConsultarEstoque.place(relx=0.66, y=300, anchor="center")
 
         self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Gerar orçamento", width=300, corner_radius=5, font=("Arial", 18), command=self)
