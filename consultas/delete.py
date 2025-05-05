@@ -6,6 +6,10 @@ import db
 class deleta:
     def deletarPedidos(numeroPedido):
         queryDeletaPedido = "DELETE FROM pedidos WHERE numero_recibo = %s;"
-        print(numeroPedido)
         db.cursor.execute(queryDeletaPedido, (numeroPedido,))
+        db.conn.commit()
+
+    def deletarProduto(descricao):
+        queryDeletaPedido = "DELETE FROM produtos WHERE descricao LIKE %s;"
+        db.cursor.execute(queryDeletaPedido, (descricao,))
         db.conn.commit()
