@@ -35,7 +35,7 @@ class App(ctk.CTk):
 
 
     def telas(self):
-        # telas.telaEstoque.telaEstoque(self)
+        # telas.telaGerarPedido.telaGerarPedido(self)
         telas.telaLogin.telaLogin(self)
 
 

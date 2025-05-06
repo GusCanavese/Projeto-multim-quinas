@@ -7,7 +7,7 @@ from tkinter import messagebox
 import requests
 from PIL import Image
 import datetime
-from funcoesTerceiras.verificaSeQuerSalvarPedido import salvarPedido
+from funcoesTerceiras.verificaSeQuerSalvar import salvarPedido, salvarOrcamento
 
 
 def telaGerarPedido(self):
@@ -57,7 +57,7 @@ def telaGerarPedido(self):
     # criação do frame
     self.frameTelaGerarPedido = ctk.CTkFrame(self, height=800, width=1200, corner_radius=5)
     
-    self.frameTelaGerarPedido.place(x=40, y=50)      
+    self.frameTelaGerarPedido.place(relx=0.5, rely=0.5, anchor="center")      
 
     # criar canva para itens adicionados
     self.frameParaItens = ctk.CTkScrollableFrame(self.frameTelaGerarPedido, width=1150, height=200, orientation="vertical")
@@ -535,6 +535,9 @@ def telaGerarPedido(self):
     self.numeroDeVenda = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable = self.variavelnumeroDoPedido, placeholder_text="Número", width=180, corner_radius=5, font=("Arial", 15))
     self.numeroDeVenda.place(x=30, y=100)
 
+    self.numeroDeVenda = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable = self.variavelnumeroDoPedido, placeholder_text="Número", width=180, corner_radius=5, font=("Arial", 15))
+    self.numeroDeVenda.place(relx=0.025, rely=0.125)
+
     # entrada da data da criação do pedido
     self.labelDataDeCriacao = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Data de criação", font=("Century Gothic bold", 14))
     self.labelDataDeCriacao.place(x=250, y=75)
@@ -722,5 +725,9 @@ def telaGerarPedido(self):
     # gerar pedido
     self.botaoGerarPedido = ctk.CTkButton(self.frameTelaGerarPedido, text="Gerar pedido", width=200, corner_radius=5, font=("Arial", 15), command=lambda:salvarPedido(self))
     self.botaoGerarPedido.place(x=950, y=760)
+
+    # botao gerar orçamento
+    self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaGerarPedido, text="Gerar Orçamento", fg_color="#b25e28", width=200, corner_radius=5, font=("Arial", 15), command=lambda:salvarOrcamento(self))
+    self.botaoGerarOrcamento.place(x=650, y=760)
     calcularTotais()
 
