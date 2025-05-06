@@ -6,8 +6,7 @@ from consultas.select import Buscas
 from consultas.insert import Insere
 from consultas.update import Atualiza
 import datetime
-from funcoesTerceiras import geradorDePedido, geradorDeOrcamento
-from telas.telaApresentadorDePdf import telaApresentarPDF
+from funcoesTerceiras import geradorDeOrcamento
 from telas.telaApresentarOrcamento import telaApresentarOrcamento 
 import json
 
@@ -52,7 +51,7 @@ def PassaDadosParaOrcamento(self):
             "observacoes2":self.textArea2.get("1.0", "end-1c"),
         }
         Insere.registraPedidoNoBanco(self.dados)
-        geradorDeOrcamento.gerar_recibo("Pedido.pdf", self.dados)
+        geradorDeOrcamento.gerarOrcamento("Orcamento.pdf", self.dados)
 
         pedidos = Buscas.buscaPedidos(self.funcionariaPedido.get(), self.numeroDeVenda.get(), None, None, 0)
 

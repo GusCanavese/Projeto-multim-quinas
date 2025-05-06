@@ -22,14 +22,15 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.janela() 
-    # define as propriedades da janela
+
+        
     def janela(self):
         self.resizable(True, True)
         self.alturaTela = 900
         self.larguraTela = 1280
         # self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+100")
-        # self.geometry(f"{self.larguraTela}x{self.alturaTela}+2000+0") 
-        self.geometry(f"{self.larguraTela}x{self.alturaTela}") 
+        self.geometry(f"{self.larguraTela}x{self.alturaTela}+2000+0") 
+        # self.geometry(f"{self.larguraTela}x{self.alturaTela}") 
         self.telas()
 
 
