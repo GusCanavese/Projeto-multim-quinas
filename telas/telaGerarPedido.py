@@ -592,11 +592,41 @@ def telaGerarPedido(self):
     self.entradaNumero = ctk.CTkEntry(self.frameTelaGerarPedido, width=60, corner_radius=5, font=("Arial", 15))
     self.entradaNumero.place(x=910, y=180)
 
+    def verificaParcelas(self, valor):
+        print(valor)
+        if valor != "a vista":
+            self.labelQtdParcelas = ctk.CTkLabel(self.frameTelaGerarPedido,  text="QTD parcelas", font=("Century Gothic bold", 14))
+            self.labelQtdParcelas.place(x=250, y=235)
+            self.QtdParcelas = ctk.CTkEntry(self.frameTelaGerarPedido, width=180, corner_radius=5, font=("Arial", 15))
+            self.QtdParcelas.place(x=250, y=260)
+
+        else:
+            if hasattr(self, "QtdParcelas"):
+                self.labelQtdParcelas.destroy()
+                del self.labelQtdParcelas
+                self.QtdParcelas.destroy()
+            else:
+                pass
+
+    opcoesPagamento = ["a vista", "cartão a prazo", "boleto a prazo"]
+    self.labelformaDePagamento = ctk.CTkLabel(self.frameTelaGerarPedido,  text="Forma de pagamento", font=("Century Gothic bold", 14))
+    self.labelformaDePagamento.place(x=30, y=235)
+    self.formaDePagamento = ctk.CTkComboBox(self.frameTelaGerarPedido,values=opcoesPagamento, width=180, corner_radius=5, font=("Arial", 15), command=lambda valor:verificaParcelas(self, valor))
+    self.formaDePagamento.place(x=30, y=260)
+
+
+
+    
+
+
+
+
     # cep paraa buscar endereço
     self.labelEnderecoNoPedido = ctk.CTkLabel(self.frameTelaGerarPedido, text="Endereço *", font=("Century Gothic bold", 14))
     self.labelEnderecoNoPedido.place(x=470, y=235)
     self.entradaEnderecoNoPedido = ctk.CTkEntry(self.frameTelaGerarPedido, width=400, corner_radius=5, font=("Arial", 13))
     self.entradaEnderecoNoPedido.place(x=470, y=260)
+
 
 
     # REFERENCIA    

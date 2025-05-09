@@ -8,7 +8,7 @@ def telaApresentarPDF(self, caminhoPdf):
     # Cria o frame principal
 
     self.frameApresentarPedido = ctk.CTkFrame(self, height=850, width=1230, corner_radius=5)
-    self.frameApresentarPedido.place(x=25, y=20)
+    self.frameApresentarPedido.place(relx=0.5, rely=0.5, anchor="center")
 
     self.framePedidoSalvoNoBanco = ctk.CTkFrame(self.frameApresentarPedido, height=70, width=300, corner_radius=5, border_width=2, border_color="green",fg_color="transparent")
     self.framePedidoSalvoNoBanco.place(relx=0.27, y=80, anchor="center")
@@ -57,11 +57,11 @@ def telaApresentarPDF(self, caminhoPdf):
     iconeDireita = ctk.CTkImage(light_image=Image.open("arquivos/direita.png"), size=(20, 20))
     iconeEsquerda = ctk.CTkImage(light_image=Image.open("arquivos/esquerda.png"), size=(20, 20))
     self.botaopagina1 = ctk.CTkButton(self.frameApresentarPedido, text="", image=iconeDireita, fg_color="#38343c", width=30, corner_radius=5 , command=soma)
-    self.botaopagina1.place(x=980, y=820)
+    self.botaopagina1.place(relx=0.752, y=680)
     self.textoPaginaN = ctk.CTkLabel(self.frameApresentarPedido, text=f"Página {self.numeroPagina}", width=100, font=("Arial", 16))
-    self.textoPaginaN.place(x=883, y=820)
+    self.textoPaginaN.place(relx=0.673, y=680)
     self.botaopagina2 = ctk.CTkButton(self.frameApresentarPedido, text="", image=iconeEsquerda, fg_color="#38343c", width=30, corner_radius=5, command=subtracao)
-    self.botaopagina2.place(x=850, y=820)
+    self.botaopagina2.place(relx=0.646, y=680)
 
     
     pagina = documentoPdf.load_page(self.numeroPagina-1)

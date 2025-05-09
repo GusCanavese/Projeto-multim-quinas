@@ -41,8 +41,6 @@ def gerarOrcamento(nome_arquivo, dados):
 
     c.line(20, altura-130, 575+15, altura-130)
 
-
-    # Tabela de itens
     c.line(20, altura - 275+ 100, 575+15, altura - 275+ 100)
     c.line(20, altura - 275+ 100 - 15, 575+15, altura - 275 - 15+ 100)
 
@@ -90,6 +88,7 @@ def gerarOrcamento(nome_arquivo, dados):
     altura_item = altura - 300  # Posição inicial dos itens
     altura_linha = 30
     for item in dados['itens']:
+
         c.drawString(23, altura_item + 100, f"{item['codigo']}")
         c.drawString(82, altura_item + 100, f"{item['descricao']}")
         c.drawString(270, altura_item +100, f"{item['unidade']}")
@@ -100,14 +99,24 @@ def gerarOrcamento(nome_arquivo, dados):
         c.drawString(490, altura_item +100, f"{item['acrescimo']}")
         c.drawString(525, altura_item +100, f"{item['subtotal']}")
 
-
-
         c.line(20, altura - 320 + altura_linha + 100, 575+15, altura - 320 + altura_linha + 100)
         
-        altura_linha -= 80
-        altura_item -= 80
+        altura_linha -= 50
+        altura_item -= 50
 
+    # Verifica se há espaço suficiente para os totais e rodapé
+    if altura_item < 200:  # Se a altura restante for menor que 200 pontos
+        c.showPage()  # Cria nova página
+        altura = height - 50  # Reinicia a altura
+        altura_item = altura - 50
+        
+        # Cabeçalho reduzido para página de totais
+        c.setFont("Times-Roman", 8)
+        c.drawString(20, altura + 20, f"Totais do Orçamento Nº {dados['numero_recibo']} - Cliente: {dados['destinatario']}")
+        c.line(20, altura + 15, 575+15, altura + 15)
+        altura_item = altura - 30
 
+    # Totais
     c.setFont("Times-Bold", 8)
     c.line(20, altura_item+110, 575+15, altura_item+110)
 
@@ -118,24 +127,31 @@ def gerarOrcamento(nome_arquivo, dados):
     c.drawString(490, altura_item+100, f"{dados['total_acrescimo']}")
     c.drawString(525, altura_item+100, f"{dados['total_subtotal']}")
 
-    novaAltura = 480
-    c.line(20, novaAltura+altura_item-390, 575+15, novaAltura+altura_item-390)
-    c.drawString(20, novaAltura+altura_item-400, "Forma de pagamento:")
-    c.drawString(100, novaAltura+altura_item-400, f"{dados['forma_pagamento']}")
-    c.line(20, novaAltura+altura_item-410, 575+15, novaAltura+altura_item-410)
+    # Verifica se há espaço suficiente para o rodapé
+    if altura_item < 150:  # Se a altura restante for menor que 150 pontos
+        c.showPage()  # Cria nova página
+        altura = height - 50  # Reinicia a altura
+        altura_item = altura - 50
+
+    # Rodapé
+    c.line(20, altura_item + 80, 590, altura_item + 80)
+    c.drawString(20, altura_item + 70, "Forma de pagamento:")
+    c.drawString(130, altura_item + 70, f"{dados['forma_pagamento']}")
+    c.line(20, altura_item + 60, 590, altura_item + 60)
 
     c.setFont("Times-Roman", 10)
-    c.drawString(20, novaAltura+altura_item-430, "Vendedor:")
-    c.drawString(70, novaAltura+altura_item-430, f"{dados['vendedor']}")
-    
+    c.drawString(20, altura_item + 40, "Vendedor:")
+    c.drawString(80, altura_item + 50, f"{dados['vendedor']}")
+
     c.setFont("Times-Bold", 12)
-    c.drawString(200, novaAltura+altura_item-430, "Itens sujeitos a disponibilidade do estoque, não reservamos mercadorias")
-    c.line(20, novaAltura+altura_item-460, 575+15, novaAltura+altura_item-460)
+    c.drawString(120, altura_item + 20, "Itens sujeitos a disponibilidade do estoque, não reservamos mercadorias")
+    c.line(20, altura_item, 590, altura_item)
 
     c.setFont("Times-Bold", 8)
-    c.drawString(width/2.7, novaAltura+altura_item-470, "É vedada a autenticação deste documento")
-   
+    c.drawString(width/2.7, altura_item - 10, "É vedada a autenticação deste documento")
+
     c.save()
+
     
 
 dados_exemplo = {

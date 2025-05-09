@@ -26,6 +26,10 @@ def PassaDadosParaOrcamento(self):
         messagebox.showerror("erro", "Selecione pelo menos um produto")
 
     else:
+        self.parcelas = 0
+        if hasattr(self, "QtdParcelas"):
+            self.parcelas = self.QtdParcelas.get()
+        else: None
         self.dados = {
             "vendedor":self.funcionariaPedido.get(),
             "frete":self.valorFrete.get() or 0.0,
@@ -49,23 +53,26 @@ def PassaDadosParaOrcamento(self):
             "subtotal": self.totalSubtotal,
             "observacoes1":self.textArea1.get("1.0", "end-1c"),
             "observacoes2":self.textArea2.get("1.0", "end-1c"),
+            "forma_pagamento":self.formaDePagamento.get(),
+            "parcelas": self.parcelas
+                 
         }
-        Insere.registraPedidoNoBanco(self.dados)
+        # Insere.registraPedidoNoBanco(self.dados)
         geradorDeOrcamento.gerarOrcamento("Orcamento.pdf", self.dados)
 
-        pedidos = Buscas.buscaPedidos(self.funcionariaPedido.get(), self.numeroDeVenda.get(), None, None, 0)
+        # pedidos = Buscas.buscaPedidos(self.funcionariaPedido.get(), self.numeroDeVenda.get(), None, None, 0)
 
-        for rowPedido, pedido in enumerate(pedidos, start=1):
-            dadosDoProdutoDoPedido = json.loads(pedido[8])
+        # for rowPedido, pedido in enumerate(pedidos, start=1):
+        #     dadosDoProdutoDoPedido = json.loads(pedido[8])
 
-            descricaoProdutos = [f"{produto['descricao']} {produto['quantidade']}" for produto in dadosDoProdutoDoPedido]
-            print(descricaoProdutos)
-            print(descricaoProdutos)
-            Atualiza.removeUnidadesDeProdutos(desc=descricaoProdutos)
+        #     descricaoProdutos = [f"{produto['descricao']} {produto['quantidade']}" for produto in dadosDoProdutoDoPedido]
+        #     print(descricaoProdutos)
+        #     print(descricaoProdutos)
+        #     Atualiza.removeUnidadesDeProdutos(desc=descricaoProdutos)
         
 
 
-        if "Pedido.pdf":
+        if "Orcamento.pdf":
             telaApresentarOrcamento(self, "Orcamento.pdf")
         
     

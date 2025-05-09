@@ -3,6 +3,7 @@ from funcoesTerceiras.geradorDePedido import gerar_recibo
 import telas 
 import telas.telaAcoes
 import telas.telaApresentadorDePdf
+import telas.telaApresentarOrcamento
 import telas.telaCadastroClientes
 import telas.telaCadastroFuncionario
 import telas.telaCadastros
@@ -36,8 +37,10 @@ class App(ctk.CTk):
 
 
     def telas(self):
-        # telas.telaGerarPedido.telaGerarPedido(self)
-        telas.telaLogin.telaLogin(self)
+        telas.telaGerarPedido.telaGerarPedido(self)
+        # telas.telaApresentadorDePdf.telaApresentarPDF(self, "Pedido.pdf")
+        # telas.telaApresentarOrcamento.telaApresentarOrcamento(self, "Orcamento.pdf")
+        # telas.telaLogin.telaLogin(self)
 
 
 
