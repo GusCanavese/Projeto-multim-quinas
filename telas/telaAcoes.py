@@ -4,10 +4,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from consultas.select import Buscas
 from telas.telaCadastros import telaCadastros
-from telas.telaDefineCnpjDoProduto import telaDefineCnpjDoProduto
 from telas.telaGerarPedido import telaGerarPedido
 from telas.telaRelatorioDeVendas import telaRelatorioDeVendas
 from telas.telaEstoque import telaEstoque
+
 
 def telaAcoes(self):
     self.frameTelaAcoes = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
@@ -31,7 +31,7 @@ def telaAcoes(self):
         self.botaoConsultarEstoque = ctk.CTkButton(self.frameTelaAcoes, text="Consultar estoque", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaEstoque(self))
         self.botaoConsultarEstoque.place(relx=0.66, y=250, anchor="center")
 
-        self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Gerar orçamento", width=300, corner_radius=5, font=("Arial", 18), command=self)
+        self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Gerar orçamento", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaGerarPedido(self))
         self.botaoGerarOrcamento.place(relx=0.33, y=200, anchor="center")
     else:
         self.botaoCadastro = ctk.CTkButton(self.frameTelaAcoes, text="Cadastros", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaCadastros(self))
@@ -52,7 +52,7 @@ def telaAcoes(self):
         self.botaoConsultarEstoque = ctk.CTkButton(self.frameTelaAcoes, text="Consultar estoque", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaEstoque(self))
         self.botaoConsultarEstoque.place(relx=0.66, y=300, anchor="center")
 
-        self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Gerar orçamento", width=300, corner_radius=5, font=("Arial", 18), command=self)
+        self.botaoGerarOrcamento = ctk.CTkButton(self.frameTelaAcoes, text="Gerar orçamento", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaGerarPedido(self))
         self.botaoGerarOrcamento.place(relx=0.33, y=350, anchor="center")
 
     # botão de trocar usuário 
