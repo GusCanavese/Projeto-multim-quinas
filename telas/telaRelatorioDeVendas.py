@@ -43,7 +43,7 @@ def telaRelatorioDeVendas(self):
     self.botaoLimpar.place(relx=0.05, rely=0.63, relwidth=0.15, anchor="nw")
 
     self.botaoVoltar = ctk.CTkButton(self.frameTelaRelatorioDeVendas, text="Voltar", command=self.frameTelaRelatorioDeVendas.destroy)
-    self.botaoVoltar.place(relx=0.79, rely=0.94, relwidth=0.15, anchor="nw")
+    self.botaoVoltar.place(relx=0.05, rely=0.94, relwidth=0.15, anchor="nw")
 
     # Cabeçalhos da tabela
     colunas = ["Pedido", "Vendedor", "Data de emissão", "Subtotal", "Confirmação da venda"]

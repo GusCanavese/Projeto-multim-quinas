@@ -71,4 +71,16 @@ ADM: adm 123
 
 
 
+
+separar a tela de gerar pedido e gerar orçamento
+fazer a tela de faturamento de acordo com a tela do tag
+fazer as abas de "gerar pedido" "faturamento" na tela de gerar pedido
+
+
+
+
+
+
+
+
     

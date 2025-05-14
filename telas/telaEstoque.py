@@ -38,7 +38,7 @@ def telaEstoque(self):
     # self.botaoLimpar.place(relx=0.05, rely=0.63, relwidth=0.15, anchor="nw")
 
     self.botaoVoltar = ctk.CTkButton(self.frameTelaEstoque, text="Voltar", command=self.frameTelaEstoque.destroy)
-    self.botaoVoltar.place(relx=0.79, rely=0.94, relwidth=0.15, anchor="nw")
+    self.botaoVoltar.place(relx=0.05, rely=0.94, relwidth=0.15, anchor="nw")
 
     # Cabeçalhos da tabela
     colunas = ["QTD", "Produto", "Código", "Preço venda", "CNPJ"]
