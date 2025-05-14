@@ -83,4 +83,4 @@ fazer as abas de "gerar pedido" "faturamento" na tela de gerar pedido
 
 
 
-    
+suar o relx com o tamanho e a divisão da largura, e fazer a mesma coisa para relwhidth e relheight pois assim os campos vão reagir proporcionalmente para a modificação do tamanho da tela
