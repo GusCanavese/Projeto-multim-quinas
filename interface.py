@@ -13,6 +13,7 @@ import telas.telaGerarPedido
 import telas.telaLogin
 import telas.telaRelatorioDeVendas
 import telas.telaVerPedidos
+import telas.telagerarFaturamento
 # import random
 
 # ctk.set_appearance_mode("system")  
@@ -40,7 +41,8 @@ class App(ctk.CTk):
         # telas.telaGerarPedido.telaGerarPedido(self)
         # telas.telaApresentadorDePdf.telaApresentarPDF(self, "Pedido.pdf")
         # telas.telaApresentarOrcamento.telaApresentarOrcamento(self, "Orcamento.pdf")
-        telas.telaLogin.telaLogin(self)
+        telas.telagerarFaturamento.telaGerarFaturamento(self)
+        # telas.telaLogin.telaLogin(self)
 
 
 

@@ -23,3 +23,4 @@ def consultarUsuarioCadastrado(self):
 
     else:
         telaAcoes(self)
+        

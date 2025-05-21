@@ -4,6 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras import confirmarAlteracoesNoPedido
 from funcoesTerceiras import confirmarExclusaoDoPedido
+from telas.telagerarFaturamento import telaGerarFaturamento
 
 def telaVerPedidos(self, p, d, desc):
     for i in desc:
@@ -59,6 +60,11 @@ def telaVerPedidos(self, p, d, desc):
     self.labelCPFCliente.place(relx=0.42, rely=0.2)
     self.CPFCliente = ctk.CTkLabel(self.frameTelaVerPedidos, width=180, textvariable=ctk.StringVar(value=d[1]), fg_color="#38343c", corner_radius=5, font=("Arial", 15))
     self.CPFCliente.place(relx=0.42, rely=0.25)
+
+    # botão que acessa a tela de gerar faturamento
+    self.botaoFaturamento = ctk.CTkButton(self.frameTelaVerPedidos, text="gerar Faturamento", command= lambda:telaGerarFaturamento())
+    self.botaoFaturamento.place(relx=0.42, rely=0.4)
+  
 
     # Terceira linha (rely 0.35 e 0.4)
     self.labelEnderecoNoPedido = ctk.CTkLabel(self.frameTelaVerPedidos, text="Endereço *",  font=("Century Gothic bold", 14))
