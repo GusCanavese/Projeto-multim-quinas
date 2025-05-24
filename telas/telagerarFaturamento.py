@@ -4,6 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 
 def telaGerarFaturamento(self):
+    self.row=1
     self.frameTelaGerarFaturamento = ctk.CTkFrame(self)
     self.frameTelaGerarFaturamento.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
 
@@ -13,10 +14,10 @@ def telaGerarFaturamento(self):
     largura_label = 0.2 
     posicaoy = 0.1
     self.y=0.138
-
+    self.teste =0.038
     self.yParcelas = 0.1
 
-    botaoAdicionarParcela = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Adicionar Parcela", width=20, corner_radius=0, command=lambda:verificaParcelasPreenchidas(self)) 
+    self.botaoAdicionarParcela = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Adicionar Parcela", width=20, corner_radius=0, command=lambda:verificaParcelasPreenchidas(self)) 
 
     self.listaComboboxes = []
     self.listaEntradaQuantidade = []
@@ -27,7 +28,7 @@ def telaGerarFaturamento(self):
     def adicionaParcela(self):
         self.y += 0.038
         self.yParcelas += 0.038
-        botaoAdicionarParcela.place(relx=0.2, rely=self.y)  # se botao já for salvo
+        self.botaoAdicionarParcela.place(relx=0.2, rely=self.y)  # se botao já for salvo
 
         self.combobox = ctk.CTkComboBox(self.frameTelaGerarFaturamento, width=100, values=opcoesPagamento, corner_radius=0, command=lambda valor: modal(self, valor))
         self.combobox.place(relx=0.2, rely=self.yParcelas, relwidth=0.2)
@@ -42,17 +43,50 @@ def telaGerarFaturamento(self):
         self.listaEntradaValor.append(self.entradaValor)
     adicionaParcela(self)
 
+    def removerParcela(self):
+        if self.row <2:
+            print("primeira linha ja encontrada")
+            print(self.row)
+            pass
+        else:
+            
+            print("teste")
+            self.y-=0.038
+            self.teste -=0.038
+            self.yParcelas -=0.038
+            
+            self.botaoAdicionarParcela.place(relx=0.2, rely=self.y)
+            self.botaoRemoverParcela.place(relx=0.8, rely=self.yParcelas)
+
+            if len(self.listaEntradaValor)>1:
+                self.row -= 1
+                print(self.row)
+                self.listaEntradaValor[self.row].destroy()
+                self.listaEntradaQuantidade[self.row].destroy()
+                self.listaComboboxes[self.row].destroy()
+
+                del self.listaEntradaValor[self.row]
+                del self.listaEntradaQuantidade[self.row]
+                del self.listaComboboxes[self.row]
+
+
+
+
+
+
+
+
     def verificaParcelasPreenchidas(self):
-        teste = 0.038
-        if self.combobox.get() and self.entradaQuantidade.get() and self.entradaValor.get():
+        if (self.listaComboboxes[self.row-1].get() and self.listaEntradaQuantidade[self.row-1].get() and self.listaEntradaValor[self.row-1].get()):
+            print(self.row)
+            self.row +=1
+
             if hasattr(self, "botaoRemoverParcela") and self.botaoRemoverParcela.winfo_exists():
                 self.botaoRemoverParcela.destroy()
-            self.botaoRemoverParcela = ctk.CTkButton(self.frameTelaGerarFaturamento, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: self.verificaParcelasPreenchidas())
-            self.botaoRemoverParcela.place(relx=0.8, rely=self.yParcelas + teste)
-
-
-
+            self.botaoRemoverParcela = ctk.CTkButton(self.frameTelaGerarFaturamento, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: removerParcela(self))
+            self.botaoRemoverParcela.place(relx=0.8, rely=self.yParcelas + self.teste)
             adicionaParcela(self)
+
         else:
             print("oi")
 
