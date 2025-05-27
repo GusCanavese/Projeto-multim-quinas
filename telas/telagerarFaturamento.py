@@ -6,30 +6,52 @@ from datetime import date
 from funcoesTerceiras import calculaParcelasFaturamento
 
 def telaGerarFaturamento(self, valorDoPedido):
-    valorDoPedidoVariavel = ctk.StringVar()
-    valorDoPedidoVariavel.set(valorDoPedido)
+
     self.row=1
     self.frameTelaGerarFaturamento = ctk.CTkFrame(self)
     self.frameTelaGerarFaturamento.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
+
+
 
     valores = ["Forma de pagamento", "Quantidade parcelas", "Valor"]
     opcoesPagamento = ["", "Bndes", "Boleto", "Carnê", "Crédito a vista", "Crédito parcelado", "Débito", "Cheque", "Depósito"]
 
     largura_label = 0.2 
     posicaoy = 0.1
-    self.y=0.138
-    self.teste =0.038
+    self.y= 0.138
+    self.teste = 0.038
     self.yParcelas = 0.138
+    self.totais = 0
+    self.totaisFormasDePagamento = ctk.StringVar()
+    self.totaisFormasDePagamento.set(self.totais)
 
-    self.botaoAdicionarParcela = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Adicionar Parcela", width=20, corner_radius=0, command=lambda:verificaParcelasPreenchidas(self)) 
+    self.frameValorTotais = ctk.CTkFrame(self.frameTelaGerarFaturamento, fg_color="red")
+
 
     self.listaComboboxes = []
     self.listaEntradaQuantidade = []
     self.listaEntradaValor = []
 
+    self.botaoAdicionarParcela = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Adicionar Parcela", width=20, corner_radius=0, command=lambda:verificaParcelasPreenchidas(self)) 
+    self.entradasTotais = ctk.CTkEntry(self.frameValorTotais, placeholder_text="TOTAIS", textvariable=self.totaisFormasDePagamento)
+    self.entradasTotais.place(relx=0.7, rely = 0.1)
+
+
+    def calcularTotal():
+        total = 0
+        for entrada in self.listaEntradaValor:
+            valor = float(entrada.get())
+            total += valor
+
+
+        self.totaisFormasDePagamento.set(f"{total:.2f}")
+
 
 
     def adicionaParcela(self):
+        valorDoPedidoVariavel = ctk.StringVar()
+        valorDoPedidoVariavel.set(valorDoPedido)
+
         self.y += 0.038
         self.botaoAdicionarParcela.place(relx=0.2, rely=self.y)  # se botao já for salvo
 
@@ -37,24 +59,36 @@ def telaGerarFaturamento(self, valorDoPedido):
         self.combobox.place(relx=0.2, rely=self.yParcelas, relwidth=0.2)
         self.listaComboboxes.append(self.combobox)
         
-
         self.entradaQuantidade = ctk.CTkEntry(self.frameTelaGerarFaturamento, width=100, corner_radius=0)
         self.entradaQuantidade.place(relx=0.4, rely=self.yParcelas, relwidth=0.2)
         self.listaEntradaQuantidade.append(self.entradaQuantidade)
 
         self.entradaValor = ctk.CTkEntry(self.frameTelaGerarFaturamento, textvariable=valorDoPedidoVariavel, width=100, corner_radius=0)
         self.entradaValor.place(relx=0.6, rely=self.yParcelas, relwidth=0.2)
+        self.entradaValor.bind("<KeyRelease>", lambda event: calcularTotal())
+        
+
         self.listaEntradaValor.append(self.entradaValor)
-        print(self.entradaValor)
+
+        if len(self.listaEntradaValor) != 1:
+            valorDoPedidoVariavel.set(0)
+
+        for i in self.listaEntradaValor:
+            print(i.get())
+        self.frameValorTotais.place(relx=0.2, rely=self.y+0.1, relwidth=0.6, relheight=0.35)
+
 
     adicionaParcela(self)
+    
+
+
+
 
     def removerParcela(self):
         if self.row ==1:
             self.botaoRemoverParcela.destroy()
             del self.botaoRemoverParcela
             print("primeira linha ja encontrada")
-            print(self.row)
             pass
         else:
             if self.row ==1 and hasattr(self, "botaoRemoverParcela"):
@@ -67,10 +101,11 @@ def telaGerarFaturamento(self, valorDoPedido):
             
             self.botaoAdicionarParcela.place(relx=0.2, rely=self.y)
             self.botaoRemoverParcela.place(relx=0.8, rely=self.yParcelas)
+            self.frameValorTotais.place(relx=0.2, rely=self.y+0.1, relwidth=0.4, relheight=0.35)
+    
 
             if len(self.listaEntradaValor)>1:
                 self.row -= 1
-                print(self.row)
                 self.listaEntradaValor[self.row].destroy()
                 self.listaEntradaQuantidade[self.row].destroy()
                 self.listaComboboxes[self.row].destroy()
@@ -84,7 +119,6 @@ def telaGerarFaturamento(self, valorDoPedido):
         if (self.listaComboboxes[self.row-1].get() and self.listaEntradaQuantidade[self.row-1].get() and self.listaEntradaValor[self.row-1].get()):
             
             self.row +=1
-            print(self.row)
 
             if hasattr(self, "botaoRemoverParcela") and self.botaoRemoverParcela.winfo_exists():
                 self.botaoRemoverParcela.destroy()
@@ -100,16 +134,17 @@ def telaGerarFaturamento(self, valorDoPedido):
 
     def obterValoresDasParcelas(self):
         for i, (combo, entradaQTD, entradaValor) in enumerate(zip(self.listaComboboxes, self.listaEntradaQuantidade, self.listaEntradaValor)):
-            self.valorCombobox = combo.get()
-            self.valorEntradaQuantidade = entradaQTD.get()
-            self.valorEntradaValor = entradaValor.get()
-
-            self.teste.set(self.valorEntradaValor)
+            valorCombobox = combo.get()
+            valorEntradaQuantidade = entradaQTD.get()
+            valorEntradaValor = entradaValor.get()
 
 
 
-    botaoteste = ctk.CTkButton(self.frameTelaGerarFaturamento, command=lambda: obterValoresDasParcelas(self))
-    botaoteste.place(x=300, y=300)
+
+ 
+    
+
+    
   
     
     for i, coluna in enumerate(valores):
@@ -117,7 +152,7 @@ def telaGerarFaturamento(self, valorDoPedido):
         colunas = ctk.CTkLabel(self.frameTelaGerarFaturamento, text=coluna, fg_color="#48424d")
         colunas.place(relx=posicaox, rely=posicaoy, relwidth=largura_label-0.001)
 
-    modal(self, 50)
+    # modal(self, 50)
 
 def modal(self, teste):
     frame = ctk.CTkFrame(self.frameTelaGerarFaturamento)
@@ -143,14 +178,6 @@ def modal(self, teste):
             except:
                 pass
         frame.destroy()
-
-
-    # colunasParcelas = ["Item Documento,", "Valor", "Vencimento", "Informação 1", "Informação 2", "Informação 3"]
-    # posicaoxa = 0.1
-    # for i, coluna in enumerate(colunasParcelas):
-    #     colunas = ctk.CTkLabel(frame, text=coluna)
-    #     colunas.place(relx=posicaoxa, rely=0.5, anchor="center")
-    #     posicaoxa += 0.1 +0.2
 
 
     # campos do modal
@@ -200,25 +227,11 @@ def modal(self, teste):
     variaveis[3].set(0.00)
     variaveis[4].set(dataHojeFormatada)
 
+    # valor = 
 
-    def getEntradas():
-        ValorAPagar = entradasLista[0].get()
-        quantidade = entradasLista[1].get()
-        juros = entradasLista[2].get()
-        taxa = entradasLista[3].get()
-        repeticao = entradasLista[4].get()
-        intervalo = entradasLista[5].get()
-        primeiraParcela = entradasLista[5].get()
-
-    botaoCalcular = ctk.CTkButton(frame, corner_radius=0, width=100, text="Calcular", command= lambda:calculaParcelasFaturamento.calculaParcelasFaturamento(self))
-    botaoCalcular.place(relx = 0.14, rely=0.15)
+    # botaoCalcular = ctk.CTkButton(frame, corner_radius=0, width=100, text="Calcular", command= lambda:calculaParcelasFaturamento.calculaParcelasFaturamento(self, valor, repeticao))
+    # botaoCalcular.place(relx = 0.14, rely=0.15)
   
-    
-
-    
-    botao = ctk.CTkButton(frame, command=lambda:getEntradas())
-    botao.place(x=300, y=300)
-
 
     botao_fechar = ctk.CTkButton(frame, text="X", width=10, height=10, corner_radius=0, command=lambda:destroyModal(self))
     botao_fechar.place(relx=0.989, rely=0.018, anchor="center")
