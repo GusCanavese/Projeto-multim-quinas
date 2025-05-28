@@ -29,22 +29,21 @@ def calcularParcelasTotais(self, quantidade, valor):
 
     posicaoY = 0.312
 
-    for i in range(int(quantidade)): 
+    for i in range(quantidade): 
         posicaoY += 0.039
         posicaoX = 0.3
 
-        for i in self.opcoesLabelModal:
+        for i, row in enumerate(self.opcoesLabelModal):
             variavelEntryModal = ctk.StringVar()
-            variavelEntryModal.set(valordividido)
+
+            if i == 2:
+                variavelEntryModal.set(f"{valordividido:.2f}")
+            else:
+                variavelEntryModal.set("")
 
             entryModal = ctk.CTkEntry(self.frame, width=120, corner_radius=0, textvariable=variavelEntryModal)
             entryModal.place(relx=posicaoX, rely=posicaoY)
 
             self.listaEntryModal.append(entryModal)
-            print(self.listaEntryModal[0].get())
-            
+
             posicaoX += 0.15
-
-    self.listaEntryModal
-
-
