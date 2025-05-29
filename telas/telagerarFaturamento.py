@@ -215,9 +215,16 @@ def modal(self, teste):
     self.posicaoXLabelModal = 0.2
 
     for labelsModal in enumerate(self.opcoesLabelModal):
-        labelModal = ctk.CTkLabel(self.frame, width=120, text=labelsModal[1], fg_color="#663030")
-        labelModal.place(relx=self.posicaoXLabelModal, rely=0.31)
-        self.posicaoXLabelModal+=0.15
+        if labelsModal[0] == 0:
+            labelModal = ctk.CTkLabel(self.frame, width=60, text=labelsModal[1], fg_color="#663030")
+            labelModal.place(relx=self.posicaoXLabelModal+0.028, rely=0.31)
+            self.posicaoXLabelModal+=0.15
+
+
+        if labelsModal[0] != 0:
+            labelModal = ctk.CTkLabel(self.frame, width=120, text=labelsModal[1], fg_color="#663030")
+            labelModal.place(relx=self.posicaoXLabelModal-0.04, rely=0.31)
+            self.posicaoXLabelModal+=0.15
         
     botaoCalcular = ctk.CTkButton(self.frame, corner_radius=0, width=100, text="Calcular", command= lambda:calculaParcelasFaturamento.calcularParcelasTotais(self, entradasLista[1].get(), entradasLista[0].get()))
     botaoCalcular.place(relx = 0.14, rely=0.2)

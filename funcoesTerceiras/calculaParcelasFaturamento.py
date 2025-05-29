@@ -41,12 +41,17 @@ def calcularParcelasTotais(self, quantidade, valor):
         for j, row in enumerate(self.opcoesLabelModal):  # <- use 'j' no lugar de 'i'
             variavelEntryModal = ctk.StringVar()
 
-            entryModal = ctk.CTkEntry(self.frame, width=120, corner_radius=0, textvariable=variavelEntryModal)
-            entryModal.place(relx=posicaoX, rely=posicaoY)
+            if j != 0:
+                entryModal = ctk.CTkEntry(self.frame, width=120, corner_radius=0, textvariable=variavelEntryModal)
+                entryModal.place(relx=posicaoX -0.04, rely=posicaoY)
+                self.listaEntryModal.append(entryModal)
+                posicaoX += 0.15
 
-            self.listaEntryModal.append(entryModal)
-
-            posicaoX += 0.15
+            if j == 0:
+                entryModal = ctk.CTkLabel(self.frame, width=60, corner_radius=0, fg_color="#4d4246", text=i+1)
+                entryModal.place(relx=posicaoX +0.028, rely=posicaoY)
+                self.listaEntryModal.append(entryModal)
+                posicaoX += 0.15
 
             if j == 2:
                 variavelEntryModal.set(f"{valordividido:.2f}")
