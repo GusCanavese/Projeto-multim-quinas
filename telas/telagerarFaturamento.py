@@ -142,23 +142,6 @@ def telaGerarFaturamento(self, valorDoPedido):
 
 
 
-
-    # opcoesTotais = ["Desconto total", "Acréscimo", "Valor Liquido"]
-
-    # for i in enumerate(opcoesTotais):
-    #     entradasTotais = ctk.CTkEntry(self.frameValorTotais, placeholder_text="TOTAIS", textvariable=self.totaisFormasDePagamento)
-    #     entradasTotais.place(relx=0.7, rely = 0.1)
-
-    # self.entradasTotais = ctk.CTkEntry(self.frameValorTotais, placeholder_text="TOTAIS", textvariable=self.totaisFormasDePagamento)
-    # self.entradasTotais.place(relx=0.7, rely = 0.1)
-
-    # self.entradasTotais = ctk.CTkEntry(self.frameValorTotais, placeholder_text="TOTAIS", textvariable=self.totaisFormasDePagamento)
-    # self.entradasTotais.place(relx=0.7, rely = 0.22)
-
-    # self.entradasTotais = ctk.CTkEntry(self.frameValorTotais, placeholder_text="TOTAIS", textvariable=self.totaisFormasDePagamento)
-    # self.entradasTotais.place(relx=0.7, rely = 0.34)
-
-
     modal(self, 50)
 
 def modal(self, teste):
@@ -228,13 +211,8 @@ def modal(self, teste):
             posicaoxb += 0.15
 
 
-
-
-
-
-
-    self.opcoesLabelModal=["Item", "Documento", "Valor"]
-    self.posicaoXLabelModal = 0.3
+    self.opcoesLabelModal=["Item", "Documento", "Valor", "Vencimento"]
+    self.posicaoXLabelModal = 0.2
 
     for labelsModal in enumerate(self.opcoesLabelModal):
         labelModal = ctk.CTkLabel(self.frame, width=120, text=labelsModal[1], fg_color="#663030")
@@ -245,11 +223,11 @@ def modal(self, teste):
     botaoCalcular.place(relx = 0.14, rely=0.2)
 
     dataHoje = date.today()
-    dataHojeFormatada = dataHoje.strftime("%d/%m/%Y")
+    self.dataHojeFormatada = dataHoje.strftime("%d/%m/%Y")
 
     variaveis[0].set(teste)
     variaveis[3].set(0.00)
-    variaveis[4].set(dataHojeFormatada)
+    variaveis[4].set(self.dataHojeFormatada)
 
     botaoFechar = ctk.CTkButton(self.frame, text="X", width=10, height=10, corner_radius=0, command=lambda:destroyModal(self))
     botaoFechar.place(relx=0.989, rely=0.018, anchor="center")

@@ -2,6 +2,9 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
+
 
 def SalvaAlteracoesFaturamento(self, valor, qtdParcelas):
     print(valor)
@@ -20,6 +23,8 @@ def calcularParcelasTotais(self, quantidade, valor):
     valor = int(valor)
     quantidade = int(quantidade)
     valordividido = valor/quantidade
+    dataHoje = self.dataHojeFormatada
+
     if hasattr(self, "listaEntryModal"):
         for widget in self.listaEntryModal:
             widget.destroy()
@@ -31,15 +36,10 @@ def calcularParcelasTotais(self, quantidade, valor):
 
     for i in range(quantidade): 
         posicaoY += 0.039
-        posicaoX = 0.3
+        posicaoX = 0.2
 
-        for i, row in enumerate(self.opcoesLabelModal):
+        for j, row in enumerate(self.opcoesLabelModal):  # <- use 'j' no lugar de 'i'
             variavelEntryModal = ctk.StringVar()
-
-            if i == 2:
-                variavelEntryModal.set(f"{valordividido:.2f}")
-            else:
-                variavelEntryModal.set("")
 
             entryModal = ctk.CTkEntry(self.frame, width=120, corner_radius=0, textvariable=variavelEntryModal)
             entryModal.place(relx=posicaoX, rely=posicaoY)
@@ -47,3 +47,18 @@ def calcularParcelasTotais(self, quantidade, valor):
             self.listaEntryModal.append(entryModal)
 
             posicaoX += 0.15
+
+            if j == 2:
+                variavelEntryModal.set(f"{valordividido:.2f}")
+
+            if j == 3:  
+                dataOriginal = datetime.strptime(dataHoje, "%d/%m/%Y")
+                
+                dataComMaisUmMes = dataOriginal + relativedelta(months=1)
+                dataHoje = dataComMaisUmMes.strftime("%d/%m/%Y")
+                variavelEntryModal.set(dataHoje)
+
+                    
+
+
+
