@@ -6,6 +6,7 @@ import telas.telaApresentadorDePdf
 import telas.telaApresentarOrcamento
 import telas.telaCadastroClientes
 import telas.telaCadastroFuncionario
+import telas.telaCadastroTransportadoras
 import telas.telaCadastros
 import telas.telaCalculaVendas
 import telas.telaEstoque
@@ -14,6 +15,7 @@ import telas.telaLogin
 import telas.telaRelatorioDeVendas
 import telas.telaVerPedidos
 import telas.telagerarFaturamento
+import telas.telaContasAPagarEAReceber
 # import random
 
 # ctk.set_appearance_mode("system")  
@@ -39,10 +41,12 @@ class App(ctk.CTk):
 
     def telas(self):
         # telas.telaGerarPedido.telaGerarPedido(self)
+        # telas.telaVerPedidos.telaVerPedidos(self, "Pedidos.pdf")
         # telas.telaApresentadorDePdf.telaApresentarPDF(self, "Pedido.pdf")
         # telas.telaApresentarOrcamento.telaApresentarOrcamento(self, "Orcamento.pdf")
-        telas.telagerarFaturamento.telaGerarFaturamento(self, 50) #VALOR SOMENTE PARA TESTE
+        # telas.telagerarFaturamento.telaGerarFaturamento(self, 50) #VALOR SOMENTE PARA TESTE
         # telas.telaLogin.telaLogin(self)
+        telas.telaContasAPagarEAReceber.telaContasAPagarEAReceber(self)
 
 
 

@@ -56,13 +56,18 @@ def telaVerPedidos(self, p, d, desc):
     self.nomeDoClienteBuscado = ctk.CTkLabel(self.frameTelaVerPedidos, textvariable=ctk.StringVar(value=d[0]), fg_color="#38343c", width=140, corner_radius=5, font=("Arial", 15))
     self.nomeDoClienteBuscado.place(relx=0.0, rely=0.25)
 
+    self.labelValor = ctk.CTkLabel(self.frameTelaVerPedidos, text="Valor", font=("Century Gothic", 14))
+    self.labelValor.place(relx=0.02, rely=0.2)
+    self.ValorBuscado = ctk.CTkLabel(self.frameTelaVerPedidos, textvariable=ctk.StringVar(value=p[3]), fg_color="#38343c", width=140, corner_radius=5, font=("Arial", 15))
+    self.ValorBuscado.place(relx=0.2, rely=0.25)
+
     self.labelCPFCliente = ctk.CTkLabel(self.frameTelaVerPedidos, text="CPF/CNPJ *", font=("Century Gothic bold", 14))
     self.labelCPFCliente.place(relx=0.42, rely=0.2)
     self.CPFCliente = ctk.CTkLabel(self.frameTelaVerPedidos, width=180, textvariable=ctk.StringVar(value=d[1]), fg_color="#38343c", corner_radius=5, font=("Arial", 15))
     self.CPFCliente.place(relx=0.42, rely=0.25)
 
     # botão que acessa a tela de gerar faturamento
-    self.botaoFaturamento = ctk.CTkButton(self.frameTelaVerPedidos, text="gerar Faturamento", command= lambda:telaGerarFaturamento())
+    self.botaoFaturamento = ctk.CTkButton(self.frameTelaVerPedidos, text="gerar Faturamento", command= lambda:telaGerarFaturamento(self, int(p[3])))
     self.botaoFaturamento.place(relx=0.42, rely=0.4)
   
 
