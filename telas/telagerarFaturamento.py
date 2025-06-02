@@ -9,7 +9,7 @@ def telaGerarFaturamento(self, valorDoPedido):
 
     self.row=1
     self.frameTelaGerarFaturamento = ctk.CTkFrame(self)
-    self.frameValorTotais = ctk.CTkFrame(self.frameTelaGerarFaturamento, fg_color="red")
+    self.frameValorTotais = ctk.CTkFrame(self.frameTelaGerarFaturamento, fg_color="#48424d")
 
     self.frameTelaGerarFaturamento.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
 
@@ -28,7 +28,47 @@ def telaGerarFaturamento(self, valorDoPedido):
     self.totaisFormasDePagamento = ctk.StringVar()
     self.totaisFormasDePagamento.set(self.totais)
 
+    self.descontoTotalVindoDoPedido = ctk.StringVar()
+    self.descontoTotalVindoDoPedido.set(123123) 
+
+    self.acrescimoTotalVindoDoPedido = ctk.StringVar()
+    self.acrescimoTotalVindoDoPedido.set(123123) 
+
+
     self.botaoAdicionarParcela = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Adicionar Parcela", width=20, corner_radius=0, command=lambda:verificaParcelasPreenchidas(self)) 
+    
+
+    labelEntradasTotais = ctk.CTkLabel(self.frameValorTotais, text="Total")
+    labelEntradasTotais.place(relx=0.6, rely = 0.10)
+    self.entradasTotais = ctk.CTkEntry(self.frameValorTotais, textvariable=self.totaisFormasDePagamento)
+    self.entradasTotais.place(relx=0.6, rely = 0.20, relwidth=0.3)
+    
+    labelDescontoTotal = ctk.CTkLabel(self.frameValorTotais, text="Desconto total")
+    labelDescontoTotal.place(relx=0.6, rely = 0.35)
+    self.descontoTotal = ctk.CTkEntry(self.frameValorTotais, textvariable=self.descontoTotalVindoDoPedido)
+    self.descontoTotal.place(relx=0.6, rely = 0.45, relwidth=0.3)
+    
+    labelAcrescimoTotal = ctk.CTkLabel(self.frameValorTotais, text="Acrescimo total")
+    labelAcrescimoTotal.place(relx=0.6, rely = 0.60)
+    self.acrescimoTotal = ctk.CTkEntry(self.frameValorTotais, textvariable=self.descontoTotalVindoDoPedido)
+    self.acrescimoTotal.place(relx=0.6, rely = 0.70, relwidth=0.3)
+
+
+
+    labelValorOriginal = ctk.CTkLabel(self.frameValorTotais, text="Valor original da fatura")
+    labelValorOriginal.place(relx=0.1, rely = 0.10)
+    self.ValorOriginal = ctk.CTkEntry(self.frameValorTotais, textvariable=self.totaisFormasDePagamento)
+    self.ValorOriginal.place(relx=0.1, rely = 0.20, relwidth=0.3)
+    
+    labelNumeroDaFatura = ctk.CTkLabel(self.frameValorTotais, text="Número da fatura")
+    labelNumeroDaFatura.place(relx=0.1, rely = 0.35)
+    self.NumeroDaFatura = ctk.CTkEntry(self.frameValorTotais, textvariable=self.descontoTotalVindoDoPedido)
+    self.NumeroDaFatura.place(relx=0.1, rely = 0.45, relwidth=0.3)
+    
+    labelValorDaNota = ctk.CTkLabel(self.frameValorTotais, text="Valor da nota")
+    labelValorDaNota.place(relx=0.1, rely = 0.60)
+    self.ValorDaNota = ctk.CTkEntry(self.frameValorTotais, textvariable=self.descontoTotalVindoDoPedido)
+    self.ValorDaNota.place(relx=0.1, rely = 0.70, relwidth=0.3)
 
     
 
@@ -45,8 +85,6 @@ def telaGerarFaturamento(self, valorDoPedido):
         for entrada in self.listaEntradaValor:
             valor = float(entrada.get())
             total += valor
-
-
         self.totaisFormasDePagamento.set(f"{total:.2f}")
 
 
@@ -56,7 +94,7 @@ def telaGerarFaturamento(self, valorDoPedido):
         self.valorDoPedidoVariavel.set(valorDoPedido)
 
         self.y += 0.038
-        self.botaoAdicionarParcela.place(relx=0.2, rely=self.y)  # se botao já for salvo
+        self.botaoAdicionarParcela.place(relx=0.2, rely=self.y)
 
         self.combobox = ctk.CTkComboBox(self.frameTelaGerarFaturamento, width=100, values=opcoesPagamento, corner_radius=0, command=lambda valor: modal(self, self.entradaValor.get()))
         self.combobox.place(relx=0.2, rely=self.yParcelas, relwidth=0.2)
@@ -102,7 +140,7 @@ def telaGerarFaturamento(self, valorDoPedido):
             
             self.botaoAdicionarParcela.place(relx=0.2, rely=self.y)
             self.botaoRemoverParcela.place(relx=0.8, rely=self.yParcelas)
-            self.frameValorTotais.place(relx=0.2, rely=self.y+0.1, relwidth=0.4, relheight=0.35)
+            self.frameValorTotais.place(relx=0.2, rely=self.y+0.1, relwidth=0.6, relheight=0.35)
     
 
             if len(self.listaEntradaValor)>1:
@@ -118,31 +156,25 @@ def telaGerarFaturamento(self, valorDoPedido):
 
     def verificaParcelasPreenchidas(self):
         if (self.listaComboboxes[self.row-1].get() and self.listaEntradaQuantidade[self.row-1].get() and self.listaEntradaValor[self.row-1].get()):
-            
+    
             self.row +=1
-
             if hasattr(self, "botaoRemoverParcela") and self.botaoRemoverParcela.winfo_exists():
                 self.botaoRemoverParcela.destroy()
             self.botaoRemoverParcela = ctk.CTkButton(self.frameTelaGerarFaturamento, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: removerParcela(self))
             self.yParcelas += 0.038
-            
             self.botaoRemoverParcela.place(relx=0.8, rely=self.yParcelas)
             adicionaParcela(self)
 
         else:
             print("oi")
 
-    
-  
-    
     for i, coluna in enumerate(valores):
         posicaox = 0.2 + i * largura_label  
         colunas = ctk.CTkLabel(self.frameTelaGerarFaturamento, text=coluna, fg_color="#48424d")
         colunas.place(relx=posicaox, rely=posicaoy, relwidth=largura_label-0.001)
 
-
-
-    modal(self, 50)
+    botaoVoltar = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Voltar", corner_radius=5, font=("Arial", 15), command=lambda: self.frameTelaGerarFaturamento.destroy())
+    botaoVoltar.place(relx=0.1, rely=0.9, relwidth=0.15)
 
 def modal(self, teste):
     self.frame = ctk.CTkFrame(self.frameTelaGerarFaturamento)
@@ -238,3 +270,5 @@ def modal(self, teste):
 
     botaoFechar = ctk.CTkButton(self.frame, text="X", width=10, height=10, corner_radius=0, command=lambda:destroyModal(self))
     botaoFechar.place(relx=0.989, rely=0.018, anchor="center")
+
+

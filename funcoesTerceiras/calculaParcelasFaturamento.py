@@ -38,7 +38,7 @@ def calcularParcelasTotais(self, quantidade, valor):
         posicaoY += 0.039
         posicaoX = 0.2
 
-        for j, row in enumerate(self.opcoesLabelModal):  # <- use 'j' no lugar de 'i'
+        for j, row in enumerate(self.opcoesLabelModal):
             variavelEntryModal = ctk.StringVar()
 
             if j != 0:
