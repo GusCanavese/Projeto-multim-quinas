@@ -46,6 +46,8 @@ class App(ctk.CTk):
         # telas.telaApresentarOrcamento.telaApresentarOrcamento(self, "Orcamento.pdf")
         # telas.telagerarFaturamento.telaGerarFaturamento(self, 50) #VALOR SOMENTE PARA TESTE
         # telas.telaLogin.telaLogin(self)
+        # telas.telaContasAPagarEAReceber.telaContasAPagarEAReceber(self)
+        # telas.telaRelatorioDeVendas.telaRelatorioDeVendas(self)
         telas.telaContasAPagarEAReceber.telaContasAPagarEAReceber(self)
 
 
