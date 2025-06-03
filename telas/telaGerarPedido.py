@@ -174,10 +174,6 @@ def telaGerarPedido(self):
             }
             self.valoresDosItens.append(valoresItem)
 
-
-
-
-
     # pesquisa que fica aparecendo e sumindo os valores que estou pesquisando
     def buscaCliente(event=None): 
         calcularTotais()
@@ -608,10 +604,6 @@ def telaGerarPedido(self):
     self.labelReferenciaEnderecoEntrega.place(x=910, y=235)
     self.entradaReferenciaEnderecoEntrega = ctk.CTkEntry(self.frameTelaGerarPedido, width=180, corner_radius=5, font=("Arial", 13))
     self.entradaReferenciaEnderecoEntrega.place(x=910, y=260)
-
-
-
-        
 
     # botão buscacep
     self.botaoBuscaCEP = ctk.CTkButton(self.frameTelaGerarPedido, text="Buscar CEP", width=30, corner_radius=5, command=lambda:buscaCep(self.entradaCEP.get(), self.entradaNumero.get()))
