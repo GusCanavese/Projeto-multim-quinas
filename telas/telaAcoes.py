@@ -8,6 +8,7 @@ from telas.telaGerarPedido import telaGerarPedido
 from telas.telaRelatorioDeVendas import telaRelatorioDeVendas
 from telas.telaEstoque import telaEstoque
 from telas.telaGerarOrcamento  import telaGerarOrcamento
+from telas.telaContasAPagarEAReceber import telaContasAPagarEAReceber
 from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
 
 
@@ -45,7 +46,7 @@ def telaAcoes(self):
         self.botaogGerarPedido = ctk.CTkButton(self.frameTelaAcoes, text="Gerar pedido", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaGerarPedido(self))
         self.botaogGerarPedido.place(relx=0.33, y=250, anchor="center")
 
-        self.botaoContasPagarReceber = ctk.CTkButton(self.frameTelaAcoes, text="Contas a pagar/receber", width=300, corner_radius=5, font=("Arial", 18), command=lambda:escolherNotaFiscal(self))
+        self.botaoContasPagarReceber = ctk.CTkButton(self.frameTelaAcoes, text="Contas a pagar/receber", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaContasAPagarEAReceber(self))
         self.botaoContasPagarReceber.place(relx=0.66, y=250, anchor="center")
 
         self.botaoConsultarEstoque = ctk.CTkButton(self.frameTelaAcoes, text="Consultar estoque", width=300, corner_radius=5, font=("Arial", 18), command=lambda:telaEstoque(self))
