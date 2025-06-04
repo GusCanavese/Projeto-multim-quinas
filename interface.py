@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from funcoesTerceiras.geradorDePedido import gerar_recibo
+from funcoesTerceiras.lerNotaFiscal import lerNotaFiscal, pegarDadosDaNota
 import telas 
 import telas.telaAcoes
 import telas.telaApresentadorDePdf
@@ -12,7 +13,10 @@ import telas.telaCalculaVendas
 import telas.telaEstoque
 import telas.telaGerarPedido
 import telas.telaLogin
+import telas.telaProdutos
+import telas.telaRegistraCredito
 import telas.telaRelatorioDeVendas
+import telas.telaTotais
 import telas.telaVerPedidos
 import telas.telagerarFaturamento
 import telas.telaContasAPagarEAReceber
@@ -33,22 +37,21 @@ class App(ctk.CTk):
         self.alturaTela = 900
         self.larguraTela = 1280
         # self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+100")
-        self.geometry(f"{self.larguraTela}x{self.alturaTela}+2000+0") 
-        # self.geometry(f"{self.larguraTela}x{self.alturaTela}") 
+        # self.geometry(f"{self.larguraTela}x{self.alturaTela}+2000+0") 
+        self.geometry(f"{self.larguraTela}x{self.alturaTela}") 
         self.telas()
 
 
 
     def telas(self):
-        # telas.telaGerarPedido.telaGerarPedido(self)
-        # telas.telaVerPedidos.telaVerPedidos(self, "Pedidos.pdf")
-        # telas.telaApresentadorDePdf.telaApresentarPDF(self, "Pedido.pdf")
-        # telas.telaApresentarOrcamento.telaApresentarOrcamento(self, "Orcamento.pdf")
-        # telas.telagerarFaturamento.telaGerarFaturamento(self, 50) #VALOR SOMENTE PARA TESTE
+        dados = pegarDadosDaNota("nota.xml")
+        # telas.telaRegistraCredito.telaRegistroCredito(self, dados)
+        # telas.telaProdutos.telaProdutos(self, dados) 
         # telas.telaLogin.telaLogin(self)
-        # telas.telaContasAPagarEAReceber.telaContasAPagarEAReceber(self)
-        # telas.telaRelatorioDeVendas.telaRelatorioDeVendas(self)
-        telas.telaContasAPagarEAReceber.telaContasAPagarEAReceber(self)
+        telas.telaTotais.telaTotais(self, dados) 
+
+
+
 
 
 
