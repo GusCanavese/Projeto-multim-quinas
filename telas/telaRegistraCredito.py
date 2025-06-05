@@ -5,6 +5,7 @@ import customtkinter as ctk
 from datetime import datetime
 from telas.telaProdutos import telaProdutos
 from componentes import criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox
+from telas.telaTransporte import telaTransporte
 
 def telaRegistroCredito(self, dadosNota):
     frame = self.frameTelaRegistroCredito = ctk.CTkFrame(self)
@@ -96,11 +97,14 @@ def telaRegistroCredito(self, dadosNota):
 
     transporte = ctk.CTkLabel(frame, text="Transporte----------")
     transporte.place(relx=0.1, rely=0.59)
-    criarLabelComboBox(frame, "Modalidade do frete", 0.1, 0.64, 0.27, opcoesTransporte)
-    criarLabelComboBox(frame, "Modalidade do frete", 0.4, 0.64, 0.2, opcoesPagamento)
+    self.modalidadeDoFrete = criarLabelComboBox(frame, "Modalidade do frete", 0.1, 0.64, 0.27, opcoesTransporte)
+    criarLabelComboBox(frame, "Forma de pagamento", 0.4, 0.64, 0.2, opcoesPagamento)
 
 
-    proximo = ctk.CTkButton(frame, text="Próximo - Tela de Produtos", command=lambda:telaProdutos(self, dadosNota))
+    # proximo = ctk.CTkButton(frame, text="Próximo - Tela de Produtos", command=lambda:telaProdutos(self, dadosNota))
+    # proximo.place(relx=0.25, rely=0.94, relwidth=0.15, anchor="nw")
+
+    proximo = ctk.CTkButton(frame, text="Próximo - Tela de Produtos", command=lambda:telaTransporte(self, dadosNota))
     proximo.place(relx=0.25, rely=0.94, relwidth=0.15, anchor="nw")
 
     botaoVoltar = ctk.CTkButton(frame, text="Voltar", command=frame.destroy)

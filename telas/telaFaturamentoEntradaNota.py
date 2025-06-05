@@ -4,8 +4,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from datetime import date
 from funcoesTerceiras import calculaParcelasFaturamento
+from telas.telaTransporte import telaTransporte
 
-def telaGerarFaturamento(self, valorDoPedido):
+def telaGerarFaturamentoEntradaNota(self, dadosNota):
+    variavelValorLiquido = ctk.StringVar()
+    variavelValorLiquido.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vNF"]["#text"])
 
     self.row=1
     self.frameTelaGerarFaturamento = ctk.CTkFrame(self)
@@ -24,7 +27,7 @@ def telaGerarFaturamento(self, valorDoPedido):
     self.yParcelas = 0.138
     self.totais = 0
     self.totaisFormasDePagamento = ctk.StringVar()
-    self.totaisFormasDePagamento.set(self.totais)
+    self.totaisFormasDePagamento = variavelValorLiquido
 
     self.descontoTotalVindoDoPedido = ctk.StringVar()
     self.descontoTotalVindoDoPedido.set(123123) 
@@ -89,7 +92,7 @@ def telaGerarFaturamento(self, valorDoPedido):
 
     def adicionaParcela(self):
         self.valorDoPedidoVariavel = ctk.StringVar()
-        self.valorDoPedidoVariavel.set(valorDoPedido)
+        self.valorDoPedidoVariavel = variavelValorLiquido
 
         self.y += 0.038
         self.botaoAdicionarParcela.place(relx=0.2, rely=self.y)
@@ -114,13 +117,8 @@ def telaGerarFaturamento(self, valorDoPedido):
             print(i.get())
         self.frameValorTotais.place(relx=0.2, rely=self.y+0.1, relwidth=0.6, relheight=0.35)
 
-
     adicionaParcela(self)
     
-
-
-
-
     def removerParcela(self):
         if self.row ==1:
             self.botaoRemoverParcela.destroy()
@@ -171,8 +169,12 @@ def telaGerarFaturamento(self, valorDoPedido):
         colunas = ctk.CTkLabel(self.frameTelaGerarFaturamento, text=coluna, fg_color="#48424d")
         colunas.place(relx=posicaox, rely=posicaoy, relwidth=largura_label-0.001)
 
-    botaoVoltar = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Voltar", corner_radius=5, font=("Arial", 15), command=lambda: self.frameTelaGerarFaturamento.destroy())
-    botaoVoltar.place(relx=0.1, rely=0.9, relwidth=0.15)
+    proximo = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Próximo - Tela de Produtos", command=lambda:telaTransporte(self, dadosNota))
+    proximo.place(relx=0.25, rely=0.94, relwidth=0.15, anchor="nw")
+
+    botaoVoltar = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Voltar", command=self.frameTelaGerarFaturamento.destroy)
+    botaoVoltar.place(relx=0.05, rely=0.94, relwidth=0.15, anchor="nw")
+
 
 def modal(self, teste):
     self.frame = ctk.CTkFrame(self.frameTelaGerarFaturamento)

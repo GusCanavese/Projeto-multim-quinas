@@ -3,6 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from datetime import datetime
+from telas.telaFaturamentoEntradaNota import telaGerarFaturamentoEntradaNota
 from componentes import criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox
 
 
@@ -24,6 +25,8 @@ def telaTotais(self, dadosNota):
     variavelTotalICMSST = ctk.StringVar()
     variavelTotalCOFINS = ctk.StringVar()
     variavelValorLiquido = ctk.StringVar()
+    variavelBCdoIRRF = ctk.StringVar()
+    variavelBCdoIRRF.set(dadosNota["NFe"]["infNFe"]["total"]["retTrib"]["vBCIRRF"]["#text"])
     variavelValorLiquido.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vNF"]["#text"])
     variavelTotalCOFINS.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vCOFINS"]["#text"])
     variavelTotalICMSST.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vST"]["#text"])
@@ -58,3 +61,25 @@ def telaTotais(self, dadosNota):
     criarLabelLateralEntry(frame, "Total PIS ST",     0.85, 0.10, 0.11, none)
     criarLabelLateralEntry(frame, "Total COFINS",     0.85, 0.15, 0.11, variavelTotalCOFINS)
     criarLabelLateralEntry(frame, "Valor líquido",    0.85, 0.20, 0.11, variavelValorLiquido)
+
+
+    destinatario = ctk.CTkLabel(frame, text="Valores retidos-------------------------------")
+    destinatario.place(relx=0.02, rely=0.45)
+
+
+
+    criarLabelLateralEntry(frame, "Valor PIS retido",       0.1, 0.50, 0.11, none)
+    criarLabelLateralEntry(frame, "Valor do COFINS Retido", 0.1, 0.55, 0.11, none)
+    criarLabelLateralEntry(frame, "Valores Retido CSLL",    0.1, 0.60, 0.11, none)
+    criarLabelLateralEntry(frame, "BC do IRRF",             0.1, 0.65, 0.11, variavelBCdoIRRF)
+    
+    criarLabelLateralEntry(frame, "Valor Retido IRRF",        0.35, 0.50, 0.11, none)
+    criarLabelLateralEntry(frame, "BC da Previdência Social", 0.35, 0.55, 0.11, none)
+    criarLabelLateralEntry(frame, "VR Previdência Social",    0.35, 0.60, 0.11, none)
+
+    
+    proximo = ctk.CTkButton(frame, text="Próximo - Tela de faturamento", command=lambda:telaGerarFaturamentoEntradaNota(self, dadosNota))
+    proximo.place(relx=0.25, rely=0.94, relwidth=0.15, anchor="nw")
+
+    botaoVoltar = ctk.CTkButton(frame, text="Voltar", command=frame.destroy)
+    botaoVoltar.place(relx=0.05, rely=0.94, relwidth=0.15, anchor="nw")
