@@ -4,12 +4,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from datetime import datetime
 from telas.telaProdutos import telaProdutos
-from componentes import criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox
+from componentes import criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox, criaFrame
 from telas.telaTransporte import telaTransporte
 
 def telaRegistroCredito(self, dadosNota):
-    frame = self.frameTelaRegistroCredito = ctk.CTkFrame(self)
-    frame.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
+    frame = criaFrame(self, 0.03, 0.05, 0.94, 0.9)
     
     # variaveis
     variavelNumeroDaNota = ctk.StringVar()
@@ -100,11 +99,7 @@ def telaRegistroCredito(self, dadosNota):
     self.modalidadeDoFrete = criarLabelComboBox(frame, "Modalidade do frete", 0.1, 0.64, 0.27, opcoesTransporte)
     criarLabelComboBox(frame, "Forma de pagamento", 0.4, 0.64, 0.2, opcoesPagamento)
 
-
-    # proximo = ctk.CTkButton(frame, text="Próximo - Tela de Produtos", command=lambda:telaProdutos(self, dadosNota))
-    # proximo.place(relx=0.25, rely=0.94, relwidth=0.15, anchor="nw")
-
-    proximo = ctk.CTkButton(frame, text="Próximo - Tela de Produtos", command=lambda:telaTransporte(self, dadosNota))
+    proximo = ctk.CTkButton(frame, text="Próximo - Tela de Produtos", command=lambda:telaProdutos(self, dadosNota))
     proximo.place(relx=0.25, rely=0.94, relwidth=0.15, anchor="nw")
 
     botaoVoltar = ctk.CTkButton(frame, text="Voltar", command=frame.destroy)

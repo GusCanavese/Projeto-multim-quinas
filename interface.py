@@ -6,7 +6,9 @@ import telas.telaAcoes
 import telas.telaApresentadorDePdf
 import telas.telaApresentarOrcamento
 import telas.telaCadastroClientes
+import telas.telaCadastroFornecedor
 import telas.telaCadastroFuncionario
+import telas.telaCadastroProdutos
 import telas.telaCadastroTransportadoras
 import telas.telaCadastros
 import telas.telaCalculaVendas
@@ -38,20 +40,19 @@ class App(ctk.CTk):
         self.alturaTela = 900
         self.larguraTela = 1280
         # self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+100")
-        # self.geometry(f"{self.larguraTela}x{self.alturaTela}+2000+0") 
-        self.geometry(f"{self.larguraTela}x{self.alturaTela}") 
+        self.geometry(f"{self.larguraTela}x{self.alturaTela}+2000+0") 
+        # self.geometry(f"{self.larguraTela}x{self.alturaTela}") 
         self.telas()
 
-#! você parou na tela de transporte 
 
     def telas(self):
         dados = pegarDadosDaNota("nota.xml")
         # telas.telaRegistraCredito.telaRegistroCredito(self, dados)
-        # telas.telaProdutos.telaProdutos(self, dados) 
-        # telas.telaLogin.telaLogin(self)
-        # telas.telaTotais.telaTotais(self, dados) 
-        # telas.telaRegistraCredito.telaRegistroCredito(self, dados)
-        telas.telaRegistraCredito.telaRegistroCredito(self, dados)
+        # telas.telaCadastros.telaCadastros(self)
+        # telas.telaCadastroFornecedor.telaCadastroFornecedores(self)
+        # telas.telaCadastroFornecedor.telaCadastroFornecedores(self)
+        telas.telaLogin.telaLogin(self)
+
 
 
 

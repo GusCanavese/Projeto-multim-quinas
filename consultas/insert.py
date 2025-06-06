@@ -31,12 +31,14 @@ class Insere:
         messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
     
 
-    def registraFornecedorNoBanco(colunas, valores):
-        query = f"INSERT INTO fornecedores ({', '.join(colunas)}) VALUES ({', '.join(valores)})"
-        print("Query gerada:", query)
-        db.cursor.execute(query)
+    def registraFornecedorNoBanco(dados):
+        colunas = ", ".join(dados.keys())
+        placeholders = ", ".join(["%s"] * len(dados))
+        valores = list(dados.values())
+        query = f"INSERT INTO fornecedores ({colunas}) VALUES ({placeholders})"
+        db.cursor.execute(query, valores)
         db.conn.commit()
-        messagebox.showinfo("Sucesso", "O fornecedor foi cadastrado com sucesso!")
+
 
 
     def insereClienteNoBanco(nome, CPF_CNPJ, IE, RG, endereco, CEP, numero, bairro, cidade):
