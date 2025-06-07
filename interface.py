@@ -48,10 +48,10 @@ class App(ctk.CTk):
     def telas(self):
         dados = pegarDadosDaNota("nota.xml")
         # telas.telaRegistraCredito.telaRegistroCredito(self, dados)
-        # telas.telaCadastros.telaCadastros(self)
+        telas.telaCadastroFuncionario.telaCadastroFuncionario(self)
         # telas.telaCadastroFornecedor.telaCadastroFornecedores(self)
         # telas.telaCadastroFornecedor.telaCadastroFornecedores(self)
-        telas.telaLogin.telaLogin(self)
+        # telas.telaLogin.telaLogin(self)
 
 
 

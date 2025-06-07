@@ -3,49 +3,23 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.registraUsuarioNoBanco import registraUsuarioNoBanco
+from componentes import criaFrame, criarLabelComboBox, criarLabelEntry, criaBotao
 
 
 def telaCadastroFuncionario(self):
-    self.frameTelaCadastroFuncionario = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
-    self.frameTelaCadastroFuncionario.place(x=140, y=100)     
-    self.frameTelaCadastroFuncionario.grid_propagate(False)
+    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
 
-
-    # ================ widgets da tela cadastro =====================#
-    # titulo
-    self.textoCadastro = ctk.CTkLabel(self.frameTelaCadastroFuncionario, width=950, height=0, text="Cadastrar funcionário", font=("Century Gothic bold", 30))
-    self.textoCadastro.grid(row=0, column=0, padx=10, pady=20)
-
-    # nome
-    self.labelNomeFuncionario = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Nome", font=("Century Gothic bold", 15))
-    self.labelNomeFuncionario.place(x=100, y=100)
-    self.nomeFuncionario = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="nomeFuncionario", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-    self.nomeFuncionario.place(x=100, y=130)
-
-    # login
-    self.labelLogin = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Login para acesso*", font=("Century Gothic bold", 15))   
-    self.labelLogin.place(x=100, y=200)
-    self.loginFuncionario = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="Login", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-    self.loginFuncionario.place(x=100, y=230)
-
-    # senha
-    self.labelSenha = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Senha para acesso*", font=("Century Gothic bold", 15))
-    self.labelSenha.place(x=550, y=200)
-    self.senhaFuncionario = ctk.CTkEntry(self.frameTelaCadastroFuncionario, placeholder_text="Senha", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-    self.senhaFuncionario.place(x=550, y=230)
-
-    # cargo
-    self.labelCargo = ctk.CTkLabel(self.frameTelaCadastroFuncionario, text="Cargo", font=("Century Gothic bold", 15))   
-    self.labelCargo.place(x=550, y=100)
     opcoes = ["Gerente", "Vendedor(a) interno", "Vendedor(a) externo", "Financeiro"]
-    self.cargo = ctk.CTkComboBox(self.frameTelaCadastroFuncionario, width=350, corner_radius=5, font=("Century Gothic bold", 20), values=opcoes)
-    self.cargo.place(x=550, y=130)
 
-    # ============== Botões =============== #
-    # voltar
-    self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroFuncionario, text="Voltar", width=200, corner_radius=5, font=("Arial", 15), command=self.frameTelaCadastroFuncionario.destroy)
-    self.botaoVoltar.place(x=200, y=600)
-    
-    # registra no bd
-    self.botaoCadastrarUsuario = ctk.CTkButton(self.frameTelaCadastroFuncionario, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=lambda:registraUsuarioNoBanco(self))
-    self.botaoCadastrarUsuario.place(x=600, y=600)
+
+    self.textoCadastro = ctk.CTkLabel(frame, width=950, height=0, text="Cadastrar funcionário", font=("Century Gothic bold", 30))
+    self.textoCadastro.place(relx=0.5, rely=0.03, anchor="center")
+
+    self.nomeFuncionario  = criarLabelEntry(frame, "Nome", 0.15, 0.14, 0.3, None)
+    self.senhaFuncionario = criarLabelEntry(frame, "Senha para acesso*", 0.55, 0.14, 0.3, None)
+    self.loginFuncionario = criarLabelEntry(frame, "Login para acesso*", 0.15, 0.28, 0.3, None)
+    self.cargo = criarLabelComboBox(frame, "Cargo*", 0.55, 0.28, 0.3, opcoes)
+
+
+    criaBotao(frame, "Voltar", 0.3, 0.80, 0.20, lambda:frame.destroy())
+    criaBotao(frame, "Cadastrar", 0.68, 0.80, 0.20, lambda:registraUsuarioNoBanco(self))
