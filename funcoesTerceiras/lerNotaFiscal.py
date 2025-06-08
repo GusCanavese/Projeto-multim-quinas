@@ -42,12 +42,6 @@ def pegarDadosDaNota(caminhoNota):
     dados = parse_element(root)
     return dados
 
-# Exemplo de uso:
-dados_nfe = pegarDadosDaNota("nota.xml")
-
-# Exibir os dados de forma legível
-print(dados_nfe["protNFe"]["infProt"]["digVal"]["#text"])
-
 
 
 

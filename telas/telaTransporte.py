@@ -4,13 +4,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from datetime import date
 from funcoesTerceiras import calculaParcelasFaturamento
-from componentes import criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox
+from componentes import criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox, criaFrame
 from telas.telaObservacoes import telaObservacoes
 
 
 def telaTransporte(self, dadosNota):
-    frame = self.frametelaTransporte = ctk.CTkFrame(self)
-    frame.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
+    frame = criaFrame(self, 0.03, 0.05, 0.94, 0.9)
+
 
     # opções
     opcoesSerie = ["", "B", "C", "U"]
