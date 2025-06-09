@@ -40,18 +40,14 @@ class App(ctk.CTk):
         self.alturaTela = 900
         self.larguraTela = 1280
         # self.geometry(f"{self.larguraTela}x{self.alturaTela}+-1500+100")
-        self.geometry(f"{self.larguraTela}x{self.alturaTela}+2000+0") 
-        # self.geometry(f"{self.larguraTela}x{self.alturaTela}") 
+        # self.geometry(f"{self.larguraTela}x{self.alturaTela}+2000+0") 
+        self.geometry(f"{self.larguraTela}x{self.alturaTela}") 
         self.telas()
 
 
     def telas(self):
-        # telas.telaRegistraCredito.telaRegistroCredito(self, dados)
-        # telas.telaCadastroFuncionario.telaCadastroFuncionario(self)
-        # telas.telaCadastroFornecedor.telaCadastroFornecedores(self)
-        # telas.telaCadastroTransportadoras.telaCadastroTransportadoras(self)
-        # telas.telaCadastroClientes.telaCadastroClientes(self)
-        telas.telaLogin.telaLogin(self)
+        telas.telaGerarPedido.telaGerarPedido(self)
+        # telas.telaLogin.telaLogin(self)
 
 
 

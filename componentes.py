@@ -29,18 +29,20 @@ def criarLabelLateralComboBox(frame, texto, relx, rely, width, opcoes):
     entry.place(relx=relx + 0.01, rely=rely, relwidth=width, anchor="w")
     return entry
 
-
 def criaFrame(self, relx, rely, width, height):
     frame = ctk.CTkFrame(self)
     frame.place(relx=relx, rely=rely, relwidth=width, relheight=height, anchor="center")
     return frame
 
+def criaFrameScroll(self, parent):
+    frame = ctk.CTkScrollableFrame(parent)
+    frame.pack(fill="both", expand=True)
+    return frame
+
 def criaBotao(frame, texto, relx, rely, width, comando):
-    botao = ctk.CTkButton(frame, text=texto, corner_radius=5, font=("Arial", 18), command=lambda:comando())
+    botao = ctk.CTkButton(frame, text=texto, corner_radius=5,  command=lambda:comando())
     botao.place(relx=relx, rely=rely, relwidth=width,  anchor="center")
     return botao
-
-
 
 def criaAviso(self, frame, height, width, texto, relx, rely):
     frameAviso = ctk.CTkFrame(frame, height=height, width=width, corner_radius=5, border_width=2, border_color="red",fg_color="transparent")
@@ -50,7 +52,6 @@ def criaAviso(self, frame, height, width, texto, relx, rely):
     self.after(3000, frameAviso.destroy)
     gc.collect
     return frame
-
 
 def criaSimouNao(frame, texto, textobt1, textobt2, relx, rely, comando):
     variavel = ctk.StringVar(value="")
@@ -64,6 +65,14 @@ def criaSimouNao(frame, texto, textobt1, textobt2, relx, rely, comando):
 
 
 
+
+
+
+
+
+
+
+# casos específicos
 
 def criarLabelEntryEmail(frame, texto, relx, rely, width, variavel):
     label = ctk.CTkLabel(frame, text=texto, width=50, font=("Arial", 15))
