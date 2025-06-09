@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 import gc
 from funcoesTerceiras.registraTransportadoraNoBanco import registraTransportadoraNoBanco
-from componentes import criaFrame, criaSimouNao, criarLabelEntry, criaBotao
+from componentes import criaFrame, criaSimouNao, criarLabelEntry, criaBotao, criarLabelEntryEmail
 
 
 def telaCadastroTransportadoras(self):
@@ -36,12 +36,14 @@ def telaCadastroTransportadoras(self):
                 self.CNPJTransportadora=criarLabelEntry(frame, "CNPJ", 0.639, 0.27, 0.25, None)
             case "Sim.":
                 if hasattr(self, "emailTransportadora"):
-                    self.emailTransportadora.destroy()
+                    self.emailTransportadora[0].destroy()
+                    self.emailTransportadora[1].destroy()
                     gc.collect()
-                self.emailTransportadora=criarLabelEntry(frame, "Email", 0.639, 0.41, 0.25, None)
+                self.emailTransportadora=criarLabelEntryEmail(frame, "Email", 0.639, 0.41, 0.25, None)
             case "Não.":
                 if hasattr(self, "emailTransportadora"):
-                    self.emailTransportadora.destroy()
+                    self.emailTransportadora[0].destroy()
+                    self.emailTransportadora[1].destroy()
                     gc.collect()
 
     self.tituloCadastroTransportadora = ctk.CTkLabel(frame, height=0, text="Cadastrar Transportadoras", font=("Century Gothic bold", 30))

@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 import gc
 from funcoesTerceiras.registraFornecedorNoBanco import registraFornecedorNoBanco 
-from componentes import criaFrame, criaSimouNao, criarLabelEntry, criaBotao
+from componentes import criaFrame, criaSimouNao, criarLabelEntry, criaBotao, criarLabelEntryEmail
 
 
 
@@ -38,15 +38,15 @@ def telaCadastroFornecedores(self):
 
                 case "Sim.":
                     if hasattr(self, "campoRecebeEmail"):
-                        self.campoRecebeEmail.destroy()
-                        del self.campoRecebeEmail
+                        self.campoRecebeEmail[0].destroy()
+                        self.campoRecebeEmail[1].destroy()
                         gc.collect
-                    self.campoRecebeEmail = criarLabelEntry(frame, "Email", 0.08, 0.562, 0.25,None)
+                    self.campoRecebeEmail = criarLabelEntryEmail(frame, "Email", 0.08, 0.562, 0.25,None)
 
                 case "Não.":
                     if hasattr(self, "campoRecebeEmail"):
-                        self.campoRecebeEmail.destroy()
-                        del self.campoRecebeEmail
+                        self.campoRecebeEmail[0].destroy()
+                        self.campoRecebeEmail[1].destroy()
                         gc.collect
 
 
@@ -71,5 +71,5 @@ def telaCadastroFornecedores(self):
     self.telefone = criarLabelEntry(frame, "Telefone", 0.64, 0.386, 0.25, None)
 
     criaBotao(frame, "Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
-    criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraFornecedorNoBanco(self))
+    criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraFornecedorNoBanco(self, frame))
 

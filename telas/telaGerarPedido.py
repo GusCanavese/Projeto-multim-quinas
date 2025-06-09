@@ -13,13 +13,11 @@ from funcoesTerceiras.verificaSeQuerSalvar import salvarPedido, salvarOrcamento
 def telaGerarPedido(self):
     self.variavelCnpjBuscado = None
     self.variavelCtkEntry = ctk.StringVar() #esses 2 só inicializam para conseguir usar fora da função
-    self.variavelIndiceDoProduto = ctk.StringVar()
     self.quantidadeMaximaPermitida = ctk.StringVar()
     self.variavelDefinidaDePorcentagem = ctk.StringVar()
     self.variavelDefinidaDeReal = ctk.StringVar()
     self.variavelDefinidaDeAcrescimo = ctk.StringVar()
     self.variavelDefinidaDeSubtotal = ctk.StringVar()
-    self.variavelDefinidaDeUnidadeDeMedida = ctk.StringVar()
     self.variavelFuncionarioAtual = ctk.StringVar()
     
     self.variavelTotalDescontoReal = ctk.StringVar()
@@ -119,7 +117,7 @@ def telaGerarPedido(self):
     
         print(self.quantidades)
     
-    self.container = ctk.CTkFrame(self.frameParaItens, height=1500)
+    self.container = ctk.CTkFrame(self.frameParaItens, fg_color="red", height=1500)
     self.container.pack(fill="x", padx=1, pady=1)
 
     self.frameParaItensNoFrame = ctk.CTkFrame(self.frameParaItens, width=1250, height=1500)
@@ -560,8 +558,7 @@ def telaGerarPedido(self):
     self.funcionariaPedido = ctk.CTkEntry(self.frameTelaGerarPedido, textvariable=self.variavelFuncionarioAtual, width=180, corner_radius=5, font=("Century Gothic bold", 15))
     self.funcionariaPedido.place(x=910, y=100)
 
-    iconeLupa = ctk.CTkImage(light_image=Image.open("arquivos/search.png"), size=(20, 20))
-    labelIcone = ctk.CTkButton(self.frameTelaGerarPedido, image=iconeLupa, fg_color="#38343c", width=30, corner_radius=5, command=buscaCliente)
+    labelIcone = ctk.CTkButton(self.frameTelaGerarPedido, text="🔍", fg_color="#38343c", width=30, corner_radius=5, command=buscaCliente, font=("Century Gothic bold", 15))
     labelIcone.place(x=30, y=180)
 
     # nome do cliente
@@ -669,7 +666,6 @@ def telaGerarPedido(self):
     self.labelSubtotal.place(x=1016, y=300)
     self.entradaSubtotal = ctk.CTkEntry(self.frameParaItensNoFrame, textvariable=self.variavelDefinidaDeSubtotal, height=30, width=120, corner_radius=0)
     self.entradaSubtotal.place(x=1016, y=332)
-
 
     # área de texto observações
     self.labelAreaTexto = ctk.CTkLabel(self.frameTelaGerarPedido, text="Observações", height=30, font=("Century Gothic", 15))

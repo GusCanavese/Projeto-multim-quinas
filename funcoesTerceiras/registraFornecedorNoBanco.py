@@ -5,7 +5,7 @@ from tkinter import messagebox
 from consultas.insert import Insere
 import gc
 
-def registraFornecedorNoBanco(self):
+def registraFornecedorNoBanco(self, frame):
     cpfoupjVariavel = 0
     if all([
         self.ativoInativo[3].get(),
@@ -41,11 +41,12 @@ def registraFornecedorNoBanco(self):
         dados = {
             "ativo": self.ativoInativo[3].get(),
             "tipo": self.cpfoupj[3].get(),
-            "documento": cpfoupjVariavel,
+            "CPF_CNPJ": cpfoupjVariavel,
             "origem": self.Origem[3].get(),
             "fabricante": self.eFabricante[3].get(),
             "recebe_email": self.recebeEmail[3].get(),
-            "email": self.campoRecebeEmail.get() if hasattr(self, "campoRecebeEmail") else None,
+            
+            "email": self.campoRecebeEmail[0].get() if hasattr(self, "campoRecebeEmail") else None,
             "nome_real": self.nomeReal.get(),
             "nome_fantasia": self.nomeFantasia.get(),
             "inscricao_estadual": self.inscricaoEstadual.get(),
@@ -60,6 +61,7 @@ def registraFornecedorNoBanco(self):
         Insere.registraFornecedorNoBanco(dados)
 
         # Limpar a tela
-        self.frameTelaCadastroFornecedores.destroy()
+        messagebox.showinfo("Sucesso!", "Fornecedor cadastrado com sucesso!")
+        frame.destroy()
         gc.collect()
     

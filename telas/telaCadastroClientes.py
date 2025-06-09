@@ -3,77 +3,28 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.registraClienteNoBanco import registraClienteNoBanco
+from componentes import criaFrame, criarLabelEntry, criaBotao
 
 def telaCadastroClientes(self):
-    self.frameTelaCadastroClientes = ctk.CTkFrame(self, height=700, width=1000, corner_radius=5)
-    self.frameTelaCadastroClientes.place(x=140, y=100)     
-    self.frameTelaCadastroClientes.grid_propagate(False)
+    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
 
-    # ================ widgets da tela cadastro =====================#
-    # titulo
-    self.textoCadastro = ctk.CTkLabel(self.frameTelaCadastroClientes, width=950, height=0, text="Cadastrar cliente", font=("Century Gothic bold", 30))
-    self.textoCadastro.grid(row=0, column=0, padx=10, pady=20)
+    self.textoCadastro = ctk.CTkLabel(frame, width=950, height=0, text="Cadastrar cliente", font=("Century Gothic bold", 30))
+    self.textoCadastro.place(relx=0.5, rely=0.08, anchor="center")
 
     #nome
-    self.labelNomeCliente = ctk.CTkLabel(self.frameTelaCadastroClientes, text="Nome", font=("Century Gothic bold", 15))
-    self.labelNomeCliente.place(x=100, y=100)
-    self.nomeCliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="nomeCliente", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-    self.nomeCliente.place(x=100, y=130)
+    self.nomeCliente = criarLabelEntry(frame, "Nome", 0.1+0.05, 0.15, 0.30, None)
+    self.CPF_PJcliente = criarLabelEntry(frame, "Documento", 0.1+0.05, 0.25, 0.30, None)
+    self.IEcliente = criarLabelEntry(frame, "Inscrição Estadual", 0.1+0.05, 0.35, 0.30, None)
+    self.RGcliente = criarLabelEntry(frame, "Insira o RG", 0.1+0.05, 0.45, 0.30, None)
 
-    #CPF/CNPJ
-    self.labelCPF_PJcliente = ctk.CTkLabel(self.frameTelaCadastroClientes, text="CPF/CNPJ", font=("Century Gothic bold", 15))
-    self.labelCPF_PJcliente.place(x=100, y=170)
-    self.CPF_PJcliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="Documento", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-    self.CPF_PJcliente.place(x=100, y=200)
+    self.enderecoCliente = criarLabelEntry(frame, "Endereço", 0.45+0.05, 0.15, 0.35, None)
+    self.CEPcliente = criarLabelEntry(frame, "CEP", 0.45+0.05, 0.25, 0.12, None)
+    self.numeroCliente = criarLabelEntry(frame, "Número", 0.58+0.05, 0.25, 0.05, None)
+    self.bairroCliente = criarLabelEntry(frame, "Bairro", 0.64+0.05, 0.25, 0.16, None)
 
-    #Inscrição Estadual
-    self.labelIEcliente = ctk.CTkLabel(self.frameTelaCadastroClientes, text="Inscrição Estadual", font=("Century Gothic bold", 15))
-    self.labelIEcliente.place(x=100, y=240)
-    self.IEcliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="IE", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-    self.IEcliente.place(x=100, y=270) 
-
-    #RG
-    self.labelRGcliente = ctk.CTkLabel(self.frameTelaCadastroClientes, text="Insira o RG", font=("Century Gothic bold", 15))
-    self.labelRGcliente.place(x=100, y=310)
-    self.RGcliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="RG", width=350, corner_radius=5, font=("Century Gothic bold", 20))
-    self.RGcliente.place(x=100, y=340) 
-        
-    #Endereço
-    self.labelEnderecoCliente = ctk.CTkLabel(self.frameTelaCadastroClientes, text="Endereço", font=("Century Gothic bold", 15))
-    self.labelEnderecoCliente.place(x=500, y=100)
-    self.enderecoCliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="Endereço", width=450, corner_radius=5, font=("Century Gothic bold", 20))
-    self.enderecoCliente.place(x=500, y=130)
-
-    #CEP
-    self.labelCEPCliente = ctk.CTkLabel(self.frameTelaCadastroClientes, text="CEP", font=("Century Gothic bold", 15))
-    self.labelCEPCliente.place(x=500, y=170)
-    self.CEPcliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="CEP", width=190, corner_radius=5, font=("Century Gothic bold", 20))
-    self.CEPcliente.place(x=500, y=200)
-
-    #Número
-    self.labelNumeroCliente = ctk.CTkLabel(self.frameTelaCadastroClientes, text="Número", font=("Century Gothic bold", 15))
-    self.labelNumeroCliente.place(x=700, y=170)
-    self.numeroCliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="00", width=60, corner_radius=5, font=("Century Gothic bold", 20))
-    self.numeroCliente.place(x=700, y=200)
-
-    #Bairro
-    self.labelBairroCliente = ctk.CTkLabel(self.frameTelaCadastroClientes, text="Bairro", font=("Century Gothic bold", 15))
-    self.labelBairroCliente.place(x=770, y=170)
-    self.bairroCliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="Bairro", width=180, corner_radius=5, font=("Century Gothic bold", 20))
-    self.bairroCliente.place(x=770, y=200)
-
-    #Cidade
-    self.labelCidadeCliente = ctk.CTkLabel(self.frameTelaCadastroClientes, text="Cidade do Endereço", font=("Century Gothic bold", 15))
-    self.labelCidadeCliente.place(x=500, y=240)
-    self.cidadeCliente = ctk.CTkEntry(self.frameTelaCadastroClientes, placeholder_text="Cidade", width=260, corner_radius=5, font=("Century Gothic bold", 20))
-    self.cidadeCliente.place(x=500, y=270)
+    self.cidadeCliente = criarLabelEntry(frame, "Bairro", 0.45+0.05, 0.35, 0.30, None)
 
     # ================ Botões =====================#
 
-    # botão para voltar para a tela
-    self.botaoVoltar = ctk.CTkButton(self.frameTelaCadastroClientes, text="Voltar", width=200, corner_radius=5, font=("Arial", 18), command=self.frameTelaCadastroClientes.destroy)
-    self.botaoVoltar.place(relx=0.33, y=650, anchor="center")
-
-    # registra no bd
-    self.botaoCadastrarCliente = ctk.CTkButton(self.frameTelaCadastroClientes, text="Cadastrar", width=200, corner_radius=5, font=("Arial", 15), command=lambda:registraClienteNoBanco(self))
-    self.botaoCadastrarCliente.place(x=650, y=650, anchor="center")
+    criaBotao(frame, "Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
+    criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraClienteNoBanco(self, frame))

@@ -5,7 +5,7 @@ from tkinter import messagebox
 from consultas.insert import Insere
 
 # é chamado quando é cadastrado um novo cliente
-def registraClienteNoBanco(self):
+def registraClienteNoBanco(self, frame):
     nome = self.nomeCliente.get()
     CPF_CNPJ = self.CPF_PJcliente.get()
     IE = self.IEcliente.get()
@@ -21,4 +21,4 @@ def registraClienteNoBanco(self):
     else:
         #Pega da classe insere, a query que ta sendo feita la
         Insere.insereClienteNoBanco(nome, CPF_CNPJ, IE, RG, endereco, CEP, numero, bairro, cidade)
-        self.frameTelaCadastroClientes.destroy()
+        frame.destroy()
