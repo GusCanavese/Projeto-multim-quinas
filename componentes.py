@@ -34,13 +34,8 @@ def criaFrame(self, relx, rely, width, height):
     frame.place(relx=relx, rely=rely, relwidth=width, relheight=height, anchor="center")
     return frame
 
-def criaFrameScroll(self, parent):
-    frame = ctk.CTkScrollableFrame(parent)
-    frame.pack(fill="both", expand=True)
-    return frame
-
 def criaBotao(frame, texto, relx, rely, width, comando):
-    botao = ctk.CTkButton(frame, text=texto, corner_radius=5,  command=lambda:comando())
+    botao = ctk.CTkButton(frame, text=texto, corner_radius=5, font=("Arial", 14), command=lambda:comando())
     botao.place(relx=relx, rely=rely, relwidth=width,  anchor="center")
     return botao
 
@@ -63,6 +58,18 @@ def criaSimouNao(frame, texto, textobt1, textobt2, relx, rely, comando):
     botao2.place(relx=relx + 0.05, rely=rely + 0.05)
     return botao1, botao2, label, variavel
 
+def criaLabel(frame, texto, relx, rely, width, cor):
+    label = ctk.CTkLabel(frame, text=texto, fg_color=cor)
+    label.place(relx=relx, rely=rely, relwidth=width, anchor="w")
+    return label
+
+def criaEntry(frame, relx, rely, width, variavel):
+    entry = ctk.CTkEntry(frame, textvariable=variavel, corner_radius=0)
+    entry.place(relx=relx, rely=rely, relwidth=width, anchor="w")
+    return entry
+
+
+
 
 
 
@@ -73,6 +80,10 @@ def criaSimouNao(frame, texto, textobt1, textobt2, relx, rely, comando):
 
 
 # casos específicos
+def criaFrameScrolavel(self, relx, rely, width, height):
+    frame = ctk.CTkFrame(self)
+    frame.place(relx=relx, rely=rely, relwidth=width, relheight=height, anchor="center")
+    return frame
 
 def criarLabelEntryEmail(frame, texto, relx, rely, width, variavel):
     label = ctk.CTkLabel(frame, text=texto, width=50, font=("Arial", 15))
