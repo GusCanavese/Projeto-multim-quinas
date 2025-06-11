@@ -229,7 +229,7 @@ def telaGerarPedido(self):
         
         for i, row in enumerate(Buscas.buscaProduto(nomeDoProduto)):
             if i >=3: break
-            self.resultadoLabelsProduto.append(label)
+            self.resultadoLabelsProduto.append(row)
             yNovo += 29
 
         # ações realizadas quando digitamos em cada campo
@@ -530,7 +530,7 @@ def telaGerarPedido(self):
 
 
 
-
+#! PROCURE DICAS NA TELA DE GERAR FATURAMENTO
 
 
 
@@ -540,35 +540,122 @@ def telaGerarPedido(self):
     self.row=1
     self.y = 0.27
     self.posicaoy = 0.21
-    self.botaoAdicionarItem = criaBotao(self.frameParaItensNoFrame, "Adicionar item", 0.87, self.y, 0.08, lambda:verificaParcelasPreenchidas(self))
+
+    listaEntradasCampoProdutos = []
+    listaLabels = ["Item", "Produto", "Preço", "Quantidade", "U.M.", "Desconto $", "Desconto %", "Acréscimo", "Subtotal"]
+    listaItem = []
+    listaProdutos = []
+    listaPreco = []
+    listaQuantidade = []
+    listaUM = []
+    listaDescontoReal = []
+    listaDescontoPorc = []
+    listaAcresc = []
+    listaSub = []
 
     def verificaParcelasPreenchidas(self):
-        print("opa")
-        print(entradasDosProdutos[self.row-1].get())
-        if entradasDosProdutos[self.row-1].get():
-            # if hasattr(self, "botaoAdicionarItem") and self.botaoAdicionarItem.winfo_exists():
-            #     self.botaoRemoverParcela.destroy()
-            # self.botaoRemoverParcela = ctk.CTkButton(self.frameTelaGerarFaturamento, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: removerParcela(self))
-            # self.yParcelas += 0.038
-            # self.botaoRemoverParcela.place(relx=0.8, rely=self.yParcelas)
+        print(self.row)
+        print(listaProdutos[self.row-1])
+
+        if listaProdutos[self.row-1].get():
+            if hasattr(self, "botaoRemoverParcela") and self.botaoRemoverParcela.winfo_exists():
+                self.botaoRemoverParcela.destroy()
+
+            posiy = self.posicaoy+0.0109
+            self.botaoRemoverParcela = ctk.CTkButton(self.frameParaItensNoFrame, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: removerParcela(self))
+            self.botaoRemoverParcela.place(relx=0.91, rely=posiy)
             adicionaParcela(self)
+            self.row+=1
+
+
+
+    def removerParcela(self):
+        print(self.row)
+        if self.row < 2:
+            self.botaoRemoverParcela.destroy()
+            print("primeira linha ja encontrada")
+        else:
+            if self.row < 2 and hasattr(self, "botaoRemoverParcela"):
+                self.botaoRemoverParcela.destroy()
+                print("teste")
+
+
+    
+
+            if len(listaItem)>1:
+                print("opa")
+                self.row -= 1
+                listaItem[self.row].destroy()
+                listaProdutos[self.row].destroy()
+                listaPreco[self.row].destroy()
+                listaQuantidade[self.row].destroy()
+                listaUM[self.row].destroy()
+                listaDescontoReal[self.row].destroy()
+                listaDescontoPorc[self.row].destroy()
+                listaAcresc[self.row].destroy()
+                listaSub[self.row].destroy()
+
+                self.y -= 0.02
+                self.posicaoy -= 0.02
+                posiy = self.posicaoy+0.0109
+
+                if hasattr(self, "botaoAdicionarItem"):
+                    self.botaoAdicionarItem.destroy()
+                self.botaoAdicionarItem = criaBotao(self.frameParaItensNoFrame, "Adicionar item", 0.87, self.y, 0.08, lambda:verificaParcelasPreenchidas(self))
+                self.botaoRemoverParcela.place(relx=0.91, rely=posiy)
+                
+
 
     def adicionaParcela(self):
-        print("somou")
+        if hasattr(self, "botaoAdicionarItem"):
+            self.botaoAdicionarItem.destroy()
+        self.botaoAdicionarItem = criaBotao(self.frameParaItensNoFrame, "Adicionar item", 0.87, self.y, 0.08, lambda:verificaParcelasPreenchidas(self))
+       
         self.posicaoy += 0.02
+        self.y += 0.02
         posicaox = 0.024
+
+
         for i, coluna in enumerate(listaLabels):
             if i == 0:
-                label1=criaLabel(self.frameParaItensNoFrame, i, posicaox, self.posicaoy, 0.040, "#38343c")
+                entrada = criaLabel(self.frameParaItensNoFrame, i, posicaox, self.posicaoy, 0.040, "#38343c")
+                listaItem.append(entrada)
                 posicaox +=0.042
             if i == 1:
                 entrada = criaEntry(self.frameParaItensNoFrame, posicaox, self.posicaoy, 0.16, None)
-                entradasDosProdutos.append(entrada)
+                listaProdutos.append(entrada)
                 posicaox +=0.161
             if i!=0 and i!=1:
-                entrada = criaEntry(self.frameParaItensNoFrame, posicaox, self.posicaoy, 0.096, None)
-                entradasDosProdutos.append(entrada)
-                posicaox +=0.0976
+                match i:
+                    case 2:
+                        entrada = criaEntry(self.frameParaItensNoFrame, posicaox, self.posicaoy, 0.096, None)
+                        listaPreco.append(entrada)
+                        posicaox +=0.0976
+                    case 3:
+                        entrada = criaEntry(self.frameParaItensNoFrame, posicaox, self.posicaoy, 0.096, None)
+                        listaQuantidade.append(entrada)
+                        posicaox +=0.0976
+                    case 4:
+                        entrada = criaEntry(self.frameParaItensNoFrame, posicaox, self.posicaoy, 0.096, None)
+                        listaUM.append(entrada)
+                        posicaox +=0.0976
+                    case 5:
+                        entrada = criaEntry(self.frameParaItensNoFrame, posicaox, self.posicaoy, 0.096, None)
+                        listaDescontoReal.append(entrada)
+                        posicaox +=0.0976
+                    case 6:
+                        entrada = criaEntry(self.frameParaItensNoFrame, posicaox, self.posicaoy, 0.096, None)
+                        listaDescontoPorc.append(entrada)
+                        posicaox +=0.0976
+                    case 7:
+                        entrada = criaEntry(self.frameParaItensNoFrame, posicaox, self.posicaoy, 0.096, None)
+                        listaAcresc.append(entrada)
+                        posicaox +=0.0976
+                    case 8:
+                        entrada = criaEntry(self.frameParaItensNoFrame, posicaox, self.posicaoy, 0.096, None)
+                        listaSub.append(entrada)
+                        posicaox +=0.0976
+
 
 
 
@@ -609,9 +696,7 @@ def telaGerarPedido(self):
 
 
 
-    listaEntradasCampoProdutos = []
-    listaLabels = ["Item", "Produto", "Preço", "Quantidade", "U.M.", "Desconto $", "Desconto %", "Acréscimo", "Subtotal"]
-    entradasDosProdutos = []
+
 
     posicaoy = 0.21
     posicaox = 0.024
@@ -626,18 +711,26 @@ def telaGerarPedido(self):
             label = criaLabel(self.frameParaItensNoFrame, coluna, posicaox, posicaoy, 0.096, "#38343c")
             posicaox +=0.0976
 
-
+    listaItem = []
+    listaProdutos = []
+    listaPreco = []
+    listaQuantidade = []
+    listaUM = []
+    listaDescontoReal = []
+    listaDescontoPorc = []
+    listaAcresc = []
+    listaSub = []
     
     adicionaParcela(self)
-
-    self.entradaProdutoPesquisado = entradasDosProdutos[0]
-    self.entradaPreco = entradasDosProdutos[1]
-    self.entradaQuantdadeItem = entradasDosProdutos[2]
-    self.entradaUnidadeMedida = entradasDosProdutos[3]
-    self.entradaDescontosReal = entradasDosProdutos[4]
-    self.entradaDescontosPorcentagem = entradasDosProdutos[5]
-    self.entradaAcrescimo = entradasDosProdutos[6]
-    self.entradaSubtotal = entradasDosProdutos[7]
+    for i, row in enumerate(listaItem):
+        self.entradaProdutoPesquisado = listaProdutos[i]
+        self.entradaPreco = listaPreco[i]
+        self.entradaQuantdadeItem = listaQuantidade[i]
+        self.entradaUnidadeMedida = listaUM[i]
+        self.entradaDescontosReal = listaDescontoReal[i]
+        self.entradaDescontosPorcentagem = listaDescontoPorc[i]
+        self.entradaAcrescimo = listaAcresc[i]
+        self.entradaSubtotal = listaSub[i]
 
 
     self.entradaSubtotal.configure(textvariable=self.variavelDefinidaDeSubtotal)
