@@ -2,10 +2,16 @@ import customtkinter as ctk
 import gc
 
 def criarLabelEntry(frame, texto, relx, rely, width, variavel):
-    label = ctk.CTkLabel(frame, text=texto, width=50, font=("Arial", 15))
+    dif =0.04
+    fonte = ("Arial", 15)
+    if texto == "Desconto total(%)" or texto == "Desconto total($)" or texto == "Acréscimo total" or texto == "Valor frete" or texto == "TOTAL:":
+        dif = 0.17
+        fonte = ("Arial", 11)
+
+    label = ctk.CTkLabel(frame, text=texto, width=50, font=fonte)
     label.place(relx=relx, rely=rely, anchor="w")
     entry = ctk.CTkEntry(frame, textvariable=variavel, corner_radius=0)
-    entry.place(relx=relx, rely=rely + 0.04, relwidth=width, anchor="w")
+    entry.place(relx=relx, rely=rely + dif, relwidth=width, anchor="w")
     return entry
 
 def criarLabelComboBox(frame, texto, relx, rely, width, lista):
@@ -68,9 +74,12 @@ def criaEntry(frame, relx, rely, width, variavel):
     entry.place(relx=relx, rely=rely, relwidth=width, anchor="w")
     return entry
 
-
-
-
+def criaTextArea(frame, relx, rely, width, titulo, texto):
+    label = ctk.CTkLabel(frame, text=titulo, height=30, font=("Century Gothic", 15))
+    label.place(relx=relx, rely=rely)
+    areaTexto = ctk.CTkTextbox(frame, height=150, corner_radius=0, wrap="word")
+    areaTexto.insert("0.0", texto)
+    areaTexto.place(relx=relx, rely=rely+0.05, relwidth=width)
 
 
 
