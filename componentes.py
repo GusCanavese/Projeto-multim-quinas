@@ -81,6 +81,13 @@ def criaTextArea(frame, relx, rely, width, titulo, texto):
     areaTexto.insert("0.0", texto)
     areaTexto.place(relx=relx, rely=rely+0.05, relwidth=width)
 
+def criaLabelDescritivo(frame, texto, relx, rely, width, cor, variavel):
+    labelTitulo = ctk.CTkLabel(frame, text=texto)
+    labelTitulo.place(relx=relx, rely=rely, relwidth=width, anchor="w")
+    label = ctk.CTkLabel(frame, fg_color=cor, textvariable=variavel)
+    label.place(relx=relx, rely=rely+0.05, relwidth=width, anchor="w")
+    return label
+
 
 
 
