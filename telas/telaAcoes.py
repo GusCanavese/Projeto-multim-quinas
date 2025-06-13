@@ -32,11 +32,23 @@ def telaAcoes(self):
         criaBotao(frame, "Trocar usuário", 0.33, 0.80, 0.18, lambda:frame.destroy())
 
     else:
+        # REFATORADA
         criaBotao(frame, "Cadastros", 0.33, 0.24, 0.24, lambda:telaCadastros(self))
+
+        #! em andamento
         criaBotao(frame, "Gerar pedido", 0.33, 0.30, 0.24, lambda:telaGerarPedido(self))
+
+        # NÃO REFATORADA
         criaBotao(frame, "Gerar orçamento", 0.33, 0.36, 0.24, lambda:telaGerarOrcamento(self))
 
+        # REFATORADA
         criaBotao(frame, "Relatório de vendas/pedidos", 0.66, 0.24, 0.24, lambda:telaRelatorioDeVendas(self))
+
+        # NÃO REFATORADA
         criaBotao(frame, "Contas a pagar/receber", 0.66, 0.30, 0.24, lambda:telaContasAPagarEAReceber(self))
+
+        # NÃO REFATORADA  
         criaBotao(frame, "Consultar estoque", 0.66, 0.36, 0.24, lambda:telaEstoque(self))
+        
+        # NÃO REFATORADA
         criaBotao(frame, "Trocar usuário", 0.33, 0.80, 0.18, lambda:frame.destroy())
