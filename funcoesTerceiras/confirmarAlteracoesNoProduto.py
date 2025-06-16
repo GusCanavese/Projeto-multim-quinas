@@ -5,7 +5,7 @@ from tkinter import messagebox
 from consultas.update import Atualiza
 
    
-def confirmarAlteracoesNoProduto(self, id, quantidade, preco):
+def confirmarAlteracoesNoProduto(self, frame, id, quantidade, preco):
     if quantidade == '' or preco == '':
         messagebox.showerror('Erro', 'todos os campos devem estar preenchidos')
     else:
@@ -17,4 +17,4 @@ def confirmarAlteracoesNoProduto(self, id, quantidade, preco):
         if resposta == "yes":
             Atualiza.atualizaProduto(quantidade, preco, id)
             messagebox.showinfo('Sucesso', 'O produto foi atualizado com sucesso')
-            self.frameTelaVerProdutos.destroy()
+            frame.destroy()

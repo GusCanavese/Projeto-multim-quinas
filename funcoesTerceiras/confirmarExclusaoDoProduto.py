@@ -5,7 +5,7 @@ from tkinter import messagebox
 from consultas.delete import deleta
 
    
-def confirmarExclusaoDoProduto(self, descricao,):
+def confirmarExclusaoDoProduto(self, frame, descricao,):
 
     resposta = messagebox.askquestion(
         "Confirmação",
@@ -14,7 +14,7 @@ def confirmarExclusaoDoProduto(self, descricao,):
     )
     if resposta == "yes":
         deleta.deletarProduto(descricao)
-        self.frameTelaVerProdutos.destroy()
+        frame.destroy()
         messagebox.showinfo('Sucesso', "Você excluiu esse produto")
         
         

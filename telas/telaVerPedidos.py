@@ -8,10 +8,6 @@ from telas.telagerarFaturamento import telaGerarFaturamento
 from componentes import criaBotao, criaFrame, criaLabel, criaLabelDescritivo, criarLabelEntry
 
 def telaVerPedidos(self, p, d, desc):
-    for i in desc:
-        print(i.rsplit(' ', 1))
-        print(i.rsplit(' ', 1))
-
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
 
     if p[4] == "Não confirmado":
@@ -46,9 +42,6 @@ def telaVerPedidos(self, p, d, desc):
     criaLabelDescritivo(frame, "Endereço",        0.02, 0.43, 0.35, "#38343c", ctk.StringVar(value=d[2]))
 
     criaBotao(frame, 'Gerar faturamento', 0.495, 0.48, 0.15, lambda:confirmarAlteracoesNoPedido.confirmarHoje(self, p[0]))
-
-  
-
     criaBotao(frame, 'Voltar',                  0.15, 0.95, 0.20, lambda:frame.destroy())
     botaoExclui = criaBotao(frame, 'Cancelar/Excluir pedido', 0.61, 0.95, 0.20, lambda:confirmarExclusaoDoPedido.confirmarExclusaoNoPedido(self, p[0], desc))
     botaoExclui.configure(fg_color="#8B0000")

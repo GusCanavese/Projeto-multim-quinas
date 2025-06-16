@@ -3,53 +3,46 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.buscarProdutos import buscarProdutos
+from componentes import criaFrame, criarLabelEntry, criarLabelComboBox, criaBotao, criaLabel
 
 
 def telaEstoque(self):
-    self.frameTelaEstoque = ctk.CTkFrame(self, corner_radius=5)
-    self.frameTelaEstoque.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
+    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frameProdutos = criaFrame(frame, 0.65, 0.5, 0.68, 0.93)
+    opcoes = ["Multimáquinas", "Nutrigel", "Polimáquinas", "Usados"]
 
-    # Frame rolável (conteúdo principal)
-    self.frameProdutosNoEstoque = ctk.CTkScrollableFrame(self.frameTelaEstoque)
-    self.frameProdutosNoEstoque.place(relx=0.3, rely=0.01, relwidth=0.68, relheight=0.93)
 
     # Filtros - lado esquerdo
-    self.labelBuscarPorNome = ctk.CTkLabel(self.frameTelaEstoque, text="Filtrar pelo Código", font=("Century Gothic bold", 15))
-    self.labelBuscarPorNome.place(relx=0.03, rely=0.01, anchor="nw")
-    self.buscarPorCodigo = ctk.CTkEntry(self.frameTelaEstoque, corner_radius=5, font=("Century Gothic bold", 20))
-    self.buscarPorCodigo.place(relx=0.03, rely=0.06, relwidth=0.22, anchor="nw")
+    self.buscarPorCodigo = criarLabelEntry(frame,"Buscar pelo código", 0.03, 0.05, 0.22, None)
+    self.buscarPorNome = criarLabelEntry(frame,"Buscar pelo Nome", 0.03, 0.17, 0.22, None)
+    self.filtrarPorVendedor = criarLabelComboBox(frame,"Filtrar por vendedor(a)", 0.03, 0.29, 0.22, opcoes)
 
-    self.labelBuscarPorNome = ctk.CTkLabel(self.frameTelaEstoque, text="Filtrar pelo Nome", font=("Century Gothic bold", 15))
-    self.labelBuscarPorNome.place(relx=0.03, rely=0.13, anchor="nw")
-    self.buscarPorNome = ctk.CTkEntry(self.frameTelaEstoque, corner_radius=5, font=("Century Gothic bold", 20))
-    self.buscarPorNome.place(relx=0.03, rely=0.17, relwidth=0.22, anchor="nw")
+    
+    criaBotao(frame, "Buscar", 0.15, 0.55, 0.15, lambda:buscarProdutos(self, frameProdutos,self.buscarPorNome.get(), self.buscarPorCodigo.get(), 1))
+    criaBotao(frame, "Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
 
-    opcoes = ["Multimáquinas", "Nutrigel", "Polimáquinas", "Usados"]
-    self.labelfiltrarPorVendedor = ctk.CTkLabel(self.frameTelaEstoque, text="Filtrar por vendedor(a)", font=("Century Gothic bold", 15))
-    self.labelfiltrarPorVendedor.place(relx=0.03, rely=0.25, anchor="nw")
-    self.filtrarPorVendedor = ctk.CTkComboBox(self.frameTelaEstoque, font=("Century Gothic bold", 20), values=opcoes)
-    self.filtrarPorVendedor.place(relx=0.03, rely=0.29, relwidth=0.22, anchor="nw")
-
-    # Botões
-    self.botaoBuscarProdutos = ctk.CTkButton(self.frameTelaEstoque,text="Buscar",command=lambda:buscarProdutos(self, self.buscarPorNome.get(), self.buscarPorCodigo.get(), 1))
-    self.botaoBuscarProdutos.place(relx=0.05, rely=0.55, relwidth=0.15, anchor="nw")
-
-    # self.botaoLimpar = ctk.CTkButton(self.frameTelaEstoque, text="Atualizar", command=self)
-    # self.botaoLimpar.place(relx=0.05, rely=0.63, relwidth=0.15, anchor="nw")
-
-    self.botaoVoltar = ctk.CTkButton(self.frameTelaEstoque, text="Voltar", command=self.frameTelaEstoque.destroy)
-    self.botaoVoltar.place(relx=0.05, rely=0.94, relwidth=0.15, anchor="nw")
 
     # Cabeçalhos da tabela
+
     colunas = ["QTD", "Produto", "Código", "Preço venda", "CNPJ"]
+    
+    x = 0.03
+    y = 0.05
+
     for i, coluna in enumerate(colunas):
-        if coluna == "QTD":
-            label = ctk.CTkLabel(self.frameProdutosNoEstoque, text=coluna, width=50, fg_color="#2C3E50", anchor="center")
-        elif coluna == "Produto":
-            label = ctk.CTkLabel(self.frameProdutosNoEstoque, text=coluna, width=400, fg_color="#2C3E50", anchor="center")
-        elif coluna == "Código" or coluna=="Preço venda":
-            label = ctk.CTkLabel(self.frameProdutosNoEstoque, text=coluna, width=100, fg_color="#2C3E50", anchor="center")
+        if i == 0:
+            label = criaLabel(frameProdutos, coluna, x, y, 0.04, "#2C3E50")
+            x+=0.043
+        elif i ==1:
+            label = criaLabel(frameProdutos, coluna, x, y, 0.4, "#2C3E50")
+            x+=0.403
+        elif i ==2:
+            label = criaLabel(frameProdutos, coluna, x, y, 0.15, "#2C3E50")
+            x+=0.153
+        elif i ==3:
+            label = criaLabel(frameProdutos, coluna, x, y, 0.10, "#2C3E50")
+            x+=0.103
         else:
-            label = ctk.CTkLabel(self.frameProdutosNoEstoque, text=coluna, width=150, fg_color="#2C3E50", anchor="center")
-        label.grid(row=0, column=i, padx=1.5, pady=5)
-        label.grid_columnconfigure(0, minsize=20)
+            label = criaLabel(frameProdutos, coluna, x, y, 0.17, "#2C3E50")
+            x+=0.178
+
