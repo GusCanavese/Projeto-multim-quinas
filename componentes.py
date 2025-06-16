@@ -21,6 +21,11 @@ def criarLabelComboBox(frame, texto, relx, rely, width, lista):
     entry.place(relx=relx, rely=rely + 0.04, relwidth=width, anchor="w")
     return entry
 
+def criaComboBox(frame, relx, rely, width, lista, comando):
+    entry = ctk.CTkComboBox(frame, values=lista, corner_radius=0, command=comando)
+    entry.place(relx=relx, rely=rely, relwidth=width, anchor="center")
+    return entry
+
 def criarLabelLateralEntry(frame, texto, relx, rely, width, variavel):
     label = ctk.CTkLabel(frame, text=texto, anchor="e", width=100, font=("Arial", 15))
     label.place(relx=relx, rely=rely, anchor="e")

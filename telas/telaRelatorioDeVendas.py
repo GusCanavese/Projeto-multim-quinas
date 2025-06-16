@@ -9,10 +9,6 @@ from componentes import criaFrame, criarLabelEntry, criarLabelComboBox, criaBota
 
 
 def telaRelatorioDeVendas(self):
-
-
-    # Frame rolável (conteúdo principal)
-
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
     frameVendas = criaFrame(frame, 0.65, 0.5, 0.68, 0.93)
     opcoes = ["Nenhum", "Yara", "Camila", "Jenifer", "Bruna", "Ana Flávia", "Maurício"]

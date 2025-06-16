@@ -3,14 +3,15 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
+from funcoesTerceiras import filtrarPedidos
+from componentes import criaFrame, criaLabel, criaBotao, criaComboBox
 
 def telaContasAPagarEAReceber(self):
-    self.frameTelaContasAPagarEAReceber = ctk.CTkFrame(self)
-    self.frameTelaContasAPagarEAReceber.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
+    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frameVendas = criaFrame(frame, 0.65, 0.5, 0.68, 0.93)
+    opcoes = ["Nenhum", "Entrada/Débito", "Saída/Crédito"]
 
-    # Frame rolável (conteúdo principal)
-    self.frameParaContasAPagarEReceber = ctk.CTkScrollableFrame(self.frameTelaContasAPagarEAReceber)
-    self.frameParaContasAPagarEReceber.place(relx=0.3, rely=0.01, relwidth=0.68, relheight=0.93)
+
 
     def escolheTela(valor):
         print(valor)
@@ -22,25 +23,24 @@ def telaContasAPagarEAReceber(self):
     def creditoOuDebito():
         if hasattr(self, "creditoOuDebito"):
             self.creditoOuDebito.destroy()
+            self.creditoOuDebito = criaComboBox(frame, 0.15, 0.2, 0.15, opcoes, lambda valor:escolheTela(valor))
         else:
-            opcoes = ["Nenhum", "Entrada/Débito", "Saída/Crédito"]
-            self.creditoOuDebito = ctk.CTkComboBox(self.frameTelaContasAPagarEAReceber, font=("Century Gothic bold", 15), values=opcoes, command=lambda valor:escolheTela(valor))
-            self.creditoOuDebito.place(relx=0.07, rely=0.2)
+            self.creditoOuDebito = criaComboBox(frame, 0.15, 0.2, 0.15, opcoes, lambda valor:escolheTela(valor))
+
             
-    
-    botaoNovo = ctk.CTkButton(self.frameTelaContasAPagarEAReceber, text="Registrar credito/débito", fg_color="#006D5B", command=lambda:creditoOuDebito())
-    botaoNovo.place(relx=0.07, rely=0.1)
+    botaoCriaNovo = criaBotao(frame, "Registrar credito/débito", 0.15, 0.1, 0.15, lambda:creditoOuDebito())
+    botaoCriaNovo.configure(fg_color="#006D5B")
 
-    # Botões
-    self.botaoFiltrar = ctk.CTkButton(self.frameTelaContasAPagarEAReceber,text="Buscar", command=lambda: filtrarPedidos.filtrarPedidos( self, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(), self.datePickerInicio.get() if hasattr(self, "datePickerInicio") else None, self.datePickerFim.get() if hasattr(self, "datePickerFim") else None, self.selecionarPeriodo.get()))
-    self.botaoFiltrar.place(relx=0.05, rely=0.55, relwidth=0.15, anchor="nw")
-
-    botaoVoltar = ctk.CTkButton(self.frameTelaContasAPagarEAReceber, text="Voltar", command=self.frameTelaContasAPagarEAReceber.destroy)
-    botaoVoltar.place(relx=0.05, rely=0.94, relwidth=0.15, anchor="nw")
+    criaBotao(frame, "Buscar", 0.15, 0.55, 0.15, lambda:filtrarPedidos.filtrarPedidos( self, frameVendas, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(), self.datePickerInicio.get() if hasattr(self, "datePickerInicio") else None, self.datePickerFim.get() if hasattr(self, "datePickerFim") else None, self.selecionarPeriodo.get()))
+    criaBotao(frame, "Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
 
     # Cabeçalhos da tabela
     colunas = ["Pedido", "Vendedor", "Data de emissão", "Subtotal", "Confirmação da venda"]
+    x = 0.03
+    y = 0.05
+
     for i, coluna in enumerate(colunas):
-        label = ctk.CTkLabel(self.frameParaContasAPagarEReceber, text=coluna, width=150, fg_color="#2C3E50", anchor="center")
-        label.grid(row=0, column=i, padx=2, pady=5)
-        label.grid_columnconfigure(0, minsize=20)
+        criaLabel(frameVendas, coluna, x, y, 0.17, "#2C3E50")
+        x+=0.175
+
+ 
