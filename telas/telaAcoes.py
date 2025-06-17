@@ -44,11 +44,11 @@ def telaAcoes(self):
         # REFATORADA
         criaBotao(frame, "Relatório de vendas/pedidos", 0.66, 0.24, 0.24, lambda:telaRelatorioDeVendas(self))
 
-        # NÃO REFATORADA
+        # REFATORADA
         criaBotao(frame, "Contas a pagar/receber", 0.66, 0.30, 0.24, lambda:telaContasAPagarEAReceber(self))
 
-        # NÃO REFATORADA  
+        # REFATORADA  
         criaBotao(frame, "Consultar estoque", 0.66, 0.36, 0.24, lambda:telaEstoque(self))
         
-        # NÃO REFATORADA
+        # REFATORADA
         criaBotao(frame, "Trocar usuário", 0.33, 0.80, 0.18, lambda:frame.destroy())

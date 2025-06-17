@@ -174,6 +174,25 @@ def telaGerarFaturamento(self, valorDoPedido):
     botaoVoltar = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Voltar", corner_radius=5, font=("Arial", 15), command=lambda: self.frameTelaGerarFaturamento.destroy())
     botaoVoltar.place(relx=0.1, rely=0.9, relwidth=0.15)
 
+    def printar(self):
+        print("==== Parcelas adicionadas ====")
+        for i in range(len(self.listaEntradaValor)):
+            forma_pagamento = self.listaComboboxes[i].get()
+            quantidade = self.listaEntradaQuantidade[i].get()
+            valor = self.listaEntradaValor[i].get()
+            print(f"Parcela {i+1}:")
+            print(f"  Forma de pagamento: {forma_pagamento}")
+            print(f"  Quantidade: {quantidade}")
+            print(f"  Valor: R$ {valor}")
+
+    # AO CLICAR NO BOTÃO SALVAR E FECHAR, 
+    # O FATURAMENTO DEVE IR PARA O BANCO DE DADOS, 
+    # EM UMA TABELA CHAMADOA "FATURAMENTO", 
+    # NESSA TABELA DEVEM SER SALVAS SUAS PARCELAS, ONDE NELAS ESTÃO INCLUSAS:
+    # SEU RESPECTIVO VALOR, SUA DATA, E QUANDO A DATA CHEGAR, ELA DEVE SER EXCLUÍDA
+    botaoVoltar = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Salvar e fechar", corner_radius=5, font=("Arial", 15), command=lambda:printar(self))
+    botaoVoltar.place(relx=0.5, rely=0.9, relwidth=0.15)
+
 def modal(self, teste):
     self.frame = ctk.CTkFrame(self.frameTelaGerarFaturamento)
     self.frame.place(relx=0.5, rely=0.5, relwidth=0.6, relheight=0.9, anchor="center")

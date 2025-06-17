@@ -20,7 +20,7 @@ def SalvaAlteracoesFaturamento(self, valor, qtdParcelas):
     self.frame.destroy()
 
 def calcularParcelasTotais(self, quantidade, valor):
-    valor = int(valor)
+    valor = float(valor)
     quantidade = int(quantidade)
     valordividido = valor/quantidade
     dataHoje = self.dataHojeFormatada
