@@ -6,9 +6,8 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
 
-def SalvaAlteracoesFaturamento(self, valor, qtdParcelas):
-    print(valor)
-    print(qtdParcelas)
+def SalvaAlteracoesFaturamento(self, valor, qtdParcelas, datas):
+    self.data=datas[4]
 
     for widget in self.frameTelaGerarFaturamento.winfo_children():
         try:

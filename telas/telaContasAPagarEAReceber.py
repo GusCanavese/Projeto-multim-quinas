@@ -36,11 +36,11 @@ def telaContasAPagarEAReceber(self):
     botaoCriaNovo = criaBotao(frame, "Registrar credito/débito", 0.15, 0.1, 0.15, lambda:creditoOuDebito())
     botaoCriaNovo.configure(fg_color="#006D5B")
 
-    criaBotao(frame, "Buscar", 0.15, 0.7, 0.15, lambda:filtrarContas.filtrarContas(self, frameContas, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(), self.datePickerInicio.get() if hasattr(self, "datePickerInicio") else None, self.datePickerFim.get() if hasattr(self, "datePickerFim") else None, self.selecionarPeriodo.get()))
+    criaBotao(frame, "Buscar", 0.15, 0.7, 0.15, lambda:filtrarContas.filtrarContas())
     criaBotao(frame, "Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
 
     # Cabeçalhos da tabela
-    colunas = ["Pedido", "Vendedor", "Data de emissão", "Subtotal", "Confirmação da venda"]
+    colunas = ["Vencimento", "Descriçao", "Descrição", "Total"]
     x = 0.03
     y = 0.05
 

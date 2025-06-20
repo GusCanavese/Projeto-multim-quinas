@@ -4,8 +4,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from datetime import date
 from funcoesTerceiras import calculaParcelasFaturamento
+from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvamentoDoFaturamento
+from componentes import criaBotao
 
-def telaGerarFaturamento(self, valorDoPedido):
+def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
 
     self.row=1
     self.frameTelaGerarFaturamento = ctk.CTkFrame(self)
@@ -174,24 +176,29 @@ def telaGerarFaturamento(self, valorDoPedido):
     botaoVoltar = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Voltar", corner_radius=5, font=("Arial", 15), command=lambda: self.frameTelaGerarFaturamento.destroy())
     botaoVoltar.place(relx=0.1, rely=0.9, relwidth=0.15)
 
-    def printar(self):
+    def salvarEFechar(self):
+        confirmarSalvamentoDoFaturamento(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, numero, pedido)
         print("==== Parcelas adicionadas ====")
         for i in range(len(self.listaEntradaValor)):
             forma_pagamento = self.listaComboboxes[i].get()
             quantidade = self.listaEntradaQuantidade[i].get()
             valor = self.listaEntradaValor[i].get()
+
             print(f"Parcela {i+1}:")
             print(f"  Forma de pagamento: {forma_pagamento}")
             print(f"  Quantidade: {quantidade}")
             print(f"  Valor: R$ {valor}")
+
+
+        self.frameTelaGerarFaturamento.destroy()
+        
 
     # AO CLICAR NO BOTÃO SALVAR E FECHAR, 
     # O FATURAMENTO DEVE IR PARA O BANCO DE DADOS, 
     # EM UMA TABELA CHAMADOA "FATURAMENTO", 
     # NESSA TABELA DEVEM SER SALVAS SUAS PARCELAS, ONDE NELAS ESTÃO INCLUSAS:
     # SEU RESPECTIVO VALOR, SUA DATA, E QUANDO A DATA CHEGAR, ELA DEVE SER EXCLUÍDA
-    botaoVoltar = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Salvar e fechar", corner_radius=5, font=("Arial", 15), command=lambda:printar(self))
-    botaoVoltar.place(relx=0.5, rely=0.9, relwidth=0.15)
+    criaBotao(self.frameTelaGerarFaturamento, "Salvar e fechar", 0.5, 0.95, 0.15, lambda: salvarEFechar(self))
 
 def modal(self, teste):
     self.frame = ctk.CTkFrame(self.frameTelaGerarFaturamento)
@@ -218,8 +225,6 @@ def modal(self, teste):
                 pass
         self.frame.destroy()
 
-    botaoSalvarEFechar = ctk.CTkButton(self.frame, corner_radius=0, width=100, height=10, text="Salvar e fechar", command= lambda:calculaParcelasFaturamento.SalvaAlteracoesFaturamento(self, entradasLista[0].get(), entradasLista[1].get()))
-    botaoSalvarEFechar.place(relx=0.14, rely=0.03)
 
     # campos do modal
     labels = ["Valor a pagar", "Qtd Parcelas", "repeticao", "Intervalo", "1ª parcela em:"]
@@ -284,6 +289,9 @@ def modal(self, teste):
     variaveis[0].set(teste)
     variaveis[3].set(0.00)
     variaveis[4].set(self.dataHojeFormatada)
+
+    botaoSalvarEFechar = ctk.CTkButton(self.frame, corner_radius=0, width=100, height=10, text="Salvar e fechar", command= lambda:calculaParcelasFaturamento.SalvaAlteracoesFaturamento(self, entradasLista[0].get(), entradasLista[1].get(), variaveis))
+    botaoSalvarEFechar.place(relx=0.14, rely=0.03)
 
     botaoFechar = ctk.CTkButton(self.frame, text="X", width=10, height=10, corner_radius=0, command=lambda:destroyModal(self))
     botaoFechar.place(relx=0.989, rely=0.018, anchor="center")

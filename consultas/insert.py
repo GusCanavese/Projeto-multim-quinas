@@ -28,7 +28,7 @@ class Insere:
         queryInserirFuncionario = "INSERT INTO funcionarios(nome, cargo, login, senha) VALUES(%s, %s, %s, %s);"
         db.cursor.execute(queryInserirFuncionario, (nome, cargo, login, senha,))
         db.conn.commit()
-        messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
+        messagebox.showinfo(title="Info", message="Registrado com Sucesso")
     
 
     def registraFornecedorNoBanco(dados):
@@ -44,6 +44,13 @@ class Insere:
     def insereClienteNoBanco(nome, CPF_CNPJ, IE, RG, endereco, CEP, numero, bairro, cidade):
         queryInserirCliente = "INSERT INTO clientes(nome, CPF_CNPJ, Inscricao_estadual, RG, Endereco, CEP, Numero, Bairro, Cidade_do_endereco) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);"
         db.cursor.execute(queryInserirCliente, (nome, CPF_CNPJ, IE, RG, endereco, CEP, numero, bairro, cidade,))
+        db.conn.commit()
+        messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
+
+
+    def registraFaturamentoNoBanco(confirmado, vencimento, descricao, total, formaPag, qtdParcelas):
+        queryInserirCliente = "INSERT INTO contasapagar(confirmado, vencimento, descricao, total, formaPag, qtdParcelas) VALUES(%s, %s, %s, %s, %s, %s);"
+        db.cursor.execute(queryInserirCliente, (confirmado, vencimento, descricao, total, formaPag, qtdParcelas))
         db.conn.commit()
         messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
 

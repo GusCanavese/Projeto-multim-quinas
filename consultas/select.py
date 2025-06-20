@@ -36,6 +36,12 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
     
+    def buscaContasAPagar():
+        queryBuscaCliente = "SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasapagar WHERE 1=1"
+        db.cursor.execute(queryBuscaCliente)
+        resultado = db.cursor.fetchall()
+        return resultado
+    
     def buscaPedidos(vendedor, numero, inicio, fim, checkbox):
         queryBuscaPedidos = "SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao, destinatario, cpf, endereco, itens FROM pedidos WHERE 1=1"
         parametros = []

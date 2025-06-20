@@ -41,7 +41,7 @@ def telaVerPedidos(self, p, d, desc):
 
     criaLabelDescritivo(frame, "Endereço",        0.02, 0.43, 0.35, "#38343c", ctk.StringVar(value=d[2]))
 
-    criaBotao(frame, 'Gerar faturamento', 0.495, 0.48, 0.15, lambda:telaGerarFaturamento(self, p[3]))
+    criaBotao(frame, 'Gerar faturamento', 0.495, 0.48, 0.15, lambda:telaGerarFaturamento(self, p[3], p[0], d[0]))
     criaBotao(frame, 'Voltar', 0.15, 0.95, 0.20, lambda:frame.destroy())
     botaoExclui = criaBotao(frame, 'Cancelar/Excluir pedido', 0.61, 0.95, 0.20, lambda:confirmarExclusaoDoPedido.confirmarExclusaoNoPedido(self, p[0], desc))
     botaoExclui.configure(fg_color="#8B0000")
