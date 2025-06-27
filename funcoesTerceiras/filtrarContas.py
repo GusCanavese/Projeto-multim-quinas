@@ -8,65 +8,64 @@ from telas.telaVerPedidos import telaVerPedidos
 import json
 from componentes import criaLabel, criaBotao
 
-def filtrarContas():
-    contas = Buscas.buscaContasAPagar()
-    print(contas)
+def filtrarContas(self, frame, pagina=1):
+    contasReceber = Buscas.buscaContasAReceber()
+    contasPagar = Buscas.buscaContasAPagar()
+    contas = contasReceber + contasPagar
 
-    COLOCAR NA TELA FILTRAR CONTAS, A MESMA TABELA QUE SE ENCONTRA NAS TELAS DE 
-    ESTOQUE E DE RELATÓRIO DE VENDAS, MAS COM OS DADOS DE CONTAS A PAGAR E RECEBER.
+    print(len(contas))
 
-    # # Remove dados anteriores da tabela
-    # if hasattr(self, "dadosTelaVerPedidos"):
-    #     for item in self.dadosTelaVerPedidos:
-    #         item.destroy()
-    # self.dadosTelaVerPedidos = []
+    if hasattr(self, "dadosTelaFiltrarContas"):
+        for item in self.dadosTelaFiltrarContas:
+            item.destroy()
+    self.dadosTelaFiltrarContas = []
 
-    # # Calcula o intervalo de pedidos a mostrar
-    # inicio_pedido = (pagina - 1) * 10
-    # fim_pedido = pagina * 10
-    # pedidos_pagina = pedidos[inicio_pedido:fim_pedido]
+    # Calcula o intervalo de pedidos a mostrar
+    inicioContas = (pagina - 1) * 10
+    fimContas = pagina * 10
+    contasPagina = contas[inicioContas:fimContas]
+    
+    y = 0.1
+    for rowProduto, conta in enumerate(contasPagina, start=1):
+        corDeFundo = "#1C60A0"
+        dadosProduto = [conta[0], conta[2], conta[1], conta[3], conta[4]]
+        dadosextras = [conta[0], conta[1], conta[2], conta[3], conta[4], conta[5]]
 
-    # y = 0.1
-    # for rowPedido, pedido in enumerate(pedidos_pagina, start=1):
-    #     if pedido[4] != "":
-    #         corDeFundo = "#196F3D" 
-    #         self.status = pedido[4]
-    #     else:
-    #         corDeFundo = "#922B21"
-    #         self.status = "Não confirmado"
 
-    #     dadosPedido = [pedido[0], pedido[2], pedido[1], pedido[3], self.status]
-    #     dadosExtras = [pedido[5], pedido[6], pedido[7]]
+        x = 0.03
+        for colNum, valor in enumerate(dadosProduto):
+            if colNum == 0:
+                label = criaLabel(frame, valor, x, y, 0.08, corDeFundo)
+                x+=0.085
+            elif colNum ==1:
+                label = criaLabel(frame, valor, x, y, 0.4, corDeFundo)
+                x+=0.405
+            elif colNum ==2:
+                label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
+                x+=0.175
+            elif colNum ==3:
+                label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
+                x+=0.175
 
-    #     dadosDoProdutoDoPedido = json.loads(pedido[8])
-    #     descricaoProdutos = [f"{produto['descricao']} {produto['quantidade']}" for produto in dadosDoProdutoDoPedido]
+            self.dadosTelaFiltrarContas.append(label)
 
-    #     x = 0.03
-    #     for colNum, valor in enumerate(dadosPedido):
-    #         label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
-    #         x += 0.175
-    #         self.dadosTelaVerPedidos.append(label)
+        btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=dadosextras: print("aopa"))
+        self.dadosTelaFiltrarContas.append(btn)
 
-    #     btn = criaBotao(frame, "Ver", 0.927, y, 0.05, lambda p=dadosPedido, d=dadosExtras, desc=descricaoProdutos: telaVerPedidos(self, p, d, desc))
-    #     self.dadosTelaVerPedidos.append(btn)
+        y += 0.045
+    
+    print(len(contasPagina))
+    if len(contas) > 10:
 
-    #     y += 0.045
+        
+        params = {
+            'pagina': pagina,
+        }
 
-    # # Adiciona botões de navegação se houver mais pedidos
-    # if len(pedidos) > 10:
-    #     params = {
-    #         'vendedor': vendedor,
-    #         'numero': numero,
-    #         'inicio': inicio,
-    #         'fim': fim,
-    #         'checkbox': checkbox,
-    #         'pagina': pagina
-    #     }
+        if pagina > 1:
+            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.6, 0.2, lambda p=params: filtrarContas(self, frame, p['pagina']-1))
+            self.dadosTelaFiltrarContas.append(btnAnterior)
 
-    #     if pagina > 1:
-    #         btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.6, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']-1))
-    #         self.dadosTelaVerPedidos.append(btnAnterior)
-
-    #     if fim_pedido < len(pedidos):
-    #         btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.6, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']+1))
-    #         self.dadosTelaVerPedidos.append(btnProxima)
+        if fimContas < len(contas):
+            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.6, 0.2, lambda p=params: filtrarContas(self, frame, p['pagina']+1))
+            self.dadosTelaFiltrarContas.append(btnProxima)

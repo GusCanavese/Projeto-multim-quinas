@@ -45,19 +45,20 @@ def pegarDadosDaNota(caminhoNota):
 
 
 
-def lerNotaFiscal(self):
+def lerNotaFiscal(self, frame):
 
     try:
         self.variavel.set(filedialog.askopenfilename())
 
         if self.variavel.get() != "":
             dados = pegarDadosDaNota(self.variavel.get())
-            buttonPegarDados = ctk.CTkButton(self.framePequeno, text="Prosseguir", command=lambda: telaRegistroCredito(self, dados))
-            buttonPegarDados.place(relx=0.4, rely=0.6)
+            buttonPegarDados = ctk.CTkButton(frame, text="Prosseguir", command=lambda: telaRegistroCredito(self, dados))
+            buttonPegarDados.place(relx=0.445, rely=0.6)
         else:
-            self.variavel.set("Nenhum ficheiro selecionado")
+            self.variavel.set("Nenhum arquivo selecionado")
 
-    except:
+    except NameError as e:
+        print(e)
         self.variavel.set("Arquivo escolhido não é valido")
 
     

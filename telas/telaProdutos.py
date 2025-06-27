@@ -3,12 +3,12 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from telas.telaTotais import telaTotais
+from componentes import criaFrame, criaBotao, criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox
 
 
 def telaProdutos(self, dadosNota):
-    frame = self.frameTelaProdutosETotais = ctk.CTkFrame(self)
-    frame.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
-    
+    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+
     variaveis = []
     lista = ["Produto", "Quantidade", "Valor", "Unitário", "Subtotal", "CFOP", "Em Estoque", "Totaliza Nota", "Desconto ($)", "Frete", "Seguro", "Outras"]
     posicaoX = 0.065
@@ -60,10 +60,8 @@ def telaProdutos(self, dadosNota):
                 entry.place(relx=posicaoX, rely=posicaoY, relwidth=0.066)
                 posicaoX += 0.07
                 variaveis.append(entry)
+
+    self.dadosNotaPegar.append(itens)
             
-
-    proximo = ctk.CTkButton(frame, text="Próximo - Totais", command=lambda:telaTotais(self, dadosNota))
-    proximo.place(relx=0.25, rely=0.94, relwidth=0.15, anchor="nw")
-
-    botaoVoltar = ctk.CTkButton(frame, text="Voltar", command=frame.destroy)
-    botaoVoltar.place(relx=0.05, rely=0.94, relwidth=0.15, anchor="nw")
+    criaBotao(frame, "proximo-totais", 0.25, 0.94, 0.15, lambda: telaTotais(self, dadosNota)).place(anchor="nw")
+    criaBotao(frame, "Voltar", 0.05, 0.94, 0.15, lambda: frame.destroy()).place(anchor="nw")

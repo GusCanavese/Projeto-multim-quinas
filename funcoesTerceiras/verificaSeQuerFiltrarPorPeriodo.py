@@ -37,15 +37,15 @@ def verificaSeQuerFiltrarPorPeriodoContas(self, frame, checkbox, event=None):
         print("teste")
         # Data Inicial
         self.labelDataInicio = ctk.CTkLabel(frame, text="Data Inicial:")
-        self.labelDataInicio.place(relx=0.05, rely=0.31, anchor="nw")
+        self.labelDataInicio.place(relx=0.7, rely=0.02, anchor="nw")
         self.datePickerInicio = DateEntry(frame, width=12, date_pattern="dd/MM/yyyy")
-        self.datePickerInicio.place(relx=0.05, rely=0.35, anchor="nw")
+        self.datePickerInicio.place(relx=0.7, rely=0.06, anchor="nw")
 
         # Data Final
         self.labelDataFim = ctk.CTkLabel(frame, text="Data Final:")
-        self.labelDataFim.place(relx=0.19, rely=0.31, anchor="nw")
+        self.labelDataFim.place(relx=0.8, rely=0.02, anchor="nw")
         self.datePickerFim = DateEntry(frame, width=12, date_pattern="dd/MM/yyyy")
-        self.datePickerFim.place(relx=0.19, rely=0.35, anchor="nw")
+        self.datePickerFim.place(relx=0.8, rely=0.06, anchor="nw")
     else:
         self.labelDataInicio.destroy()
         del self.labelDataInicio

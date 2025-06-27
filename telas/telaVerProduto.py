@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras import confirmarExclusaoDoProduto, confirmarAlteracoesNoProduto
-from componentes import criaFrame, criaLabelDescritivo, criaBotao, criarLabelEntry
+from componentes import criaFrame, criaLabelDescritivo, criaBotao, criarLabelEntry;
 
 
 def telaVerProduto(self, p):

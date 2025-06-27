@@ -9,7 +9,7 @@ from telas.telaObservacoes import telaObservacoes
 
 
 def telaTransporte(self, dadosNota):
-    frame = criaFrame(self, 0.03, 0.05, 0.94, 0.9)
+    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
 
 
     # opções

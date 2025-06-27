@@ -9,13 +9,15 @@ from componentes import criaFrame, criaLabel, criaBotao, criaComboBox, criarLabe
 
 def telaContasAPagarEAReceber(self):
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
-    frameContas = criaFrame(frame, 0.65, 0.5, 0.68, 0.93)
+    frameContas = criaFrame(frame, 0.5, 0.65, 0.95, 0.93)
     opcoes = ["Nenhum", "Entrada/Débito", "Saída/Crédito"]
 
-    self.filtrarPorNumero = criarLabelEntry(frame,"Filtrar pelo Nº", 0.04, 0.5, 0.22, None)
+    self.filtrarPorNumero = criarLabelEntry(frame,"Filtrar pelo Nº", 0.25, 0.01, 0.22, None)
+    criaBotao(frame, "Buscar", 0.36, 0.11, 0.22, lambda:filtrarContas.filtrarContas(self, frameContas))
+
     
     self.selecionarPeriodoContas = ctk.CTkCheckBox(frame, text="Selecionar período")
-    self.selecionarPeriodoContas.place(relx=0.05, rely=0.27, anchor="nw")
+    self.selecionarPeriodoContas.place(relx=0.55, rely=0.03, anchor="nw")
     self.selecionarPeriodoContas.bind("<Button-1>", command=lambda event: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodoContas(self, frame, self.selecionarPeriodoContas.get(), event))
 
     def escolheTela(valor):
@@ -28,24 +30,31 @@ def telaContasAPagarEAReceber(self):
     def creditoOuDebito():
         if hasattr(self, "creditoOuDebito"):
             self.creditoOuDebito.destroy()
-            self.creditoOuDebito = criaComboBox(frame, 0.15, 0.2, 0.15, opcoes, lambda valor:escolheTela(valor))
+            self.creditoOuDebito = criaComboBox(frame, 0.1, 0.11, 0.15, opcoes, lambda valor:escolheTela(valor))
         else:
-            self.creditoOuDebito = criaComboBox(frame, 0.15, 0.2, 0.15, opcoes, lambda valor:escolheTela(valor))
+            self.creditoOuDebito = criaComboBox(frame, 0.1, 0.11, 0.15, opcoes, lambda valor:escolheTela(valor))
 
             
-    botaoCriaNovo = criaBotao(frame, "Registrar credito/débito", 0.15, 0.1, 0.15, lambda:creditoOuDebito())
-    botaoCriaNovo.configure(fg_color="#006D5B")
-
-    criaBotao(frame, "Buscar", 0.15, 0.7, 0.15, lambda:filtrarContas.filtrarContas())
+    criaBotao(frame, "Registrar credito/débito", 0.1, 0.05, 0.15, lambda:creditoOuDebito()).configure(fg_color="#006D5B")
     criaBotao(frame, "Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
 
     # Cabeçalhos da tabela
-    colunas = ["Vencimento", "Descriçao", "Descrição", "Total"]
+    colunas = ["Confirmado", "Descriçao", "Vencimento", "Total"]
     x = 0.03
     y = 0.05
 
     for i, coluna in enumerate(colunas):
-        criaLabel(frameContas, coluna, x, y, 0.17, "#2C3E50")
-        x+=0.175
+        if i == 0:
+            criaLabel(frameContas, coluna, x, y, 0.08, "#2C3E50")
+            x+=0.085
+        elif i == 1:
+            criaLabel(frameContas, coluna, x, y, 0.4, "#2C3E50")
+            x+=0.405
+        elif i == 2:
+            criaLabel(frameContas, coluna, x, y, 0.17, "#2C3E50")
+            x+=0.175
+        elif i == 3:
+            criaLabel(frameContas, coluna, x, y, 0.17, "#2C3E50")
+            x+=0.175
 
  

@@ -38,7 +38,7 @@ def telaGerarFaturamentoEntradaNota(self, dadosNota):
 
     self.botaoAdicionarParcela = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Adicionar Parcela", width=20, corner_radius=0, command=lambda:verificaParcelasPreenchidas(self)) 
     
-
+    
     labelEntradasTotais = ctk.CTkLabel(self.frameValorTotais, text="Total")
     labelEntradasTotais.place(relx=0.6, rely = 0.10)
     self.entradasTotais = ctk.CTkEntry(self.frameValorTotais, textvariable=self.totaisFormasDePagamento)

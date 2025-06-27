@@ -36,8 +36,14 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
     
+    def buscaContasAReceber():
+        queryBuscaCliente = "SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasareceber"
+        db.cursor.execute(queryBuscaCliente)
+        resultado = db.cursor.fetchall()
+        return resultado
+    
     def buscaContasAPagar():
-        queryBuscaCliente = "SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasapagar WHERE 1=1"
+        queryBuscaCliente = "SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasapagar"
         db.cursor.execute(queryBuscaCliente)
         resultado = db.cursor.fetchall()
         return resultado
@@ -85,3 +91,6 @@ class Buscas:
 
         return resultado
     
+
+
+

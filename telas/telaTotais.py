@@ -26,18 +26,31 @@ def telaTotais(self, dadosNota):
     variavelTotalCOFINS = ctk.StringVar()
     variavelValorLiquido = ctk.StringVar()
     variavelBCdoIRRF = ctk.StringVar()
-    variavelBCdoIRRF.set(dadosNota["NFe"]["infNFe"]["total"]["retTrib"]["vBCIRRF"]["#text"])
-    variavelValorLiquido.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vNF"]["#text"])
-    variavelTotalCOFINS.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vCOFINS"]["#text"])
-    variavelTotalICMSST.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vST"]["#text"])
-    variavelICMSCompleto.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vICMSDeson"]["#text"])
-    variavelTotalIPI.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vIPI"]["#text"])
-    variavelTotalPis.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vPIS"]["#text"])
-    variavelBcImcsST.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vBCST"]["#text"])
-    variavelIMCS.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vICMSDeson"]["#text"] )
-    variavelTotalBCIMS.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vBC"]["#text"])
-    variavelOutrasDespesas.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vIPI"]["#text"])
-    variavelValorTotalProdutos.set(dadosNota["NFe"]["infNFe"]["total"]["ICMSTot"]["vProd"]["#text"])
+    
+    def get_nfe_value(data, path, default="0.00"):
+        """Acessa valores aninhados no dict da NFe com fallback seguro"""
+        keys = path.split('/')
+        current = data
+        for key in keys:
+            if isinstance(current, dict) and key in current:
+                current = current[key]
+            else:
+                return default
+        return current.get("#text", current) if isinstance(current, dict) else current
+
+    # Acessando os dados de forma segura:
+    variavelBCdoIRRF.set(get_nfe_value(dadosNota, "NFe/infNFe/total/retTrib/vBCIRRF"))
+    variavelValorLiquido.set(get_nfe_value(dadosNota, "NFe/infNFe/total/ICMSTot/vNF"))
+    variavelTotalCOFINS.set(get_nfe_value(dadosNota, "NFe/infNFe/total/ICMSTot/vCOFINS"))
+    variavelTotalICMSST.set(get_nfe_value(dadosNota, "NFe/infNFe/total/ICMSTot/vST"))
+    variavelICMSCompleto.set(get_nfe_value(dadosNota, "NFe/infNFe/total/ICMSTot/vICMSDeson"))
+    variavelTotalIPI.set(get_nfe_value(dadosNota, "NFe/infNFe/total/ICMSTot/vIPI"))
+    variavelTotalPis.set(get_nfe_value(dadosNota, "NFe/infNFe/total/ICMSTot/vPIS"))
+    variavelBcImcsST.set(get_nfe_value(dadosNota, "NFe/infNFe/total/ICMSTot/vBCST"))
+    variavelIMCS.set(get_nfe_value(dadosNota, "NFe/infNFe/total/ICMSTot/vICMSDeson"))
+    variavelTotalBCIMS.set(get_nfe_value(dadosNota, "NFe/infNFe/total/ICMSTot/vBC"))
+    variavelOutrasDespesas.set(get_nfe_value(dadosNota, "NFe/infNFe/total/ICMSTot/vOutro"))  # Alterado para vOutro que é o campo correto
+    variavelValorTotalProdutos.set(get_nfe_value(dadosNota, "NFe/infNFe/total/ICMSTot/vProd"))
 
 
     criarLabelLateralEntry(frame, "Total frete",     0.1, 0.05, 0.11, none)
@@ -76,6 +89,7 @@ def telaTotais(self, dadosNota):
     criarLabelLateralEntry(frame, "Valor Retido IRRF",        0.35, 0.50, 0.11, none)
     criarLabelLateralEntry(frame, "BC da Previdência Social", 0.35, 0.55, 0.11, none)
     criarLabelLateralEntry(frame, "VR Previdência Social",    0.35, 0.60, 0.11, none)
+
 
     
     proximo = ctk.CTkButton(frame, text="Próximo - Tela de faturamento", command=lambda:telaGerarFaturamentoEntradaNota(self, dadosNota))

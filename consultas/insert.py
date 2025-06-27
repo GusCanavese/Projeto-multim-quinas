@@ -89,3 +89,32 @@ class Insere:
         
         db.conn.commit()
         print("Pedido salvo com sucesso!")
+
+    def inserir_nota_fiscal(chave_nfe, numero_nfe, serie_nfe, data_emissao, data_saida,
+                       emitente_cnpj, emitente_nome, destinatario_cnpj, destinatario_nome,
+                       valor_total, valor_produtos, valor_bc_icms, valor_icms,
+                       valor_icms_desonerado, valor_bc_icms_st, valor_icms_st,
+                       valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
+                       transportadora_cnpj, transportadora_nome, itens_json):
+   
+        query = """INSERT INTO notasFiscais (
+            chave_nfe, numero_nfe, serie_nfe, data_emissao, data_saida,
+            emitente_cnpj, emitente_nome, destinatario_cnpj, destinatario_nome,
+            valor_total, valor_produtos, valor_bc_icms, valor_icms,
+            valor_icms_desonerado, valor_bc_icms_st, valor_icms_st,
+            valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
+            transportadora_cnpj, transportadora_nome, itens
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
+        
+        dados = (
+            chave_nfe, numero_nfe, serie_nfe, data_emissao, data_saida,
+            emitente_cnpj, emitente_nome, destinatario_cnpj, destinatario_nome,
+            valor_total, valor_produtos, valor_bc_icms, valor_icms,
+            valor_icms_desonerado, valor_bc_icms_st, valor_icms_st,
+            valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
+            transportadora_cnpj, transportadora_nome, itens_json
+        )
+        
+        db.cursor.execute(query, dados)
+        db.conn.commit()
+        messagebox.showinfo("Sucesso", "Nota fiscal inserida com sucesso!")

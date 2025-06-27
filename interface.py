@@ -49,7 +49,9 @@ class App(ctk.CTk):
         # telas.telaGerarPedido.telaGerarPedido(self)
         # telas.telaRelatorioDeVendas.telaRelatorioDeVendas(self)
         telas.telaContasAPagarEAReceber.telaContasAPagarEAReceber(self)
+        # telas.telaProdutos.telaProdutos(self)
         # telas.telaLogin.telaLogin(self)
+        
 
 
 
