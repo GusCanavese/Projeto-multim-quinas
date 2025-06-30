@@ -49,7 +49,7 @@ class Insere:
 
 
     def registraFaturamentoNoBanco(confirmado, vencimento, descricao, total, formaPag, qtdParcelas):
-        queryInserirCliente = "INSERT INTO contasapagar(confirmado, vencimento, descricao, total, formaPag, qtdParcelas) VALUES(%s, %s, %s, %s, %s, %s);"
+        queryInserirCliente = "INSERT INTO contasareceber(confirmado, vencimento, descricao, total, formaPag, qtdParcelas) VALUES(%s, %s, %s, %s, %s, %s);"
         db.cursor.execute(queryInserirCliente, (confirmado, vencimento, descricao, total, formaPag, qtdParcelas))
         db.conn.commit()
         messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
@@ -97,7 +97,7 @@ class Insere:
                        valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
                        transportadora_cnpj, transportadora_nome, itens_json):
    
-        query = """INSERT INTO notasFiscais (
+        query = """INSERT INTO contasapagar (
             chave_nfe, numero_nfe, serie_nfe, data_emissao, data_saida,
             emitente_cnpj, emitente_nome, destinatario_cnpj, destinatario_nome,
             valor_total, valor_produtos, valor_bc_icms, valor_icms,

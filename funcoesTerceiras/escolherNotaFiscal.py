@@ -10,11 +10,6 @@ from componentes import criaFrame
 def escolherNotaFiscal(self):
     self.variavel = ctk.StringVar()
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
-    # framePequeno = criaFrame(self, 0.5, 0.5, 0.5, 0.5)
-    # framePequeno.place(anchor="center")
-
-    # framePequeno = ctk.CTkFrame(frame)
-    # framePequeno.place(relx=0.5, rely=0.5, relwidth=0.5, relheight=0.5, anchor="center")
 
     self.variavel.set("Nenhum arquivo selecionado")
 

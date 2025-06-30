@@ -43,7 +43,7 @@ class Buscas:
         return resultado
     
     def buscaContasAPagar():
-        queryBuscaCliente = "SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasapagar"
+        queryBuscaCliente = "SELECT * FROM contasapagar"
         db.cursor.execute(queryBuscaCliente)
         resultado = db.cursor.fetchall()
         return resultado
