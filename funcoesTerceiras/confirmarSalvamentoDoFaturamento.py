@@ -2,6 +2,8 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from tkinter import messagebox
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from consultas.update import Atualiza
 from consultas.insert import Insere
 
@@ -15,6 +17,16 @@ def confirmarSalvamentoDoFaturamento(self, quantidade, valor, formaPag, data, pe
         dataFaturamento = data.get()
         descricao = f"lançamento referente ao pedido de número {pedido}, com o cliente {cliente}"
 
-        Insere.registraFaturamentoNoBanco(confirmado, dataFaturamento, descricao, valorTotal, formaPagamento, qtdParcelas)
+        dataBase = datetime.strptime(dataFaturamento, "%d/%m/%Y")
+        
+        valorParcela = round(float(valorTotal) / int(qtdParcelas), 2)
+
+        for i in range(int(qtdParcelas)):
+            dataParcela = dataBase + relativedelta(months=+ (i + 1))
+            dataFormatada = dataParcela.strftime("%Y-%m-%d")
+
+            Insere.registraFaturamentoNoBanco(confirmado, dataFormatada, descricao, valorParcela, formaPagamento, 1)
+        messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
+
     else:
         pass

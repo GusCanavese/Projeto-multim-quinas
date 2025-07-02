@@ -42,10 +42,22 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
     
-    def buscaContasAPagar():
-        queryBuscaCliente = "SELECT * FROM contasapagar"
-        db.cursor.execute(queryBuscaCliente)
+    def buscaContasAPagar(valor, inicio, fim):
+        queryBuscaCliente = f"""SELECT confirmado, data_vencimento, descricao,  valor_total, numero_nfe, emitente_nome FROM contasapagar
+        where 
+        confirmado like %s
+        or data_vencimento like %s
+        or descricao like %s    
+        or valor_total like %s
+        or numero_nfe like %s"""
+
+        if inicio:
+            queryBuscaCliente += " AND data_vencimento BETWEEN %s AND %s"
+            db.cursor.execute(queryBuscaCliente, (f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", inicio, fim))
+
+        db.cursor.execute(queryBuscaCliente, (f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%"))
         resultado = db.cursor.fetchall()
+        print(resultado)
         return resultado
     
     def buscaPedidos(vendedor, numero, inicio, fim, checkbox):

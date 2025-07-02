@@ -6,12 +6,17 @@ from datetime import date
 import json
 from consultas.insert import Insere
 from funcoesTerceiras import calculaParcelasFaturamento
-from componentes import criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox, criaFrame, criaBotao
+from componentes import criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox, criaFrame, criaBotao, criaLabel
 
 
 def telaObservacoes(self, dadosNota):
+
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
-    
+    criaLabel(frame, "Observações", 0.05, 0.01, 0.2, "#2C3E50")
+
+
+    text_area = ctk.CTkTextbox(frame, width=400, height=150)
+    text_area.pack(pady=20)
     def safe_get(dados, path, default=""):
         """Acessa dados aninhados de forma segura"""
         keys = path.split('.')
@@ -22,6 +27,7 @@ def telaObservacoes(self, dadosNota):
             else:
                 return default
         return current.get("#text", current) if isinstance(current, dict) else current
+
 
     # Extrair todos os dados necessários
     dados_insercao = {
@@ -47,6 +53,8 @@ def telaObservacoes(self, dadosNota):
         'valor_bc_irrf': safe_get(dadosNota, "NFe.infNFe.total.retTrib.vBCIRRF", "0"),
         'transportadora_cnpj': safe_get(dadosNota, "NFe.infNFe.transp.transporta.CNPJ", ""),
         'transportadora_nome': safe_get(dadosNota, "NFe.infNFe.transp.transporta.xNome", ""),
+        'data_vencimento': safe_get(dadosNota, "NFe.infNFe.cobr.dup.dVenc", "")
+
     }
 
     # Preparar itens da nota
@@ -66,7 +74,8 @@ def telaObservacoes(self, dadosNota):
             'cfop': safe_get(item, "prod.CFOP"),
             'ncm': safe_get(item, "prod.NCM"),
             'cest': safe_get(item, "prod.CEST", ""),
-            'ean': safe_get(item, "prod.cEAN", "")
+            'ean': safe_get(item, "prod.cEAN", ""),
+
         })
 
     # Adicionar itens ao dicionário de dados

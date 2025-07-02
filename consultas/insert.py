@@ -52,7 +52,6 @@ class Insere:
         queryInserirCliente = "INSERT INTO contasareceber(confirmado, vencimento, descricao, total, formaPag, qtdParcelas) VALUES(%s, %s, %s, %s, %s, %s);"
         db.cursor.execute(queryInserirCliente, (confirmado, vencimento, descricao, total, formaPag, qtdParcelas))
         db.conn.commit()
-        messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
 
     
     def registraPedidoNoBanco(dadosPedido):        
@@ -95,26 +94,37 @@ class Insere:
                        valor_total, valor_produtos, valor_bc_icms, valor_icms,
                        valor_icms_desonerado, valor_bc_icms_st, valor_icms_st,
                        valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
-                       transportadora_cnpj, transportadora_nome, itens_json):
-   
-        query = """INSERT INTO contasapagar (
-            chave_nfe, numero_nfe, serie_nfe, data_emissao, data_saida,
-            emitente_cnpj, emitente_nome, destinatario_cnpj, destinatario_nome,
-            valor_total, valor_produtos, valor_bc_icms, valor_icms,
-            valor_icms_desonerado, valor_bc_icms_st, valor_icms_st,
-            valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
-            transportadora_cnpj, transportadora_nome, itens
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
+                       transportadora_cnpj, transportadora_nome, itens_json, data_vencimento):
+        print(data_vencimento)
         
-        dados = (
-            chave_nfe, numero_nfe, serie_nfe, data_emissao, data_saida,
-            emitente_cnpj, emitente_nome, destinatario_cnpj, destinatario_nome,
-            valor_total, valor_produtos, valor_bc_icms, valor_icms,
-            valor_icms_desonerado, valor_bc_icms_st, valor_icms_st,
-            valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
-            transportadora_cnpj, transportadora_nome, itens_json
-        )
+        resposta = messagebox.askquestion("Aviso", "Você tem certeza que deseja inserir essa nota fiscal?")
+        if resposta == 'yes':
+            descricao = f"lançamento referente a nota {numero_nfe}, com o fornecedor {emitente_nome}"
+            confirmado = "Não"
+
+            query = """INSERT INTO contasapagar (
+                chave_nfe, numero_nfe, serie_nfe, data_emissao, data_saida,
+                emitente_cnpj, emitente_nome, destinatario_cnpj, destinatario_nome,
+                valor_total, valor_produtos, valor_bc_icms, valor_icms,
+                valor_icms_desonerado, valor_bc_icms_st, valor_icms_st,
+                valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
+                transportadora_cnpj, transportadora_nome, itens, data_vencimento, confirmado, descricao 
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
+            
+            dados = (
+                chave_nfe, numero_nfe, serie_nfe, data_emissao, data_saida,
+                emitente_cnpj, emitente_nome, destinatario_cnpj, destinatario_nome,
+                valor_total, valor_produtos, valor_bc_icms, valor_icms,
+                valor_icms_desonerado, valor_bc_icms_st, valor_icms_st,
+                valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
+                transportadora_cnpj, transportadora_nome, itens_json, data_vencimento, confirmado, descricao, 
+            )
+            
+            db.cursor.execute(query, dados)
+            db.conn.commit()
+            messagebox.showinfo("Sucesso", "Nota fiscal inserida com sucesso!")
+
+
+        else:
+            pass
         
-        db.cursor.execute(query, dados)
-        db.conn.commit()
-        messagebox.showinfo("Sucesso", "Nota fiscal inserida com sucesso!")

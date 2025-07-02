@@ -1,19 +1,17 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-import customtkinter as ctk
 from consultas.select import Buscas 
-import tkinter as tk
-from telas.telaVerPedidos import telaVerPedidos
-import json
+from datetime import datetime
+from decimal import Decimal
 from componentes import criaLabel, criaBotao
 
-def filtrarContas(self, frame, pagina=1):
+def filtrarContas(self, frame, valor, pagina=1):
     contasReceber = Buscas.buscaContasAReceber()
-    contasPagar = Buscas.buscaContasAPagar()
+    contasPagar = Buscas.buscaContasAPagar(valor)
     contas = contasReceber + contasPagar
 
-    print(len(contas))
+
 
     if hasattr(self, "dadosTelaFiltrarContas"):
         for item in self.dadosTelaFiltrarContas:
@@ -26,25 +24,54 @@ def filtrarContas(self, frame, pagina=1):
     contasPagina = contas[inicioContas:fimContas]
     
     y = 0.1
+    # print(contas)
+    # print("=###==###=###==###==###==###==###==###==###==###==###==###==###==###=")
+    # print(contasPagina)
+
     for rowProduto, conta in enumerate(contasPagina, start=1):
         corDeFundo = "#1C60A0"
         dadosProduto = [conta[0], conta[2], conta[1], conta[3], conta[4]]
         dadosextras = [conta[0], conta[1], conta[2], conta[3], conta[4], conta[5]]
-
+        try:
+            datetime.strptime(conta[1], "%d/%m/%Y")
+        except:
+            dataOriginal = dadosProduto[2]
+            dataOriginal = str(dataOriginal)
+            try:
+                dataFormatada = datetime.strptime(dataOriginal, "%Y-%m-%d").strftime("%d/%m/%Y")
+            except:
+                dataFormatada = datetime.strptime(dataOriginal, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y")
+            dadosProduto[2] = dataFormatada
 
         x = 0.03
+
+
         for colNum, valor in enumerate(dadosProduto):
             if colNum == 0:
+                if "Não" in conta[0]:
+                    corDeFundo = "#922B21"
+                elif "Sim" in conta[2]:
+                    corDeFundo = "#196F3D"
                 label = criaLabel(frame, valor, x, y, 0.08, corDeFundo)
                 x+=0.085
             elif colNum ==1:
+                corDeFundo = "#1C60A0"
                 label = criaLabel(frame, valor, x, y, 0.4, corDeFundo)
                 x+=0.405
             elif colNum ==2:
+                corDeFundo = "#1C60A0"
                 label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
                 x+=0.175
             elif colNum ==3:
-                label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
+                if "lançamento referente a nota" in conta[2]:
+                    valor1 = conta[3]
+                    valor1 = valor *-1
+                    corDeFundo = "#922B21"
+                    label = criaLabel(frame, valor1, x, y, 0.17, corDeFundo)
+                if "lançamento referente ao pedido" in conta[2]:
+                    corDeFundo = "#196F3D" 
+                    label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
+                
                 x+=0.175
 
             self.dadosTelaFiltrarContas.append(label)
@@ -54,7 +81,6 @@ def filtrarContas(self, frame, pagina=1):
 
         y += 0.045
     
-    print(len(contasPagina))
     if len(contas) > 10:
 
         

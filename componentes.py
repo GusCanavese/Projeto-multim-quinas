@@ -70,7 +70,7 @@ def criaSimouNao(frame, texto, textobt1, textobt2, relx, rely, comando):
     return botao1, botao2, label, variavel
 
 def criaLabel(frame, texto, relx, rely, width, cor):
-    label = ctk.CTkLabel(frame, text=texto, fg_color=cor)
+    label = ctk.CTkLabel(frame, text=texto, fg_color=cor, wraplength=450)
     label.place(relx=relx, rely=rely, relwidth=width, anchor="w")
     return label
 
