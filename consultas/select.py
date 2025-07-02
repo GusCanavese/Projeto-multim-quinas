@@ -36,14 +36,26 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
     
-    def buscaContasAReceber():
-        queryBuscaCliente = "SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasareceber"
-        db.cursor.execute(queryBuscaCliente)
+    def buscaContasAReceber(valor, inicio, fim):
+        queryBuscaCliente = """SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasareceber
+        where
+        confirmado like %s
+        or vencimento like %s
+        or descricao like %s
+        or total like %s
+        or formaPag like %s
+        or qtdParcelas like %s"""
+        if inicio:
+            queryBuscaCliente += " AND vencimento BETWEEN %s AND %s"
+            db.cursor.execute(queryBuscaCliente, (f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", inicio, fim))
+        else:
+            db.cursor.execute(queryBuscaCliente, (f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%",))
         resultado = db.cursor.fetchall()
         return resultado
     
     def buscaContasAPagar(valor, inicio, fim):
-        queryBuscaCliente = f"""SELECT confirmado, data_vencimento, descricao,  valor_total, numero_nfe, emitente_nome FROM contasapagar
+        print(inicio, fim)
+        queryBuscaCliente = """SELECT confirmado, data_vencimento, descricao,  valor_total, numero_nfe, emitente_nome FROM contasapagar
         where 
         confirmado like %s
         or data_vencimento like %s
@@ -52,12 +64,18 @@ class Buscas:
         or numero_nfe like %s"""
 
         if inicio:
+            queryBuscaCliente = """SELECT confirmado, data_vencimento, descricao,  valor_total, numero_nfe, emitente_nome FROM contasapagar
+            where 
+            confirmado like %s
+            or descricao like %s    
+            or valor_total like %s
+            or numero_nfe like %s"""
             queryBuscaCliente += " AND data_vencimento BETWEEN %s AND %s"
-            db.cursor.execute(queryBuscaCliente, (f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", inicio, fim))
+            db.cursor.execute(queryBuscaCliente, (f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", inicio, fim))
+        else:
+            db.cursor.execute(queryBuscaCliente, (f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%",))
 
-        db.cursor.execute(queryBuscaCliente, (f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%"))
         resultado = db.cursor.fetchall()
-        print(resultado)
         return resultado
     
     def buscaPedidos(vendedor, numero, inicio, fim, checkbox):

@@ -6,9 +6,22 @@ from datetime import datetime
 from decimal import Decimal
 from componentes import criaLabel, criaBotao
 
+#! PARA A BUSCA COM DATAS FUNCIONAR, 
+# É NECESSÁRIO CADASTRAR A CONTAARECEBER 
+# E PAGAR COM O FORMATO DATETIME SEM A 
+# HORA, SOMENTE COM A DATA
 def filtrarContas(self, frame, valor, pagina=1):
-    contasReceber = Buscas.buscaContasAReceber()
-    contasPagar = Buscas.buscaContasAPagar(valor)
+    if hasattr(self, "datePickerInicio") and hasattr(self, "datePickerFim"):
+        inicio = self.datePickerInicio.get()
+        fim = self.datePickerFim.get()
+        inicio = datetime.strptime(inicio, "%d/%m/%Y").strftime("%Y-%m-%d")
+        fim = datetime.strptime(fim, "%d/%m/%Y").strftime("%Y-%m-%d")
+    else:
+        inicio = None
+        fim = None
+
+    contasReceber = Buscas.buscaContasAReceber(valor, inicio, fim)
+    contasPagar = Buscas.buscaContasAPagar(valor, inicio, fim)
     contas = contasReceber + contasPagar
 
 
