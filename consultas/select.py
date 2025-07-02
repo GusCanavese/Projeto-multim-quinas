@@ -55,19 +55,40 @@ class Buscas:
     
     def buscaContasAPagar(valor, inicio, fim):
         print(inicio, fim)
-        queryBuscaCliente = """SELECT confirmado, data_vencimento, descricao,  valor_total, numero_nfe, emitente_nome FROM contasapagar
-        where 
+         
+        # serie_nfe, 
+        # data_emissao, 
+        # data_saida, 
+        # emitente_cnpj, 
+        # destinatario_cnpj, 
+        # destinatario_nome,  
+        # valor_produtos, 
+        # valor_bc_icms, 
+        # valor_icms, 
+        # valor_icms_desonerado, 
+        # valor_bc_icms_st, 
+        # valor_icms_st, 
+        # valor_ipi, 
+        # valor_pis, 
+        # alor_cofins, 
+        # valor_bc_irrf, 
+        # transportadora_cnpj, 
+        # transportadora_nome, 
+        # itens, 
+        # data_registro, confirmado, descricao, 
+        queryBuscaCliente = """SELECT confirmado, data_vencimento, descricao, valor_total, numero_nfe, emitente_nome, chave_nfe, serie_nfe, data_emissao, data_saida, emitente_cnpj, destinatario_cnpj, destinatario_nome, valor_produtos, valor_bc_icms, valor_icms, valor_icms_desonerado, valor_bc_icms_st, valor_icms_st, valor_ipi, valor_pis, valor_cofins, valor_bc_irrf, transportadora_cnpj, transportadora_nome, itens, data_registro FROM contasapagar;
+        where
         confirmado like %s
         or data_vencimento like %s
-        or descricao like %s    
+        or descricao like %s
         or valor_total like %s
         or numero_nfe like %s"""
 
         if inicio:
             queryBuscaCliente = """SELECT confirmado, data_vencimento, descricao,  valor_total, numero_nfe, emitente_nome FROM contasapagar
-            where 
+            where
             confirmado like %s
-            or descricao like %s    
+            or descricao like %s
             or valor_total like %s
             or numero_nfe like %s"""
             queryBuscaCliente += " AND data_vencimento BETWEEN %s AND %s"

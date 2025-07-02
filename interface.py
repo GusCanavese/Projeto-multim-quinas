@@ -21,6 +21,7 @@ import telas.telaRelatorioDeVendas
 import telas.telaTotais
 import telas.telaTransporte
 import telas.telaVerPedidos
+import telas.telaVercontasApagar
 import telas.telagerarFaturamento
 import telas.telaContasAPagarEAReceber
 # import random

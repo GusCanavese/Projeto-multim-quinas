@@ -3,9 +3,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from consultas.select import Buscas 
 from datetime import datetime
-from decimal import Decimal
 from componentes import criaLabel, criaBotao
-
+from telas.telaVercontasApagar import telaVercontasApagar
 #! PARA A BUSCA COM DATAS FUNCIONAR, 
 # É NECESSÁRIO CADASTRAR A CONTAARECEBER 
 # E PAGAR COM O FORMATO DATETIME SEM A 
@@ -37,14 +36,11 @@ def filtrarContas(self, frame, valor, pagina=1):
     contasPagina = contas[inicioContas:fimContas]
     
     y = 0.1
-    # print(contas)
-    # print("=###==###=###==###==###==###==###==###==###==###==###==###==###==###=")
-    # print(contasPagina)
 
     for rowProduto, conta in enumerate(contasPagina, start=1):
         corDeFundo = "#1C60A0"
         dadosProduto = [conta[0], conta[2], conta[1], conta[3], conta[4]]
-        dadosextras = [conta[0], conta[1], conta[2], conta[3], conta[4], conta[5]]
+        print(dadosProduto)
         try:
             datetime.strptime(conta[1], "%d/%m/%Y")
         except:
@@ -89,7 +85,7 @@ def filtrarContas(self, frame, valor, pagina=1):
 
             self.dadosTelaFiltrarContas.append(label)
 
-        btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=dadosextras: print("aopa"))
+        btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=conta: telaVercontasApagar(self, p))
         self.dadosTelaFiltrarContas.append(btn)
 
         y += 0.045
