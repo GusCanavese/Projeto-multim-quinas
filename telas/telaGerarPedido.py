@@ -17,7 +17,10 @@ def telaGerarPedido(self):
     self.posicaox = 0.024
     self.posicaoyBotao = 0.231
     self.posicaoyBotaoRemover = 0.191
+    self.contadorDeLinhas =0
+    self.yNovo = 0.24
     linhas_widgets = []
+    self.linhas = []
 
 
     # usuarioLogado = self.login.get()
@@ -75,50 +78,56 @@ def telaGerarPedido(self):
         for label in self.resultadoLabels: 
             label.destroy()
 
-    def buscaProduto(event=None):
-        nomeDoProduto = entradaProdutoPesquisado.get()
-        Buscas.buscaProduto(nomeDoProduto)
-
+    def buscaProduto(nomeDoProduto, entradaProduto, yNovo):
         if hasattr(self, "resultadoLabelsProduto"):
             for label in self.resultadoLabelsProduto:
                 label.destroy()
 
         self.resultadoLabelsProduto = []
-        yNovo = 0.24
 
         for i, row in enumerate(Buscas.buscaProduto(nomeDoProduto)):
-            if i >=3: break
-            label = criaBotao(frameParaItensNoFrame, row[0], 0.195, yNovo, 0.26, lambda nome=row[0], valor=row[1], quantidade=row[2]: selecionaProduto(nome, valor, quantidade))
+            if i >= 3:
+                break
+            label = criaBotao(frameParaItensNoFrame,row[0],0.195,yNovo + i * 0.02,0.26,lambda nome=row[0], valor=row[1], quantidade=row[2], ent=entradaProduto:selecionaProduto(nome, valor, quantidade, ent))
             label.configure(fg_color="#38343c", corner_radius=0)
             self.resultadoLabelsProduto.append(label)
-            yNovo += 0.02
 
-        entradaQuantdadeItem.bind("<KeyRelease>", lambda event: verificaQuantidadeMaxima(self.quantidadeMaximaAtualOriginal))
+    def selecionaProduto(nome, valor, quantidade, entradaProduto):
+        entradaProduto.delete(0, "end")
+        entradaProduto.insert(0, nome)
 
-    def selecionaProduto(nome, valor, quantidade):
-        
-        entradaProdutoPesquisado.delete(0, "end")
-        entradaProdutoPesquisado.insert(0, nome)
-        
-        entradaQuantdadeItem.delete(0, "end")
-        entradaQuantdadeItem.insert(0, 0)
+        # Procura a linha correta
+        for linha in self.linhas:
+            if linha["produto"] == entradaProduto:
+                linha["preco"].delete(0, "end")
+                linha["preco"].insert(0, valor)
 
-        entradaPreco.delete(0,"end")
-        entradaPreco.insert(0, valor)
+                linha["quantidade"].delete(0, "end")
+                linha["quantidade"].insert(0, "0")
 
-        entradaUnidadeMedida.delete(0, "end")
-        entradaUnidadeMedida.insert(0, "UN")
+                linha["unidade"].delete(0, "end")
+                linha["unidade"].insert(0, "UN")
 
-        variavelDefinidaDeAcrescimo.set(0.00)
+                linha["desc_real"].delete(0, "end")
+                linha["desc_real"].insert(0, "0")
 
-        variavelValorSubtotal.set(valor)
-        self.quantidadeMaximaAtualOriginal = quantidade 
+                linha["desc_porcentagem"].delete(0, "end")
+                linha["desc_porcentagem"].insert(0, "0")
 
-        for label in self.resultadoLabelsProduto: 
+                linha["acrescimo"].delete(0, "end")
+                linha["acrescimo"].insert(0, "0")
+
+                linha["subtotal"].delete(0, "end")
+                linha["subtotal"].insert(0, valor)
+                break
+
+        for label in self.resultadoLabelsProduto:
             label.destroy()
 
+
+
     def verificaQuantidadeMaxima(quantidade):
-        if quantidade is not None and int(entradaQuantdadeItem.get()) >= quantidade or int(entradaQuantdadeItem.get())<=0 :
+        if quantidade is not None and int(self.entradaQuantdadeItem.get()) >= quantidade or int(self.entradaQuantdadeItem.get())<=0 :
             self.quantidadeMaximaPermitida.set(quantidade)
             print(quantidade)
             labelValorQuanrtidadeMax = ctk.CTkLabel(self, text="Quantidade excede o estoque", fg_color="red", text_color="white", corner_radius=5)
@@ -143,18 +152,6 @@ def telaGerarPedido(self):
         else:
             messagebox.showerror(title="Não encontrado", message="CEP não foi encontrado")
     
-    def verificaItensPreenchidos(self, entradasDosProdutos):
-        if any(campo.get() == '' for i, campo in enumerate(entradasDosProdutos)):
-            messagebox.showerror("campos vazios", "preencha todos os campos antes de adicionar um novo item")
-        else:
-            self.row +=1
-            if hasattr(self, "botaoRemoverItem") and self.botaoRemoverItem.winfo_exists():
-                self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotao)
-
-            # self.posicaoyBotao += 0.02
-            adicionarItem(self)
-
-
     for i, coluna in enumerate(listaLabels):
         if i == 0:
             criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.040, "#38343c")
@@ -166,95 +163,78 @@ def telaGerarPedido(self):
             criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.096, "#38343c")
             self.posicaox +=0.0976
     self.posicaox = 0.024
-    self.botaoAdicionarItem = criaBotao(frameParaItensNoFrame, "Adicionar Item", 0.87, self.posicaoyBotao, 0.05, lambda:verificaItensPreenchidos(self, entradasDosProdutos))
+    
+    self.botaoAdicionarItem = criaBotao(frameParaItensNoFrame, "Adicionar Item", 0.87, self.posicaoyBotao, 0.05,
+        lambda: (
+            messagebox.showerror("Campos vazios", "Preencha todos os campos da última linha antes de adicionar um novo item")
+            if any(widget.get().strip() == "" for chave, widget in self.linhas[-1].items() if chave != "item")
+            else adicionarItem(self)
+        ))
+   
     self.botaoRemoverItem = ctk.CTkButton(frameParaItensNoFrame, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: removerItem(self))
     self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotao-0.04)  # Posiciona imediatamente
     
 
     def adicionarItem(self):
         self.posicaoy += 0.02
-        self.posicaoyBotao += 0.02  # Garante que o botão de adicionar desça
-        self.posicaoyBotaoRemover += 0.02  
-        
+        self.posicaoyBotao += 0.02
+        self.posicaoyBotaoRemover += 0.02
+
         self.botaoAdicionarItem.place(relx=0.883, rely=self.posicaoyBotao)
-        self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotaoRemover)  # Atualiza o botão de remoção também
+        self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotaoRemover)
 
-
-        linha_widgets = []  # Lista para armazenar os widgets da linha
-
+        linha_widgets = {}
         for i, coluna in enumerate(listaLabels):
             if i == 0:
-                label = criaLabel(frameParaItensNoFrame, i, self.posicaox, self.posicaoy, 0.040, "#38343c")
-                linha_widgets.append(label)
+                label = criaLabel(frameParaItensNoFrame, int(self.contadorDeLinhas / 9) + 1, self.posicaox, self.posicaoy, 0.040, "#38343c")
+                linha_widgets["item"] = label
                 self.posicaox += 0.042
             elif i == 1:
-                entrada = criaEntry(frameParaItensNoFrame, self.posicaox, self.posicaoy, 0.16, None)
-                entradasDosProdutos.append(entrada)
-                linha_widgets.append(entrada)
+                entradaProduto = criaEntry(frameParaItensNoFrame, self.posicaox, self.posicaoy, 0.16, None)
+                entradaProduto.bind(
+                    "<KeyRelease>",
+                    lambda event, ent=entradaProduto, y=self.posicaoy: buscaProduto(ent.get(), ent, y)
+                )
+                linha_widgets["produto"] = entradaProduto
                 self.posicaox += 0.161
             else:
                 entrada = criaEntry(frameParaItensNoFrame, self.posicaox, self.posicaoy, 0.096, None)
-                entradasDosProdutos.append(entrada)
-                linha_widgets.append(entrada)
+                campo = ["preco", "quantidade", "unidade", "desc_real", "desc_porcentagem", "acrescimo", "subtotal"][i - 2]
+                linha_widgets[campo] = entrada
                 self.posicaox += 0.0976
 
+            self.contadorDeLinhas += 1
+
         self.posicaox = 0.024
-        linhas_widgets.append(linha_widgets)
+        self.linhas.append(linha_widgets)
 
-        # Mapear entradas
-        entradaProdutoPesquisado    = entradasDosProdutos[-8]
-        entradaPreco                = entradasDosProdutos[-7]
-        entradaQuantdadeItem        = entradasDosProdutos[-6]
-        entradaUnidadeMedida        = entradasDosProdutos[-5]
-        entradaDescontosReal        = entradasDosProdutos[-4]
-        entradaDescontosPorcentagem = entradasDosProdutos[-3]
-        entradaAcrescimo            = entradasDosProdutos[-2]
-        entradaSubtotal             = entradasDosProdutos[-1]
+        # Atualiza yNovo para essa linha
+        self.yNovo = self.posicaoy + 0.02
 
-        # Valores padrão
-        entradaProdutoPesquisado.insert(0, "teste")
-        entradaPreco.insert(0, "teste")
-        entradaQuantdadeItem.insert(0, "teste")
-        entradaUnidadeMedida.insert(0, "teste")
-        entradaDescontosReal.insert(0, "teste")
-        entradaDescontosPorcentagem.insert(0, "teste")
-        entradaAcrescimo.insert(0, "teste")
-        entradaSubtotal.insert(0, "teste")
 
-        entradaProdutoPesquisado.bind("<KeyRelease>", buscaProduto)
-        frameTelaPedido.bind("<Button-1>", lambda event: [label.destroy() for label in getattr(self, 'resultadoLabelsProduto', [])])
-        frameTelaPedido.bind("<Button-1>", lambda event: [label.destroy() for label in getattr(self, 'resultadoLabels', [])])
-
-    
-    
-    
     adicionarItem(self)
 
-
-
-
-
     def removerItem(self):
-        if len(linhas_widgets) > 1:
-            ultima_linha = linhas_widgets.pop()
-            
-            for _ in range(8):
-                if entradasDosProdutos:
-                    entradasDosProdutos.pop()
-            
-            for widget in ultima_linha:
+        if len(self.linhas) > 1:
+            ultima_linha = self.linhas.pop()  # Remove o último dicionário de entradas
+
+            # Destroi todos os widgets da linha
+            for widget in ultima_linha.values():
                 widget.destroy()
-            
+
+            self.contadorDeLinhas -= 9  # 1 label + 8 entradas
             self.posicaoy -= 0.02
             self.posicaoyBotao -= 0.02
             self.posicaoyBotaoRemover -= 0.02
-            
+
             self.botaoAdicionarItem.place(relx=0.883, rely=self.posicaoyBotao)
             self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotaoRemover)
-        
-        if len(linhas_widgets) == 1:
+
+        if len(self.linhas) == 1:
             self.botaoRemoverItem.place_forget()
 
+        # Atualiza yNovo para ficar abaixo da nova última linha
+        self.yNovo = self.posicaoy + 0.02
 
 
     self.numeroDeVenda = criarLabelEntry(frameTelaPedido, "Número da venda", 0.05, 0.05, 0.12, None)
