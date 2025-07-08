@@ -1,6 +1,4 @@
 import customtkinter as ctk
-from funcoesTerceiras.geradorDePedido import gerar_recibo
-from funcoesTerceiras.lerNotaFiscal import lerNotaFiscal, pegarDadosDaNota
 import telas 
 import telas.telaAcoes
 import telas.telaApresentadorDePdf
@@ -47,9 +45,9 @@ class App(ctk.CTk):
 
 
     def telas(self):
-        # telas.telaGerarPedido.telaGerarPedido(self)
+        telas.telaGerarPedido.telaGerarPedido(self)
         # telas.telaRelatorioDeVendas.telaRelatorioDeVendas(self)
-        telas.telaContasAPagarEAReceber.telaContasAPagarEAReceber(self)
+        # telas.telaContasAPagarEAReceber.telaContasAPagarEAReceber(self)
         # telas.telaProdutos.telaProdutos(self)
         # telas.telaLogin.telaLogin(self)
         
