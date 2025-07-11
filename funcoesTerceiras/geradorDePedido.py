@@ -3,6 +3,7 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 def gerar_recibo(nome_arquivo, dados):
+    print(dados)
     c = canvas.Canvas(nome_arquivo, pagesize=letter)
     width, height = letter
 
@@ -139,13 +140,13 @@ def gerar_recibo(nome_arquivo, dados):
     altura_linha = 0
     for item in dados['itens']:
 
-        c.drawString(23, altura_item, f"{item['codigo']}")
+        # c.drawString(23, altura_item, f"{item['codigo']}")
         c.drawString(82, altura_item, f"{item['descricao']}")
         c.drawString(270, altura_item, f"{item['unidade']}")
         c.drawString(300, altura_item, f"{item['quantidade']}")
-        c.drawString(345, altura_item, f"{item['valor_unitario']}")
+        c.drawString(345, altura_item, f"{item['subtotal']}")
         c.drawString(405, altura_item, f"{item['desconto_porcentagem']}")
-        c.drawString(450, altura_item, f"{item['desconto_real']}")
+        c.drawString(450, altura_item, f"{item['desconto_reais']}")
         c.drawString(490, altura_item, f"{item['acrescimo']}")
         c.drawString(525, altura_item, f"{item['subtotal']}")
 
@@ -169,7 +170,7 @@ def gerar_recibo(nome_arquivo, dados):
 
     c.setFont("Times-Bold", 8)
     c.drawString(155, altura_item, "TOTAL DE MERCADORIAS")
-    c.drawString(300, altura_item, f"{dados['total_quantidade']}")
+    # c.drawString(300, altura_item, f"{dados['total_quantidade']}")
     # c.drawString(345, altura_item, f"{dados['total_valor_unitario']}")
     c.drawString(405, altura_item, f"{dados['total_desc_porc']}")
     c.drawString(450, altura_item, f"{dados['total_desc_real']}")

@@ -54,38 +54,40 @@ class Insere:
         db.conn.commit()
 
     
-    def registraPedidoNoBanco(dadosPedido):        
+    def registraPedidoNoBanco(dadosPedido):     
         itens_json = json.dumps(dadosPedido['itens'])
+
         db.cursor.execute("""INSERT INTO pedidos (
                 numero_recibo, data_emissao, data_confirmacao, destinatario,
                 cpf, cnpj, telefone, endereco, referencia, cep, vendedor,
                 frete, valor_total, total_subtotal, total_acrescimo,
-                total_desc_real, total_desc_porc, total_quantidade,
+                total_desc_real, total_desc_porc,
                 subtotal, itens
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", 
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", 
             (
-            dadosPedido['numero_recibo'],
-            dadosPedido['data_emissao'],
-            dadosPedido.get('data_confirmacao', ''),
-            dadosPedido['destinatario'],
-            dadosPedido.get('cpf', ''),
-            dadosPedido.get('cnpj', ''),
-            dadosPedido.get('telefone', ''),
-            dadosPedido['endereco'],
-            dadosPedido.get('referencia', ''),
-            dadosPedido.get('cep', ''),
-            dadosPedido.get('vendedor',''),
-            float(dadosPedido.get('frete', 0.0)),
-            float(dadosPedido['valor_total']),
-            float(dadosPedido['total_subtotal']),
-            float(dadosPedido.get('total_acrescimo', 0.0)),
-            float(dadosPedido.get('total_desc_real', 0.0)),
-            float(dadosPedido.get('total_desc_porc', 0.0)),
-            int(dadosPedido.get('total_quantidade', 0)),
-            float(dadosPedido.get('subtotal', 0.0)),
-            itens_json
-        ))
-        
+                dadosPedido['numero_recibo'],
+                dadosPedido['data_emissao'],
+                dadosPedido.get('data_confirmacao', ''),
+                dadosPedido['destinatario'],
+                dadosPedido.get('cpf', ''),
+                dadosPedido.get('cnpj', ''),
+                dadosPedido.get('telefone', ''),
+                dadosPedido['endereco'],
+                dadosPedido.get('referencia', ''),
+                dadosPedido.get('cep', ''),
+                dadosPedido.get('vendedor', ''),
+                float(dadosPedido.get('frete', 0.0) or 0.0),
+                float(dadosPedido.get('valor_total') or 0.0),
+                float(dadosPedido.get('total_subtotal') or 0.0),
+                float(dadosPedido.get('total_acrescimo') or 0.0),
+                float(dadosPedido.get('total_desc_real') or 0.0),
+                float(dadosPedido.get('total_desc_porc') or 0.0),
+                # int(dadosPedido.get('total_quantidade') or 0),
+                float(dadosPedido.get('subtotal') or 0.0),
+                itens_json
+            )
+        )
+
         db.conn.commit()
         print("Pedido salvo com sucesso!")
 

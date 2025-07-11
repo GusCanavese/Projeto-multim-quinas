@@ -22,34 +22,39 @@ def PassaDadosParaPedido(self):
 
     if self.entradaEnderecoNoPedido.get() =="" or self.entradaReferenciaEnderecoEntrega.get()=="" or self.entradaNumero.get() =="" or self.CPFCliente.get()=="" or self.nomeDoClienteBuscado.get()=="":
         messagebox.showerror("erro", "Preencha todos os campos obrigatórios")
-    elif self.entradaProdutoPesquisado.get()=="":
+    elif self.entradaProduto.get()=="":
         messagebox.showerror("erro", "Selecione pelo menos um produto")
 
     else:
         self.dados = {
-            "vendedor":self.funcionariaPedido.get(),
-            "frete":self.valorFrete.get() or 0.0,
-            "valor_total": self.totalSubtotal,
-            "total_subtotal":self.totalSubtotal,
-            "total_acrescimo":self.totalAcrescimo,
-            "total_desc_real":self.totalDescontoReal,
-            "total_desc_porc":self.totalDescontoPorcentagem,
-            "total_quantidade": self.totalQuantidade,
+            "vendedor": self.funcionariaPedido.get(),
+            "frete": self.valorFrete.get() or 0.0,
+            
+            "valor_total": self.totalSubtotal.get(),
+            "total_subtotal": self.totalSubtotal.get(),
+            "total_acrescimo": self.totalAcrescimo.get(),
+            "total_desc_real": self.totalDescontoReal.get(),
+            "total_desc_porc": self.totalDescontoPorcentagem.get(),
+            
             "itens": self.valoresDosItens,
+            
             "referencia": self.entradaReferenciaEnderecoEntrega.get(),
             "endereco": self.entradaEnderecoNoPedido.get(),
             "cep": self.entradaCEP.get(),
-            "telefone": telefone,
+            "telefone": telefone,  # já é string fora de Entry, ok aqui
             "cnpj": self.CPFCliente.get(),
             "cpf": self.CPFCliente.get(),
             "destinatario": self.nomeDoClienteBuscado.get(),
-            "data_confirmacao":self.dataDaVenda.get() ,
-            "numero_recibo":self.numeroDeVenda.get(),
-            "data_emissao":dataAgora,
-            "subtotal": self.totalSubtotal,
-            "observacoes1":self.textArea1.get("1.0", "end-1c"),
-            "observacoes2":self.textArea2.get("1.0", "end-1c"),
+            
+            "data_confirmacao": self.dataDaVenda.get(),
+            "numero_recibo": self.numeroDeVenda.get(),  # corrigido, estava self..get()
+            "data_emissao": dataAgora,  # OK, já é string
+            
+            "subtotal": self.totalSubtotal.get(),
+            "observacoes1": self.textArea1.get("1.0", "end-1c"),
+            "observacoes2": self.textArea2.get("1.0", "end-1c")
         }
+
         Insere.registraPedidoNoBanco(self.dados)
         geradorDePedido.gerar_recibo("Pedido.pdf", self.dados)
 

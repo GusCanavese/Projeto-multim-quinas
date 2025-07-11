@@ -4,8 +4,9 @@ import gc
 def criarLabelEntry(frame, texto, relx, rely, width, variavel):
     dif =0.04
     fonte = ("Arial", 15)
+    
     if texto == "Desconto total(%)" or texto == "Desconto total($)" or texto == "Acréscimo total" or texto == "Valor frete" or texto == "TOTAL:":
-        dif = 0.17
+        dif = 0.045
         fonte = ("Arial", 11)
 
     label = ctk.CTkLabel(frame, text=texto, width=50, font=fonte)
@@ -85,6 +86,7 @@ def criaTextArea(frame, relx, rely, width, titulo, texto):
     areaTexto = ctk.CTkTextbox(frame, height=150, corner_radius=0, wrap="word")
     areaTexto.insert("0.0", texto)
     areaTexto.place(relx=relx, rely=rely+0.05, relwidth=width)
+    return areaTexto
 
 def criaLabelDescritivo(frame, texto, relx, rely, width, cor, variavel):
     labelTitulo = ctk.CTkLabel(frame, text=texto)
