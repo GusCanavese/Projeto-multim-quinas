@@ -168,7 +168,9 @@ def telaGerarPedido(self):
                 novo_subtotal = valorSubtotal - desconto
 
 
-            novo_subtotal = novo_subtotal*quantida+acrescim
+            if quantida >0:
+                novo_subtotal = novo_subtotal*quantida+acrescim
+                
             entry_subtotal.delete(0, "end")
             entry_subtotal.insert(0, f"{novo_subtotal:.2f}")
 

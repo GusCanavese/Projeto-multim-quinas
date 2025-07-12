@@ -142,7 +142,7 @@ def gerar_recibo(nome_arquivo, dados):
 
         # c.drawString(23, altura_item, f"{item['codigo']}")
         c.drawString(82, altura_item, f"{item['descricao']}")
-        c.drawString(270, altura_item, f"{item['unidade']}")
+        # c.drawString(270, altura_item, f"{item['unidade']}")
         c.drawString(300, altura_item, f"{item['quantidade']}")
         c.drawString(345, altura_item, f"{item['subtotal']}")
         c.drawString(405, altura_item, f"{item['desconto_porcentagem']}")
