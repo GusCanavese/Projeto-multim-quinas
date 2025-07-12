@@ -17,9 +17,10 @@ def telaGerarPedido(self):
     self.posicaox = 0.024
     self.posicaoyBotao = 0.231
     self.posicaoyBotaoRemover = 0.191
-    self.contadorDeLinhas =0
+    self.contadorDeLinhas = 0
     self.yNovo = 0.24
-    self.entradaProduto =0
+    self.entradaProduto = 0
+    self.valorSubtotal = 0
     self.linhas = []
 
 
@@ -121,6 +122,8 @@ def telaGerarPedido(self):
 
                 linha["subtotal"].delete(0, "end")
                 linha["subtotal"].insert(0, valor)
+                linha["subtotal_original"] = float(valor)
+
                 break
 
         for label in self.resultadoLabelsProduto:
@@ -132,11 +135,40 @@ def telaGerarPedido(self):
 
 
     def atualizarTotalGeral():
-        #!COLOCAR UM IF E ELSE AQUI PARA DETECTAR OS DESCONTOS EM REAL E EM PORCENTAGEM
         total = 0.0
+
         for linha in self.linhas:
-            subtotal = float(linha["subtotal"].get().replace(",", ".") or 0)
-            total += subtotal
+
+            entry_descPorc = linha["desc_porcentagem"]
+            entry_descReal = linha["desc_real"]
+            entry_subtotal = linha["subtotal"]
+            
+            subtotal = float(entry_subtotal.get().replace(",", ".") or 0)
+            descReal = float(entry_descReal.get().replace(",", ".") or 0)
+            descPorc = float(entry_descPorc.get().replace(",", ".") or 0)
+            descPorc = descPorc/100
+
+            valorSubtotal = linha.get("subtotal_original", float(entry_subtotal.get().replace(",", ".") or 0))
+
+            descReal = float(entry_descReal.get().replace(",", ".") or 0)
+
+            novo_subtotal = valorSubtotal - descReal if descReal > 0 else valorSubtotal
+            if descReal:
+                entry_descPorc.delete(0, "end")
+                entry_descPorc.insert(0, "0")
+                novo_subtotal = valorSubtotal - descReal if descReal > 0 else valorSubtotal
+
+            if descPorc:
+                entry_descReal.delete(0, "end")
+                entry_descReal.insert(0, "0")
+                desconto = valorSubtotal *descPorc if descPorc > 0 and descPorc < 100 else valorSubtotal
+                novo_subtotal = valorSubtotal - desconto
+
+            entry_subtotal.delete(0, "end")
+            entry_subtotal.insert(0, f"{novo_subtotal:.2f}")
+
+            total += novo_subtotal
+
         self.totalSubtotal.configure(state="normal")
         self.totalSubtotal.delete(0, 'end')
         self.totalSubtotal.insert(0, f"{total:.2f}")
@@ -171,7 +203,11 @@ def telaGerarPedido(self):
     self.botaoAdicionarItem = criaBotao(frameParaItensNoFrame, "Adicionar Item", 0.87, self.posicaoyBotao, 0.05,
         lambda: (
             messagebox.showerror("Campos vazios", "Preencha todos os campos da última linha antes de adicionar um novo item")
-            if any(widget.get().strip() == "" for chave, widget in self.linhas[-1].items() if chave != "item")
+            if any(
+                hasattr(widget, "get") and widget.get().strip() == ""
+                for chave, widget in self.linhas[-1].items()
+                if chave != "item"
+            )
             else adicionarItem(self)
         ))
     
@@ -245,9 +281,11 @@ def telaGerarPedido(self):
                         else None
                     ))
 
-                    
+                if campo == "desc_real":
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada:(atualizarTotalGeral()))
 
-
+                if campo == "desc_porcentagem":
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada:(atualizarTotalGeral()))
 
                 if campo == 'subtotal':
                     entrada.bind("<KeyRelease>", lambda event: atualizarTotalGeral())
@@ -258,7 +296,7 @@ def telaGerarPedido(self):
 
         self.posicaox = 0.024
         self.linhas.append(linha_widgets)
-        atualizarTotalGeral()
+        # atualizarTotalGeral()
         self.yNovo = self.posicaoy + 0.02
 
     adicionarItem(self)
