@@ -100,7 +100,6 @@ def telaGerarPedido(self):
 
         # Procura a linha correta
         for linha in self.linhas:
-            print(linha)
             if linha["produto"] == entradaProduto:
                 linha["preco"].delete(0, "end")
                 linha["preco"].insert(0, valor)
@@ -138,14 +137,17 @@ def telaGerarPedido(self):
         total = 0.0
 
         for linha in self.linhas:
-
             entry_descPorc = linha["desc_porcentagem"]
             entry_descReal = linha["desc_real"]
             entry_subtotal = linha["subtotal"]
+            entry_quantida = linha["quantidade"]
+            entry_acrescim = linha["acrescimo"]
             
-            subtotal = float(entry_subtotal.get().replace(",", ".") or 0)
+            
             descReal = float(entry_descReal.get().replace(",", ".") or 0)
             descPorc = float(entry_descPorc.get().replace(",", ".") or 0)
+            quantida = float(entry_quantida.get().replace(",", ".") or 0)
+            acrescim = float(entry_acrescim.get().replace(",", ".") or 0)
             descPorc = descPorc/100
 
             valorSubtotal = linha.get("subtotal_original", float(entry_subtotal.get().replace(",", ".") or 0))
@@ -153,6 +155,7 @@ def telaGerarPedido(self):
             descReal = float(entry_descReal.get().replace(",", ".") or 0)
 
             novo_subtotal = valorSubtotal - descReal if descReal > 0 else valorSubtotal
+
             if descReal:
                 entry_descPorc.delete(0, "end")
                 entry_descPorc.insert(0, "0")
@@ -164,15 +167,34 @@ def telaGerarPedido(self):
                 desconto = valorSubtotal *descPorc if descPorc > 0 and descPorc < 100 else valorSubtotal
                 novo_subtotal = valorSubtotal - desconto
 
+
+            novo_subtotal = novo_subtotal*quantida+acrescim
             entry_subtotal.delete(0, "end")
             entry_subtotal.insert(0, f"{novo_subtotal:.2f}")
 
             total += novo_subtotal
 
+            
+       
+            desconto_total_porc = float(self.totalDescontoPorcentagem.get().replace(",", ".") or 0)
+            total -= total * (desconto_total_porc / 100)
+
+            desconto_total_real = float(self.totalDescontoReal.get().replace(",", ".") or 0)
+            total -= desconto_total_real
+
+            acrescimo_total = float(self.totalAcrescimo.get().replace(",", ".") or 0)
+            total += acrescimo_total
+
+            frete = float(self.valorFrete.get().replace(",", ".") or 0)
+            total += frete
+
+        # Exibe o TOTAL formatado
         self.totalSubtotal.configure(state="normal")
         self.totalSubtotal.delete(0, 'end')
         self.totalSubtotal.insert(0, f"{total:.2f}")
         self.totalSubtotal.configure(state="disabled")
+
+
 
     def buscaCep(cepPassado, numero):
         url = f"https://cep.awesomeapi.com.br/json/{cepPassado}"
@@ -282,13 +304,21 @@ def telaGerarPedido(self):
                     ))
 
                 if campo == "desc_real":
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada:(atualizarTotalGeral()))
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
 
                 if campo == "desc_porcentagem":
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada:(atualizarTotalGeral()))
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+
+                if campo == 'quantidade':
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+
+                if campo == 'acrescimo':
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
 
                 if campo == 'subtotal':
                     entrada.bind("<KeyRelease>", lambda event: atualizarTotalGeral())
+
+
                 
                 self.posicaox += 0.0976
 
@@ -303,13 +333,13 @@ def telaGerarPedido(self):
 
     def removerItem(self):
         if len(self.linhas) > 1:
-            ultima_linha = self.linhas.pop()  # Remove o último dicionário de entradas
+            ultima_linha = self.linhas.pop()
 
-            # Destroi todos os widgets da linha
             for widget in ultima_linha.values():
-                widget.destroy()
+                if hasattr(widget, "destroy"):
+                    widget.destroy()
 
-            self.contadorDeLinhas -= 9  # 1 label + 8 entradas
+            self.contadorDeLinhas -= 9
             self.posicaoy -= 0.02
             self.posicaoyBotao -= 0.02
             self.posicaoyBotaoRemover -= 0.02
@@ -320,7 +350,6 @@ def telaGerarPedido(self):
         if len(self.linhas) == 1:
             self.botaoRemoverItem.place_forget()
 
-        # Atualiza yNovo para ficar abaixo da nova última linha
         self.yNovo = self.posicaoy + 0.02
         atualizarTotalGeral()
     
@@ -348,6 +377,11 @@ def telaGerarPedido(self):
     self.totalDescontoReal = criarLabelEntry(frameTelaPedido, "Desconto total($)", 0.67, 0.675, 0.08, None)
     self.totalAcrescimo = criarLabelEntry(frameTelaPedido, "Acréscimo total", 0.55, 0.8, 0.08, None)
     self.valorFrete = criarLabelEntry(frameTelaPedido, "Valor frete", 0.67, 0.8, 0.08, None)
+
+    self.totalDescontoPorcentagem.bind("<KeyRelease>", lambda event,:(atualizarTotalGeral()))
+    self.totalDescontoReal.bind("<KeyRelease>", lambda event,:(atualizarTotalGeral()))
+    self.totalAcrescimo.bind("<KeyRelease>", lambda event,:(atualizarTotalGeral()))
+    self.valorFrete.bind("<KeyRelease>", lambda event,:(atualizarTotalGeral()))
 
 
 
