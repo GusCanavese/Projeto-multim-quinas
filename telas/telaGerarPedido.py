@@ -50,6 +50,18 @@ def telaGerarPedido(self):
     frameParaItensNoFrame = ctk.CTkFrame(frameParaItens,  height=1500)
     frameParaItensNoFrame.place(x=-25, y=-280, relwidth=1.06)
 
+    def geraNumeroPedido():
+            # self.numeroDoPedido += 1
+            maiorNumero = Buscas.selecionaNumeroPedido()[0]
+            
+            print(maiorNumero)
+            if maiorNumero == None:
+                maiorNumero = 1
+            else:
+                maiorNumero += 1
+            numeroDoPedidoSendoCriado = maiorNumero
+            self.variavelnumeroDoPedido.set(numeroDoPedidoSendoCriado)
+
     def buscaCliente(event=None): 
         nomeDoCliente = self.nomeDoClienteBuscado.get()
         dadosCliente = Buscas.buscaDadosCliente(nomeDoCliente)
@@ -195,8 +207,6 @@ def telaGerarPedido(self):
         self.totalSubtotal.delete(0, 'end')
         self.totalSubtotal.insert(0, f"{total:.2f}")
         self.totalSubtotal.configure(state="disabled")
-
-
 
     def buscaCep(cepPassado, numero):
         url = f"https://cep.awesomeapi.com.br/json/{cepPassado}"

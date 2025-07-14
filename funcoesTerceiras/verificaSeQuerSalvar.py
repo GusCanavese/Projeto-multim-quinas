@@ -1,6 +1,6 @@
 from tkinter import messagebox
 from funcoesTerceiras.PassaDadosParaPedido import PassaDadosParaPedido
-from funcoesTerceiras.passaDadosParaOrcamento import PassaDadosParaOrcamento
+from funcoesTerceiras.passaDadosParaOrcamento import passaDadosParaOrcamento
 
 def salvarPedido(self):
     resposta = messagebox.askquestion(
@@ -28,7 +28,7 @@ def salvarOrcamento(self):
         
 
     else:
-        PassaDadosParaOrcamento(self)
+        passaDadosParaOrcamento(self)
 
 
 

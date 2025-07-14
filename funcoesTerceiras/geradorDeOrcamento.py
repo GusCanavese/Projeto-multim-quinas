@@ -89,13 +89,13 @@ def gerarOrcamento(nome_arquivo, dados):
     altura_linha = 30
     for item in dados['itens']:
 
-        c.drawString(23, altura_item + 100, f"{item['codigo']}")
+        # c.drawString(23, altura_item + 100, f"{item['codigo']}")
         c.drawString(82, altura_item + 100, f"{item['descricao']}")
-        c.drawString(270, altura_item +100, f"{item['unidade']}")
+        # c.drawString(270, altura_item +100, f"{item['unidade']}")
         c.drawString(300, altura_item +100, f"{item['quantidade']}")
-        c.drawString(345, altura_item +100, f"{item['valor_unitario']}")
+        # c.drawString(345, altura_item +100, f"{item['valor_unitario']}")
         c.drawString(405, altura_item +100, f"{item['desconto_porcentagem']}")
-        c.drawString(450, altura_item +100, f"{item['desconto_real']}")
+        c.drawString(450, altura_item +100, f"{item['desconto_reais']}")
         c.drawString(490, altura_item +100, f"{item['acrescimo']}")
         c.drawString(525, altura_item +100, f"{item['subtotal']}")
 
@@ -121,7 +121,7 @@ def gerarOrcamento(nome_arquivo, dados):
     c.line(20, altura_item+110, 575+15, altura_item+110)
 
     c.drawString(150, altura_item+100, "TOTAL DE MERCADORIAS")
-    c.drawString(300, altura_item+100, f"{dados['total_quantidade']}")
+    # c.drawString(300, altura_item+100, f"{dados['total_quantidade']}")
     c.drawString(405, altura_item+100, f"{dados['total_desc_porc']}")
     c.drawString(450, altura_item+100, f"{dados['total_desc_real']}")
     c.drawString(490, altura_item+100, f"{dados['total_acrescimo']}")
@@ -136,7 +136,7 @@ def gerarOrcamento(nome_arquivo, dados):
     # Rodapé
     c.line(20, altura_item + 80, 590, altura_item + 80)
     c.drawString(20, altura_item + 70, "Forma de pagamento:")
-    c.drawString(130, altura_item + 70, f"{dados['forma_pagamento']}")
+    # c.drawString(130, altura_item + 70, f"{dados['forma_pagamento']}")
     c.line(20, altura_item + 60, 590, altura_item + 60)
 
     c.setFont("Times-Roman", 10)
