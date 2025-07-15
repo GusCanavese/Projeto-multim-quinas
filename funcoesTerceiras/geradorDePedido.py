@@ -23,7 +23,7 @@ def gerar_recibo(nome_arquivo, dados):
     c.setFont("Times-Bold", 8)
     c.drawString(52, altura - 70, "Máquinas e")
     c.drawString(50, altura - 80, "equipamentos")
-    c.drawString(52, altura - 90, "32-33751671")
+    c.drawString(52, altura - 90, "32-33716171")
 
     # Quadrado superior direito
     c.setFont("Times-Bold", 7)

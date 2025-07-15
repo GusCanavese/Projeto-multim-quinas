@@ -6,7 +6,7 @@ from consultas.delete import deleta
 from consultas.update import Atualiza
 
    
-def confirmarExclusaoNoPedido(self, identificador, desc):
+def confirmarExclusaoNoPedido(self, identificador, desc, frame):
 
     resposta = messagebox.askquestion(
         "Confirmação",
@@ -15,7 +15,7 @@ def confirmarExclusaoNoPedido(self, identificador, desc):
     )
     if resposta == "yes":
         deleta.deletarPedidos(identificador)
-        self.frameTelaVerPedidos.destroy()
+        frame.destroy()
         if hasattr(self, "dadosTelaVerPedidos"):
             for item in self.dadosTelaVerPedidos:
                 item.destroy()

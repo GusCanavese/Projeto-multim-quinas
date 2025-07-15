@@ -46,9 +46,25 @@ class Buscas:
         or formaPag like %s
         or qtdParcelas like %s"""
         if inicio:
+            queryBuscaCliente = """SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasareceber
+            where
+            confirmado like %s
+            or vencimento like %s
+            or descricao like %s
+            or total like %s
+            or formaPag like %s
+            or qtdParcelas like %s"""
             queryBuscaCliente += " AND vencimento BETWEEN %s AND %s"
             db.cursor.execute(queryBuscaCliente, (f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", inicio, fim))
         else:
+            queryBuscaCliente = """SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasareceber
+            where
+            confirmado like %s
+            or vencimento like %s
+            or descricao like %s
+            or total like %s
+            or formaPag like %s
+            or qtdParcelas like %s"""
             db.cursor.execute(queryBuscaCliente, (f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%",))
         resultado = db.cursor.fetchall()
         return resultado
@@ -56,34 +72,6 @@ class Buscas:
     def buscaContasAPagar(valor, inicio, fim):
         print(inicio, fim)
          
-        # serie_nfe, 
-        # data_emissao, 
-        # data_saida, 
-        # emitente_cnpj, 
-        # destinatario_cnpj, 
-        # destinatario_nome,  
-        # valor_produtos, 
-        # valor_bc_icms, 
-        # valor_icms, 
-        # valor_icms_desonerado, 
-        # valor_bc_icms_st, 
-        # valor_icms_st, 
-        # valor_ipi, 
-        # valor_pis, 
-        # alor_cofins, 
-        # valor_bc_irrf, 
-        # transportadora_cnpj, 
-        # transportadora_nome, 
-        # itens, 
-        # data_registro, confirmado, descricao, 
-        queryBuscaCliente = """SELECT confirmado, data_vencimento, descricao, valor_total, numero_nfe, emitente_nome, chave_nfe, serie_nfe, data_emissao, data_saida, emitente_cnpj, destinatario_cnpj, destinatario_nome, valor_produtos, valor_bc_icms, valor_icms, valor_icms_desonerado, valor_bc_icms_st, valor_icms_st, valor_ipi, valor_pis, valor_cofins, valor_bc_irrf, transportadora_cnpj, transportadora_nome, itens, data_registro FROM contasapagar;
-        where
-        confirmado like %s
-        or data_vencimento like %s
-        or descricao like %s
-        or valor_total like %s
-        or numero_nfe like %s"""
-
         if inicio:
             queryBuscaCliente = """SELECT confirmado, data_vencimento, descricao,  valor_total, numero_nfe, emitente_nome FROM contasapagar
             where
@@ -94,6 +82,13 @@ class Buscas:
             queryBuscaCliente += " AND data_vencimento BETWEEN %s AND %s"
             db.cursor.execute(queryBuscaCliente, (f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", inicio, fim))
         else:
+            queryBuscaCliente = """SELECT confirmado, data_vencimento, descricao, valor_total, numero_nfe, emitente_nome, chave_nfe, serie_nfe, data_emissao, data_saida, emitente_cnpj, destinatario_cnpj, destinatario_nome, valor_produtos, valor_bc_icms, valor_icms, valor_icms_desonerado, valor_bc_icms_st, valor_icms_st, valor_ipi, valor_pis, valor_cofins, valor_bc_irrf, transportadora_cnpj, transportadora_nome, itens, data_registro FROM contasapagar
+            where
+            confirmado like %s
+            or data_vencimento like %s
+            or descricao like %s
+            or valor_total like %s
+            or numero_nfe like %s"""
             db.cursor.execute(queryBuscaCliente, (f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%",))
 
         resultado = db.cursor.fetchall()
@@ -141,7 +136,3 @@ class Buscas:
         resultado = db.cursor.fetchall()
 
         return resultado
-    
-
-
-

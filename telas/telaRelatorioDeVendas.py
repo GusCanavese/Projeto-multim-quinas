@@ -35,6 +35,6 @@ def telaRelatorioDeVendas(self):
     y = 0.05
 
     for i, coluna in enumerate(colunas):
-        criaLabel(frameVendas, coluna, x, y, 0.17, "#2C3E50")
+        criaLabel(frameVendas, coluna, x, y, 0.17, self.cor)
         x+=0.175
 

@@ -31,18 +31,18 @@ def telaEstoque(self):
 
     for i, coluna in enumerate(colunas):
         if i == 0:
-            label = criaLabel(frameProdutos, coluna, x, y, 0.04, "#2C3E50")
+            label = criaLabel(frameProdutos, coluna, x, y, 0.04, self.cor)
             x+=0.043
         elif i ==1:
-            label = criaLabel(frameProdutos, coluna, x, y, 0.4, "#2C3E50")
+            label = criaLabel(frameProdutos, coluna, x, y, 0.4, self.cor)
             x+=0.403
         elif i ==2:
-            label = criaLabel(frameProdutos, coluna, x, y, 0.15, "#2C3E50")
+            label = criaLabel(frameProdutos, coluna, x, y, 0.15, self.cor)
             x+=0.153
         elif i ==3:
-            label = criaLabel(frameProdutos, coluna, x, y, 0.10, "#2C3E50")
+            label = criaLabel(frameProdutos, coluna, x, y, 0.10, self.cor)
             x+=0.103
         else:
-            label = criaLabel(frameProdutos, coluna, x, y, 0.17, "#2C3E50")
+            label = criaLabel(frameProdutos, coluna, x, y, 0.17, self.cor)
             x+=0.178
 

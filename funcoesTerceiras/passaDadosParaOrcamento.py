@@ -46,8 +46,6 @@ def passaDadosParaOrcamento(self):
             "cpf": self.CPFCliente.get(),
             "destinatario": self.nomeDoClienteBuscado.get(),
             
-            "data_confirmacao": self.dataDaVenda.get(),
-            "numero_recibo": self.numeroDeVenda.get(),  # corrigido, estava self..get()
             "data_emissao": dataAgora,  # OK, já é string
             
             "subtotal": self.totalSubtotal.get(),

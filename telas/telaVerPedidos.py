@@ -20,7 +20,7 @@ def telaVerPedidos(self, p, d, desc):
     else:
         self.status = "Confirmado"
         dataDaVendaTelaVerPedidos = p[4]
-        criaLabelDescritivo(frame, "Data de confirmação", 0.42, 0.07, 0.15, "#38343c", ctk.StringVar(value=dataDaVendaTelaVerPedidos))
+        criaLabelDescritivo(frame, "Data de confirmação", 0.42, 0.07, 0.15, self.cor, ctk.StringVar(value=dataDaVendaTelaVerPedidos))
         criaLabelDescritivo(frame, 'Venda confirmada', 0.62, 0.07, 0.15, "green", None)
         
 
@@ -30,18 +30,18 @@ def telaVerPedidos(self, p, d, desc):
 
 
     # Primeira linha (relx espaçado em 0.2, rely em 0.05 e 0.1)
-    criaLabelDescritivo(frame, "Número da venda",     0.02, 0.07, 0.15, "#38343c", ctk.StringVar(value=p[0]))
-    criaLabelDescritivo(frame, "Data de criação",     0.22, 0.07, 0.15, "#38343c", ctk.StringVar(value=p[2]))
-    criaLabelDescritivo(frame, "Vendedor(a)",         0.82, 0.07, 0.15, "#38343c", ctk.StringVar(value=p[1]))
+    criaLabelDescritivo(frame, "Número da venda",     0.02, 0.07, 0.15, self.cor, ctk.StringVar(value=p[0]))
+    criaLabelDescritivo(frame, "Data de criação",     0.22, 0.07, 0.15, self.cor, ctk.StringVar(value=p[2]))
+    criaLabelDescritivo(frame, "Vendedor(a)",         0.82, 0.07, 0.15, self.cor, ctk.StringVar(value=p[1]))
 
-    criaLabelDescritivo(frame, "Nome do cliente", 0.02, 0.25, 0.15, "#38343c", ctk.StringVar(value=d[0]))
-    criaLabelDescritivo(frame, "Valor",           0.22, 0.25, 0.15, "#38343c", ctk.StringVar(value=p[3]))
-    criaLabelDescritivo(frame, "CPF/CNPJ",        0.42, 0.25, 0.15, "#38343c", ctk.StringVar(value=d[1]))
-    criaLabelDescritivo(frame, "Produto",         0.62, 0.25, 0.35, "#38343c", ctk.StringVar(value=desc[0]))
+    criaLabelDescritivo(frame, "Nome do cliente", 0.02, 0.25, 0.15, self.cor, ctk.StringVar(value=d[0]))
+    criaLabelDescritivo(frame, "Valor",           0.22, 0.25, 0.15, self.cor, ctk.StringVar(value=p[3]))
+    criaLabelDescritivo(frame, "CPF/CNPJ",        0.42, 0.25, 0.15, self.cor, ctk.StringVar(value=d[1]))
+    criaLabelDescritivo(frame, "Produto",         0.62, 0.25, 0.35, self.cor, ctk.StringVar(value=desc[0]))
 
-    criaLabelDescritivo(frame, "Endereço",        0.02, 0.43, 0.35, "#38343c", ctk.StringVar(value=d[2]))
+    criaLabelDescritivo(frame, "Endereço",        0.02, 0.43, 0.35, self.cor, ctk.StringVar(value=d[2]))
 
     criaBotao(frame, 'Gerar faturamento', 0.495, 0.48, 0.15, lambda:telaGerarFaturamento(self, p[3], p[0], d[0]))
     criaBotao(frame, 'Voltar', 0.15, 0.95, 0.20, lambda:frame.destroy())
-    botaoExclui = criaBotao(frame, 'Cancelar/Excluir pedido', 0.61, 0.95, 0.20, lambda:confirmarExclusaoDoPedido.confirmarExclusaoNoPedido(self, p[0], desc))
+    botaoExclui = criaBotao(frame, 'Cancelar/Excluir pedido', 0.61, 0.95, 0.20, lambda:confirmarExclusaoDoPedido.confirmarExclusaoNoPedido(self, p[0], desc, ))
     botaoExclui.configure(fg_color="#8B0000")

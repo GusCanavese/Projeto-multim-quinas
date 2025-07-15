@@ -37,7 +37,7 @@ def telaContasAPagarEAReceber(self):
             self.creditoOuDebito = criaComboBox(frame, 0.1, 0.11, 0.15, opcoes, lambda valor:escolheTela(valor))
 
             
-    criaBotao(frame, "Registrar credito/débito", 0.1, 0.05, 0.15, lambda:creditoOuDebito()).configure(fg_color="#006D5B")
+    criaBotao(frame, "Registrar credito/débito", 0.1, 0.05, 0.15, lambda:creditoOuDebito()).configure(fg_color="#009351")
     criaBotao(frame, "Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
 
     # Cabeçalhos da tabela
@@ -47,16 +47,16 @@ def telaContasAPagarEAReceber(self):
 
     for i, coluna in enumerate(colunas):
         if i == 0:
-            criaLabel(frameContas, coluna, x, y, 0.08, "#2C3E50")
+            criaLabel(frameContas, coluna, x, y, 0.08, self.cor)
             x+=0.085
         elif i == 1:
-            criaLabel(frameContas, coluna, x, y, 0.4, "#2C3E50")
+            criaLabel(frameContas, coluna, x, y, 0.4, self.cor)
             x+=0.405
         elif i == 2:
-            criaLabel(frameContas, coluna, x, y, 0.17, "#2C3E50")
+            criaLabel(frameContas, coluna, x, y, 0.17, self.cor)
             x+=0.175
         elif i == 3:
-            criaLabel(frameContas, coluna, x, y, 0.17, "#2C3E50")
+            criaLabel(frameContas, coluna, x, y, 0.17, self.cor)
             x+=0.175
 
  

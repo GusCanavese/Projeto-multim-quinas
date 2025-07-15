@@ -16,3 +16,4 @@ cursor = conn.cursor()
 # cursor.execute("""
 # DROP table teste
 # """)mysql://root:cUxQKiTNIHZUlBQhphYhiESVTcrCJTGO@ballast.proxy.rlwy.net:15192/railway
+# mysql://root:cUxQKiTNIHZUlBQhphYhiESVTcrCJTGO@mysql.railway.internal:3306/railway

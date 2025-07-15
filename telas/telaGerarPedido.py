@@ -8,7 +8,7 @@ import requests
 from PIL import Image
 import datetime
 from funcoesTerceiras.verificaSeQuerSalvar import salvarPedido
-from componentes import criaFrame, criaBotao, criarLabelEntry, criaLabel, criaEntry, criaTextArea
+from componentes import criaFrame, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
 
 
 def telaGerarPedido(self):
@@ -36,6 +36,7 @@ def telaGerarPedido(self):
     variavelDefinidaDeAcrescimo = ctk.StringVar()
     variavelValorSubtotal = ctk.StringVar()
     dataCriacao = ctk.StringVar()
+    variavelnumeroDoPedido = ctk.StringVar()
     variavelEmAbertoFechado = ctk.StringVar() 
 
     # variavelFuncionarioAtual.set(usuarioLogado)
@@ -60,7 +61,7 @@ def telaGerarPedido(self):
             else:
                 maiorNumero += 1
             numeroDoPedidoSendoCriado = maiorNumero
-            self.variavelnumeroDoPedido.set(numeroDoPedidoSendoCriado)
+            variavelnumeroDoPedido.set(numeroDoPedidoSendoCriado)
 
     def buscaCliente(event=None): 
         nomeDoCliente = self.nomeDoClienteBuscado.get()
@@ -76,7 +77,7 @@ def telaGerarPedido(self):
         for i, row in enumerate(dadosCliente):
             if i >= 5:
                 break
-            label = ctk.CTkButton(frameTelaPedido,  text=row[0], corner_radius=0,fg_color="#38343c", font=("Century Gothic bold", 15), command=lambda  nome=row[0], cnpj=row[1]: selecionaCliente(nome, cnpj))
+            label = ctk.CTkButton(frameTelaPedido,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cnpj=row[1]: selecionaCliente(nome, cnpj))
             label.place(relx=0.05, rely=yNovo, relwidth=0.27)
             self.resultadoLabels.append(label)  
             yNovo += 0.039
@@ -102,8 +103,8 @@ def telaGerarPedido(self):
         for i, row in enumerate(Buscas.buscaProduto(nomeDoProduto)):
             if i >= 3:
                 break
-            label = criaBotao(frameParaItensNoFrame,row[0],0.195,yNovo + i * 0.02,0.26,lambda nome=row[0], valor=row[1], quantidade=row[2], ent=entradaProduto:selecionaProduto(nome, valor, quantidade, ent))
-            label.configure(fg_color="#38343c", corner_radius=0)
+            label = criaBotao(frameParaItensNoFrame,row[0],0.195,yNovo+0.02 + i * 0.02,0.26,lambda nome=row[0], valor=row[1], quantidade=row[2], ent=entradaProduto:selecionaProduto(nome, valor, quantidade, ent))
+            label.configure(fg_color=self.cor, corner_radius=0, font=("TkDefaultFont", 14))
             self.resultadoLabelsProduto.append(label)
 
     def selecionaProduto(nome, valor, quantidade, entradaProduto):
@@ -224,17 +225,18 @@ def telaGerarPedido(self):
     
     for i, coluna in enumerate(listaLabels):
         if i == 0:
-            criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.040, "#38343c")
+            print(self.cor)
+            criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.040, self.cor)
             self.posicaox +=0.042
         if i == 1:
-            criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.16, "#38343c")
+            criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.16, self.cor)
             self.posicaox +=0.161
         if i!=0 and i!=1:
-            criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.096, "#38343c")
+            criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.096, self.cor)
             self.posicaox +=0.0976
     self.posicaox = 0.024
 
-    self.botaoAdicionarItem = criaBotao(frameParaItensNoFrame, "Adicionar Item", 0.87, self.posicaoyBotao, 0.05,
+    self.botaoAdicionarItem = criaBotaoPequeno(frameParaItensNoFrame, "Adicionar item", 0.7, self.posicaoyBotao, 0.07,
         lambda: (
             messagebox.showerror("Campos vazios", "Preencha todos os campos da última linha antes de adicionar um novo item")
             if any(
@@ -284,7 +286,7 @@ def telaGerarPedido(self):
         self.posicaoyBotao += 0.02
         self.posicaoyBotaoRemover += 0.02
 
-        self.botaoAdicionarItem.place(relx=0.883, rely=self.posicaoyBotao)
+        self.botaoAdicionarItem.place(relx=0.875, rely=self.posicaoyBotao)
         self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotaoRemover)
         linha_widgets = {}
         
@@ -294,7 +296,7 @@ def telaGerarPedido(self):
             self.quantidade = 0
 
             if i == 0:
-                label = criaLabel(frameParaItensNoFrame, int(self.contadorDeLinhas / 9) + 1, self.posicaox, self.posicaoy, 0.040, "#38343c")
+                label = criaLabel(frameParaItensNoFrame, int(self.contadorDeLinhas / 9) + 1, self.posicaox, self.posicaoy, 0.040, self.cor)
                 linha_widgets["item"] = label
                 self.posicaox += 0.042
             elif i == 1:
@@ -366,8 +368,8 @@ def telaGerarPedido(self):
         atualizarTotalGeral()
     
 
-    
-    self.numeroDeVenda = criarLabelEntry(frameTelaPedido, "Número da venda", 0.05, 0.05, 0.12, None)
+    geraNumeroPedido()
+    self.numeroDeVenda = criarLabelEntry(frameTelaPedido, "Número da venda", 0.05, 0.05, 0.12, variavelnumeroDoPedido)
     self.dataDeCriacao = criarLabelEntry(frameTelaPedido, "Data de criação", 0.20, 0.05, 0.12, dataCriacao)
     self.nomeDoClienteBuscado = criarLabelEntry(frameTelaPedido, "Nome do cliente *", 0.05, 0.15, 0.27, None)
     self.nomeDoClienteBuscado.bind("<KeyRelease>", buscaCliente)
@@ -378,7 +380,7 @@ def telaGerarPedido(self):
     self.CPFCliente = criarLabelEntry(frameTelaPedido, "CPF/CNPJ *", 0.39, 0.15, 0.15, variavelCtkEntry)
     self.entradaCEP = criarLabelEntry(frameTelaPedido, "CEP *", 0.57, 0.15, 0.15, None)
     self.entradaNumero = criarLabelEntry(frameTelaPedido, "Nº *", 0.75, 0.15, 0.05, None)
-    self.botaoBuscaCEP = criaBotao(frameTelaPedido, "Buscar CEP", 0.865, 0.19, 0.07, lambda:buscaCep(self.entradaCEP.get(), self.entradaNumero.get()))
+    self.botaoBuscaCEP = criaBotaoPequeno(frameTelaPedido, "Buscar CEP", 0.865, 0.19, 0.07, lambda:buscaCep(self.entradaCEP.get(), self.entradaNumero.get()))
     self.entradaEnderecoNoPedido = criarLabelEntry(frameTelaPedido, "Endereço *", 0.39, 0.25, 0.33, None)
     self.entradaReferenciaEnderecoEntrega = criarLabelEntry(frameTelaPedido, "Referencia *", 0.75, 0.25, 0.15, None)
 

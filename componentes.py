@@ -3,11 +3,11 @@ import gc
 
 def criarLabelEntry(frame, texto, relx, rely, width, variavel):
     dif =0.04
-    fonte = ("Arial", 15)
+    fonte = ("TkDefaultFont", 15)
     
     if texto == "Desconto total(%)" or texto == "Desconto total($)" or texto == "Acréscimo total" or texto == "Valor frete" or texto == "TOTAL:":
         dif = 0.045
-        fonte = ("Arial", 11)
+        fonte = ("TkDefaultFont", 11)
 
     label = ctk.CTkLabel(frame, text=texto, width=50, font=fonte)
     label.place(relx=relx, rely=rely, anchor="w")
@@ -47,9 +47,28 @@ def criaFrame(self, relx, rely, width, height):
     return frame
 
 def criaBotao(frame, texto, relx, rely, width, comando):
-    botao = ctk.CTkButton(frame, text=texto, corner_radius=5, font=("Arial", 14), command=lambda:comando())
+    modo_atual = ctk.get_appearance_mode().lower()
+    if modo_atual == "dark":
+        text = "white"
+    else:
+        text = "black"
+    fonte=("TkDefaultFont", 16)
+    botao = ctk.CTkButton(frame, text=texto, corner_radius=5, font=fonte, command=lambda:comando(), text_color=text)
     botao.place(relx=relx, rely=rely, relwidth=width,  anchor="center")
     return botao
+
+
+def criaBotaoPequeno(frame, texto, relx, rely, width, comando):
+    modo_atual = ctk.get_appearance_mode().lower()
+    if modo_atual == "dark":
+        text = "white"
+    else:
+        text = "black"
+    fonte=("TkDefaultFont", 11)
+    botao = ctk.CTkButton(frame, text=texto, corner_radius=5, font=fonte, command=lambda:comando(), text_color=text)
+    botao.place(relx=relx, rely=rely, relwidth=width,  anchor="center")
+    return botao
+
 
 def criaAviso(self, frame, height, width, texto, relx, rely):
     frameAviso = ctk.CTkFrame(frame, height=height, width=width, corner_radius=5, border_width=2, border_color="red",fg_color="transparent")

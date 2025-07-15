@@ -20,7 +20,7 @@ def gerarOrcamento(nome_arquivo, dados):
     c.line(20, altura-60, 575+15, altura-60)
     c.setFont("Times-Roman", 10)
     c.drawString(20, altura - 70, f"{dados['data_emissao']}")
-    c.drawString(width/2.35, altura - 70, f"Nº {dados['numero_recibo']}")
+    # c.drawString(width/2.35, altura - 70, f"Nº {dados['numero_recibo']}")
     c.line(20, altura-75, 575+15, altura-75)
 
     c.setFont("Times-Roman", 8)

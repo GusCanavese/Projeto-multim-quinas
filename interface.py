@@ -31,8 +31,7 @@ ctk.set_default_color_theme("blue")
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.janela() 
-
+        self.janela()
         
     def janela(self):
         self.resizable(True, True)

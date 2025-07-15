@@ -23,3 +23,26 @@ def telaLogin(self):
 
     self.botaoEntrar = ctk.CTkButton(frame, text="Entrar", width=200, corner_radius=5, font=("Arial", 20), command=lambda:consultarUsuarioCadastrado(self))
     self.botaoEntrar.place(relx=0.5, rely=0.6, anchor="center")
+
+    ctk.set_appearance_mode("system")  # isso pode vir antes de tudo
+
+    modo_atual = ctk.get_appearance_mode()  # retorna "Dark" ou "Light"
+    if modo_atual == "Dark":
+        self.cor = "#38343c"
+        valor_inicial = True
+    else:
+        self.cor = "#9c94d3"
+        valor_inicial = False
+
+    self.switch_var = ctk.BooleanVar(value=valor_inicial)
+
+    def mudar_estado():
+        if self.switch_var.get():
+            ctk.set_appearance_mode("dark")
+            self.cor = "#38343c"
+        else:
+            ctk.set_appearance_mode("light")
+            self.cor = "#3399FF"
+
+    switch = ctk.CTkSwitch(frame,text="Tema claro/escuro",variable=self.switch_var,command=mudar_estado)
+    switch.place(relx=0.44, rely=0.7)
