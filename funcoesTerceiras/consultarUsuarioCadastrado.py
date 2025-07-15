@@ -11,7 +11,6 @@ def consultarUsuarioCadastrado(self):
     login = self.login.get()
     senha = self.senha.get()
     usuarioLogando = Buscas.consultaUsuario(login, senha)
-    print(usuarioLogando)
 
     if not usuarioLogando:
         self.frameUsuarioNaoCadastrado = ctk.CTkFrame(self, height=100, width=300, corner_radius=5, border_width=2, border_color="red",fg_color="transparent")
