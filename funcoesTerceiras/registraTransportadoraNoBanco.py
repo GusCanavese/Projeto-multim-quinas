@@ -6,7 +6,7 @@ from consultas.insert import Insere
 import gc
 
 
-def registraTransportadoraNoBanco(self):
+def registraTransportadoraNoBanco(self, frame):
     cpfoupjVariavel=0
     if all([
         self.ehAtivo[3].get(),
@@ -53,7 +53,7 @@ def registraTransportadoraNoBanco(self):
 
         Insere.registraFornecedorNoBanco(dados)
 
-        self.frameTelaCadastroFornecedores.destroy()
+        frame.destroy()
         gc.collect()
                 
     else:

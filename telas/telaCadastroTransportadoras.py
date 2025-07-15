@@ -60,5 +60,5 @@ def telaCadastroTransportadoras(self):
     self.descricaoTransportadora = criarLabelEntry(frame, "Descrição", 0.1, 0.55, 0.79, None)
 
     criaBotao(frame, "Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
-    criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraTransportadoraNoBanco(self))
+    criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraTransportadoraNoBanco(self, frame))
 

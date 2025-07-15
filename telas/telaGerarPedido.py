@@ -25,21 +25,19 @@ def telaGerarPedido(self):
 
 
 
-    # usuarioLogado = self.login.get()
+    usuarioLogado = self.login.get()
+    usuarioLogado = usuarioLogado.capitalize()
 
     #pós refat 
     listaLabels = ["Item", "Produto", "Preço", "Quantidade", "Estoque", "Desconto $", "Desconto %", "Acréscimo", "Subtotal"]
-    entradasDosProdutos = []
 
     variavelCtkEntry = ctk.StringVar() 
     variavelFuncionarioAtual = ctk.StringVar()
-    variavelDefinidaDeAcrescimo = ctk.StringVar()
-    variavelValorSubtotal = ctk.StringVar()
     dataCriacao = ctk.StringVar()
     variavelnumeroDoPedido = ctk.StringVar()
     variavelEmAbertoFechado = ctk.StringVar() 
 
-    # variavelFuncionarioAtual.set(usuarioLogado)
+    variavelFuncionarioAtual.set(usuarioLogado)
     variavelEmAbertoFechado.set("Em aberto")
     dataCriacao.set(value=datetime.datetime.now().strftime("%d/%m/%y"))
 

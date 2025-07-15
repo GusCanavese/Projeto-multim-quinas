@@ -6,7 +6,7 @@ from consultas.insert import Insere
 
 
     # é chamado quando é cadastrado um novo usuário
-def registraUsuarioNoBanco(self):
+def registraUsuarioNoBanco(self, frame):
     nome = self.nomeFuncionario.get()
     cargo = self.cargo.get()
     login = self.loginFuncionario.get()
@@ -17,5 +17,5 @@ def registraUsuarioNoBanco(self):
     else:
         # cata da classe insere, a query que ta sendo feitra la
         Insere.insereUsuarioNoBanco(nome, cargo, login, senha)
-        self.frameTelaCadastroFuncionario.destroy()
+        frame.destroy()
     
