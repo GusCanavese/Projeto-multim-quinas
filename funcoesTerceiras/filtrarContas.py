@@ -30,7 +30,6 @@ def filtrarContas(self, frame, valor, pagina=1):
             item.destroy()
     self.dadosTelaFiltrarContas = []
 
-    # Calcula o intervalo de pedidos a mostrar
     inicioContas = (pagina - 1) * 10
     fimContas = pagina * 10
     contasPagina = contas[inicioContas:fimContas]

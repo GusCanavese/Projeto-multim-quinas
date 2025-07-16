@@ -6,8 +6,8 @@ from consultas.select import Buscas
 from telas.telaVerProduto import telaVerProduto
 from componentes import criaLabel, criaBotao
  
-def buscarProdutos(self, frame, nome, codigo, pagina=1):
-    produtos = Buscas.buscaEstoqueProdutos(nome, codigo)
+def buscarProdutos(self, frame, nome, cnpj, pagina=1):
+    produtos = Buscas.buscaEstoqueProdutos(nome, cnpj)
 
     # Remove dados anteriores da tabela
     if hasattr(self, "dadosTelaVerProdutos"):
@@ -25,8 +25,7 @@ def buscarProdutos(self, frame, nome, codigo, pagina=1):
         corDeFundo = "#1C60A0" 
         dadosProduto = [produto[0], produto[11], produto[2], produto[3], produto[4]]
         dadosextras = [produto[0], produto[11], produto[2], produto[3], produto[4], produto[5], produto[6], produto[7], produto[8]]
-        print(produto[1])
-        print(produto)
+
 
 
         x = 0.03
@@ -61,14 +60,14 @@ def buscarProdutos(self, frame, nome, codigo, pagina=1):
         
         params = {
             'nome': nome,
-            'codigo': codigo,
+            'cnpj': cnpj,
             'pagina': pagina,
         }
 
         if pagina > 1:
-            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.6, 0.2, lambda p=params: buscarProdutos(self, frame, p['nome'], p['codigo'], p['pagina']-1))
+            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.6, 0.2, lambda p=params: buscarProdutos(self, frame, p['nome'], p['cnpj'], p['pagina']-1))
             self.dadosTelaVerProdutos.append(btnAnterior)
 
         if fimProdutos < len(produtos):
-            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.6, 0.2, lambda p=params: buscarProdutos(self, frame, p['nome'], p['codigo'], p['pagina']+1))
+            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.6, 0.2, lambda p=params: buscarProdutos(self, frame, p['nome'], p['cnpj'], p['pagina']+1))
             self.dadosTelaVerProdutos.append(btnProxima)

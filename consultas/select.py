@@ -70,7 +70,6 @@ class Buscas:
         return resultado
     
     def buscaContasAPagar(valor, inicio, fim):
-        print(inicio, fim)
          
         if inicio:
             queryBuscaCliente = """SELECT confirmado, data_vencimento, descricao,  valor_total, numero_nfe, emitente_nome FROM contasapagar
@@ -95,44 +94,88 @@ class Buscas:
         return resultado
     
     def buscaPedidos(vendedor, numero, inicio, fim, checkbox):
-        queryBuscaPedidos = "SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao, destinatario, cpf, endereco, itens FROM pedidos WHERE 1=1"
-        parametros = []
+        if checkbox and inicio and fim:
+            if vendedor != "Todos":
+                queryBuscaPedidos = """SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao, 
+                                    destinatario, cpf, endereco, itens FROM pedidos 
+                                WHERE
+                                    data_emissao BETWEEN %s AND %s
+                                    AND vendedor LIKE %s
+                                    AND (
+                                        numero_recibo LIKE %s
+                                        OR subtotal LIKE %s
+                                    ) 
+                                ORDER BY data_emissao DESC"""
+                parametros = (inicio, fim, f"%{vendedor}%", f"%{numero}%", f"%{numero}%")
+            else:
+                queryBuscaPedidos = """SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao,
+                                    destinatario, cpf, endereco, itens FROM pedidos 
+                                WHERE 
+                                    data_emissao BETWEEN %s AND %s
+                                    AND (
+                                        vendedor LIKE %s
+                                        OR numero_recibo LIKE %s
+                                        OR subtotal LIKE %s
+                                    )
+                                ORDER BY data_emissao DESC"""
+                parametros = (inicio, fim, f"%{numero}%", f"%{numero}%", f"%{numero}%")
+        else:
+            if vendedor != "Todos":
+                queryBuscaPedidos = """SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao,
+                                    destinatario, cpf, endereco, itens FROM pedidos 
+                                WHERE
+                                    vendedor LIKE %s
+                                    AND (
+                                        numero_recibo LIKE %s
+                                        OR subtotal LIKE %s
+                                    )
+                                ORDER BY data_emissao DESC"""
+                parametros = (f"%{vendedor}%", f"%{numero}%", f"%{numero}%")
+            else:
+                queryBuscaPedidos = """SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao,
+                                    destinatario, cpf, endereco, itens FROM pedidos 
+                                WHERE 
+                                    vendedor LIKE %s
+                                    OR numero_recibo LIKE %s
+                                    OR subtotal LIKE %s
+                                ORDER BY data_emissao DESC"""
+                parametros = (f"%{numero}%", f"%{numero}%", f"%{numero}%")
 
-        if vendedor !="Nenhum":
-            queryBuscaPedidos += " AND vendedor LIKE %s"
-            parametros.append(f'%{vendedor}%')
-
-        if numero != '':
-            queryBuscaPedidos += " AND numero_recibo LIKE %s"
-            parametros.append(f'%{numero}%')
-
-        if not checkbox:
-            pass
-
-        elif (inicio and fim):
-            queryBuscaPedidos += " AND data_emissao BETWEEN %s AND %s"
-            parametros.extend([inicio, fim])
-
-
-        print(parametros)
+        print("Query executada:", queryBuscaPedidos % parametros)  # Debug: mostra a query com parâmetros
         db.cursor.execute(queryBuscaPedidos, parametros)
         resultado = db.cursor.fetchall()
+        print("Resultados encontrados:", len(resultado))  # Debug: mostra quantidade de resultados
         return resultado
-    
-    def buscaEstoqueProdutos(nome, codigo):
-        queryBuscaProdutosEstoque = "SELECT quantidade, descricao, codigo_interno, valor_de_venda, CNPJ, codigo_ncm, codigo_cfop, codigo_cest, valor_de_venda, valor_de_custo, origem_cst, nome_do_produto FROM produtos WHERE 1=1"
-        parametros = []
-        if nome is not None:
-            queryBuscaProdutosEstoque += " AND descricao LIKE %s"
-            parametros.append(f'%{nome}%')
 
-            print(codigo)
-        if codigo is not None:
-            queryBuscaProdutosEstoque += " AND codigo_interno LIKE %s"
-            parametros.append(f'%{codigo}%')
 
-        queryBuscaProdutosEstoque += " ORDER BY descricao ASC"
-        db.cursor.execute(queryBuscaProdutosEstoque, parametros)
+    def buscaEstoqueProdutos(valor, cnpj):
+        print(cnpj)
+        if cnpj == "Todos":
+            queryBuscaProdutosEstoque = """SELECT quantidade, descricao, codigo_interno, valor_de_venda, CNPJ, codigo_ncm, codigo_cfop, codigo_cest, valor_de_venda, valor_de_custo, origem_cst, nome_do_produto FROM produtos 
+            WHERE 
+                descricao like %s
+                or CNPJ like %s
+                or quantidade like %s
+                or nome_do_produto like %s
+                or codigo_interno like %s
+                or valor_de_venda like %s
+                ORDER BY descricao ASC"""
+            db.cursor.execute(queryBuscaProdutosEstoque, (f"%{valor}%", f"%{cnpj}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%"))
+        else:
+            queryBuscaProdutosEstoque = """SELECT quantidade, descricao, codigo_interno, valor_de_venda, CNPJ, codigo_ncm, codigo_cfop, codigo_cest, valor_de_venda, valor_de_custo, origem_cst, nome_do_produto FROM produtos 
+            WHERE 
+                CNPJ like %s
+                    AND (
+                        descricao LIKE %s
+                        OR quantidade LIKE %s
+                        OR nome_do_produto LIKE %s
+                        OR codigo_interno LIKE %s
+                        OR valor_de_venda LIKE %s
+                    )
+                ORDER BY descricao ASC"""
+            db.cursor.execute(queryBuscaProdutosEstoque, (cnpj, f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%"))
+
+        
         resultado = db.cursor.fetchall()
 
         return resultado

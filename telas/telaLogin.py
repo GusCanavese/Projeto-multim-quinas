@@ -7,7 +7,7 @@ from componentes import criaFrame
 
 
 def telaLogin(self):
-    self.title("login")
+    self.title("GestUp")
 
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
 
