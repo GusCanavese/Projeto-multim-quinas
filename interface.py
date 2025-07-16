@@ -43,6 +43,7 @@ class App(ctk.CTk):
         self.telas()
 
 
+
     def telas(self):
         # telas.telaGerarPedido.telaGerarPedido(self)
         # telas.telaApresentadorDePdf.telaApresentarPDF(self, "Pedido.pdf")

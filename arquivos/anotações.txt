@@ -5,8 +5,22 @@
 5 - tirar botao de gerar faturamento de um pedido concluído ✅
 6 - tela consultar estoque ta sem um botão de próximo ✅
 7 - limitar campos quantidade a 4 caracteres ✅
-8 - fazer um campo de busca geral da mesma forma que existe na tela contas a pagar e a receber ✅
+8 - fazer um campo de busca geral igual tela contas a pagar e receber ✅
 9 - colocar as buscas em ordem ✅
-10 - fazer as telas de busca iguais a de contas a pagar e a receber X
 11 - puxar a tela de contas a pagar e a receber para cima ✅
-12 - fazer com que a pesquisa de nome e de produto suma quando clicado para fora da tela
+12 - fazer com que a pesquisa de nome e de produto suma quando clicado para fora da tela ✅
+13 - correção dos emails nas telas de cadastro de transportadora e fornecedora ✅
+
+14 - deixar caps lock ativo quando for cadastrar algo 
+15 - cadastro de cliente trocar documento por 2 campos, o campo de cpf e um de cnpj ✅
+16 - buscar clientes na tela gerar pedido adaptada paracpf ou cnpj ✅
+16 - colocar função buscacep no cadastro de clientes com botao ✅
+17 - colocar cifrão nos campos de dinheiro e ,00
+18 - descrição do cadastro de proutos deve ser um capo escrito✅
+19 - alterar os cnpjs de cadastro de produto ✅
+
+ESTÉTICO:
+1 - telas de cadastro, colocar elas um pouco mais no meio
+2 - aumentar o tamanho dos botões da tela de ações 
+3 - colocar icones nos botoes das telas de ações
+4 - colocar um fundo nos labels das telas de cadastros

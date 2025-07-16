@@ -75,17 +75,20 @@ def telaGerarPedido(self):
         for i, row in enumerate(dadosCliente):
             if i >= 5:
                 break
-            label = ctk.CTkButton(frameTelaPedido,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cnpj=row[1]: selecionaCliente(nome, cnpj))
+            label = ctk.CTkButton(frameTelaPedido,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cpf=row[1], cnpj=row[2]: selecionaCliente(nome, cpf, cnpj))
             label.place(relx=0.05, rely=yNovo, relwidth=0.27)
             self.resultadoLabels.append(label)  
             yNovo += 0.039
 
-    def selecionaCliente(nome, cnpj):
+    def selecionaCliente(nome, cpf, cnpj):
         self.nomeDoClienteBuscado.delete(0, "end")
         self.nomeDoClienteBuscado.insert(0, nome)
-        variavelCnpjBuscado = cnpj
+        print(cpf)
+        print(cnpj)
         if cnpj:
-            variavelCtkEntry.set(variavelCnpjBuscado)
+            variavelCtkEntry.set(cnpj)
+        elif cpf:
+            variavelCtkEntry.set(cpf)
         else:
             variavelCtkEntry.set("sem valores")
         for label in self.resultadoLabels: 
