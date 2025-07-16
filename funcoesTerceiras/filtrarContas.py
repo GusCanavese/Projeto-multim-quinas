@@ -88,7 +88,7 @@ def filtrarContas(self, frame, valor, pagina=1):
         btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=conta: telaVercontasApagar(self, p))
         self.dadosTelaFiltrarContas.append(btn)
 
-        y += 0.045
+        y += 0.059
     
     if len(contas) > 10:
 

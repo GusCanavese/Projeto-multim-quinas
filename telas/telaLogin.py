@@ -9,7 +9,6 @@ from componentes import criaFrame
 def telaLogin(self):
     self.title("login")
 
-    # Frame centralizado com place(relx, rely)
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
 
     self.texto = ctk.CTkLabel(frame, width=1000, height=100, text="Fazer Login", font=("Century Gothic bold", 35))
@@ -24,9 +23,9 @@ def telaLogin(self):
     self.botaoEntrar = ctk.CTkButton(frame, text="Entrar", width=200, corner_radius=5, font=("Arial", 20), command=lambda:consultarUsuarioCadastrado(self))
     self.botaoEntrar.place(relx=0.5, rely=0.6, anchor="center")
 
-    ctk.set_appearance_mode("system")  # isso pode vir antes de tudo
+    ctk.set_appearance_mode("system")
 
-    modo_atual = ctk.get_appearance_mode()  # retorna "Dark" ou "Light"
+    modo_atual = ctk.get_appearance_mode()
     if modo_atual == "Dark":
         self.cor = "#38343c"
         valor_inicial = True
@@ -46,3 +45,6 @@ def telaLogin(self):
 
     switch = ctk.CTkSwitch(frame,text="Tema claro/escuro",variable=self.switch_var,command=mudar_estado)
     switch.place(relx=0.44, rely=0.7)
+
+    self.login.bind("<Return>", lambda event: consultarUsuarioCadastrado(self))
+    self.senha.bind("<Return>", lambda event: consultarUsuarioCadastrado(self))

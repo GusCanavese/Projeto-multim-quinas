@@ -11,24 +11,18 @@ def telaVerPedidos(self, p, d, desc):
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
 
     if p[4] == "Não confirmado":
-        criaBotao(frame, 'Confirmar alterações',    0.38, 0.95, 0.20, lambda:confirmarAlteracoesNoPedido.confirmarAlteracoesNoPedido(self, self.dataDaVendaTelaVerPedidos.get(), p[0]))
-
+        criaBotao(frame, 'Gerar faturamento', 0.495, 0.48, 0.15, lambda:telaGerarFaturamento(self, p[3], p[0], d[0]))
+        criaBotao(frame, 'Confirmar alterações',    0.38, 0.95, 0.20, lambda:confirmarAlteracoesNoPedido.confirmarAlteracoesNoPedido(self, self.dataDaVendaTelaVerPedidos.get(), p[0], frame))
         self.status = "Venda em aberto"
         dataDaVendaTelaVerPedidos = ''
         criarLabelEntry(frame, "Data de confirmação", 0.42, 0.08, 0.15, ctk.StringVar(value=dataDaVendaTelaVerPedidos))
-        criaBotao(frame, 'Confirmar venda', 0.7, 0.12, 0.15, lambda:confirmarAlteracoesNoPedido.confirmarHoje(self, p[0]))
+        criaBotao(frame, 'Confirmar venda', 0.7, 0.12, 0.15, lambda:confirmarAlteracoesNoPedido.confirmarHoje(self, p[0], frame))
     else:
         self.status = "Confirmado"
         dataDaVendaTelaVerPedidos = p[4]
         criaLabelDescritivo(frame, "Data de confirmação", 0.42, 0.07, 0.15, self.cor, ctk.StringVar(value=dataDaVendaTelaVerPedidos))
         criaLabelDescritivo(frame, 'Venda confirmada', 0.62, 0.07, 0.15, "green", None)
         
-
-
-
-
-
-
     # Primeira linha (relx espaçado em 0.2, rely em 0.05 e 0.1)
     criaLabelDescritivo(frame, "Número da venda",     0.02, 0.07, 0.15, self.cor, ctk.StringVar(value=p[0]))
     criaLabelDescritivo(frame, "Data de criação",     0.22, 0.07, 0.15, self.cor, ctk.StringVar(value=p[2]))
@@ -41,7 +35,6 @@ def telaVerPedidos(self, p, d, desc):
 
     criaLabelDescritivo(frame, "Endereço",        0.02, 0.43, 0.35, self.cor, ctk.StringVar(value=d[2]))
 
-    criaBotao(frame, 'Gerar faturamento', 0.495, 0.48, 0.15, lambda:telaGerarFaturamento(self, p[3], p[0], d[0]))
     criaBotao(frame, 'Voltar', 0.15, 0.95, 0.20, lambda:frame.destroy())
-    botaoExclui = criaBotao(frame, 'Cancelar/Excluir pedido', 0.61, 0.95, 0.20, lambda:confirmarExclusaoDoPedido.confirmarExclusaoNoPedido(self, p[0], desc, ))
+    botaoExclui = criaBotao(frame, 'Cancelar/Excluir pedido', 0.61, 0.95, 0.20, lambda:confirmarExclusaoDoPedido.confirmarExclusaoNoPedido(self, p[0], desc, frame))
     botaoExclui.configure(fg_color="#8B0000")

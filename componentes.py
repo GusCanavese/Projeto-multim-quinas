@@ -2,7 +2,7 @@ import customtkinter as ctk
 import gc
 
 def criarLabelEntry(frame, texto, relx, rely, width, variavel):
-    dif =0.04
+    dif = 0.04
     fonte = ("TkDefaultFont", 15)
     
     if texto == "Desconto total(%)" or texto == "Desconto total($)" or texto == "Acréscimo total" or texto == "Valor frete" or texto == "TOTAL:":
@@ -11,26 +11,93 @@ def criarLabelEntry(frame, texto, relx, rely, width, variavel):
 
     label = ctk.CTkLabel(frame, text=texto, width=50, font=fonte)
     label.place(relx=relx, rely=rely, anchor="w")
-    entry = ctk.CTkEntry(frame, textvariable=variavel, corner_radius=0)
+
+    if texto == "CPF" or texto == "CNPJ" or texto == "CPF/CNPJ *":
+        max_length = 14
+        numeric_only = True
+    elif texto == "CEP" or texto == "CEP *":
+        max_length = 8
+        numeric_only = True
+    elif texto == "Quantidade" or texto == "Quantidade *":
+        max_length = 4
+        numeric_only = True
+    elif texto == "Valor de custo" or texto == "Valor de venda" or texto == "Quantidade":
+        max_length = 30
+        numeric_only = True
+    elif texto == "Nome do produto":
+        max_length = 40
+        numeric_only = False
+    else:
+        max_length = 100
+        numeric_only = False
+
+    def _validate_input(valor_pos_edicao):
+        if valor_pos_edicao == "":
+            return True
+        
+        if len(valor_pos_edicao) > max_length:
+            return False
+            
+        if numeric_only:
+            if not valor_pos_edicao.isdigit():
+                return False
+        
+        return True
+
+    validation_command = frame.register(_validate_input)
+
+    entry = ctk.CTkEntry(frame, textvariable=variavel, corner_radius=0, validate="key", validatecommand=(validation_command, '%P'))
     entry.place(relx=relx, rely=rely + dif, relwidth=width, anchor="w")
+
     return entry
 
 def criarLabelComboBox(frame, texto, relx, rely, width, lista):
     label = ctk.CTkLabel(frame, text=texto, width=50, font=("Arial", 15))
     label.place(relx=relx, rely=rely, anchor="w")
     entry = ctk.CTkComboBox(frame, values=lista, corner_radius=0)
+    entry.bind("<Key>", lambda e: "break")
     entry.place(relx=relx, rely=rely + 0.04, relwidth=width, anchor="w")
     return entry
 
 def criaComboBox(frame, relx, rely, width, lista, comando):
     entry = ctk.CTkComboBox(frame, values=lista, corner_radius=0, command=comando)
+    entry.bind("<Key>", lambda e: "break")
     entry.place(relx=relx, rely=rely, relwidth=width, anchor="center")
     return entry
 
 def criarLabelLateralEntry(frame, texto, relx, rely, width, variavel):
     label = ctk.CTkLabel(frame, text=texto, anchor="e", width=100, font=("Arial", 15))
     label.place(relx=relx, rely=rely, anchor="e")
-    entry = ctk.CTkEntry(frame, textvariable=variavel, corner_radius=0)
+
+    if texto == "CPF" or texto == "CNPJ" or texto == "CPF/CNPJ *":
+        max_length = 14
+        numeric_only = True
+    elif texto == "CEP" or texto == "CEP *":
+        max_length = 8
+        numeric_only = True
+    elif texto == "Valor de custo" or texto == "Valor de venda":
+        max_length = 30
+        numeric_only = True
+    else:
+        max_length = 100
+        numeric_only = False
+
+    def _validate_input(valor_pos_edicao):
+        if valor_pos_edicao == "":
+            return True
+        
+        if len(valor_pos_edicao) > max_length:
+            return False
+            
+        if numeric_only:
+            if not valor_pos_edicao.isdigit():
+                return False
+        
+        return True
+
+    validation_command = frame.register(_validate_input)
+
+    entry = ctk.CTkEntry(frame, textvariable=variavel, corner_radius=0, validate="key", validatecommand=(validation_command, '%P'))
     entry.place(relx=relx + 0.01, rely=rely, relwidth=width, anchor="w")
     return entry
 
@@ -38,6 +105,7 @@ def criarLabelLateralComboBox(frame, texto, relx, rely, width, opcoes):
     label = ctk.CTkLabel(frame, text=texto, anchor="e", width=100, font=("Arial", 15))
     label.place(relx=relx, rely=rely, anchor="e")
     entry = ctk.CTkComboBox(frame, corner_radius=0, values=opcoes)
+    entry.bind("<Key>", lambda e: "break")
     entry.place(relx=relx + 0.01, rely=rely, relwidth=width, anchor="w")
     return entry
 
@@ -95,7 +163,27 @@ def criaLabel(frame, texto, relx, rely, width, cor):
     return label
 
 def criaEntry(frame, relx, rely, width, variavel):
-    entry = ctk.CTkEntry(frame, textvariable=variavel, corner_radius=0)
+
+    
+    max_length = 100
+    numeric_only = False
+
+    def _validate_input(valor_pos_edicao):
+        if valor_pos_edicao == "":
+            return True
+        
+        if len(valor_pos_edicao) > max_length:
+            return False
+            
+        if numeric_only:
+            if not valor_pos_edicao.isdigit():
+                return False
+        
+        return True
+
+    validation_command = frame.register(_validate_input)
+
+    entry = ctk.CTkEntry(frame, textvariable=variavel, corner_radius=0, validate="key", validatecommand=(validation_command, '%P'))
     entry.place(relx=relx, rely=rely, relwidth=width, anchor="w")
     return entry
 

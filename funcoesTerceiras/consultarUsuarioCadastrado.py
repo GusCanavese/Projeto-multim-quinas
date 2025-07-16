@@ -10,6 +10,7 @@ from telas.telaAcoes import telaAcoes
 def consultarUsuarioCadastrado(self):
     login = self.login.get()
     senha = self.senha.get()
+    self.logado = login
     usuarioLogando = Buscas.consultaUsuario(login, senha)
 
     if not usuarioLogando:
@@ -18,8 +19,12 @@ def consultarUsuarioCadastrado(self):
         self.usuarioNaoCadastrado = ctk.CTkLabel(self.frameUsuarioNaoCadastrado,  text="Esse usuário não foi encontrado.", font=("Arial", 18))
         self.usuarioNaoCadastrado.place(x=20, y=35)
         self.after(3000, self.frameUsuarioNaoCadastrado.destroy)
-        gc.collect
+        gc.collect()
 
     else:
+        self.login.delete(0, 'end')
+        self.senha.delete(0, 'end')
+        print('é pra ter deletado')
         telaAcoes(self)
+
         

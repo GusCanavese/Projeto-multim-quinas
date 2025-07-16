@@ -1,86 +1,11 @@
-1 - tela de login pra criação de perfis ✅
-2 - relatório de vendas podendo selecionar a vendedora, e o período ✅
-3 - estoque geral e fiscal (não representável no protótipo)
-4 - tela de saída seleção de produtos e criação de nota *em produção* 
-    4.1 - nota fiscal pode ter a opção de ser dada a entrada pelo arquivo XML ✅
-
-5 - tela de cadastros
-    5.1 - clientes
-        5.1.1 - nome                ✅    
-        5.1.2 - cpf/cnpj            ✅
-        5.1.3 - inscrição estadual  ✅
-        5.1.4 - RG                  ✅
-        5.1.5 - endereço            ✅
-        5.1.6 - cep                 ✅
-        5.1.7 - número              ✅
-        5.1.8 - bairro              ✅
-        5.1.9 - cidade              ✅
-
-    5.2 - produtos
-        5.2.1 - nome do produto       ✅
-        5.2.2 - Código do produto     ✅
-        5.2.3 - valor de custo        ✅
-        5.2.4 - valor de venda        ✅
-        5.2.5 - codigo ncm, cfop cest ✅
-
-
-
-
-ANOTAÇÕES
-- VENDEDOR INTERNO ainda poderá cadastrar outras coisas
-
-- fazer entrar com enter na tela de login 
-- tornar senha obrigatopria na tela de login                 ✅
-- fazer um perfil persistente, onde você não se disconecta   ✅
-- economia de memoria destruindo as telas                    ✅
-- COINECTAR ao banco de dados a tela de cadastro de produtos ✅
-
-- corrigir erro de quando dermarcar o "sim" do receber email, a entry também precisa sair
-- sumir com a mensagem de campos obrigatorios do cadastro de produtos
-- fazer com que a mensagem de usuario nao cadastrado apareça somente quando nao encontrar o usuário que procurou
-- colocar numero de série no produto
-- tornar o campo CPF ou CNPJ de fornecedor, obrigatório
-
-- fazer o desconto porcentagem do item afetar seu valor final
-- definir um vaor limite para os descontos na tela de gerar pedido
-- corrigir calculo do desconto total porcentagem da tela de gerar pedido
-- fazer com que o produto seja referente ao cpf
-- corrigir o campo quantidade quando adicionado um novo item da tela de pedido
-
-
-# ========================================================================================================================================================================================= #
--ao gerar pedido, colocar um valor de quantidade, salvar pedido, clicar em "nao confirmar" e mudar a quantidade, o pedido vai ou com o valor digitado primeiro, ou vai com 0, corrigir isso
-# ========================================================================================================================================================================================= #
-
-
-
-
-
-USUÁRIO BLOQUEADO(Yara): userbloq 123
-USUÁRIO SEMIBLOQUEADO(vendedor interno) semibloq 123
-ADM: adm 123
- 
-
-
-
-
-
-
-
-
-
-
-
-
-separar a tela de gerar pedido e gerar orçamento
-fazer a tela de faturamento de acordo com a tela do tag
-fazer as abas de "gerar pedido" "faturamento" na tela de gerar pedido
-
-
-
-
-
-
-
-
-suar o relx com o tamanho e a divisão da largura, e fazer a mesma coisa para relwhidth e relheight pois assim os campos vão reagir proporcionalmente para a modificação do tamanho da tela
+1 - tamanho ilimitado para campos ✅
+2 - cpf e cnpj devem ser somente numero ✅
+3 - não é possível escrever em um combobox ✅
+4 - login e senha são deletados após acessar a tela de ações ✅
+5 - tirar botao de gerar faturamento de um pedido concluído ✅
+6 - tela consultar estoque ta sem um botão de próximo ✅
+7 - limitar campos quantidade a 4 caracteres ✅
+8 - fazer um campo de busca geral da mesma forma que existe na tela contas a pagar e a receber 
+9 - colocar as buscas em ordem ✅
+10 - fazer as telas de busca iguais a de contas a pagar e a receber
+11 - puxar a tela de contas a pagar e a receber para cima ✅

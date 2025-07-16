@@ -13,11 +13,11 @@ from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
 from componentes import criaFrame, criaBotao
 
 def telaAcoes(self):
+    
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
 
-    usuarioBloqueado = self.login.get()
+    usuarioBloqueado = self.logado
     cargo = Buscas.buscaCargoUsuarioBloqueado(usuarioBloqueado)
-    print("Cargo:", cargo)
 
     self.Acoes = ctk.CTkLabel(frame, width=950, height=0, text="Ações", font=("Century Gothic bold", 30))
     self.Acoes.place(relx=0.5, y=50, anchor="center")

@@ -19,18 +19,18 @@ def buscarProdutos(self, frame, nome, codigo, pagina=1):
     inicioProduto = (pagina - 1) * 10
     fimProdutos = pagina * 10
     pedidosPagina = produtos[inicioProduto:fimProdutos]
-    print(pedidosPagina)
     
     y = 0.1
-    for rowProduto, produtos in enumerate(pedidosPagina, start=1):
+    for rowProduto, produto in enumerate(pedidosPagina, start=1):
         corDeFundo = "#1C60A0" 
-        dadosProduto = [produtos[0], produtos[1], produtos[2], produtos[3], produtos[4]]
-        dadosextras = [produtos[0], produtos[1], produtos[2], produtos[3], produtos[4], produtos[5], produtos[6], produtos[7], produtos[8]]
+        dadosProduto = [produto[0], produto[11], produto[2], produto[3], produto[4]]
+        dadosextras = [produto[0], produto[11], produto[2], produto[3], produto[4], produto[5], produto[6], produto[7], produto[8]]
+        print(produto[1])
+        print(produto)
 
 
         x = 0.03
         for colNum, valor in enumerate(dadosProduto):
-            print(colNum)
             if colNum == 0:
                 label = criaLabel(frame, valor, x, y, 0.04, corDeFundo)
                 x+=0.043
@@ -55,6 +55,8 @@ def buscarProdutos(self, frame, nome, codigo, pagina=1):
         y += 0.045
 
     # Adiciona botões de navegação se houver mais pedidos
+
+
     if len(produtos) > 10:
         
         params = {

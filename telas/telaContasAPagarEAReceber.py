@@ -9,7 +9,7 @@ from componentes import criaFrame, criaLabel, criaBotao, criaComboBox, criarLabe
 
 def telaContasAPagarEAReceber(self):
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
-    frameContas = criaFrame(frame, 0.5, 0.65, 0.95, 0.93)
+    frameContas = criaFrame(frame, 0.5, 0.50, 0.95, 0.7)
     opcoes = ["Nenhum", "Entrada/Débito", "Saída/Crédito"]
 
     
@@ -19,7 +19,7 @@ def telaContasAPagarEAReceber(self):
     self.selecionarPeriodoContas.place(relx=0.55, rely=0.03, anchor="nw")
     self.selecionarPeriodoContas.bind("<Button-1>", command=lambda event: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodoContas(self, frame, self.selecionarPeriodoContas.get(), event))
     
-    filtrarPorNumero = criarLabelEntry(frame,"Filtrar pelo Nº", 0.25, 0.01, 0.22, None)
+    filtrarPorNumero = criarLabelEntry(frame,"Filtrar", 0.25, 0.01, 0.22, None)
     criaBotao(frame, "Buscar", 0.36, 0.11, 0.22, lambda:filtrarContas.filtrarContas(self, frameContas, filtrarPorNumero.get()))
 
     def escolheTela(valor):

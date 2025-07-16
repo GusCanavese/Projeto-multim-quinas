@@ -25,7 +25,7 @@ def telaGerarOrcamento(self):
 
 
 
-    usuarioLogado = self.login.get()
+    usuarioLogado = self.logado
     usuarioLogado = usuarioLogado.capitalize()
 
     #pós refat 

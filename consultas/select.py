@@ -120,7 +120,7 @@ class Buscas:
         return resultado
     
     def buscaEstoqueProdutos(nome, codigo):
-        queryBuscaProdutosEstoque = "SELECT quantidade, descricao, codigo_interno, valor_de_venda, CNPJ, codigo_ncm, codigo_cfop, codigo_cest, valor_de_venda, valor_de_custo origem_cst FROM produtos WHERE 1=1"
+        queryBuscaProdutosEstoque = "SELECT quantidade, descricao, codigo_interno, valor_de_venda, CNPJ, codigo_ncm, codigo_cfop, codigo_cest, valor_de_venda, valor_de_custo, origem_cst, nome_do_produto FROM produtos WHERE 1=1"
         parametros = []
         if nome is not None:
             queryBuscaProdutosEstoque += " AND descricao LIKE %s"
