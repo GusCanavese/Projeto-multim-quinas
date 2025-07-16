@@ -143,6 +143,17 @@ def telaGerarPedido(self):
     self.totalSubtotal=criarLabelEntry(frameTelaPedido, "TOTAL:", 0.8, 0.75, 0.15, None)
     self.totalSubtotal.configure(state="disabled")
 
+    def fechar_resultados(event):
+        if hasattr(self, 'resultadoLabels'):
+            for label in self.resultadoLabels:
+                label.destroy()
+        if hasattr(self, 'resultadoLabelsProduto'):
+            for label in self.resultadoLabelsProduto:
+                label.destroy()
+
+    frameParaItens.bind("<Button-1>", fechar_resultados)
+    frameParaItensNoFrame.bind("<Button-1>", fechar_resultados)
+    frameTelaPedido.bind("<Button-1>", fechar_resultados)
 
     def atualizarTotalGeral():
         total = 0.0
@@ -300,6 +311,7 @@ def telaGerarPedido(self):
             elif i == 1:
                 entradaProduto = criaEntry(frameParaItensNoFrame, self.posicaox, self.posicaoy, 0.16, None)
                 entradaProduto.bind("<KeyRelease>", lambda event, ent=entradaProduto, y=self.posicaoy: buscaProduto(ent.get(), ent, y))
+                entradaProduto.bind("<Button-1>", lambda event, ent=entradaProduto, y=self.posicaoy: buscaProduto(ent.get(), ent, y))
                 linha_widgets["produto"] = entradaProduto
                 self.posicaox += 0.161
                 self.entradaProduto = entradaProduto
@@ -371,6 +383,7 @@ def telaGerarPedido(self):
     self.dataDeCriacao = criarLabelEntry(frameTelaPedido, "Data de criação", 0.20, 0.05, 0.12, dataCriacao)
     self.nomeDoClienteBuscado = criarLabelEntry(frameTelaPedido, "Nome do cliente *", 0.05, 0.15, 0.27, None)
     self.nomeDoClienteBuscado.bind("<KeyRelease>", buscaCliente)
+    self.nomeDoClienteBuscado.bind("<Button-1>", buscaCliente)
 
     self.dataDaVenda = criarLabelEntry(frameTelaPedido, "Data da venda", 0.39, 0.05, 0.15, None)
     self.statusDoPedido = criarLabelEntry(frameTelaPedido, "Status", 0.57, 0.05, 0.15, variavelEmAbertoFechado)

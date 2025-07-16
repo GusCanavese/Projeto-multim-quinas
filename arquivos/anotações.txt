@@ -5,7 +5,8 @@
 5 - tirar botao de gerar faturamento de um pedido concluído ✅
 6 - tela consultar estoque ta sem um botão de próximo ✅
 7 - limitar campos quantidade a 4 caracteres ✅
-8 - fazer um campo de busca geral da mesma forma que existe na tela contas a pagar e a receber 
+8 - fazer um campo de busca geral da mesma forma que existe na tela contas a pagar e a receber ✅
 9 - colocar as buscas em ordem ✅
-10 - fazer as telas de busca iguais a de contas a pagar e a receber
+10 - fazer as telas de busca iguais a de contas a pagar e a receber X
 11 - puxar a tela de contas a pagar e a receber para cima ✅
+12 - fazer com que a pesquisa de nome e de produto suma quando clicado para fora da tela
