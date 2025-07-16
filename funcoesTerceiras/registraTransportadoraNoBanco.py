@@ -22,16 +22,16 @@ def registraTransportadoraNoBanco(self, frame):
         try:
             cnpjTransport = self.CNPJTransportadora.get()
             cpfoupjVariavel = cnpjTransport
-            print("pegou cnpj")
+
         except:
             cpfTransport = self.CPFTransportadora.get()
             cpfoupjVariavel = cpfTransport
-            print("pegou cpf")
-            print(self.transpRecebeEmail[3].get())
-        if self.transpRecebeEmail[3].get() == "Sim." and self.emailTransportadora.get() == "":
+
+        if self.transpRecebeEmail[3].get() == "Sim." and self.emailTransportadora[0].get() == "":
             messagebox.showerror("erro", "valores estão em branco")
+            condicao = False
+        else:
             condicao = True
-        condicao = True
     else:
         messagebox.showerror("erro", "valores estão em branco")
         condicao = False
@@ -41,9 +41,9 @@ def registraTransportadoraNoBanco(self, frame):
         dados = {
             "ativo": self.ehAtivo[3].get(),
             "tipo": self.ehCpfCnpj[3].get(),
-            "documento": cpfoupjVariavel,
+            "CPF_CNPJ": cpfoupjVariavel,
             "recebe_email": self.transpRecebeEmail[3].get(),
-            "email": self.emailTransportadora.get() if hasattr(self, "emailTransportadora") else None,
+            "email": self.emailTransportadora[0].get() if hasattr(self, "emailTransportadora") else None,
             "nome_real": self.nomeTransportadora.get(),
             "nome_fantasia": self.nomeFantasiaTransportadora.get(),
             "inscricao_estadual": self.inscricaoEstadualTransportadora.get(),
@@ -52,7 +52,7 @@ def registraTransportadoraNoBanco(self, frame):
         dados = {k: v for k, v in dados.items() if v is not None and v != ""}
 
         Insere.registraFornecedorNoBanco(dados)
-
+        messagebox.showinfo("Sucesso!", "Fornecedor cadastrado com sucesso!")
         frame.destroy()
         gc.collect()
                 

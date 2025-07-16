@@ -23,15 +23,14 @@ def registraFornecedorNoBanco(self, frame):
         try:
             cnpjfornecedor = self.cnpjFornecedor.get()
             cpfoupjVariavel = cnpjfornecedor
-            print("pegou cnpj")
         except:
             cpffornecedor = self.cpfFornecedor.get()
             cpfoupjVariavel = cpffornecedor
-            print("pegou cpf")
-        if self.recebeEmail[3].get() == "Sim." and self.campoRecebeEmail.get() == "":
+        if self.recebeEmail[3].get() == "Sim." and self.campoRecebeEmail[0].get() == "":
             messagebox.showerror("erro", "valores estão em branco")
+            condicao = False
+        else:
             condicao = True
-        condicao = True
     else:
         messagebox.showerror("erro", "valores estão em branco")
         condicao = False
