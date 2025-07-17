@@ -1,23 +1,26 @@
-1 - tamanho ilimitado para campos ✅
-2 - cpf e cnpj devem ser somente numero ✅
-3 - não é possível escrever em um combobox ✅
-4 - login e senha são deletados após acessar a tela de ações ✅
-5 - tirar botao de gerar faturamento de um pedido concluído ✅
-6 - tela consultar estoque ta sem um botão de próximo ✅
-7 - limitar campos quantidade a 4 caracteres ✅
-8 - fazer um campo de busca geral igual tela contas a pagar e receber ✅
-9 - colocar as buscas em ordem ✅
-11 - puxar a tela de contas a pagar e a receber para cima ✅
+1 - tamanho ilimitado para campos                                                        ✅
+2 - cpf e cnpj devem ser somente numero                                                  ✅
+3 - não é possível escrever em um combobox                                               ✅
+4 - login e senha são deletados após acessar a tela de ações                             ✅
+5 - tirar botao de gerar faturamento de um pedido concluído                              ✅
+6 - tela consultar estoque ta sem um botão de próximo                                    ✅
+7 - limitar campos quantidade a 4 caracteres                                             ✅
+8 - fazer um campo de busca geral igual tela contas a pagar e receber                    ✅
+9 - colocar as buscas em ordem                                                           ✅
+11 - puxar a tela de contas a pagar e a receber para cima                                ✅
 12 - fazer com que a pesquisa de nome e de produto suma quando clicado para fora da tela ✅
-13 - correção dos emails nas telas de cadastro de transportadora e fornecedora ✅
+13 - correção dos emails nas telas de cadastro de transportadora e fornecedora           ✅
 
-14 - deixar caps lock ativo quando for cadastrar algo 
+14 - deixar caps lock ativo quando for cadastrar algo                               ❌
 15 - cadastro de cliente trocar documento por 2 campos, o campo de cpf e um de cnpj ✅
-16 - buscar clientes na tela gerar pedido adaptada paracpf ou cnpj ✅
-16 - colocar função buscacep no cadastro de clientes com botao ✅
-17 - colocar cifrão nos campos de dinheiro e ,00
-18 - descrição do cadastro de proutos deve ser um capo escrito✅
-19 - alterar os cnpjs de cadastro de produto ✅
+16 - buscar clientes na tela gerar pedido adaptada paracpf ou cnpj                  ✅
+16 - colocar função buscacep no cadastro de clientes com botao                      ✅
+17 - colocar cifrão nos campos de dinheiro e ,00                                    ❌
+18 - descrição do cadastro de proutos deve ser um capo escrito                      ✅
+19 - alterar os cnpjs de cadastro de produto                                        ✅
+20 - tirar o campo data de venda da tela de gerar pedido                            ✅
+21 - quantidade de itens ta indo com a quantidade existente no estoque              ❓
+22 - buscar o cep direto de cliente                                                 ✅
 
 ESTÉTICO:
 1 - telas de cadastro, colocar elas um pouco mais no meio

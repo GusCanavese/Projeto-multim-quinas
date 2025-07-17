@@ -10,7 +10,7 @@ from funcoesTerceiras import geradorDePedido
 from telas.telaApresentadorDePdf import telaApresentarPDF
 import json
 
-def PassaDadosParaPedido(self):
+def PassaDadosParaPedido(self, frame):
     dataAgora = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     resultados = Buscas.buscaDadosCliente(self.nomeDoClienteBuscado.get())
 
@@ -46,7 +46,6 @@ def PassaDadosParaPedido(self):
             "cpf": self.CPFCliente.get(),
             "destinatario": self.nomeDoClienteBuscado.get(),
             
-            "data_confirmacao": self.dataDaVenda.get(),
             "numero_recibo": self.numeroDeVenda.get(),  # corrigido, estava self..get()
             "data_emissao": dataAgora,  # OK, já é string
             
@@ -67,6 +66,7 @@ def PassaDadosParaPedido(self):
             print(descricaoProdutos)
             print(descricaoProdutos)
             Atualiza.removeUnidadesDeProdutos(desc=descricaoProdutos)
+            frame.destroy()
         
 
 

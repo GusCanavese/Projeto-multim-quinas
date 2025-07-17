@@ -16,10 +16,10 @@ def registraClienteNoBanco(self, frame):
     numero = self.numeroCliente.get()
     bairro = self.bairroCliente.get()
     cidade = self.cidadeCliente.get()
+    referencia = self.referencia.get()
 
-    if not nome or not (cpf or cnpj) or not IE or not RG or not endereco or not numero or not bairro or not cidade: 
+    if not nome or not (cpf or cnpj) or not endereco or not numero or not bairro or not cidade: 
         messagebox.showinfo(title="Registro falhou", message="Campos obrigatórios não podem estar em branco")
     else:
-        #Pega da classe insere, a query que ta sendo feita la
-        Insere.insereClienteNoBanco(nome, cpf, cnpj, IE, RG, endereco, CEP, numero, bairro, cidade)
+        Insere.insereClienteNoBanco(nome, cpf, cnpj, IE, RG, endereco, CEP, numero, bairro, cidade, referencia)
         frame.destroy()

@@ -16,11 +16,10 @@ def telaCadastroProdutos(self):
 
     # Nome
     self.nomeProduto = criarLabelEntry(frame, "Nome do produto", 0.1, 0.135, 0.20, None)
-    self.valorCusto = criarLabelEntry(frame, "Valor de custo", 0.33, 0.135, 0.20, None)
+    self.ValorCusto = criarLabelEntry(frame, "Valor de custo", 0.33, 0.135, 0.20, None)
     self.ValorVenda = criarLabelEntry(frame, "Valor de venda", 0.56, 0.135, 0.20, None)
     self.Quantidade = criarLabelEntry(frame, "Quantidade", 0.79, 0.135, 0.10, None)
-    self.valorCusto.configure(placeholder_text="R$ 0,00")  
-    self.ValorVenda.configure(placeholder_text="R$ 0,00")
+
 
     self.CodigoInterno = criarLabelEntry(frame, "Código interno", 0.1, 0.26, 0.20, None)
     self.NCM = criarLabelEntry(frame, "Código NCM", 0.33, 0.26, 0.17, None)
@@ -31,6 +30,5 @@ def telaCadastroProdutos(self):
     self.Descricao = criarLabelEntry(frame, "Descrição", 0.33, 0.4, 0.265, None)
     self.CNPJ = criarLabelComboBox(frame, "CNPJ", 0.63, 0.4, 0.26, opcoesCNPJ)
 
-    self.valorCusto.bind("<Button-1>", lambda e: self.valorCusto.delete(0, "end") if self.valorCusto.get() in ("0", "0,00", "0.00") else None)
     criaBotao(frame, "Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
     criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraProdutoNoBanco(self, frame))

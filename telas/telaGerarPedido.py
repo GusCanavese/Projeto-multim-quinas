@@ -36,6 +36,10 @@ def telaGerarPedido(self):
     dataCriacao = ctk.StringVar()
     variavelnumeroDoPedido = ctk.StringVar()
     variavelEmAbertoFechado = ctk.StringVar() 
+    variavelCep = ctk.StringVar()
+    variavelEndereco = ctk.StringVar()
+    variavelNumero = ctk.StringVar()
+    variavelReferencia = ctk.StringVar()
 
     variavelFuncionarioAtual.set(usuarioLogado)
     variavelEmAbertoFechado.set("Em aberto")
@@ -72,25 +76,38 @@ def telaGerarPedido(self):
         self.resultadoLabels = []
         
         yNovo = 0.21  
+        print(dadosCliente)
+
         for i, row in enumerate(dadosCliente):
             if i >= 5:
                 break
-            label = ctk.CTkButton(frameTelaPedido,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cpf=row[1], cnpj=row[2]: selecionaCliente(nome, cpf, cnpj))
+            label = ctk.CTkButton(frameTelaPedido,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cpf=row[1], cnpj=row[2], cep=row[4], endereco=row[5], referencia=row[6], num=row[7]: selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, num))
             label.place(relx=0.05, rely=yNovo, relwidth=0.27)
             self.resultadoLabels.append(label)  
-            yNovo += 0.039
+            yNovo += 0.0399
 
-    def selecionaCliente(nome, cpf, cnpj):
+    def selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, numero):
         self.nomeDoClienteBuscado.delete(0, "end")
         self.nomeDoClienteBuscado.insert(0, nome)
-        print(cpf)
-        print(cnpj)
         if cnpj:
             variavelCtkEntry.set(cnpj)
         elif cpf:
             variavelCtkEntry.set(cpf)
         else:
             variavelCtkEntry.set("sem valores")
+        
+        self.entradaCEP.delete(0, "end")
+        self.entradaEnderecoNoPedido.delete(0, "end")
+        self.entradaNumero.delete(0, "end")
+        self.entradaReferenciaEnderecoEntrega.delete(0, "end")
+        if referencia == None:
+            referencia = ""
+
+
+        variavelCep.set(cep)
+        variavelEndereco.set(endereco)
+        variavelReferencia.set(referencia)
+        variavelNumero.set(numero)
         for label in self.resultadoLabels: 
             label.destroy()
 
@@ -123,6 +140,7 @@ def telaGerarPedido(self):
 
                 linha["estoque"].delete(0, "end")
                 linha["estoque"].insert(0, quantidade)
+                linha["estoque"].configure(state="disabled")
 
                 linha["desc_real"].delete(0, "end")
                 linha["desc_real"].insert(0, "0")
@@ -171,7 +189,7 @@ def telaGerarPedido(self):
             
             descReal = float(entry_descReal.get().replace(",", ".") or 0)
             descPorc = float(entry_descPorc.get().replace(",", ".") or 0)
-            quantida = float(entry_quantida.get().replace(",", ".") or 0)
+            quantida = float(entry_quantida.get() or 0)
             acrescim = float(entry_acrescim.get().replace(",", ".") or 0)
             descPorc = descPorc/100
 
@@ -264,7 +282,7 @@ def telaGerarPedido(self):
     self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotao-0.04)
     
 
-    def montarValoresDosItens():
+    def montarValoresDosItens(frame):
         self.valoresDosItens = []
         for linha in self.linhas:
             produto = linha["produto"].get()
@@ -290,7 +308,7 @@ def telaGerarPedido(self):
                 "desconto_porcentagem": desc_porcentagem,
             }
             self.valoresDosItens.append(item)
-        salvarPedido(self)
+        salvarPedido(self, frame)
 
 
     def adicionarItem(self):
@@ -304,9 +322,6 @@ def telaGerarPedido(self):
         
 
         for i, coluna in enumerate(listaLabels):
-            self.totalEstoque = 0
-            self.quantidade = 0
-
             if i == 0:
                 label = criaLabel(frameParaItensNoFrame, int(self.contadorDeLinhas / 9) + 1, self.posicaox, self.posicaoy, 0.040, self.cor)
                 linha_widgets["item"] = label
@@ -332,15 +347,19 @@ def telaGerarPedido(self):
 
                 if campo == "desc_real":
                     entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == "desc_porcentagem":
                     entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'quantidade':
                     entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'acrescimo':
                     entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'subtotal':
                     entrada.bind("<KeyRelease>", lambda event: atualizarTotalGeral())
@@ -388,15 +407,15 @@ def telaGerarPedido(self):
     self.nomeDoClienteBuscado.bind("<KeyRelease>", buscaCliente)
     self.nomeDoClienteBuscado.bind("<Button-1>", buscaCliente)
 
-    self.dataDaVenda = criarLabelEntry(frameTelaPedido, "Data da venda", 0.39, 0.05, 0.15, None)
-    self.statusDoPedido = criarLabelEntry(frameTelaPedido, "Status", 0.57, 0.05, 0.15, variavelEmAbertoFechado)
+    self.statusDoPedido = criarLabelEntry(frameTelaPedido, "Status", 0.39, 0.05, 0.33, variavelEmAbertoFechado)
+    self.statusDoPedido.configure(state="disabled")
     self.funcionariaPedido = criarLabelEntry(frameTelaPedido, "Vendedor(a)", 0.75, 0.05, 0.15, variavelFuncionarioAtual)
     self.CPFCliente = criarLabelEntry(frameTelaPedido, "CPF/CNPJ *", 0.39, 0.15, 0.15, variavelCtkEntry)
-    self.entradaCEP = criarLabelEntry(frameTelaPedido, "CEP *", 0.57, 0.15, 0.15, None)
-    self.entradaNumero = criarLabelEntry(frameTelaPedido, "Nº *", 0.75, 0.15, 0.05, None)
+    self.entradaCEP = criarLabelEntry(frameTelaPedido, "CEP *", 0.57, 0.15, 0.15, variavelCep)
+    self.entradaNumero = criarLabelEntry(frameTelaPedido, "Nº *", 0.75, 0.15, 0.05, variavelNumero)
     self.botaoBuscaCEP = criaBotaoPequeno(frameTelaPedido, "Buscar CEP", 0.865, 0.19, 0.07, lambda:buscaCep(self.entradaCEP.get(), self.entradaNumero.get()))
-    self.entradaEnderecoNoPedido = criarLabelEntry(frameTelaPedido, "Endereço *", 0.39, 0.25, 0.33, None)
-    self.entradaReferenciaEnderecoEntrega = criarLabelEntry(frameTelaPedido, "Referencia *", 0.75, 0.25, 0.15, None)
+    self.entradaEnderecoNoPedido = criarLabelEntry(frameTelaPedido, "Endereço *", 0.39, 0.25, 0.33, variavelEndereco)
+    self.entradaReferenciaEnderecoEntrega = criarLabelEntry(frameTelaPedido, "Referencia *", 0.75, 0.25, 0.15, variavelReferencia)
 
     self.textArea1 = criaTextArea(frameTelaPedido, 0.05, 0.65, 0.2, "Observações", "É necessário a apresentação do recibo de venda para que a vendedora abra \na assistência técnica, se necessário. Não devolvemos dinheiro. \n\nCONDIÇÃO DE PAGAMENTO:\nTROCA: \nENTREGA:")
     self.textArea2 = criaTextArea(frameTelaPedido, 0.3, 0.65, 0.2, "Observações da entrega", "Dados financeiros pertinentes")
@@ -414,6 +433,6 @@ def telaGerarPedido(self):
 
 
     criaBotao(frameTelaPedido, "Voltar", 0.15, 0.95, 0.20, lambda:frameTelaPedido.destroy())
-    criaBotao(frameTelaPedido, "Cadastrar", 0.87, 0.95, 0.20, lambda:montarValoresDosItens())
+    criaBotao(frameTelaPedido, "Cadastrar", 0.87, 0.95, 0.20, lambda:montarValoresDosItens(frameTelaPedido))
 
     
