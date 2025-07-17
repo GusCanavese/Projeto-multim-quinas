@@ -9,6 +9,7 @@ from PIL import Image
 import datetime
 from funcoesTerceiras.verificaSeQuerSalvar import salvarPedido
 from componentes import criaFrame, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
+from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
 def telaGerarPedido(self):
@@ -434,5 +435,7 @@ def telaGerarPedido(self):
 
     criaBotao(frameTelaPedido, "Voltar", 0.15, 0.95, 0.20, lambda:frameTelaPedido.destroy())
     criaBotao(frameTelaPedido, "Cadastrar", 0.87, 0.95, 0.20, lambda:montarValoresDosItens(frameTelaPedido))
+
+    aplicar_maiusculo_em_todos_entries(self)
 
     

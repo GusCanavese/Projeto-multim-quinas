@@ -13,6 +13,17 @@ from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
 from componentes import criaFrame, criaBotao
 
 def telaAcoes(self):
+
+    def aplicar_maiusculo_em_todos_entries(widget_raiz):
+        for widget in widget_raiz.winfo_children():
+            if isinstance(widget, ctk.CTkEntry):
+                var = widget.cget("textvariable")
+                if not var:
+                    var = ctk.StringVar()
+                    widget.configure(textvariable=var)
+                var.trace_add("write", lambda *args, v=var: v.set(v.get().upper()))
+            aplicar_maiusculo_em_todos_entries(widget)
+
     
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
 
@@ -38,3 +49,4 @@ def telaAcoes(self):
         criaBotao(frame, "Contas a pagar/receber", 0.66, 0.30, 0.24, lambda: telaContasAPagarEAReceber(self))
         criaBotao(frame, "Consultar estoque", 0.66, 0.36, 0.24, lambda: telaEstoque(self))
         criaBotao(frame, "Trocar usuário", 0.33, 0.80, 0.18, lambda: frame.destroy())
+    aplicar_maiusculo_em_todos_entries(self)

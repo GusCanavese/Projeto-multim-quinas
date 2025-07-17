@@ -4,6 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.registraProdutoNoBanco import registraProdutoNoBanco
 from componentes import criarLabelEntry, criaFrame, criaBotao, criarLabelComboBox
+from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 def telaCadastroProdutos(self):
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
@@ -32,3 +33,4 @@ def telaCadastroProdutos(self):
 
     criaBotao(frame, "Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
     criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraProdutoNoBanco(self, frame))
+    aplicar_maiusculo_em_todos_entries(self)

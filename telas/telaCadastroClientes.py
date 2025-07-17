@@ -7,6 +7,7 @@ from tkinter import messagebox
 import requests
 from funcoesTerceiras.registraClienteNoBanco import registraClienteNoBanco
 from componentes import criaFrame, criarLabelEntry, criaBotao, criaBotaoPequeno
+from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 def telaCadastroClientes(self):
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
@@ -56,3 +57,4 @@ def telaCadastroClientes(self):
 
     criaBotao(frame, "Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
     criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraClienteNoBanco(self, frame))
+    aplicar_maiusculo_em_todos_entries(self)

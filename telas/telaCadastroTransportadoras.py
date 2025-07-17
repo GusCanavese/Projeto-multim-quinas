@@ -5,6 +5,7 @@ import customtkinter as ctk
 import gc
 from funcoesTerceiras.registraTransportadoraNoBanco import registraTransportadoraNoBanco
 from componentes import criaFrame, criaSimouNao, criarLabelEntry, criaBotao, criarLabelEntryEmail
+from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
 def telaCadastroTransportadoras(self):
@@ -62,3 +63,4 @@ def telaCadastroTransportadoras(self):
     criaBotao(frame, "Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
     criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraTransportadoraNoBanco(self, frame))
 
+    aplicar_maiusculo_em_todos_entries(self)
