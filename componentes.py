@@ -12,7 +12,7 @@ def criarLabelEntry(frame, texto, relx, rely, width, variavel):
     label = ctk.CTkLabel(frame, text=texto, width=50, font=fonte)
     label.place(relx=relx, rely=rely, anchor="w")
 
-    if texto == "CPF" or texto == "CNPJ" or texto == "CPF/CNPJ *":
+    if texto == "CPF" or texto == "CNPJ" or texto == "CPF/CNPJ *" or texto == "CPF *" or texto == "CNPJ *":
         max_length = 14
         numeric_only = True
     elif texto == "CEP" or texto == "CEP *":
