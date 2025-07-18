@@ -12,6 +12,9 @@ from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 def telaCadastroClientes(self):
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
     bairro = ctk.StringVar()
+    rua = ctk.StringVar()
+    cidade = ctk.StringVar()
+    estado = ctk.StringVar()
 
     self.textoCadastro = ctk.CTkLabel(frame, width=950, height=0, text="Cadastrar cliente", font=("Century Gothic bold", 30))
     self.textoCadastro.place(relx=0.5, rely=0.08, anchor="center")
@@ -24,18 +27,19 @@ def telaCadastroClientes(self):
     self.IEcliente = criarLabelEntry(frame, "Inscrição Estadual", 0.15, 0.45, 0.30, None)
     self.RGcliente = criarLabelEntry(frame, "Insira o RG", 0.15, 0.55, 0.30, None)
 
-    self.CEPcliente    = criarLabelEntry(frame, "CEP *", 0.45+0.05, 0.15, 0.12, None)
-    self.numeroCliente = criarLabelEntry(frame, "Número *", 0.58+0.05, 0.15, 0.05, None)
-    self.bairroCliente = criarLabelEntry(frame, "Bairro *", 0.64+0.05, 0.15, 0.16, bairro)
-    self.cidadeCliente = criarLabelEntry(frame, "Endereço *", 0.45+0.05, 0.25, 0.35, None)
-    self.referencia    = criarLabelEntry(frame, "Referência *", 0.45+0.05, 0.35, 0.35, None)
+    self.CEPcliente    = criarLabelEntry(frame, "CEP", 0.45+0.05, 0.15, 0.12, None)
+    self.rua = criarLabelEntry(frame, "Rua *", 0.63, 0.15, 0.22, rua)
 
- 
+    self.bairroCliente = criarLabelEntry(frame, "Bairro *", 0.50, 0.25, 0.20, bairro)
+    self.numeroCliente = criarLabelEntry(frame, "Número *", 0.71, 0.25, 0.14, None)
 
+    self.cidadeCliente = criarLabelEntry(frame, "Cidade *", 0.50, 0.35, 0.24, cidade)
+    self.estadoCliente = criarLabelEntry(frame, "Estado *", 0.75, 0.35, 0.10, estado)
 
-    criaBotaoPequeno(frame, "Buscar CEP", 0.815, 0.45, 0.07, lambda:buscaCep(self.CEPcliente.get(), self.numeroCliente.get()))
+    self.referencia    = criarLabelEntry(frame, "Referência ", 0.45+0.05, 0.45, 0.35, None)
 
     self.CEPcliente.bind("<Return>", lambda event: buscaCep(self.CEPcliente.get(), self.numeroCliente.get()))
+    self.CEPcliente.bind("<Tab>", lambda event: buscaCep(self.CEPcliente.get(), self.numeroCliente.get()) if self.CEPcliente.get().strip() else None)
     self.numeroCliente.bind("<Return>", lambda event: buscaCep(self.CEPcliente.get(), self.numeroCliente.get()))
 
     def buscaCep(cep, numero):
@@ -43,13 +47,10 @@ def telaCadastroClientes(self):
         response = requests.get(url)
         if response.status_code == 200:
             dados = response.json()
-            endereco_completo = f"{dados.get('address', '')} - {numero} - {dados.get('district', '')} - {dados.get('city', '')} - {dados.get('state', '')}"
             bairro.set(dados.get('district', ''))
-            if numero == '':
-                messagebox.showerror(title="Não encontrado", message="Campo 'Número não deve ficar em branco'")
-            else:
-                self.cidadeCliente.delete(0, ctk.END)
-                self.cidadeCliente.insert(0, endereco_completo)
+            rua.set(dados.get('address', ''))
+            cidade.set(dados.get('city', ''))
+            estado.set(dados.get('state', ''))
         else:
             messagebox.showerror(title="Não encontrado", message="CEP não foi encontrado")
 

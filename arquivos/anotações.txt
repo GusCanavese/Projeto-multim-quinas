@@ -11,7 +11,7 @@
 12 - fazer com que a pesquisa de nome e de produto suma quando clicado para fora da tela ✅
 13 - correção dos emails nas telas de cadastro de transportadora e fornecedora           ✅
 
-14 - deixar caps lock ativo quando for cadastrar algo                               ❌
+14 - deixar caps lock ativo quando for cadastrar algo                               ✅
 15 - cadastro de cliente trocar documento por 2 campos, o campo de cpf e um de cnpj ✅
 16 - buscar clientes na tela gerar pedido adaptada paracpf ou cnpj                  ✅
 16 - colocar função buscacep no cadastro de clientes com botao                      ✅
@@ -21,9 +21,21 @@
 20 - tirar o campo data de venda da tela de gerar pedido                            ✅
 21 - quantidade de itens ta indo com a quantidade existente no estoque              ❓
 22 - buscar o cep direto de cliente                                                 ✅
+23 - arrumar o tab na tela de cadastros
+24 - arrumar a busca de cep, separar numero, referencia, cidade, etc
+25 - alterar a quantidade para ser possível vender mais que o existente no estoque, porém 
+26 - tela pedidos - campos: acréscimo, descontos nao precisam ser obrigatórios, 
+27 - campo preço do produto precisa estar inativo
+28 - alterar cor do modo claro
+29 - deixar as telas de relatórios da mesma forma que a tela de contas a pagar e a receber
+30 - colocar nome do cliente no pedido
+31 - tela verpedido tem que ser possível imprimir ele
+32 - as meninas podem ver a tela de cadastros, mas somente cadastrar clientes
+33 - colocar campos obrgatórios nas telas de cadastro
 
 ESTÉTICO:
 1 - telas de cadastro, colocar elas um pouco mais no meio
 2 - aumentar o tamanho dos botões da tela de ações 
 3 - colocar icones nos botoes das telas de ações
 4 - colocar um fundo nos labels das telas de cadastros
+5 - PDF - olhar na folha criada

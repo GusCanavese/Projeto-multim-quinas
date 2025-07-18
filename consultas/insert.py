@@ -41,9 +41,9 @@ class Insere:
 
 
 
-    def insereClienteNoBanco(nome, cpf, cnpj, IE, RG, endereco, CEP, numero, bairro, cidade, referencia):
-        queryInserirCliente = "INSERT INTO clientes(nome, cpf, cnpj, Inscricao_estadual, RG, Endereco, CEP, Numero, Bairro, Cidade_do_endereco, referencia) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-        db.cursor.execute(queryInserirCliente, (nome, cpf, cnpj, IE, RG, endereco, CEP, numero, bairro, cidade, referencia,))
+    def insereClienteNoBanco(nome, cpf, cnpj, IE, RG, CEP, rua, numero, bairro, cidade, estado, referencia):
+        queryInserirCliente = "INSERT INTO clientes(nome, cpf, cnpj, IE, RG, CEP, rua, numero, bairro, cidade, estado, referencia) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        db.cursor.execute(queryInserirCliente, (nome, cpf, cnpj, IE, RG, CEP, rua, numero, bairro, cidade, estado, referencia,))
         db.conn.commit()
         messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
 
