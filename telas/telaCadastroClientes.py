@@ -30,7 +30,7 @@ def telaCadastroClientes(self):
     self.cidadeCliente = criarLabelEntry(frame, "Endereço *", 0.45+0.05, 0.25, 0.35, None)
     self.referencia    = criarLabelEntry(frame, "Referência *", 0.45+0.05, 0.35, 0.35, None)
 
-
+ 
 
 
     criaBotaoPequeno(frame, "Buscar CEP", 0.815, 0.45, 0.07, lambda:buscaCep(self.CEPcliente.get(), self.numeroCliente.get()))

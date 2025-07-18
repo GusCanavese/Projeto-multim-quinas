@@ -11,7 +11,7 @@
 12 - fazer com que a pesquisa de nome e de produto suma quando clicado para fora da tela ✅
 13 - correção dos emails nas telas de cadastro de transportadora e fornecedora           ✅
 
-14 - deixar caps lock ativo quando for cadastrar algo                               ✅
+14 - deixar caps lock ativo quando for cadastrar algo                               ❌
 15 - cadastro de cliente trocar documento por 2 campos, o campo de cpf e um de cnpj ✅
 16 - buscar clientes na tela gerar pedido adaptada paracpf ou cnpj                  ✅
 16 - colocar função buscacep no cadastro de clientes com botao                      ✅
@@ -21,7 +21,6 @@
 20 - tirar o campo data de venda da tela de gerar pedido                            ✅
 21 - quantidade de itens ta indo com a quantidade existente no estoque              ❓
 22 - buscar o cep direto de cliente                                                 ✅
-23 - necessário melhorar busca cep da tela de clientes                              ✅
 
 ESTÉTICO:
 1 - telas de cadastro, colocar elas um pouco mais no meio
