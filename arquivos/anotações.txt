@@ -25,14 +25,15 @@
 24 - arrumar a busca de cep, separar numero, referencia, cidade, etc                ✅
 25 - alterar a quantidade para ser possível vender mais que o existente no estoque, 
 porém mandar o excedente para a tela de "pedidos fábrica"
-26 - tela pedidos - campos: acréscimo, descontos nao precisam ser obrigatórios, 
-27 - campo preço do produto precisa estar inativo
+26 - tela pedidos - campos: acréscimo, descontos nao precisam ser obrigatórios,     ✅ 
+27 - campo preço do produto precisa estar inativo                                   ✅
 28 - alterar cor das tabelas do modo claro
-29 - deixar as telas de relatórios da mesma forma que a tela de contas a pagar e a receber
-30 - colocar nome do cliente no pedido
+29 - deixar as telas de relatórios da mesma forma que a tela de contas a pagar e a receber ✅
+30 - colocar nome do cliente na tela relatorio de vendas pedido ✅
 31 - tela verpedido tem que ser possível imprimir ele
 32 - as meninas podem ver a tela de cadastros, mas somente cadastrar clientes
 33 - colocar campos obrgatórios nas telas de cadastro
+34 - fazer a exclusão de produtos funcionar
 
 
 

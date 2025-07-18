@@ -22,7 +22,6 @@ def telaGerarPedido(self):
     self.yNovo = 0.24
     self.entradaProduto = 0
     self.valorSubtotal = 0
-    self.quantidadeExtra = 0
     self.linhas = []
 
 
@@ -292,8 +291,8 @@ def telaGerarPedido(self):
         self.valoresDosItens = []
 
 
-        if self.quantidadeExtra > 0:
-            listaQuantidadesExtras.append(self.quantidadeExtra)
+        # if self.quantidadeExtra > 0:
+            # listaQuantidadesExtras.append(self.quantidadeExtra)
 
 
         for linha in self.linhas:
@@ -305,8 +304,8 @@ def telaGerarPedido(self):
             acrescimo = linha["acrescimo"].get()
             desc_real = linha["desc_real"].get()
             desc_porcentagem = linha["desc_porcentagem"].get()
-            quantidade_extra = int(quantidade) - int(estoque)
-            print(quantidade_extra)
+            # quantidade_extra = int(quantidade) - int(estoque)
+            # print(quantidade_extra)
 
             if produto.strip() == "":
                 continue
@@ -320,10 +319,9 @@ def telaGerarPedido(self):
                 "acrescimo": acrescimo,
                 "desconto_reais": desc_real,
                 "desconto_porcentagem": desc_porcentagem,
-                "quantidade_extra": quantidade_extra
+                # "quantidade_extra": quantidade_extra
             }
             self.valoresDosItens.append(item)
-            print(self.valoresDosItens)
         salvarPedido(self, frame)
 
 

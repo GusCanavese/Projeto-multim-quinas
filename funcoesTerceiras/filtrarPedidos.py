@@ -31,7 +31,7 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
             corDeFundo = "#922B21"
             self.status = "Não confirmado"
 
-        dadosPedido = [pedido[0], pedido[2], pedido[1], pedido[3], self.status]
+        dadosPedido = [pedido[0], pedido[5], pedido[2], pedido[1], pedido[3], self.status]
         dadosExtras = [pedido[5], pedido[6], pedido[7]]
 
         dadosDoProdutoDoPedido = json.loads(pedido[8])
@@ -39,14 +39,27 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
 
         x = 0.03
         for colNum, valor in enumerate(dadosPedido):
-            label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
-            x += 0.175
-            self.dadosTelaVerPedidos.append(label)
+            if colNum == 0:
+                label = criaLabel(frame, valor, x, y, 0.05, corDeFundo)
+                x += 0.055
+                self.dadosTelaVerPedidos.append(label)
+            elif colNum == 1:
+                label = criaLabel(frame, valor, x, y, 0.15, corDeFundo)
+                x += 0.155
+                self.dadosTelaVerPedidos.append(label)
+            elif colNum == 2:
+                label = criaLabel(frame, valor, x, y, 0.15, corDeFundo)
+                x += 0.155
+                self.dadosTelaVerPedidos.append(label)
+            else:
+                label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
+                x += 0.175
+                self.dadosTelaVerPedidos.append(label)
 
         btn = criaBotao(frame, "Ver", 0.927, y, 0.05, lambda p=dadosPedido, d=dadosExtras, desc=descricaoProdutos: telaVerPedidos(self, p, d, desc))
         self.dadosTelaVerPedidos.append(btn)
 
-        y += 0.045
+        y += 0.059
 
     # Adiciona botões de navegação se houver mais pedidos
     if len(pedidos) > 10:
@@ -60,9 +73,9 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
         }
 
         if pagina > 1:
-            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.6, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']-1))
+            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.8, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']-1))
             self.dadosTelaVerPedidos.append(btnAnterior)
 
         if fim_pedido < len(pedidos):
-            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.6, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']+1))
+            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.8, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']+1))
             self.dadosTelaVerPedidos.append(btnProxima)

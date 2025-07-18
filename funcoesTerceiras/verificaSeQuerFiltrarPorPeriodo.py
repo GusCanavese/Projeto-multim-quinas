@@ -7,19 +7,20 @@ import tkinter as tk
 from tkcalendar import DateEntry
 
 def verificaSeQuerFiltrarPorPeriodo(self, frame, checkbox, event=None):
+    # relx=0.50, rely=0.065
     if checkbox:
         print("teste")
         # Data Inicial
         self.labelDataInicio = ctk.CTkLabel(frame, text="Data Inicial:")
-        self.labelDataInicio.place(relx=0.03, rely=0.31, anchor="nw")
+        self.labelDataInicio.place(relx=0.65, rely=0.02, anchor="nw")
         self.datePickerInicio = DateEntry(frame, width=12, date_pattern="dd/MM/yyyy")
-        self.datePickerInicio.place(relx=0.03, rely=0.35, anchor="nw")
+        self.datePickerInicio.place(relx=0.65, rely=0.069, anchor="nw")
 
         # Data Final
         self.labelDataFim = ctk.CTkLabel(frame, text="Data Final:")
-        self.labelDataFim.place(relx=0.14, rely=0.31, anchor="nw")
+        self.labelDataFim.place(relx=0.76, rely=0.02, anchor="nw")
         self.datePickerFim = DateEntry(frame, width=12, date_pattern="dd/MM/yyyy")
-        self.datePickerFim.place(relx=0.14, rely=0.35, anchor="nw")
+        self.datePickerFim.place(relx=0.76, rely=0.069, anchor="nw")
     else:
         self.labelDataInicio.destroy()
         del self.labelDataInicio
