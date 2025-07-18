@@ -43,8 +43,8 @@ class App(ctk.CTk):
 
 
     def telas(self):
-        # telas.telaLogin.telaLogin(self)
-        telas.telaCadastroClientes.telaCadastroClientes(self)
+        telas.telaLogin.telaLogin(self)
+        # telas.telaCadastroClientes.telaCadastroClientes(self)
         
 
 

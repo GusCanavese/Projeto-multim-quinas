@@ -22,6 +22,7 @@ def telaGerarPedido(self):
     self.yNovo = 0.24
     self.entradaProduto = 0
     self.valorSubtotal = 0
+    self.quantidadeExtra = 0
     self.linhas = []
 
 
@@ -135,6 +136,8 @@ def telaGerarPedido(self):
             if linha["produto"] == entradaProduto:
                 linha["preco"].delete(0, "end")
                 linha["preco"].insert(0, valor)
+                linha["preco"].configure(state="disabled")
+
 
                 linha["quantidade"].delete(0, "end")
                 linha["quantidade"].insert(0, "0")
@@ -266,6 +269,7 @@ def telaGerarPedido(self):
             criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.096, self.cor)
             self.posicaox +=0.0976
     self.posicaox = 0.024
+    campos_obrigatorios = {"quantidade", "valor", "nome"}
 
     self.botaoAdicionarItem = criaBotaoPequeno(frameParaItensNoFrame, "Adicionar item", 0.7, self.posicaoyBotao, 0.07,
         lambda: (
@@ -273,7 +277,7 @@ def telaGerarPedido(self):
             if any(
                 hasattr(widget, "get") and widget.get().strip() == ""
                 for chave, widget in self.linhas[-1].items()
-                if chave != "item"
+                if chave in campos_obrigatorios
             )
             else adicionarItem(self)
         ))
@@ -284,7 +288,14 @@ def telaGerarPedido(self):
     
 
     def montarValoresDosItens(frame):
+        listaQuantidadesExtras = []
         self.valoresDosItens = []
+
+
+        if self.quantidadeExtra > 0:
+            listaQuantidadesExtras.append(self.quantidadeExtra)
+
+
         for linha in self.linhas:
             produto = linha["produto"].get()
             quantidade = linha["quantidade"].get()
@@ -294,6 +305,8 @@ def telaGerarPedido(self):
             acrescimo = linha["acrescimo"].get()
             desc_real = linha["desc_real"].get()
             desc_porcentagem = linha["desc_porcentagem"].get()
+            quantidade_extra = int(quantidade) - int(estoque)
+            print(quantidade_extra)
 
             if produto.strip() == "":
                 continue
@@ -307,8 +320,10 @@ def telaGerarPedido(self):
                 "acrescimo": acrescimo,
                 "desconto_reais": desc_real,
                 "desconto_porcentagem": desc_porcentagem,
+                "quantidade_extra": quantidade_extra
             }
             self.valoresDosItens.append(item)
+            print(self.valoresDosItens)
         salvarPedido(self, frame)
 
 
@@ -338,13 +353,14 @@ def telaGerarPedido(self):
                 entrada = criaEntry(frameParaItensNoFrame, self.posicaox, self.posicaoy, 0.096, None)
                 campo = ["preco", "quantidade", "estoque", "desc_real", "desc_porcentagem", "acrescimo", "subtotal"][i - 2]
                 linha_widgets[campo] = entrada
-
-                if campo == "quantidade":
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada: (
-                        linha_widgets["quantidade"].delete(0, "end") or linha_widgets["quantidade"].insert(0, linha_widgets["estoque"].get())
-                        if linha_widgets.get("estoque") and e.get().isdigit() and int(e.get()) > int(linha_widgets["estoque"].get() or 0)
-                        else None
-                    ))
+                
+                # if campo == "quantidade":
+                #     entrada.bind("<KeyRelease>", lambda event, e=entrada: (
+                #     setattr(self, 'quantidadeExtra', int(e.get()) - int(linha_widgets["estoque"].get())) 
+                #     if (linha_widgets.get("estoque") and e.get().isdigit() and 
+                #         int(e.get()) > int(linha_widgets["estoque"].get() or 0)) 
+                #     else None
+                #     ))
 
                 if campo == "desc_real":
                     entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
@@ -434,7 +450,7 @@ def telaGerarPedido(self):
 
 
     criaBotao(frameTelaPedido, "Voltar", 0.15, 0.95, 0.20, lambda:frameTelaPedido.destroy())
-    criaBotao(frameTelaPedido, "Cadastrar", 0.87, 0.95, 0.20, lambda:montarValoresDosItens(frameTelaPedido))
+    criaBotao(frameTelaPedido, "Gerar pedido", 0.87, 0.95, 0.20, lambda:montarValoresDosItens(frameTelaPedido))
 
     aplicar_maiusculo_em_todos_entries(self)
 

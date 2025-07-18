@@ -25,7 +25,8 @@ def telaCadastroClientes(self):
     self.cpf = criarLabelEntry(frame, "CPF *", 0.15, 0.25, 0.30, None)
     self.cnpj = criarLabelEntry(frame, "CNPJ", 0.15, 0.35, 0.30, None)
     self.IEcliente = criarLabelEntry(frame, "Inscrição Estadual", 0.15, 0.45, 0.30, None)
-    self.RGcliente = criarLabelEntry(frame, "Insira o RG", 0.15, 0.55, 0.30, None)
+    self.RGcliente = criarLabelEntry(frame, "Insira o RG", 0.15, 0.55, 0.15, None)
+    self.telefoneCliente = criarLabelEntry(frame, "Telefone *", 0.31, 0.55, 0.14, None)
 
     self.CEPcliente    = criarLabelEntry(frame, "CEP", 0.45+0.05, 0.15, 0.12, None)
     self.rua = criarLabelEntry(frame, "Rua *", 0.63, 0.15, 0.22, rua)

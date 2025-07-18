@@ -11,8 +11,6 @@ def salvarPedido(self, frame):
     
     if resposta == 'no':
         return
-        
-
     else:
         PassaDadosParaPedido(self, frame)
 

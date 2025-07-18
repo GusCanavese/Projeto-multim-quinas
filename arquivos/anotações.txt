@@ -22,16 +22,22 @@
 21 - quantidade de itens ta indo com a quantidade existente no estoque              ❓
 22 - buscar o cep direto de cliente                                                 ✅
 23 - arrumar o tab na tela de cadastros
-24 - arrumar a busca de cep, separar numero, referencia, cidade, etc
-25 - alterar a quantidade para ser possível vender mais que o existente no estoque, porém 
+24 - arrumar a busca de cep, separar numero, referencia, cidade, etc                ✅
+25 - alterar a quantidade para ser possível vender mais que o existente no estoque, 
+porém mandar o excedente para a tela de "pedidos fábrica"
 26 - tela pedidos - campos: acréscimo, descontos nao precisam ser obrigatórios, 
 27 - campo preço do produto precisa estar inativo
-28 - alterar cor do modo claro
+28 - alterar cor das tabelas do modo claro
 29 - deixar as telas de relatórios da mesma forma que a tela de contas a pagar e a receber
 30 - colocar nome do cliente no pedido
 31 - tela verpedido tem que ser possível imprimir ele
 32 - as meninas podem ver a tela de cadastros, mas somente cadastrar clientes
 33 - colocar campos obrgatórios nas telas de cadastro
+
+
+
+
+    NO QUANTIDADE EXTRA, REALIZAR A BUSCA EM PRODUTOS SOMENTE COM OS PRODUTOS QUE TEM O CAMPO QUNTIDADE EXTRA >0
 
 ESTÉTICO:
 1 - telas de cadastro, colocar elas um pouco mais no meio
@@ -39,3 +45,5 @@ ESTÉTICO:
 3 - colocar icones nos botoes das telas de ações
 4 - colocar um fundo nos labels das telas de cadastros
 5 - PDF - olhar na folha criada
+
+
