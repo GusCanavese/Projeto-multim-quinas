@@ -24,10 +24,10 @@ def telaCadastroClientes(self):
     self.IEcliente = criarLabelEntry(frame, "Inscrição Estadual", 0.15, 0.45, 0.30, None)
     self.RGcliente = criarLabelEntry(frame, "Insira o RG", 0.15, 0.55, 0.30, None)
 
-    self.cidadeCliente = criarLabelEntry(frame, "Endereço *", 0.45+0.05, 0.25, 0.35, None)
     self.CEPcliente    = criarLabelEntry(frame, "CEP *", 0.45+0.05, 0.15, 0.12, None)
     self.numeroCliente = criarLabelEntry(frame, "Número *", 0.58+0.05, 0.15, 0.05, None)
     self.bairroCliente = criarLabelEntry(frame, "Bairro *", 0.64+0.05, 0.15, 0.16, bairro)
+    self.cidadeCliente = criarLabelEntry(frame, "Endereço *", 0.45+0.05, 0.25, 0.35, None)
     self.referencia    = criarLabelEntry(frame, "Referência *", 0.45+0.05, 0.35, 0.35, None)
 
 
