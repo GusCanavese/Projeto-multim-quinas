@@ -4,8 +4,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras import confirmarAlteracoesNoPedido
 from funcoesTerceiras import confirmarExclusaoDoPedido
+from funcoesTerceiras import geradorDePedido
+from telas.telaApresentadorDePdf import telaApresentarPDF
 from telas.telagerarFaturamento import telaGerarFaturamento
-from componentes import criaBotao, criaFrame, criaLabel, criaLabelDescritivo, criarLabelEntry
+from componentes import criaBotao, criaFrame, criaLabelDescritivo, criarLabelEntry
 
 def telaVerPedidos(self, p, d, desc):
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
@@ -38,3 +40,61 @@ def telaVerPedidos(self, p, d, desc):
     criaBotao(frame, 'Voltar', 0.15, 0.95, 0.20, lambda:frame.destroy())
     botaoExclui = criaBotao(frame, 'Cancelar/Excluir pedido', 0.61, 0.95, 0.20, lambda:confirmarExclusaoDoPedido.confirmarExclusaoNoPedido(self, p[0], desc, frame))
     botaoExclui.configure(fg_color="#8B0000")
+
+    print(p[4])
+
+
+    def imprimirPedido():
+        itens = []
+        for item in desc:
+            partes = item.split()
+            if len(partes) < 2:
+                continue  # ignora itens mal formatados
+
+            descricao = " ".join(partes[:-1])
+            quantidade = partes[-1]
+
+            itens.append({
+                "descricao": descricao,
+                "quantidade": quantidade,
+                "subtotal": p[4],
+                "desconto_porcentagem": 0.0,
+                "desconto_reais": 0.0,
+                "acrescimo": 0.0,
+            })
+
+        dados = {
+            "vendedor": p[1],
+            "frete": 0.0,
+
+            "valor_total": p[3],
+            "total_subtotal": p[3],
+            "total_acrescimo": 0.0,
+            "total_desc_real": 0.0,
+            "total_desc_porc": 0.0,
+
+            "itens": itens,
+
+            "referencia": "", 
+            "endereco": d[2],
+            "cep": "", 
+            "telefone": "", 
+            "cnpj": d[1],
+            "cpf": d[1],
+            "destinatario": d[0],
+
+            "numero_recibo": p[0],
+            "data_emissao": p[2],
+
+            "subtotal": 1,
+            "observacoes1": "",
+            "observacoes2": ""
+        }
+
+        from funcoesTerceiras import geradorDePedido
+        from telas.telaApresentadorDePdf import telaApresentarPDF
+
+        geradorDePedido.gerar_recibo("Pedido.pdf", dados)
+        telaApresentarPDF(self, "Pedido.pdf", 1)
+
+    criaBotao(frame, 'Imprimir pedido', 0.38, 0.89, 0.20, imprimirPedido)

@@ -18,12 +18,14 @@ def telaCadastros(self):
     self.Acoes = ctk.CTkLabel(frame, width=950, height=0, text="Cadastros", font=("Century Gothic bold", 30))
     self.Acoes.place(relx=0.5, y=50, anchor="center")
     
-    criaBotao(frame, "Produtos", 0.33, 0.24, 0.24, lambda:telaCadastroProdutos(self))
-    criaBotao(frame, "Fornecedores", 0.33, 0.30, 0.24, lambda:telaCadastroFornecedores(self))
-    criaBotao(frame, "Transportadoras", 0.33, 0.36, 0.24, lambda:telaCadastroTransportadoras(self))
-    
-    criaBotao(frame, "Clientes", 0.66, 0.24, 0.24, lambda:telaCadastroClientes(self))
-    criaBotao(frame, "Funcionários", 0.66, 0.30, 0.24, lambda:telaCadastroFuncionario(self))
+    if self.cargo == (('Vendedor(a) externo',),) or self.cargo == (('Vendedor(a) interno',),):
+        criaBotao(frame, "Clientes", 0.5, 0.24, 0.24, lambda:telaCadastroClientes(self))
+    elif self.cargo == (('Financeiro',),) or self.cargo == (('Gerente',),):
+        criaBotao(frame, "Clientes", 0.66, 0.24, 0.24, lambda:telaCadastroClientes(self))
+        criaBotao(frame, "Produtos", 0.33, 0.24, 0.24, lambda:telaCadastroProdutos(self))
+        criaBotao(frame, "Fornecedores", 0.33, 0.30, 0.24, lambda:telaCadastroFornecedores(self))
+        criaBotao(frame, "Transportadoras", 0.33, 0.36, 0.24, lambda:telaCadastroTransportadoras(self))
+        criaBotao(frame, "Funcionários", 0.66, 0.30, 0.24, lambda:telaCadastroFuncionario(self))
 
     criaBotao(frame, "Voltar", 0.33, 0.80, 0.18, lambda:frame.destroy())
 

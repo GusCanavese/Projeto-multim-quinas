@@ -115,6 +115,12 @@ def criaFrame(self, relx, rely, width, height):
     return frame
 
 def criaBotao(frame, texto, relx, rely, width, comando):
+    # if texto == "Voltar":
+    #     texto = "←"
+    #     fonte=("TkDefaultFont", 22)
+    #     width = 0.1
+        
+
     modo_atual = ctk.get_appearance_mode().lower()
     if modo_atual == "dark":
         text = "white"

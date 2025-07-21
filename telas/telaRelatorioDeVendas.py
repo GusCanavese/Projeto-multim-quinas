@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
-from funcoesTerceiras import filtrarPedidos, verificaSeQuerFiltrarPorPeriodo
+from funcoesTerceiras import filtrar, verificaSeQuerFiltrarPorPeriodo
 from componentes import criaFrame, criarLabelEntry, criarLabelComboBox, criaBotao, criaLabel
 
 
@@ -25,7 +25,7 @@ def telaRelatorioDeVendas(self):
     # Botões
     
     
-    criaBotao(frame, "Buscar", 0.90, 0.08, 0.1, lambda:filtrarPedidos.filtrarPedidos( self, frameVendas, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(), self.datePickerInicio.get() if hasattr(self, "datePickerInicio") else None, self.datePickerFim.get() if hasattr(self, "datePickerFim") else None, self.selecionarPeriodo.get()))
+    criaBotao(frame, "Buscar", 0.90, 0.08, 0.1, lambda:filtrar.filtrarPedidos( self, frameVendas, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(), self.datePickerInicio.get() if hasattr(self, "datePickerInicio") else None, self.datePickerFim.get() if hasattr(self, "datePickerFim") else None, self.selecionarPeriodo.get()))
     criaBotao(frame, "Voltar", 0.32, 0.94, 0.15, lambda:frame.destroy())
 
     # Cabeçalhos da tabela

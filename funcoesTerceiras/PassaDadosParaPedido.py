@@ -41,13 +41,13 @@ def PassaDadosParaPedido(self, frame):
             "referencia": self.entradaReferenciaEnderecoEntrega.get(),
             "endereco": self.entradaEnderecoNoPedido.get(),
             "cep": self.entradaCEP.get(),
-            "telefone": telefone,  # já é string fora de Entry, ok aqui
+            "telefone": telefone,  
             "cnpj": self.CPFCliente.get(),
             "cpf": self.CPFCliente.get(),
             "destinatario": self.nomeDoClienteBuscado.get(),
             
-            "numero_recibo": self.numeroDeVenda.get(),  # corrigido, estava self..get()
-            "data_emissao": dataAgora,  # OK, já é string
+            "numero_recibo": self.numeroDeVenda.get(),  
+            "data_emissao": dataAgora,  
             
             "subtotal": self.totalSubtotal.get(),
             "observacoes1": self.textArea1.get("1.0", "end-1c"),

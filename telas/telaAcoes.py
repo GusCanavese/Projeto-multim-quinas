@@ -7,6 +7,7 @@ from telas.telaCadastros import telaCadastros
 from telas.telaGerarPedido import telaGerarPedido
 from telas.telaRelatorioDeVendas import telaRelatorioDeVendas
 from telas.telaEstoque import telaEstoque
+from telas.telaGerenciar import telaGerenciar
 from telas.telaGerarOrcamento  import telaGerarOrcamento
 from telas.telaContasAPagarEAReceber import telaContasAPagarEAReceber
 from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
@@ -28,20 +29,23 @@ def telaAcoes(self):
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
 
     usuarioBloqueado = self.logado
-    cargo = Buscas.buscaCargoUsuarioBloqueado(usuarioBloqueado)
+    self.cargo = Buscas.buscaCargoUsuarioBloqueado(usuarioBloqueado)
 
     self.Acoes = ctk.CTkLabel(frame, width=950, height=0, text="Ações", font=("Century Gothic bold", 30))
     self.Acoes.place(relx=0.5, y=50, anchor="center")
 
 
-    if cargo == (('Vendedor(a) externo',),) or cargo == (('Vendedor(a) interno',),):
+    if self.cargo == (('Vendedor(a) externo',),) or self.cargo == (('Vendedor(a) interno',),):
         criaBotao(frame, "Relatório de vendas/pedidos", 0.66, 0.24, 0.24, lambda: telaRelatorioDeVendas(self))
         criaBotao(frame, "Consultar estoque", 0.66, 0.30, 0.24, lambda: telaEstoque(self))
-        criaBotao(frame, "Gerar pedido", 0.33, 0.24, 0.24, lambda: telaGerarPedido(self))
+        criaBotao(frame, "Gerar pedido", 0.33, 0.36, 0.24, lambda: telaGerarPedido(self))
         criaBotao(frame, "Gerar orçamento", 0.33, 0.30, 0.24, lambda: telaGerarOrcamento(self))
         criaBotao(frame, "Trocar usuário", 0.33, 0.80, 0.18, lambda: frame.destroy())
+        criaBotao(frame, "Cadastros", 0.33, 0.24, 0.24, lambda: telaCadastros(self))
 
-    elif cargo == (('Financeiro',),) or cargo == (('Gerente',),):
+
+    elif self.cargo == (('Financeiro',),) or self.cargo == (('Gerente',),):
+        criaBotao(frame, "Gerenciar", 0.33, 0.42, 0.24, lambda: telaGerenciar(self))
         criaBotao(frame, "Cadastros", 0.33, 0.24, 0.24, lambda: telaCadastros(self))
         criaBotao(frame, "Gerar pedido", 0.33, 0.30, 0.24, lambda: telaGerarPedido(self))
         criaBotao(frame, "Gerar orçamento", 0.33, 0.36, 0.24, lambda: telaGerarOrcamento(self))

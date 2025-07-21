@@ -151,7 +151,6 @@ class Buscas:
         print("Resultados encontrados:", len(resultado))  # Debug: mostra quantidade de resultados
         return resultado
 
-
     def buscaEstoqueProdutos(valor, cnpj):
         print(cnpj)
         if cnpj == "Todos":
@@ -182,4 +181,13 @@ class Buscas:
         
         resultado = db.cursor.fetchall()
 
+        return resultado
+
+    def buscaFuncionarios(valor):
+        queryBuscaFuncionarios = """SELECT nome, cargo FROM funcionarios 
+        WHERE 
+            nome LIKE %s
+            OR cargo LIKE %s"""
+        db.cursor.execute(queryBuscaFuncionarios, (f"%{valor}%", f"%{valor}%"))
+        resultado = db.cursor.fetchall()
         return resultado

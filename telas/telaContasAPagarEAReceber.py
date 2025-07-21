@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
-from funcoesTerceiras import filtrarContas, verificaSeQuerFiltrarPorPeriodo
+from funcoesTerceiras import filtrar, verificaSeQuerFiltrarPorPeriodo
 from componentes import criaFrame, criaLabel, criaBotao, criaComboBox, criarLabelEntry, criarLabelComboBox
 
 
@@ -20,7 +20,7 @@ def telaContasAPagarEAReceber(self):
     self.selecionarPeriodoContas.bind("<Button-1>", command=lambda event: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodoContas(self, frame, self.selecionarPeriodoContas.get(), event))
     
     filtrarPorNumero = criarLabelEntry(frame,"Filtrar", 0.25, 0.01, 0.22, None)
-    criaBotao(frame, "Buscar", 0.36, 0.11, 0.22, lambda:filtrarContas.filtrarContas(self, frameContas, filtrarPorNumero.get()))
+    criaBotao(frame, "Buscar", 0.36, 0.11, 0.22, lambda:filtrar.filtrarContas(self, frameContas, filtrarPorNumero.get()))
 
     def escolheTela(valor):
         print(valor)
