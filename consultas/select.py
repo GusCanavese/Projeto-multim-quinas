@@ -102,6 +102,7 @@ class Buscas:
                                     data_emissao BETWEEN %s AND %s
                                     AND vendedor LIKE %s
                                     AND (
+                                        destinatario LIKE %s
                                         numero_recibo LIKE %s
                                         OR subtotal LIKE %s
                                     ) 
@@ -113,12 +114,13 @@ class Buscas:
                                 WHERE 
                                     data_emissao BETWEEN %s AND %s
                                     AND (
-                                        vendedor LIKE %s
+                                        destinatario LIKE %s
+                                        OR vendedor LIKE %s
                                         OR numero_recibo LIKE %s
                                         OR subtotal LIKE %s
                                     )
                                 ORDER BY data_emissao DESC"""
-                parametros = (inicio, fim, f"%{numero}%", f"%{numero}%", f"%{numero}%")
+                parametros = (inicio, fim, f"%{numero}%", f"%{numero}%", f"%{numero}%", f"%{numero}%")
         else:
             if vendedor != "Todos":
                 queryBuscaPedidos = """SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao,
@@ -126,20 +128,22 @@ class Buscas:
                                 WHERE
                                     vendedor LIKE %s
                                     AND (
-                                        numero_recibo LIKE %s
+                                        destinatario LIKE %s
+                                        OR numero_recibo LIKE %s
                                         OR subtotal LIKE %s
                                     )
                                 ORDER BY data_emissao DESC"""
-                parametros = (f"%{vendedor}%", f"%{numero}%", f"%{numero}%")
+                parametros = (f"%{vendedor}%", f"%{numero}%", f"%{numero}%", f"%{numero}%")
             else:
                 queryBuscaPedidos = """SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao,
                                     destinatario, cpf, endereco, itens FROM pedidos 
                                 WHERE 
-                                    vendedor LIKE %s
+                                    destinatario LIKE %s
+                                    OR vendedor LIKE %s
                                     OR numero_recibo LIKE %s
                                     OR subtotal LIKE %s
                                 ORDER BY data_emissao DESC"""
-                parametros = (f"%{numero}%", f"%{numero}%", f"%{numero}%")
+                parametros = (f"%{numero}%", f"%{numero}%", f"%{numero}%", f"%{numero}%")
 
         print("Query executada:", queryBuscaPedidos % parametros)  # Debug: mostra a query com parâmetros
         db.cursor.execute(queryBuscaPedidos, parametros)

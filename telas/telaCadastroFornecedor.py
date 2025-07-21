@@ -5,6 +5,8 @@ import customtkinter as ctk
 import gc
 from funcoesTerceiras.registraFornecedorNoBanco import registraFornecedorNoBanco 
 from componentes import criaFrame, criaSimouNao, criarLabelEntry, criaBotao, criarLabelEntryEmail
+from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
+
 
 
 
@@ -23,7 +25,7 @@ def telaCadastroFornecedores(self):
                         self.cnpjFornecedor.destroy()
                         del self.cnpjFornecedor
                         gc.collect
-                    self.cpfFornecedor = criarLabelEntry(frame, "CPF", 0.64, 0.246, 0.25, None)
+                    self.cpfFornecedor = criarLabelEntry(frame, "CPF *", 0.64, 0.386, 0.25, None)
 
                 case "CNPJ":
                     if hasattr(self, "cnpjFornecedor"):
@@ -34,14 +36,14 @@ def telaCadastroFornecedores(self):
                         self.cpfFornecedor.destroy()
                         del self.cpfFornecedor
                         gc.collect
-                    self.cnpjFornecedor = criarLabelEntry(frame, "CNPJ", 0.64, 0.246, 0.25, None)
+                    self.cnpjFornecedor = criarLabelEntry(frame, "CNPJ *", 0.64, 0.246, 0.25, None)
 
                 case "Sim.":
                     if hasattr(self, "campoRecebeEmail"):
                         self.campoRecebeEmail[0].destroy()
                         self.campoRecebeEmail[1].destroy()
                         gc.collect
-                    self.campoRecebeEmail = criarLabelEntryEmail(frame, "Email", 0.08, 0.562, 0.25,None)
+                    self.campoRecebeEmail = criarLabelEntryEmail(frame, "Email *", 0.08, 0.562, 0.25,None)
 
                 case "Não.":
                     if hasattr(self, "campoRecebeEmail"):
@@ -63,13 +65,15 @@ def telaCadastroFornecedores(self):
     self.eFabricante = criaSimouNao(frame, "É fabricante?", "Sim", "Não", 0.60, 0.1, comando=meDesmarque)
     self.recebeEmail = criaSimouNao(frame, "Recebe email?", "Sim.", "Não.", 0.76, 0.1, comando=meDesmarque)
 
-    self.nomeReal = criarLabelEntry(frame, "Razão social", 0.08, 0.246, 0.25, None)
-    self.nomeFantasia = criarLabelEntry(frame, "Nome fantasia", 0.36, 0.246, 0.25, None)
+    self.nomeReal = criarLabelEntry(frame, "Razão social *", 0.08, 0.246, 0.25, None)
+    self.nomeFantasia = criarLabelEntry(frame, "Nome fantasia *", 0.36, 0.246, 0.25, None)
+    self.telefone = criarLabelEntry(frame, "Telefone *", 0.64, 0.246, 0.25, None)
 
-    self.inscricaoEstadual = criarLabelEntry(frame, "Inscrição estadual", 0.08, 0.386, 0.25,None)
-    self.codigoCRT = criarLabelEntry(frame, "CRT", 0.36, 0.386, 0.25, None)
-    self.telefone = criarLabelEntry(frame, "Telefone", 0.64, 0.386, 0.25, None)
+
+    self.inscricaoEstadual = criarLabelEntry(frame, "Inscrição estadual *", 0.08, 0.386, 0.25,None)
+    self.codigoCRT = criarLabelEntry(frame, "CRT *", 0.36, 0.386, 0.25, None)
 
     criaBotao(frame, "Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
     criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraFornecedorNoBanco(self, frame))
+    aplicar_maiusculo_em_todos_entries(self)
 

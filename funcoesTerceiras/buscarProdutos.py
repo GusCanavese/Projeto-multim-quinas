@@ -49,7 +49,7 @@ def buscarProdutos(self, frame, nome, cnpj, pagina=1):
 
 
         btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=dadosextras: telaVerProduto(self, p))
-        self.dadosTelaVerProdutos.append(btn)
+        self.dadosTelaVerProdutos.append(btn) 
 
         y += 0.045
 

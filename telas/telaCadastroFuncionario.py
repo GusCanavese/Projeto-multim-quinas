@@ -24,3 +24,5 @@ def telaCadastroFuncionario(self):
 
     criaBotao(frame, "Voltar", 0.3, 0.80, 0.20, lambda:frame.destroy())
     criaBotao(frame, "Cadastrar", 0.68, 0.80, 0.20, lambda:registraUsuarioNoBanco(self, frame))
+    aplicar_maiusculo_em_todos_entries(self)
+

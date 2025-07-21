@@ -6,6 +6,8 @@ from funcoesTerceiras import confirmarExclusaoDoProduto, confirmarAlteracoesNoPr
 from componentes import criaFrame, criaLabelDescritivo, criaBotao, criarLabelEntry;
 
 
+
+
 def telaVerProduto(self, p):
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
 
@@ -29,8 +31,9 @@ def telaVerProduto(self, p):
 
 
     criaBotao(frame, 'salvar alterações', 0.61, 0.43, 0.15, lambda:confirmarAlteracoesNoProduto.confirmarAlteracoesNoProduto(self, frame, p[1], self.quantidade.get(), self.precoVenda.get()))
-    botaoExclui = criaBotao(frame, 'Cancelar/Excluir pedido', 0.79, 0.43, 0.15, lambda:confirmarExclusaoDoProduto.confirmarExclusaoDoProduto(self, frame, p[1]))
+    botaoExclui = criaBotao(frame, 'Excluir pedido', 0.79, 0.43, 0.15, lambda:confirmarExclusaoDoProduto.confirmarExclusaoDoProduto(self, frame, p[1]))
     botaoExclui.configure(fg_color="#8B0000")
     criaBotao(frame, 'Voltar', 0.15, 0.95, 0.20, lambda:frame.destroy())
+    
 
 
