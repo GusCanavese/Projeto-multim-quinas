@@ -71,6 +71,6 @@ def PassaDadosParaPedido(self, frame):
 
 
         if "Pedido.pdf":
-            telaApresentarPDF(self, "Pedido.pdf")
+            telaApresentarPDF(self, "Pedido.pdf", 0)
         
     

@@ -304,8 +304,6 @@ def telaGerarPedido(self):
             acrescimo = linha["acrescimo"].get()
             desc_real = linha["desc_real"].get()
             desc_porcentagem = linha["desc_porcentagem"].get()
-            # quantidade_extra = int(quantidade) - int(estoque)
-            # print(quantidade_extra)
 
             if produto.strip() == "":
                 continue
@@ -319,7 +317,6 @@ def telaGerarPedido(self):
                 "acrescimo": acrescimo,
                 "desconto_reais": desc_real,
                 "desconto_porcentagem": desc_porcentagem,
-                # "quantidade_extra": quantidade_extra
             }
             self.valoresDosItens.append(item)
         salvarPedido(self, frame)
@@ -352,13 +349,6 @@ def telaGerarPedido(self):
                 campo = ["preco", "quantidade", "estoque", "desc_real", "desc_porcentagem", "acrescimo", "subtotal"][i - 2]
                 linha_widgets[campo] = entrada
                 
-                # if campo == "quantidade":
-                #     entrada.bind("<KeyRelease>", lambda event, e=entrada: (
-                #     setattr(self, 'quantidadeExtra', int(e.get()) - int(linha_widgets["estoque"].get())) 
-                #     if (linha_widgets.get("estoque") and e.get().isdigit() and 
-                #         int(e.get()) > int(linha_widgets["estoque"].get() or 0)) 
-                #     else None
-                #     ))
 
                 if campo == "desc_real":
                     entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())

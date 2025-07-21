@@ -62,7 +62,7 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
         btn = criaBotao(frame, "Ver", 0.927, y, 0.05, lambda p=dadosPedido, d=dadosExtras, desc=descricaoProdutos: telaVerPedidos(self, p, d, desc))
         self.dadosTelaVerPedidos.append(btn)
 
-        y += 0.059
+        y += 0.06
 
     # Adiciona botões de navegação se houver mais pedidos
     if len(pedidos) > 10:
@@ -166,7 +166,7 @@ def filtrarContas(self, frame, valor, pagina=1):
         btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=conta: telaVercontasApagar(self, p))
         self.dadosTelaFiltrarContas.append(btn)
 
-        y += 0.059
+        y += 0.06
     
     if len(contas) > 10:
 
@@ -220,4 +220,4 @@ def filtrarFuncionarios(self, frame, valor, pagina=1):
         btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=dadosProduto: telaVer(self, p))
         self.dadosTelaFiltrarFunc.append(btn)
 
-        y += 0.045
+        y += 0.059
