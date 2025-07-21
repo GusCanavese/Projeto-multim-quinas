@@ -22,8 +22,6 @@ def PassaDadosParaPedido(self, frame):
 
     if self.entradaEnderecoNoPedido.get() =="" or self.entradaReferenciaEnderecoEntrega.get()=="" or self.entradaNumero.get() =="" or self.CPFCliente.get()=="" or self.nomeDoClienteBuscado.get()=="":
         messagebox.showerror("erro", "Preencha todos os campos obrigatórios")
-    elif self.entradaProduto.get()=="":
-        messagebox.showerror("erro", "Selecione pelo menos um produto")
 
     else:
         self.dados = {

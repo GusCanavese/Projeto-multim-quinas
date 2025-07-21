@@ -58,7 +58,6 @@ def telaGerarPedido(self):
             # self.numeroDoPedido += 1
             maiorNumero = Buscas.selecionaNumeroPedido()[0]
             
-            print(maiorNumero)
             if maiorNumero == None:
                 maiorNumero = 1
             else:
@@ -77,7 +76,6 @@ def telaGerarPedido(self):
         self.resultadoLabels = []
         
         yNovo = 0.21  
-        print(dadosCliente)
 
         for i, row in enumerate(dadosCliente):
             if i >= 5:
@@ -258,7 +256,6 @@ def telaGerarPedido(self):
     
     for i, coluna in enumerate(listaLabels):
         if i == 0:
-            print(self.cor)
             criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.040, self.cor)
             self.posicaox +=0.042
         if i == 1:
@@ -402,6 +399,10 @@ def telaGerarPedido(self):
             self.botaoRemoverItem.place_forget()
 
         self.yNovo = self.posicaoy + 0.02
+        print("destruiu")
+        self.entradaProduto = ""
+        print("destruiu")
+
         atualizarTotalGeral()
     
 
