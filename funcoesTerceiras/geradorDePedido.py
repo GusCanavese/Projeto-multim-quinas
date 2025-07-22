@@ -36,6 +36,7 @@ def gerar_recibo(nome_arquivo, dados):
     c.drawString(425, altura - 65, f"Nº {dados['numero_recibo']}")
     c.drawString(425, altura - 75, f"Vendedor: {dados['vendedor']}")
     # c.drawString(425, altura - 85, f"Data de Confirmação: {dados['data_confirmacao']}")
+    c.drawString(425, altura - 85, "Data de venda:")
     c.drawString(425, altura - 95, f"Data de Emissão: {dados['data_emissao']}")
     c.drawString(425, altura - 105, "Página 1 de 1")
 
@@ -193,7 +194,7 @@ def gerar_recibo(nome_arquivo, dados):
     c.drawString(40, altura_item -85, "ENTREGAR")
     c.rect(23, altura_item - 90, 15, 15, stroke=1, fill=0)
 
-    c.drawString(353, altura_item -40, "TOTAIS DE MERCADORIA")
+    c.drawString(353, altura_item -40, "TOTAL DE MERCADORIA")
     c.drawString(353, altura_item -55, "DESCONTO NA VENDA($)")
     c.drawString(353, altura_item -70, "DESCONTO NA VENDA(%)")
     c.drawString(353, altura_item -85, "ACRESCIMO NA VENDA($)")
@@ -312,7 +313,7 @@ def gerar_recibo(nome_arquivo, dados):
         c.rect(494, altura_item - 165, 15, 15, stroke=1, fill=0)
 
         c.setFont("Times-Bold", 9)
-        c.drawString(322, altura_item -183, "FINANCEIRO")
+        c.drawString(322, altura_item -190, "FINANCEIRO")
         c.rect(20, altura_item - 143, (width - 50)/2 -5, -200, stroke=1, fill=0)
         c.line(314, altura_item - 175, 590, altura_item - 175)
 
@@ -371,7 +372,7 @@ dados_exemplo = {
         "unidade": "UN",
         "quantidade": 2,
         "valor_unitario": "7.076,00",
-        "desconto_real": "0,00",
+        "desconto_reais": "0,00",
         "desconto_porcentagem": "0,00",
         "acrescimo": "0,00",
         "subtotal": "14.152,00"
@@ -430,34 +431,34 @@ dados_exemplo = {
         "unidade": "UN",
         "quantidade": 2,
         "valor_unitario": "7.076,00",
-        "desconto_real": "0,00",
+        "desconto_reais": "0,00",
         "desconto_porcentagem": "0,00",
         "acrescimo": "0,00",
         "subtotal": "14.152,00"
     },
-    {
-        "codigo": "2087118514613",
-        "descricao": "FREEZER VERTICAL 500L - POLAR",
-        "unidade": "UN",
-        "quantidade": 1,
-        "valor_unitario": "3.500,00",
-        "desconto_real": "0,00",
-        "desconto_porcentagem": "0,00",
-        "acrescimo": "0,00",
-        "subtotal": "3.500,00"
-    },
-    {
-        "codigo": "2087118514613",
-        "descricao": "FREEZER VERTICAL 500L - POLAR",
-        "unidade": "UN",
-        "quantidade": 1,
-        "valor_unitario": "3.500,00",
-        "desconto_real": "0,00",
-        "desconto_porcentagem": "0,00",
-        "acrescimo": "0,00",
-        "subtotal": "3.500,00"
-    }
+#     {
+#         "codigo": "2087118514613",
+#         "descricao": "FREEZER VERTICAL 500L - POLAR",
+#         "unidade": "UN",
+#         "quantidade": 1,
+#         "valor_unitario": "3.500,00",
+#         "desconto_real": "0,00",
+#         "desconto_porcentagem": "0,00",
+#         "acrescimo": "0,00",
+#         "subtotal": "3.500,00"
+#     },
+#     {
+#         "codigo": "2087118514613",
+#         "descricao": "FREEZER VERTICAL 500L - POLAR",
+#         "unidade": "UN",
+#         "quantidade": 1,
+#         "valor_unitario": "3.500,00",
+#         "desconto_real": "0,00",
+#         "desconto_porcentagem": "0,00",
+#         "acrescimo": "0,00",
+#         "subtotal": "3.500,00"
+#     }
 ],
 }
     
-# gerar_recibo("recibo_venda.pdf", dados_exemplo)
+gerar_recibo("Pedido.pdf", dados_exemplo)

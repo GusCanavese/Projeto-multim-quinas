@@ -441,7 +441,7 @@ def telaGerarPedido(self):
     self.entradaEnderecoNoPedido = criarLabelEntry(frameTelaPedido, "Endereço *", 0.39, 0.25, 0.33, variavelEndereco)
     self.entradaReferenciaEnderecoEntrega = criarLabelEntry(frameTelaPedido, "Referencia *", 0.75, 0.25, 0.15, variavelReferencia)
 
-    self.textArea1 = criaTextArea(frameTelaPedido, 0.05, 0.65, 0.2, "Observações", "É necessário a apresentação do recibo de venda para que a vendedora abra \na assistência técnica, se necessário. Não devolvemos dinheiro. \n\nCONDIÇÃO DE PAGAMENTO:\nTROCA: \nENTREGA:")
+    self.textArea1 = criaTextArea(frameTelaPedido, 0.05, 0.65, 0.2, "Observações", "É necessário a apresentação do recibo de venda para que a vendedora abra \na assistência técnica, se necessário. Não devolvemos dinheiro. \n\nCONDIÇÃO DE PAGAMENTO:\n\nTROCA: \n\nENTREGA:")
     self.textArea2 = criaTextArea(frameTelaPedido, 0.3, 0.65, 0.2, "Observações da entrega", "Dados financeiros pertinentes")
 
     self.totalDescontoPorcentagem = criarLabelEntry(frameTelaPedido, "Desconto total(%)", 0.55, 0.675, 0.08, None)
