@@ -20,7 +20,7 @@ def PassaDadosParaPedido(self, frame):
             telefone = "N/A"
 
 
-    if self.entradaEnderecoNoPedido.get() =="" or self.entradaReferenciaEnderecoEntrega.get()=="" or self.entradaNumero.get() =="" or self.CPFCliente.get()=="" or self.nomeDoClienteBuscado.get()=="":
+    if self.entradaEnderecoNoPedido.get() =="" or self.entradaNumero.get() =="" or self.CPFCliente.get()=="" or self.nomeDoClienteBuscado.get()=="":
         messagebox.showerror("erro", "Preencha todos os campos obrigatórios")
 
     else:

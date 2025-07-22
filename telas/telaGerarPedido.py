@@ -41,6 +41,7 @@ def telaGerarPedido(self):
     variavelEndereco = ctk.StringVar()
     variavelNumero = ctk.StringVar()
     variavelReferencia = ctk.StringVar()
+    # enderecoCliente = ctk.StringVar()
 
     variavelFuncionarioAtual.set(usuarioLogado)
     variavelEmAbertoFechado.set("Em aberto")
@@ -53,6 +54,27 @@ def telaGerarPedido(self):
     container.pack(fill="x", padx=0, pady=0)
     frameParaItensNoFrame = ctk.CTkFrame(frameParaItens,  height=1500)
     frameParaItensNoFrame.place(x=-25, y=-280, relwidth=1.06)
+
+    def formatar_moeda(event):
+        entrada = event.widget  # widget que disparou o evento
+        texto = entrada.get()
+
+        texto_numerico = ''.join(filter(str.isdigit, texto))
+
+        if not texto_numerico:
+            texto_numerico = "0"
+
+        while len(texto_numerico) < 3:
+            texto_numerico = "0" + texto_numerico
+
+        reais = texto_numerico[:-2]
+        centavos = texto_numerico[-2:]
+
+        valor = f"{int(reais)},{centavos}"
+
+        # Evita piscar o cursor para o final
+        entrada.delete(0, "end")
+        entrada.insert(0, valor)
 
     def geraNumeroPedido():
             # self.numeroDoPedido += 1
@@ -80,12 +102,14 @@ def telaGerarPedido(self):
         for i, row in enumerate(dadosCliente):
             if i >= 5:
                 break
-            label = ctk.CTkButton(frameTelaPedido,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cpf=row[1], cnpj=row[2], cep=row[4], endereco=row[5], referencia=row[6], num=row[7]: selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, num))
+            label = ctk.CTkButton(frameTelaPedido,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cpf=row[1], cnpj=row[2], cep=row[4], endereco=row[5], referencia=row[6], num=row[7], bairro=row[8], rua=row[9]: selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, num, bairro, rua))
             label.place(relx=0.05, rely=yNovo, relwidth=0.27)
             self.resultadoLabels.append(label)  
             yNovo += 0.0399
 
-    def selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, numero):
+    def selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, numero, bairro, rua):
+
+        enderecoCliente = f"{rua} - {numero} - {bairro} - {endereco}"
         self.nomeDoClienteBuscado.delete(0, "end")
         self.nomeDoClienteBuscado.insert(0, nome)
         if cnpj:
@@ -104,7 +128,7 @@ def telaGerarPedido(self):
 
 
         variavelCep.set(cep)
-        variavelEndereco.set(endereco)
+        variavelEndereco.set(enderecoCliente)
         variavelReferencia.set(referencia)
         variavelNumero.set(numero)
         for label in self.resultadoLabels: 
@@ -118,7 +142,7 @@ def telaGerarPedido(self):
         self.resultadoLabelsProduto = []
 
         for i, row in enumerate(Buscas.buscaProduto(nomeDoProduto)):
-            if i >= 3:
+            if i >= 5:
                 break
             label = criaBotao(frameParaItensNoFrame,row[0],0.195,yNovo+0.02 + i * 0.02,0.26,lambda nome=row[0], valor=row[1], quantidade=row[2], ent=entradaProduto:selecionaProduto(nome, valor, quantidade, ent))
             label.configure(fg_color=self.cor, corner_radius=0, font=("TkDefaultFont", 14))
@@ -284,13 +308,7 @@ def telaGerarPedido(self):
     
 
     def montarValoresDosItens(frame):
-        listaQuantidadesExtras = []
         self.valoresDosItens = []
-
-
-        # if self.quantidadeExtra > 0:
-            # listaQuantidadesExtras.append(self.quantidadeExtra)
-
 
         for linha in self.linhas:
             produto = linha["produto"].get()

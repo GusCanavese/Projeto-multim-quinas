@@ -45,12 +45,12 @@ def telaAcoes(self):
 
 
     elif self.cargo == (('Financeiro',),) or self.cargo == (('Gerente',),):
-        criaBotao(frame, "Gerenciar", 0.33, 0.42, 0.24, lambda: telaGerenciar(self))
+        criaBotao(frame, "Gerenciar ", 0.33, 0.42, 0.24, lambda: telaGerenciar(self))
         criaBotao(frame, "Cadastros", 0.33, 0.24, 0.24, lambda: telaCadastros(self))
         criaBotao(frame, "Gerar pedido", 0.33, 0.30, 0.24, lambda: telaGerarPedido(self))
         criaBotao(frame, "Gerar orçamento", 0.33, 0.36, 0.24, lambda: telaGerarOrcamento(self))
         criaBotao(frame, "Relatório de vensdas/pedidos", 0.66, 0.24, 0.24, lambda: telaRelatorioDeVendas(self))
         criaBotao(frame, "Contas a pagar/receber", 0.66, 0.30, 0.24, lambda: telaContasAPagarEAReceber(self))
-        criaBotao(frame, "Consultar estoque", 0.66, 0.36, 0.24, lambda: telaEstoque(self))
+        criaBotao(frame, "Estoque/Produtos📦", 0.66, 0.36, 0.24, lambda: telaEstoque(self))
         criaBotao(frame, "Trocar usuário", 0.33, 0.80, 0.18, lambda: frame.destroy())
     aplicar_maiusculo_em_todos_entries(self)

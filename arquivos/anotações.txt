@@ -15,7 +15,7 @@
 15 - cadastro de cliente trocar documento por 2 campos, o campo de cpf e um de cnpj ✅
 16 - buscar clientes na tela gerar pedido adaptada paracpf ou cnpj                  ✅
 16 - colocar função buscacep no cadastro de clientes com botao                      ✅
-17 - colocar cifrão nos campos de dinheiro e ,00                                    ❌
+17 - colocar cifrão nos campos de dinheiro e ,00                                    ✅
 18 - descrição do cadastro de proutos deve ser um capo escrito                      ✅
 19 - alterar os cnpjs de cadastro de produto                                        ✅
 20 - tirar o campo data de venda da tela de gerar pedido                            ✅
@@ -35,16 +35,16 @@
 33 - colocar campos obrgatórios nas telas de cadastro                               ✅
 34 - fazer a exclusão de produtos funcionar                                         ✅
 35 - fazer a pesquisa no tela relatorio de vendas tbm buscar pelo nome do cliente   ✅
-36 - criar telas de gerenciar clientes, transportadoras, funcionarios etc
+36 - criar telas de gerenciar clientes, transportadoras, funcionarios etc           1/5
+37 - Tela ver pedido tá desconfigurado o tamanho                                    ✅
+38 - Colocar condição para ver pedidos                                              ✅
+40 - referencia nao precisa ser obrigatórios                                        ✅
+41 - alterar dados no pedido solicitados pela bruna
+42 - arrumar o endereço do cliente na telaGerar Pedido                              ✅
+
+39 - mandar o excedente dos produtos para a tela de "pedidos fábrica"      1/2❓
 
 
-
-36 - porém mandar o excedente dos produtos para a tela de "pedidos fábrica"      1/2❓
-
-
-
-
-    NO QUANTIDADE EXTRA, REALIZAR A BUSCA EM PRODUTOS SOMENTE COM OS PRODUTOS QUE TEM O CAMPO QUNTIDADE EXTRA >0
 
 ESTÉTICO:
 1 - telas de cadastro, colocar elas um pouco mais no meio
