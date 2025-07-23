@@ -89,7 +89,6 @@ class Insere:
         )
 
         db.conn.commit()
-        print("Pedido salvo com sucesso!")
 
     def inserir_nota_fiscal(chave_nfe, numero_nfe, serie_nfe, data_emissao, data_saida,
                        emitente_cnpj, emitente_nome, destinatario_cnpj, destinatario_nome,
@@ -97,7 +96,6 @@ class Insere:
                        valor_icms_desonerado, valor_bc_icms_st, valor_icms_st,
                        valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
                        transportadora_cnpj, transportadora_nome, itens_json, data_vencimento):
-        print(data_vencimento)
         
         resposta = messagebox.askquestion("Aviso", "Você tem certeza que deseja inserir essa nota fiscal?")
         if resposta == 'yes':

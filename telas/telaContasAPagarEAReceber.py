@@ -23,9 +23,8 @@ def telaContasAPagarEAReceber(self):
     criaBotao(frame, "Buscar", 0.36, 0.11, 0.22, lambda:filtrar.filtrarContas(self, frameContas, filtrarPorNumero.get()))
 
     def escolheTela(valor):
-        print(valor)
         if valor=="Entrada/Débito":
-            print("sem tela no momento")
+            pass
         if valor=="Saída/Crédito":
             escolherNotaFiscal(self)
             

@@ -9,7 +9,6 @@ from tkcalendar import DateEntry
 def verificaSeQuerFiltrarPorPeriodo(self, frame, checkbox, event=None):
     # relx=0.50, rely=0.065
     if checkbox:
-        print("teste")
         # Data Inicial
         self.labelDataInicio = ctk.CTkLabel(frame, text="Data Inicial:")
         self.labelDataInicio.place(relx=0.65, rely=0.02, anchor="nw")
@@ -35,7 +34,6 @@ def verificaSeQuerFiltrarPorPeriodo(self, frame, checkbox, event=None):
 
 def verificaSeQuerFiltrarPorPeriodoContas(self, frame, checkbox, event=None):
     if checkbox:
-        print("teste")
         # Data Inicial
         self.labelDataInicio = ctk.CTkLabel(frame, text="Data Inicial:")
         self.labelDataInicio.place(relx=0.7, rely=0.02, anchor="nw")

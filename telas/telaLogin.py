@@ -32,7 +32,7 @@ def telaLogin(self):
         else:
             self.configure(fg_color="#eaeaea")
             self.corFundo = "#eaeaea"
-            self.cor = "#cccccc"
+            self.cor = "#3b8ed0"
 
             self.switch_var.set(False)
         self.frame_login.configure(fg_color=self.corFundo)
@@ -58,17 +58,20 @@ def telaLogin(self):
 
     # Switch de tema claro/escuro
 
+    corNegando = "#8B0000"
+
     def mudar_estado():
         if self.switch_var.get():
             ctk.set_appearance_mode("dark")
             self.configure(fg_color="#242424")
             self.corFundo = "#2b2b2b"
+            self.cor = "#5a3e3e"
             
         else:
             ctk.set_appearance_mode("light")
             self.configure(fg_color="#DFDFDF")
             self.corFundo = "#C6C6C6"
-            self.corTopicos = "#3b8ed0"
+            self.cor = "#3b8ed0"
 
         # Atualiza cor do frame manualmente
         self.frame_login.configure(fg_color=self.corFundo)

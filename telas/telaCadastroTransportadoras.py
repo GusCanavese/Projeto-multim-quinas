@@ -13,7 +13,6 @@ def telaCadastroTransportadoras(self):
 
 
     def meDesmarqueTransportadora(checkboxSelecionada):
-        print(checkboxSelecionada)
         match checkboxSelecionada:
             case "CPF":
                 if hasattr(self, "CPFTransportadora"):

@@ -123,13 +123,11 @@ def telaGerarFaturamentoEntradaNota(self, dadosNota):
         if self.row ==1:
             self.botaoRemoverParcela.destroy()
             del self.botaoRemoverParcela
-            print("primeira linha ja encontrada")
             pass
         else:
             if self.row ==1 and hasattr(self, "botaoRemoverParcela"):
                 self.botaoRemoverParcela.destroy()
                 del self.botaoRemoverParcela
-                print("teste")
             self.y-=0.038
             self.teste -=0.038
             self.yParcelas -=0.038
@@ -162,7 +160,7 @@ def telaGerarFaturamentoEntradaNota(self, dadosNota):
             adicionaParcela(self)
 
         else:
-            print("oi")
+            pass
 
     for i, coluna in enumerate(valores):
         posicaox = 0.2 + i * largura_label  

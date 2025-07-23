@@ -106,7 +106,7 @@ class Buscas:
                                         numero_recibo LIKE %s
                                         OR subtotal LIKE %s
                                     ) 
-                                ORDER BY data_emissao DESC"""
+                                ORDER BY numero_recibo ASC"""
                 parametros = (inicio, fim, f"%{vendedor}%", f"%{numero}%", f"%{numero}%")
             else:
                 queryBuscaPedidos = """SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao,
@@ -119,7 +119,7 @@ class Buscas:
                                         OR numero_recibo LIKE %s
                                         OR subtotal LIKE %s
                                     )
-                                ORDER BY data_emissao DESC"""
+                                ORDER BY numero_recibo ASC"""
                 parametros = (inicio, fim, f"%{numero}%", f"%{numero}%", f"%{numero}%", f"%{numero}%")
         else:
             if vendedor != "Todos":
@@ -132,7 +132,7 @@ class Buscas:
                                         OR numero_recibo LIKE %s
                                         OR subtotal LIKE %s
                                     )
-                                ORDER BY data_emissao DESC"""
+                                ORDER BY numero_recibo ASC"""
                 parametros = (f"%{vendedor}%", f"%{numero}%", f"%{numero}%", f"%{numero}%")
             else:
                 queryBuscaPedidos = """SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao,
@@ -142,17 +142,14 @@ class Buscas:
                                     OR vendedor LIKE %s
                                     OR numero_recibo LIKE %s
                                     OR subtotal LIKE %s
-                                ORDER BY data_emissao DESC"""
+                                ORDER BY numero_recibo ASC"""
                 parametros = (f"%{numero}%", f"%{numero}%", f"%{numero}%", f"%{numero}%")
 
-        print("Query executada:", queryBuscaPedidos % parametros)  # Debug: mostra a query com parâmetros
         db.cursor.execute(queryBuscaPedidos, parametros)
         resultado = db.cursor.fetchall()
-        print("Resultados encontrados:", len(resultado))  # Debug: mostra quantidade de resultados
         return resultado
 
     def buscaEstoqueProdutos(valor, cnpj):
-        print(cnpj)
         if cnpj == "Todos":
             queryBuscaProdutosEstoque = """SELECT quantidade, descricao, codigo_interno, valor_de_venda, CNPJ, codigo_ncm, codigo_cfop, codigo_cest, valor_de_venda, valor_de_custo, origem_cst, nome_do_produto FROM produtos 
             WHERE 

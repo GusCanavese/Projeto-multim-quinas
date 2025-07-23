@@ -7,7 +7,6 @@ from componentes import criaFrame, criaFrameJanela, criaLabelDescritivo, criaBot
 
 def telaVer(self, p):
     frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
-    print(p)
 
 
     for row, i in enumerate(p):

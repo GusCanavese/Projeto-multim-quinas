@@ -3,7 +3,6 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 def gerar_recibo(nome_arquivo, dados):
-    print(dados)
     c = canvas.Canvas(nome_arquivo, pagesize=letter)
     width, height = letter
 

@@ -127,13 +127,11 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
         if self.row ==1:
             self.botaoRemoverParcela.destroy()
             del self.botaoRemoverParcela
-            print("primeira linha ja encontrada")
             pass
         else:
             if self.row ==1 and hasattr(self, "botaoRemoverParcela"):
                 self.botaoRemoverParcela.destroy()
                 del self.botaoRemoverParcela
-                print("teste")
             self.y-=0.038
             self.teste -=0.038
             self.yParcelas -=0.038
@@ -166,7 +164,7 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
             adicionaParcela(self)
 
         else:
-            print("oi")
+            pass
 
     for i, coluna in enumerate(valores):
         posicaox = 0.2 + i * largura_label  
@@ -178,16 +176,11 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
 
     def salvarEFechar(self):
         confirmarSalvamentoDoFaturamento(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, numero, pedido)
-        print("==== Parcelas adicionadas ====")
-        for i in range(len(self.listaEntradaValor)):
-            forma_pagamento = self.listaComboboxes[i].get()
-            quantidade = self.listaEntradaQuantidade[i].get()
-            valor = self.listaEntradaValor[i].get()
+        # for i in range(len(self.listaEntradaValor)):
+        #     forma_pagamento = self.listaComboboxes[i].get()
+        #     quantidade = self.listaEntradaQuantidade[i].get()
+        #     valor = self.listaEntradaValor[i].get()
 
-            print(f"Parcela {i+1}:")
-            print(f"  Forma de pagamento: {forma_pagamento}")
-            print(f"  Quantidade: {quantidade}")
-            print(f"  Valor: R$ {valor}")
 
 
         self.frameTelaGerarFaturamento.destroy()

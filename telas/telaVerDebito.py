@@ -21,7 +21,6 @@ def telaVerDebito(self, lista):
     emitente.place(relx=0.1, rely=0.3)
     criarLabelEntry(frame, "Razão social", 0.1, 0.35, 0.3, lista[5])
     criarLabelEntry(frame, "CNPJ", 0.45, 0.35, 0.15, lista[10])
-    print(lista[9].get())
     dataHora = "2025-05-28 15:53:00"
     data = dataHora.split(" ")[0]
     hora = dataHora.split(" ")[1]

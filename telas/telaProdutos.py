@@ -53,7 +53,6 @@ def telaProdutos(self, dadosNota):
                 entry.place(relx=posicaoX, rely=posicaoY, relwidth=0.096)
                 posicaoX += 0.1
                 variaveis.append(entry)
-                print("oi")
             else:
                 entry = ctk.CTkEntry(frame, width=80, corner_radius=0)
                 entry.insert(0, valores.get(cabecalho, ""))

@@ -18,7 +18,6 @@ class Atualiza:
         db.conn.commit()
 
     def removeUnidadesDeProdutos(desc):
-        print(desc)
         for i in desc:
             partes = i.rsplit(' ', 1)
             quantidade = partes[1]
@@ -30,7 +29,6 @@ class Atualiza:
 
 
     def retornaProdutoParaOEstoque(desc):
-        print(desc)
         for i in desc:
             partes = i.rsplit(' ', 1)
             quantidade = partes[1]

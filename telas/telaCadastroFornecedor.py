@@ -13,7 +13,6 @@ from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 def telaCadastroFornecedores(self):
     # função criada somente para verificar qual checkbox ta marcado e qual
     def meDesmarque(checkboxSelecionada):
-        print(checkboxSelecionada)
         match checkboxSelecionada:
                 
                 case "CPF":

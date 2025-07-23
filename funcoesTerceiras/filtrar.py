@@ -25,7 +25,7 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
     fim_pedido = pagina * 10
     pedidos_pagina = pedidos[inicio_pedido:fim_pedido]
 
-    y = 0.1
+    y = 0.12
     for rowPedido, pedido in enumerate(pedidos_pagina, start=1):
         if pedido[4] != "":
             corDeFundo = "#196F3D" 
@@ -59,10 +59,10 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
                 x += 0.175
                 self.dadosTelaVerPedidos.append(label)
 
-        btn = criaBotao(frame, "Ver", 0.927, y, 0.05, lambda p=dadosPedido, d=dadosExtras, desc=descricaoProdutos: telaVerPedidos(self, p, d, desc))
+        btn = criaBotao(frame, "Ver", 0.94, y, 0.05, lambda p=dadosPedido, d=dadosExtras, desc=descricaoProdutos: telaVerPedidos(self, p, d, desc))
         self.dadosTelaVerPedidos.append(btn)
 
-        y += 0.06
+        y += 0.07
 
     # Adiciona botões de navegação se houver mais pedidos
     if len(pedidos) > 10:
@@ -76,11 +76,11 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
         }
 
         if pagina > 1:
-            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.8, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']-1))
+            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 1, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']-1))
             self.dadosTelaVerPedidos.append(btnAnterior)
 
         if fim_pedido < len(pedidos):
-            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.8, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']+1))
+            btnProxima = criaBotao(frame, "Próximo →", 0.66, 1, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']+1))
             self.dadosTelaVerPedidos.append(btnProxima)
 
 
@@ -118,7 +118,6 @@ def filtrarContas(self, frame, valor, pagina=1):
     for rowProduto, conta in enumerate(contasPagina, start=1):
         corDeFundo = "#1C60A0"
         dadosProduto = [conta[0], conta[2], conta[1], conta[3], conta[4]]
-        print(dadosProduto)
         try:
             datetime.strptime(conta[1], "%d/%m/%Y")
         except:
@@ -206,7 +205,6 @@ def filtrarFuncionarios(self, frame, valor, pagina=1):
     for row, funcionarios in enumerate(contasPagina, start=1):
         corDeFundo = "#1C60A0"
         dadosProduto = [funcionarios[0], funcionarios[1]]
-        print(dadosProduto)
 
         x = 0.03
 
