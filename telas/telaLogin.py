@@ -10,7 +10,7 @@ def telaLogin(self):
     self.title("GestUp")
     self.switch_var = ctk.BooleanVar()
 
-        # Define modo inicial com base no sistema
+    # Define modo inicial com base no sistema
     # Inicializa modo como system, mas define cor padrão temporária
     ctk.set_appearance_mode("system")
     self.corFundo = "#d0d0d0"  # cor intermediária neutra
@@ -33,10 +33,10 @@ def telaLogin(self):
             
         else:
             self.configure(fg_color="#eaeaea")
-            self.corFundo = "#eaeaea"
+            self.corFundo = "#F5F5F5"
             self.cor = "#3b8ed0"
-            self.corNegado = "#DB2E2E"
-            self.corAfirma = "#14B457"
+            self.corNegado = "#F44336"
+            self.corAfirma = "#4CAF50"
 
             self.switch_var.set(False)
         self.frame_login.configure(fg_color=self.corFundo)

@@ -417,7 +417,9 @@ def telaGerarPedido(self):
             self.botaoRemoverItem.place_forget()
 
         self.yNovo = self.posicaoy + 0.02
+        print("destruiu")
         self.entradaProduto = ""
+        print("destruiu")
 
         atualizarTotalGeral()
     
