@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.lerNotaFiscal import lerNotaFiscal
 from tkinter import filedialog
-from componentes import criaFrame
+from componentes import criaFrame, criaFrameJanela
 
 
 def escolherNotaFiscal(self):

@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.registraUsuarioNoBanco import registraUsuarioNoBanco
-from componentes import criaFrame, criarLabelComboBox, criarLabelEntry, criaBotao
+from componentes import criaFrame, criaFrameJanela, criarLabelComboBox, criarLabelEntry, criaBotao
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 

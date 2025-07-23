@@ -6,7 +6,7 @@ from consultas.select import Buscas
 from tkinter import messagebox
 import requests
 from funcoesTerceiras.registraClienteNoBanco import registraClienteNoBanco
-from componentes import criaFrame, criarLabelEntry, criaBotao, criaBotaoPequeno
+from componentes import criaFrame, criaFrameJanela, criarLabelEntry, criaBotao, criaBotaoPequeno
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 def telaCadastroClientes(self):

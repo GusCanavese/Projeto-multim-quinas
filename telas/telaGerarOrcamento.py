@@ -8,7 +8,7 @@ import requests
 from PIL import Image
 import datetime
 from funcoesTerceiras.verificaSeQuerSalvar import salvarOrcamento
-from componentes import criaFrame, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
+from componentes import criaFrame, criaFrameJanela, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
 
 
 def telaGerarOrcamento(self):

@@ -3,7 +3,7 @@ from PIL import Image, ImageTk
 import fitz
 from funcoesTerceiras.imprimirPDF import imprimirPdf
 from telas.telaVerPedidos import telaVerPedidos
-from componentes import criaFrame, criaBotao, criarLabelEntry, criaLabel, criaEntry, criaTextArea
+from componentes import criaFrame, criaFrameJanela, criaBotao, criarLabelEntry, criaLabel, criaEntry, criaTextArea
 
 
 def telaApresentarOrcamento(self, caminhoPdf):

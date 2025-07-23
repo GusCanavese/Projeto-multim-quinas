@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.buscarProdutos import buscarProdutos
-from componentes import criaFrame, criarLabelEntry, criarLabelComboBox, criaBotao, criaLabel
+from componentes import criaFrame, criaFrameJanela, criarLabelEntry, criarLabelComboBox, criaBotao, criaLabel
 
 
 def telaEstoque(self):

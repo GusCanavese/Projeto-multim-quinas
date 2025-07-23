@@ -2,7 +2,7 @@ import customtkinter as ctk
 from PIL import Image, ImageTk
 import fitz
 from funcoesTerceiras.imprimirPDF import imprimirPdf
-from componentes import criaFrame, criaBotao, criarLabelEntry, criaLabel, criaEntry, criaTextArea
+from componentes import criaFrame, criaFrameJanela, criaBotao, criarLabelEntry, criaLabel, criaEntry, criaTextArea
 
 
 def telaApresentarPDF(self, caminhoPdf, condicao):

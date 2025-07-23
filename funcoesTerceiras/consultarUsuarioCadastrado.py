@@ -24,7 +24,6 @@ def consultarUsuarioCadastrado(self):
     else:
         self.login.delete(0, 'end')
         self.senha.delete(0, 'end')
-        print('é pra ter deletado')
         telaAcoes(self)
 
         

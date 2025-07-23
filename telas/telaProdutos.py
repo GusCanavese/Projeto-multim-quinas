@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from telas.telaTotais import telaTotais
-from componentes import criaFrame, criaBotao, criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox
+from componentes import criaFrame, criaFrameJanela, criaBotao, criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox
 
 
 def telaProdutos(self, dadosNota):

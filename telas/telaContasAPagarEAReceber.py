@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
 from funcoesTerceiras import filtrar, verificaSeQuerFiltrarPorPeriodo
-from componentes import criaFrame, criaLabel, criaBotao, criaComboBox, criarLabelEntry, criarLabelComboBox
+from componentes import criaFrame, criaFrameJanela, criaLabel, criaBotao, criaComboBox, criarLabelEntry, criarLabelComboBox
 
 
 def telaContasAPagarEAReceber(self):

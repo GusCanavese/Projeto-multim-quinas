@@ -11,7 +11,7 @@ from telas.telaGerenciar import telaGerenciar
 from telas.telaGerarOrcamento  import telaGerarOrcamento
 from telas.telaContasAPagarEAReceber import telaContasAPagarEAReceber
 from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
-from componentes import criaFrame, criaBotao
+from componentes import criaFrame, criaFrameJanela, criaBotao
 
 def telaAcoes(self):
 

@@ -8,7 +8,7 @@ import requests
 from PIL import Image
 import datetime
 from funcoesTerceiras.verificaSeQuerSalvar import salvarPedido
-from componentes import criaFrame, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
+from componentes import criaFrame, criaFrameJanela, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 

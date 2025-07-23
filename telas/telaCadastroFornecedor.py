@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 import gc
 from funcoesTerceiras.registraFornecedorNoBanco import registraFornecedorNoBanco 
-from componentes import criaFrame, criaSimouNao, criarLabelEntry, criaBotao, criarLabelEntryEmail
+from componentes import criaFrame, criaFrameJanela, criaSimouNao, criarLabelEntry, criaBotao, criarLabelEntryEmail
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 

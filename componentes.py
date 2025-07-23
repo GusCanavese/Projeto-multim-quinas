@@ -109,6 +109,11 @@ def criarLabelLateralComboBox(frame, texto, relx, rely, width, opcoes):
     entry.place(relx=relx + 0.01, rely=rely, relwidth=width, anchor="w")
     return entry
 
+def criaFrameJanela(self, relx, rely, width, height, cor):
+    frame = ctk.CTkFrame(self, fg_color=cor)
+    frame.place(relx=relx, rely=rely, relwidth=width, relheight=height, anchor="center")
+    return frame
+
 def criaFrame(self, relx, rely, width, height):
     frame = ctk.CTkFrame(self)
     frame.place(relx=relx, rely=rely, relwidth=width, relheight=height, anchor="center")
