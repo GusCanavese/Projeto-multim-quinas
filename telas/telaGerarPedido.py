@@ -8,7 +8,7 @@ import requests
 from PIL import Image
 import datetime
 from funcoesTerceiras.verificaSeQuerSalvar import salvarPedido
-from componentes import criaFrame, criaFrameJanela, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
@@ -47,7 +47,7 @@ def telaGerarPedido(self):
     variavelEmAbertoFechado.set("Em aberto")
     dataCriacao.set(value=datetime.datetime.now().strftime("%d/%m/%y"))
 
-    frameTelaPedido = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frameTelaPedido = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     frameParaItens = ctk.CTkScrollableFrame(frameTelaPedido, height=200, orientation="vertical")
     frameParaItens.place(relx=0.5, rely=0.5, relwidth=0.94, anchor="center")
     container = ctk.CTkFrame(frameParaItens, fg_color="red", height=1500)

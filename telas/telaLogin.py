@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.consultarUsuarioCadastrado import consultarUsuarioCadastrado
-from componentes import criaFrame, criaFrameJanela
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela
 
 
 def telaLogin(self):
@@ -17,8 +17,8 @@ def telaLogin(self):
     self.switch_var = ctk.BooleanVar(value=False)
 
     # Frame inicial
-    self.frame_login = criaFrameJanela(self, 0.5, 0.5, 0.94, 0.9, self.corFundo)
-
+    self.frame_login = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
+ 
     # Depois de um pequeno tempo, define a cor correta baseada no modo real
     def aplicar_cor_do_sistema():
         modo_atual = ctk.get_appearance_mode()
@@ -28,15 +28,16 @@ def telaLogin(self):
             self.cor = "#5a3e3e"
             self.corNegado = "#922B21"
             self.corAfirma = "#196F3D"
+            self.corModal = "#404040"
 
             self.switch_var.set(True)
             
         else:
-            self.configure(fg_color="#eaeaea")
-            self.corFundo = "#F5F5F5"
-            self.cor = "#3b8ed0"
-            self.corNegado = "#F44336"
-            self.corAfirma = "#4CAF50"
+            self.configure(fg_color="#bbbbbb")
+            self.corFundo = "#bbbbbb"
+            self.cor = "#408cd4"
+            self.corNegado = "#c83c3c"
+            self.corAfirma = "#3cc861"
 
             self.switch_var.set(False)
         self.frame_login.configure(fg_color=self.corFundo)
@@ -45,7 +46,7 @@ def telaLogin(self):
 
 
     # Cria o frame com a cor inicial
-    self.frame_login = criaFrameJanela(self, 0.5, 0.5, 0.94, 0.9, self.corFundo)
+    self.frame_login = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     # Widgets da tela de login
     self.texto = ctk.CTkLabel(self.frame_login, width=1000, height=100, text="Fazer Login", font=("Century Gothic bold", 35))
@@ -74,10 +75,10 @@ def telaLogin(self):
         else:
             ctk.set_appearance_mode("light")
             self.configure(fg_color="#DFDFDF")
-            self.corFundo = "#C6C6C6"
-            self.cor = "#3b8ed0"
-            self.corNegado = "#DB2E2E"
-            self.corAfirma = "#358356"
+            self.corFundo = "#bbbbbb"
+            self.cor = "#408cd4"
+            self.corNegado = "#c83c3c"
+            self.corAfirma = "#3cc861"
 
         # Atualiza cor do frame manualmente
         self.frame_login.configure(fg_color=self.corFundo)

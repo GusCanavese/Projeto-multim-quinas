@@ -7,11 +7,11 @@ from telas.telaCadastroFuncionario import telaCadastroFuncionario
 from telas.telaCadastroFornecedor import telaCadastroFornecedores
 from telas.telaCadastroTransportadoras import telaCadastroTransportadoras 
 from telas.telaCadastroClientes import telaCadastroClientes
-from componentes import criaFrame, criaFrameJanela, criaBotao
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaBotao
 
 
 def telaCadastros(self):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     # título
 

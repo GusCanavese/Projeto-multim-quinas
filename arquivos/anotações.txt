@@ -42,6 +42,7 @@
 41 - alterar dados no pedido solicitados pela bruna                                 ✅
 42 - arrumar o endereço do cliente na telaGerar Pedido                              ✅
 42 - arrumar botão de imprimir pedido na tela "verPedidos"                              
+43 - tela gerar faturamento, o valor data ta indo pro campo "valor" total
 
 39 - mandar o excedente dos produtos para a tela de "pedidos fábrica"      1/2❓
 

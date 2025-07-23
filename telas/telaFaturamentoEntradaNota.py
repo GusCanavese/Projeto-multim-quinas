@@ -160,7 +160,7 @@ def telaGerarFaturamentoEntradaNota(self, dadosNota):
             adicionaParcela(self)
 
         else:
-            pass
+            print("oi")
 
     for i, coluna in enumerate(valores):
         posicaox = 0.2 + i * largura_label  

@@ -130,7 +130,7 @@ def criaBotao(frame, texto, relx, rely, width, comando):
     if modo_atual == "dark":
         text = "white"
     else:
-        text = "black"
+        text = "white"
     fonte=("TkDefaultFont", 16)
     botao = ctk.CTkButton(frame, text=texto, corner_radius=5, font=fonte, command=lambda:comando(), text_color=text)
     botao.place(relx=relx, rely=rely, relwidth=width,  anchor="center")

@@ -11,7 +11,7 @@ from telas.telaGerenciar import telaGerenciar
 from telas.telaGerarOrcamento  import telaGerarOrcamento
 from telas.telaContasAPagarEAReceber import telaContasAPagarEAReceber
 from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
-from componentes import criaFrame, criaFrameJanela, criaBotao
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaBotao
 
 def telaAcoes(self):
 
@@ -26,7 +26,7 @@ def telaAcoes(self):
             aplicar_maiusculo_em_todos_entries(widget)
 
     
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     usuarioBloqueado = self.logado
     self.cargo = Buscas.buscaCargoUsuarioBloqueado(usuarioBloqueado)
@@ -40,7 +40,7 @@ def telaAcoes(self):
         criaBotao(frame, "Consultar estoque", 0.66, 0.30, 0.24, lambda: telaEstoque(self))
         criaBotao(frame, "Gerar pedido", 0.33, 0.36, 0.24, lambda: telaGerarPedido(self))
         criaBotao(frame, "Gerar orçamento", 0.33, 0.30, 0.24, lambda: telaGerarOrcamento(self))
-        criaBotao(frame, "Trocar usuário", 0.33, 0.80, 0.18, lambda: frame.destroy())
+        criaBotao(frame, "◀️", 0.33, 0.80, 0.18, lambda: frame.destroy())
         criaBotao(frame, "Cadastros", 0.33, 0.24, 0.24, lambda: telaCadastros(self))
 
 

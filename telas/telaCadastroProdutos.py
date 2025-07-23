@@ -3,11 +3,11 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.registraProdutoNoBanco import registraProdutoNoBanco
-from componentes import criarLabelEntry, criaFrame, criaBotao, criarLabelComboBox
+from componentes import criaFrameJanela,  criarLabelEntry, criaFrame, criaBotao, criarLabelComboBox
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 def telaCadastroProdutos(self):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     self.valor_formatado = ctk.StringVar(value="0,00")
 
 

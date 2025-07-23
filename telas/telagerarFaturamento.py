@@ -5,15 +5,14 @@ import customtkinter as ctk
 from datetime import date
 from funcoesTerceiras import calculaParcelasFaturamento
 from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvamentoDoFaturamento
-from componentes import criaBotao
+from componentes import criaFrameJanela, criaBotao, criaFrame
 
 def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
 
     self.row=1
-    self.frameTelaGerarFaturamento = ctk.CTkFrame(self)
+    self.frameTelaGerarFaturamento = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     self.frameValorTotais = ctk.CTkFrame(self.frameTelaGerarFaturamento, fg_color="#48424d")
 
-    self.frameTelaGerarFaturamento.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
 
 
     valores = ["Forma de pagamento", "Quantidade parcelas", "Valor"]
@@ -194,9 +193,8 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
     criaBotao(self.frameTelaGerarFaturamento, "Salvar e fechar", 0.5, 0.95, 0.15, lambda: salvarEFechar(self))
 
 def modal(self, teste):
-    self.frame = ctk.CTkFrame(self.frameTelaGerarFaturamento)
-    self.frame.place(relx=0.5, rely=0.5, relwidth=0.6, relheight=0.9, anchor="center")
-    self.frame.place(relx=0.5, rely=0.5, anchor="center")
+    self.frame = criaFrameJanela(self.frameTelaGerarFaturamento, 0.5, 0.5, 0.6, 0.9, self.corModal)
+
 
     for widget in self.frameTelaGerarFaturamento.winfo_children():
         try:

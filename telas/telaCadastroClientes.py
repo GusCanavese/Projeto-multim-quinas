@@ -6,11 +6,11 @@ from consultas.select import Buscas
 from tkinter import messagebox
 import requests
 from funcoesTerceiras.registraClienteNoBanco import registraClienteNoBanco
-from componentes import criaFrame, criaFrameJanela, criarLabelEntry, criaBotao, criaBotaoPequeno
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criarLabelEntry, criaBotao, criaBotaoPequeno
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 def telaCadastroClientes(self):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     bairro = ctk.StringVar()
     rua = ctk.StringVar()
     cidade = ctk.StringVar()

@@ -11,10 +11,10 @@ from telas.telaGerenciarFuncionarios import telaGerenciarFuncionarios
 from telas.telaGerarOrcamento  import telaGerarOrcamento
 from telas.telaContasAPagarEAReceber import telaContasAPagarEAReceber
 from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
-from componentes import criaFrame, criaFrameJanela, criaBotao
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaBotao
 
 def telaGerenciar(self):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     criaBotao(frame, "Clientes", 0.5, 0.24, 0.24, lambda:telaGerenciarFuncionarios(self))
     criaBotao(frame, "Clientes", 0.66, 0.24, 0.24, None)

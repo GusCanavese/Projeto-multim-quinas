@@ -4,12 +4,12 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.lerNotaFiscal import lerNotaFiscal
 from tkinter import filedialog
-from componentes import criaFrame, criaFrameJanela
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela
 
 
 def escolherNotaFiscal(self):
     self.variavel = ctk.StringVar()
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     self.variavel.set("Nenhum arquivo selecionado")
 

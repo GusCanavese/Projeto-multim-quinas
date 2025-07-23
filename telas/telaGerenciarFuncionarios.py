@@ -4,11 +4,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.buscarProdutos import buscarProdutos
 from funcoesTerceiras import filtrar
-from componentes import criaFrame, criaFrameJanela, criarLabelEntry, criarLabelComboBox, criaBotao, criaLabel
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criarLabelEntry, criarLabelComboBox, criaBotao, criaLabel
 
 
 def telaGerenciarFuncionarios(self):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     frameProdutos = criaFrame(frame, 0.65, 0.5, 0.68, 0.93)
 
     # Filtros - lado esquerdo

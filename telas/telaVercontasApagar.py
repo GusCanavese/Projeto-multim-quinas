@@ -3,10 +3,10 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from telas import telaRegistraCredito, telaVerDebito
-from componentes import criaFrame, criaFrameJanela, criarLabelEntry, criaBotao
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criarLabelEntry, criaBotao
 
 def telaVercontasApagar(self, d):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     varConfirmado          = ctk.StringVar()
     varVencimento          = ctk.StringVar()

@@ -2,11 +2,11 @@ import customtkinter as ctk
 from PIL import Image, ImageTk
 import fitz
 from funcoesTerceiras.imprimirPDF import imprimirPdf
-from componentes import criaFrame, criaFrameJanela, criaBotao, criarLabelEntry, criaLabel, criaEntry, criaTextArea
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaBotao, criarLabelEntry, criaLabel, criaEntry, criaTextArea
 
 
 def telaApresentarPDF(self, caminhoPdf, condicao):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
    
     # Variável para controle de redimensionamento
     self.last_width = frame.winfo_width()

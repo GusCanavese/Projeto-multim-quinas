@@ -7,10 +7,10 @@ from funcoesTerceiras import confirmarExclusaoDoPedido
 from funcoesTerceiras import geradorDePedido
 from telas.telaApresentadorDePdf import telaApresentarPDF
 from telas.telagerarFaturamento import telaGerarFaturamento
-from componentes import criaBotao, criaFrame, criaLabelDescritivo, criarLabelEntry
+from componentes import criaFrameJanela,  criaBotao, criaFrame, criaLabelDescritivo, criarLabelEntry
 
 def telaVerPedidos(self, p, d, desc):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     if p[5] == "Não confirmado":
         

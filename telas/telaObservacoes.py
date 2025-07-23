@@ -6,12 +6,12 @@ from datetime import date
 import json
 from consultas.insert import Insere
 from funcoesTerceiras import calculaParcelasFaturamento
-from componentes import criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox, criaFrame, criaBotao, criaLabel
+from componentes import criaFrameJanela,  criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox, criaFrame, criaBotao, criaLabel
 
 
 def telaObservacoes(self, dadosNota):
 
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     criaLabel(frame, "Observações", 0.05, 0.01, 0.2, "#2C3E50")
 
 

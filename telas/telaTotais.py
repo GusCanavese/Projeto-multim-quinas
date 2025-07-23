@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from datetime import datetime
 from telas.telaFaturamentoEntradaNota import telaGerarFaturamentoEntradaNota
-from componentes import criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox
+from componentes import criaFrameJanela,  criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox
 
 
 def telaTotais(self, dadosNota):

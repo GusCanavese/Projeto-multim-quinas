@@ -9,7 +9,7 @@ from telas.telaVerPedidos import telaVerPedidos
 from telas.telaVercontasApagar import telaVercontasApagar
 from telas.telaVer import telaVer
 import json
-from componentes import criaLabel, criaBotao
+from componentes import criaFrameJanela,  criaLabel, criaBotao
 
 def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=1):
     pedidos = Buscas.buscaPedidos(vendedor, numero, inicio, fim, checkbox)

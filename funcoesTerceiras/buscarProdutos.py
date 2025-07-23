@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from consultas.select import Buscas 
 from telas.telaVerProduto import telaVerProduto
-from componentes import criaLabel, criaBotao
+from componentes import criaFrameJanela,  criaLabel, criaBotao
  
 def buscarProdutos(self, frame, nome, cnpj, pagina=1):
     produtos = Buscas.buscaEstoqueProdutos(nome, cnpj)

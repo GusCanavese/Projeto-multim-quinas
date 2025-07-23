@@ -3,12 +3,12 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.registraUsuarioNoBanco import registraUsuarioNoBanco
-from componentes import criaFrame, criaFrameJanela, criarLabelComboBox, criarLabelEntry, criaBotao
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criarLabelComboBox, criarLabelEntry, criaBotao
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
 def telaCadastroFuncionario(self):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     opcoes = ["Gerente", "Vendedor(a) interno", "Vendedor(a) externo", "Financeiro"]
 

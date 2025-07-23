@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from consultas.select import Buscas 
-from componentes import criaLabel, criaBotao
+from componentes import criaFrameJanela,  criaLabel, criaBotao
 from telas.telaVercontasApagar import telaVercontasApagar
 #! PARA A BUSCA COM DATAS FUNCIONAR, 
 # É NECESSÁRIO CADASTRAR A CONTAARECEBER 

@@ -3,10 +3,10 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from telas.telaProdutos import telaProdutos
-from componentes import criarLabelLateralEntry, criaBotao, criarLabelEntry, criaFrame, criarLabelLateralComboBox, criarLabelComboBox
+from componentes import criaFrameJanela, criarLabelLateralEntry, criaBotao, criarLabelEntry, criaFrame, criarLabelLateralComboBox, criarLabelComboBox
 
 def telaVerDebito(self, lista):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     criarLabelEntry(frame, "Número da NF", 0.1, 0.05, 0.07, lista[4])
     criarLabelEntry(frame, "Série", 0.2, 0.05, 0.07, lista[7])
@@ -42,4 +42,4 @@ def telaVerDebito(self, lista):
     criarLabelComboBox(frame, "Forma de pagamento", 0.4, 0.64, 0.2, None)
 
     criaBotao(frame, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda:telaProdutos(self, lista)).place(anchor="nw")
-    criaBotao(frame, "Voltar", 0.05, 0.94, 0.15, lambda: frame.destroy()).place(anchor="nw")
+    criaBotao(frame, "◀️", 0.05, 0.94, 0.15, lambda: frame.destroy()).place(anchor="nw")

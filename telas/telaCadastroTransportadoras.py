@@ -4,12 +4,12 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 import gc
 from funcoesTerceiras.registraTransportadoraNoBanco import registraTransportadoraNoBanco
-from componentes import criaFrame, criaFrameJanela, criaSimouNao, criarLabelEntry, criaBotao, criarLabelEntryEmail
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaSimouNao, criarLabelEntry, criaBotao, criarLabelEntryEmail
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
 def telaCadastroTransportadoras(self):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
 
     def meDesmarqueTransportadora(checkboxSelecionada):

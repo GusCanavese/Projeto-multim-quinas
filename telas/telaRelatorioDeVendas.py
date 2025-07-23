@@ -4,21 +4,21 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras import filtrar, verificaSeQuerFiltrarPorPeriodo
-from componentes import criaFrame, criaFrameJanela, criarLabelEntry, criarLabelComboBox, criaBotao, criaLabel
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criarLabelEntry, criarLabelComboBox, criaBotao, criaLabel
 
 
 
 def telaRelatorioDeVendas(self):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
-    frameVendas = criaFrame(frame, 0.5, 0.5, 0.95, 0.7)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
+    frameVendas = criaFrameJanela(frame, 0.5, 0.5, 0.95, 0.7, self.corFundo)
     opcoes = ["Todos", "1", "Yara", "Camila", "Jenifer", "Bruna", "Ana Flávia", "Maurício"]
 
 
-    self.filtrarPorNumero = criarLabelEntry(frame,"Filtrar", 0.03, 0.04, 0.22, None)
-    self.filtrarPorVendedor = criarLabelComboBox(frame, "Filtrar por vendedor(a)", 0.26, 0.04, 0.22, opcoes)
+    self.filtrarPorNumero = criarLabelEntry(frame,"Filtrar", 0.055, 0.04, 0.22, None)
+    self.filtrarPorVendedor = criarLabelComboBox(frame, "Filtrar por vendedor(a)", 0.315, 0.04, 0.22, opcoes)
     
     self.selecionarPeriodo = ctk.CTkCheckBox(frame, text="Selecionar período")
-    self.selecionarPeriodo.place(relx=0.50, rely=0.065, anchor="nw")
+    self.selecionarPeriodo.place(relx=0.525, rely=0.065, anchor="nw")
     self.selecionarPeriodo.bind("<Button-1>", command=lambda event: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodo(self,frame, self.selecionarPeriodo.get(), event))
     
 

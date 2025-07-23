@@ -3,11 +3,11 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from telas.telaTotais import telaTotais
-from componentes import criaFrame, criaFrameJanela, criaBotao, criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaBotao, criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox
 
 
 def telaProdutos(self, dadosNota):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     variaveis = []
     lista = ["Produto", "Quantidade", "Valor", "Unitário", "Subtotal", "CFOP", "Em Estoque", "Totaliza Nota", "Desconto ($)", "Frete", "Seguro", "Outras"]

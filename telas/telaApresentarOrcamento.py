@@ -3,11 +3,11 @@ from PIL import Image, ImageTk
 import fitz
 from funcoesTerceiras.imprimirPDF import imprimirPdf
 from telas.telaVerPedidos import telaVerPedidos
-from componentes import criaFrame, criaFrameJanela, criaBotao, criarLabelEntry, criaLabel, criaEntry, criaTextArea
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaBotao, criarLabelEntry, criaLabel, criaEntry, criaTextArea
 
 
 def telaApresentarOrcamento(self, caminhoPdf):
-    frame = criaFrame(self, 0.5, 0.5, 0.94, 0.9)
+    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     frameConfirmado = criaFrame(frame, 0.27, 0.15, 0.3, 0.1)
     frameConfirmado.configure(border_width=2, border_color="green", fg_color="transparent")
 
