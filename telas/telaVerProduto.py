@@ -32,7 +32,7 @@ def telaVerProduto(self, p):
 
     criaBotao(frame, 'salvar alterações', 0.61, 0.43, 0.15, lambda:confirmarAlteracoesNoProduto.confirmarAlteracoesNoProduto(self, frame, p[1], self.quantidade.get(), self.precoVenda.get()))
     botaoExclui = criaBotao(frame, 'Excluir pedido', 0.79, 0.43, 0.15, lambda:confirmarExclusaoDoProduto.confirmarExclusaoDoProduto(self, frame, p[1]))
-    botaoExclui.configure(fg_color="#8B0000")
+    botaoExclui.configure(fg_color=self.corNegado)
     criaBotao(frame, 'Voltar', 0.15, 0.95, 0.20, lambda:frame.destroy())
     
 

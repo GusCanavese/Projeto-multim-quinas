@@ -28,10 +28,10 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
     y = 0.12
     for rowPedido, pedido in enumerate(pedidos_pagina, start=1):
         if pedido[4] != "":
-            corDeFundo = "#196F3D" 
+            corDeFundo = self.corAfirma
             self.status = pedido[4]
         else:
-            corDeFundo = "#922B21"
+            corDeFundo = self.corNegado
             self.status = "Não confirmado"
 
         dadosPedido = [pedido[0], pedido[5], pedido[2], pedido[1], pedido[3], self.status]
@@ -76,11 +76,11 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
         }
 
         if pagina > 1:
-            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 1, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']-1))
+            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.9, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']-1))
             self.dadosTelaVerPedidos.append(btnAnterior)
 
         if fim_pedido < len(pedidos):
-            btnProxima = criaBotao(frame, "Próximo →", 0.66, 1, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']+1))
+            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.9, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']+1))
             self.dadosTelaVerPedidos.append(btnProxima)
 
 
@@ -135,9 +135,9 @@ def filtrarContas(self, frame, valor, pagina=1):
         for colNum, valor in enumerate(dadosProduto):
             if colNum == 0:
                 if "Não" in conta[0]:
-                    corDeFundo = "#922B21"
+                    corDeFundo = self.corNegado
                 elif "Sim" in conta[2]:
-                    corDeFundo = "#196F3D"
+                    corDeFundo = self.corAfirma
                 label = criaLabel(frame, valor, x, y, 0.08, corDeFundo)
                 x+=0.085
             elif colNum ==1:
@@ -152,10 +152,10 @@ def filtrarContas(self, frame, valor, pagina=1):
                 if "lançamento referente a nota" in conta[2]:
                     valor1 = conta[3]
                     valor1 = valor *-1
-                    corDeFundo = "#922B21"
+                    corDeFundo = self.corNegado
                     label = criaLabel(frame, valor1, x, y, 0.17, corDeFundo)
                 if "lançamento referente ao pedido" in conta[2]:
-                    corDeFundo = "#196F3D" 
+                    corDeFundo = self.corAfirma 
                     label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
                 
                 x+=0.175

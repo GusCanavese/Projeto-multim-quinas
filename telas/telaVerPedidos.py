@@ -40,7 +40,7 @@ def telaVerPedidos(self, p, d, desc):
 
     criaBotao(frame, 'Voltar', 0.15, 0.95, 0.20, lambda:frame.destroy())
     botaoExclui = criaBotao(frame, 'Cancelar/Excluir pedido', 0.61, 0.95, 0.20, lambda:confirmarExclusaoDoPedido.confirmarExclusaoNoPedido(self, p[0], desc, frame))
-    botaoExclui.configure(fg_color="#8B0000")
+    botaoExclui.configure(fg_color=self.corNegado)
 
 
     def imprimirPedido():
