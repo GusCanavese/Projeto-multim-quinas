@@ -18,6 +18,8 @@ def telaGerenciar(self):
     label = ctk.CTkLabel(frame, text="Tela em desenvolvimento", font=("Arial", 20))
     label.place(relx=0.5, rely=0.5, anchor="center")
 
+    criaBotao(frame, "◀️ Voltar", 0.33, 0.80, 0.18, lambda: frame.destroy())
+
     # criaBotao(frame, "Clientes", 0.5, 0.24, 0.24, lambda:telaGerenciarFuncionarios(self))
     # criaBotao(frame, "Clientes", 0.66, 0.24, 0.24, None)
     # criaBotao(frame, "Produtos", 0.33, 0.24, 0.24, None)

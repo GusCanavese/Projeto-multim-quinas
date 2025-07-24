@@ -26,7 +26,8 @@ def telaRelatorioDeVendas(self):
     
     
     criaBotao(frame, "Buscar", 0.90, 0.08, 0.1, lambda:filtrar.filtrarPedidos( self, frameVendas, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(), self.datePickerInicio.get() if hasattr(self, "datePickerInicio") else None, self.datePickerFim.get() if hasattr(self, "datePickerFim") else None, self.selecionarPeriodo.get()))
-    criaBotao(frame, "Voltar", 0.32, 0.94, 0.15, lambda:frame.destroy())
+    criaBotao(frame, "◀️ Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
+
 
     # Cabeçalhos da tabela
     colunas = ["Pedido", "Cliente", "Vendedor", "Data de emissão", "Subtotal", "Confirmação"]

@@ -37,7 +37,7 @@ def telaContasAPagarEAReceber(self):
 
             
     criaBotao(frame, "Registrar credito/débito", 0.13, 0.05, 0.15, lambda:creditoOuDebito()).configure(fg_color="#009351")
-    criaBotao(frame, "Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
+    criaBotao(frame, "◀️ Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
 
     # Cabeçalhos da tabela
     colunas = ["Confirmado", "Descriçao", "Vencimento", "Total"]

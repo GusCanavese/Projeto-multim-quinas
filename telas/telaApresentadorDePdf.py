@@ -90,7 +90,7 @@ def telaApresentarPDF(self, caminhoPdf, condicao):
         # Botões na posição original
         criaBotao(frame, '→', 0.752-0.2, 0.975, 0.03, soma).configure(fg_color="#38343c")
         criaBotao(frame, '←', 0.646-0.2, 0.975, 0.03, subtracao).configure(fg_color="#38343c")
-        criaBotao(frame, "Voltar", 0.15, 0.95, 0.15, lambda: frame.destroy())
+        criaBotao(frame, "◀️ Voltar", 0.15, 0.95, 0.15, lambda: frame.destroy())
         criaBotao(frame, "Imprimir", 0.85, 0.95, 0.15, lambda: imprimirPdf("Pedido.pdf"))
 
         # Função para redimensionamento
@@ -181,7 +181,7 @@ def telaApresentarPDF(self, caminhoPdf, condicao):
         # Botões na posição original
         criaBotao(frame, '→', 0.752, 0.9, 0.03, soma).configure(fg_color="#38343c")
         criaBotao(frame, '←', 0.646, 0.9, 0.03, subtracao).configure(fg_color="#38343c")
-        criaBotao(frame, "Voltar", 0.15, 0.95, 0.15, lambda: frame.destroy())
+        criaBotao(frame, "◀️ Voltar", 0.15, 0.95, 0.15, lambda: frame.destroy())
         criaBotao(frame, "Imprimir", 0.35, 0.95, 0.15, lambda: imprimirPdf("Pedido.pdf"))
 
         # Função para redimensionamento

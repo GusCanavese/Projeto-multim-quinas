@@ -25,7 +25,7 @@ def escolherNotaFiscal(self):
     cadastrarNF = ctk.CTkButton(frame, text="Buscar NF", command=frame.destroy)
     cadastrarNF.place(relx=0.05, rely=0.94, relwidth=0.15, anchor="nw")
 
-    botaoVoltar = ctk.CTkButton(frame, text="Voltar", command=frame.destroy)
+    botaoVoltar = ctk.CTkButton(frame, text="◀️ Voltar", command=frame.destroy)
     botaoVoltar.place(relx=0.05, rely=0.94, relwidth=0.15, anchor="nw")
 
 

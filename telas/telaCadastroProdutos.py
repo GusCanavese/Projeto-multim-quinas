@@ -59,6 +59,6 @@ def telaCadastroProdutos(self):
     self.Descricao = criarLabelEntry(frame, "Descrição *", 0.33, 0.4, 0.265, None)
     self.CNPJ = criarLabelComboBox(frame, "CNPJ *", 0.63, 0.4, 0.26, opcoesCNPJ)
 
-    criaBotao(frame, "Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
+    criaBotao(frame, "◀️ Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
     criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraProdutoNoBanco(self, frame))
     aplicar_maiusculo_em_todos_entries(self)

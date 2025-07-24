@@ -53,6 +53,6 @@ def telaApresentarOrcamento(self, caminhoPdf):
     criaBotao(frame, '→', 0.752, 0.975, 0.03, soma).configure(fg_color=self.cor)
     criaBotao(frame, '←', 0.646, 0.975, 0.03, subtracao).configure(fg_color=self.cor)
 
-    criaBotao(frame, "Voltar", 0.15, 0.95, 0.15, lambda: frame.destroy())
+    criaBotao(frame, "◀️ Voltar", 0.15, 0.95, 0.15, lambda: frame.destroy())
     criaBotao(frame, "Imprimir", 0.35, 0.95, 0.15, lambda: imprimirPdf("Orcamento.pdf"))
 

@@ -57,6 +57,6 @@ def telaCadastroClientes(self):
 
     # ================ Botões =====================#
 
-    criaBotao(frame, "Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
+    criaBotao(frame, "◀️ Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
     criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraClienteNoBanco(self, frame))
     aplicar_maiusculo_em_todos_entries(self)

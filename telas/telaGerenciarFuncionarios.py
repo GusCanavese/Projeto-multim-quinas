@@ -15,7 +15,7 @@ def telaGerenciarFuncionarios(self):
     self.buscar = criarLabelEntry(frame,"Filtrar", 0.03, 0.05, 0.22, None)
     
     criaBotao(frame, "Buscar", 0.15, 0.05, 0.15, lambda:filtrar.filtrarFuncionarios(self, frameProdutos, self.buscar.get()))
-    criaBotao(frame, "Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
+    criaBotao(frame, "◀️ Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
 
     # Cabeçalhos da tabela
 

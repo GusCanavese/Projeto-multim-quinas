@@ -60,7 +60,7 @@ def telaCadastroTransportadoras(self):
     self.inscricaoEstadualTransportadora = criarLabelEntry(frame, "Inscrição estadual *", 0.1, 0.41, 0.25, None)
     self.descricaoTransportadora = criarLabelEntry(frame, "Descrição *", 0.37, 0.41, 0.55, None)
 
-    criaBotao(frame, "Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
+    criaBotao(frame, "◀️ Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
     criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraTransportadoraNoBanco(self, frame))
 
     aplicar_maiusculo_em_todos_entries(self)

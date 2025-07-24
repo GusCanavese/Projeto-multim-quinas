@@ -72,7 +72,7 @@ def telaCadastroFornecedores(self):
     self.inscricaoEstadual = criarLabelEntry(frame, "Inscrição estadual *", 0.08, 0.386, 0.25,None)
     self.codigoCRT = criarLabelEntry(frame, "CRT *", 0.36, 0.386, 0.25, None)
 
-    criaBotao(frame, "Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
+    criaBotao(frame, "◀️ Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
     criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraFornecedorNoBanco(self, frame))
     aplicar_maiusculo_em_todos_entries(self)
 
