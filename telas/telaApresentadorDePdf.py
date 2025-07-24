@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from PIL import Image, ImageTk
 import fitz
+print(fitz.__file__)
 from funcoesTerceiras.imprimirPDF import imprimirPdf
 from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaBotao, criarLabelEntry, criaLabel, criaEntry, criaTextArea
 
