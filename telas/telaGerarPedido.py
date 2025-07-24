@@ -48,11 +48,11 @@ def telaGerarPedido(self):
     dataCriacao.set(value=datetime.datetime.now().strftime("%d/%m/%y"))
 
     frameTelaPedido = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
-    frameParaItens = ctk.CTkScrollableFrame(frameTelaPedido, height=200, orientation="vertical")
+    frameParaItens = ctk.CTkScrollableFrame(frameTelaPedido, height=200, orientation="vertical", fg_color=self.corFundo)
     frameParaItens.place(relx=0.5, rely=0.5, relwidth=0.94, anchor="center")
     container = ctk.CTkFrame(frameParaItens, fg_color="red", height=1500)
     container.pack(fill="x", padx=0, pady=0)
-    frameParaItensNoFrame = ctk.CTkFrame(frameParaItens,  height=1500)
+    frameParaItensNoFrame = ctk.CTkFrame(frameParaItens, height=1500, fg_color=self.corFundo)
     frameParaItensNoFrame.place(x=-25, y=-280, relwidth=1.06)
 
     def formatar_moeda(event):

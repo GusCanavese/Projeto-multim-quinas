@@ -142,7 +142,7 @@ def criaBotaoPequeno(frame, texto, relx, rely, width, comando):
     if modo_atual == "dark":
         text = "white"
     else:
-        text = "black"
+        text = "white"
     fonte=("TkDefaultFont", 11)
     botao = ctk.CTkButton(frame, text=texto, corner_radius=5, font=fonte, command=lambda:comando(), text_color=text)
     botao.place(relx=relx, rely=rely, relwidth=width,  anchor="center")
@@ -169,7 +169,7 @@ def criaSimouNao(frame, texto, textobt1, textobt2, relx, rely, comando):
     return botao1, botao2, label, variavel
 
 def criaLabel(frame, texto, relx, rely, width, cor):
-    label = ctk.CTkLabel(frame, text=texto, fg_color=cor, wraplength=450)
+    label = ctk.CTkLabel(frame, text=texto, fg_color=cor, wraplength=450, text_color="white")
     label.place(relx=relx, rely=rely, relwidth=width, anchor="w")
     return label
 
@@ -209,7 +209,7 @@ def criaTextArea(frame, relx, rely, width, titulo, texto):
 def criaLabelDescritivo(frame, texto, relx, rely, width, cor, variavel):
     labelTitulo = ctk.CTkLabel(frame, text=texto)
     labelTitulo.place(relx=relx, rely=rely, relwidth=width, anchor="w")
-    label = ctk.CTkLabel(frame, fg_color=cor, textvariable=variavel)
+    label = ctk.CTkLabel(frame, fg_color=cor, textvariable=variavel, text_color="white")
     label.place(relx=relx, rely=rely+0.05, relwidth=width, anchor="w")
     return label
 

@@ -8,7 +8,7 @@ from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criarLabel
 
 def telaEstoque(self):
     frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
-    frameProdutos = criaFrame(frame, 0.65, 0.5, 0.68, 0.93)
+    frameProdutos = criaFrameJanela(frame, 0.65, 0.5, 0.68, 0.93, self.corFundo)
     opcoes = ["Todos", "Multimáquinas", "Nutrigel", "Polimáquinas", "Usados"]
 
 

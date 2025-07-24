@@ -18,7 +18,7 @@ def telaRelatorioDeVendas(self):
     self.filtrarPorVendedor = criarLabelComboBox(frame, "Filtrar por vendedor(a)", 0.315, 0.04, 0.22, opcoes)
     
     self.selecionarPeriodo = ctk.CTkCheckBox(frame, text="Selecionar período")
-    self.selecionarPeriodo.place(relx=0.525, rely=0.065, anchor="nw")
+    self.selecionarPeriodo.place(relx=0.54, rely=0.065, anchor="nw")
     self.selecionarPeriodo.bind("<Button-1>", command=lambda event: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodo(self,frame, self.selecionarPeriodo.get(), event))
     
 

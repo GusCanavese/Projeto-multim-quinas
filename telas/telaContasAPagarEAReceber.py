@@ -9,7 +9,7 @@ from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaLabel,
 
 def telaContasAPagarEAReceber(self):
     frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
-    frameContas = criaFrame(frame, 0.5, 0.50, 0.95, 0.7)
+    frameContas = criaFrameJanela(frame, 0.5, 0.50, 0.95, 0.7, self.corFundo)
     opcoes = ["Nenhum", "Entrada/Débito", "Saída/Crédito"]
 
     
@@ -31,12 +31,12 @@ def telaContasAPagarEAReceber(self):
     def creditoOuDebito():
         if hasattr(self, "creditoOuDebito"):
             self.creditoOuDebito.destroy()
-            self.creditoOuDebito = criaComboBox(frame, 0.1, 0.11, 0.15, opcoes, lambda valor:escolheTela(valor))
+            self.creditoOuDebito = criaComboBox(frame, 0.13, 0.11, 0.15, opcoes, lambda valor:escolheTela(valor))
         else:
-            self.creditoOuDebito = criaComboBox(frame, 0.1, 0.11, 0.15, opcoes, lambda valor:escolheTela(valor))
+            self.creditoOuDebito = criaComboBox(frame, 0.13, 0.11, 0.15, opcoes, lambda valor:escolheTela(valor))
 
             
-    criaBotao(frame, "Registrar credito/débito", 0.1, 0.05, 0.15, lambda:creditoOuDebito()).configure(fg_color="#009351")
+    criaBotao(frame, "Registrar credito/débito", 0.13, 0.05, 0.15, lambda:creditoOuDebito()).configure(fg_color="#009351")
     criaBotao(frame, "Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
 
     # Cabeçalhos da tabela
