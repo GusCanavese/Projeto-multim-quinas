@@ -38,7 +38,7 @@ def telaVerPedidos(self, p, d, desc):
 
     criaLabelDescritivo(frame, "Endereço",        0.02, 0.43, 0.35, self.cor, ctk.StringVar(value=d[2]))
 
-    criaBotao(frame, 'Voltar', 0.15, 0.95, 0.20, lambda:frame.destroy())
+    criaBotao(frame, '◀️ Voltar', 0.15, 0.95, 0.20, lambda:frame.destroy())
     botaoExclui = criaBotao(frame, 'Cancelar/Excluir pedido', 0.61, 0.95, 0.20, lambda:confirmarExclusaoDoPedido.confirmarExclusaoNoPedido(self, p[0], desc, frame))
     botaoExclui.configure(fg_color=self.corNegado)
 
@@ -96,4 +96,4 @@ def telaVerPedidos(self, p, d, desc):
         geradorDePedido.gerar_recibo("Pedido.pdf", dados)
         telaApresentarPDF(self, "Pedido.pdf", 1)
 
-    criaBotao(frame, 'Imprimir pedido', 0.38, 0.89, 0.20, imprimirPedido)
+    criaBotao(frame, 'Imprimir pedido', 0.12, 0.60, 0.20, imprimirPedido)
