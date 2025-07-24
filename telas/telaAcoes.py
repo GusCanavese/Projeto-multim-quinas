@@ -10,11 +10,9 @@ from telas.telaEstoque import telaEstoque
 from telas.telaGerenciar import telaGerenciar
 from telas.telaGerarOrcamento  import telaGerarOrcamento
 from telas.telaContasAPagarEAReceber import telaContasAPagarEAReceber
-from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
-from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaBotao
+from componentes import criaFrameJanela, criaFrameJanela, criaBotao
 from PIL import Image, ImageTk
 from funcoesTerceiras.carregamentoDasImagens import resource_path
-import tkinter as tk
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
