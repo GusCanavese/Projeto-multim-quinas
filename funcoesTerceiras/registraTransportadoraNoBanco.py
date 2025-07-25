@@ -9,50 +9,41 @@ import gc
 def registraTransportadoraNoBanco(self, frame):
     cpfoupjVariavel=0
     if all([
-        self.ehAtivo[3].get(),
-        self.ehCpfCnpj[3].get(),
-        self.transpRecebeEmail[3].get(),
         self.nomeTransportadora.get(),
         self.nomeFantasiaTransportadora.get(),
-        self.inscricaoEstadualTransportadora.get(),
+        self.CPFTransportadora.get(),
         self.telefoneTransportadora.get(),
-        self.descricaoTransportadora.get(),
-
+        self.inscricaoEstadualTransportadora.get(),
+        self.emailTransportadora.get(),
+        self.CEPTransportadora.get(),
+        self.rua.get(),
+        self.bairroTransportadora.get(),
+        self.numeroTransportadora.get(),
+        self.cidadeTransportadora.get(),
+        self.estadoTransportadora.get(),
     ]):
-        try:
-            cnpjTransport = self.CNPJTransportadora.get()
-            cpfoupjVariavel = cnpjTransport
 
-        except:
-            cpfTransport = self.CPFTransportadora.get()
-            cpfoupjVariavel = cpfTransport
-
-        if self.transpRecebeEmail[3].get() == "Sim." and self.emailTransportadora[0].get() == "":
-            messagebox.showerror("erro", "valores estão em branco")
-            condicao = False
-        else:
-            condicao = True
-    else:
-        messagebox.showerror("erro", "valores estão em branco")
-        condicao = False
-
-
-    if condicao:
         dados = {
-            "ativo": self.ehAtivo[3].get(),
-            "tipo": self.ehCpfCnpj[3].get(),
-            "CPF_CNPJ": cpfoupjVariavel,
-            "recebe_email": self.transpRecebeEmail[3].get(),
-            "email": self.emailTransportadora[0].get() if hasattr(self, "emailTransportadora") else None,
             "nome_real": self.nomeTransportadora.get(),
             "nome_fantasia": self.nomeFantasiaTransportadora.get(),
+            "cpf_cnpj": self.CPFTransportadora.get(),
+            "telefone": self.telefoneTransportadora.get(),
             "inscricao_estadual": self.inscricaoEstadualTransportadora.get(),
+            "descricao": self.descricaoTransportadora.get(),
+            "email": self.emailTransportadora.get(),
+            "cep": self.CEPTransportadora.get(),
+            "rua": self.rua.get(),
+            "bairro": self.bairroTransportadora.get(),
+            "numero": self.numeroTransportadora.get(),
+            "cidade": self.cidadeTransportadora.get(),
+            "estado": self.estadoTransportadora.get(),
+            "referencia": self.referencia.get()
         }
 
         dados = {k: v for k, v in dados.items() if v is not None and v != ""}
 
-        Insere.registraFornecedorNoBanco(dados)
-        messagebox.showinfo("Sucesso!", "Fornecedor cadastrado com sucesso!")
+        Insere.insereTransportadoraNoBanco(dados)
+        messagebox.showinfo("Sucesso!", "Transportadora cadastrado com sucesso!")
         frame.destroy()
         gc.collect()
                 

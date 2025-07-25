@@ -2,11 +2,10 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
-from consultas.select import Buscas
 from tkinter import messagebox
 import requests
 from funcoesTerceiras.registraClienteNoBanco import registraClienteNoBanco
-from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criarLabelEntry, criaBotao, criaBotaoPequeno
+from componentes import criaFrameJanela, criaFrameJanela, criarLabelEntry, criaBotao
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 def telaCadastroClientes(self):
@@ -44,16 +43,21 @@ def telaCadastroClientes(self):
     self.numeroCliente.bind("<Return>", lambda event: buscaCep(self.CEPcliente.get(), self.numeroCliente.get()))
 
     def buscaCep(cep, numero):
-        url = f"https://cep.awesomeapi.com.br/json/{cep}"
+        cep_limpo = ''.join(filter(str.isdigit, cep))
+        url = f"https://viacep.com.br/ws/{cep_limpo}/json/"
         response = requests.get(url)
+
         if response.status_code == 200:
             dados = response.json()
-            bairro.set(dados.get('district', ''))
-            rua.set(dados.get('address', ''))
-            cidade.set(dados.get('city', ''))
-            estado.set(dados.get('state', ''))
+            if "erro" in dados:
+                messagebox.showerror("Erro", "CEP não encontrado.")
+            else:
+                bairro.set(dados.get("bairro", ""))
+                rua.set(dados.get("logradouro", ""))
+                cidade.set(dados.get("localidade", ""))
+                estado.set(dados.get("uf", ""))
         else:
-            messagebox.showerror(title="Não encontrado", message="CEP não foi encontrado")
+            messagebox.showerror("Erro", "Falha na consulta do CEP.")
 
     # ================ Botões =====================#
 

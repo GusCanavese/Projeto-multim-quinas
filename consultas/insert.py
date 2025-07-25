@@ -10,11 +10,13 @@ import json
 class Insere:
 
 
-    def insereTransportadoraNoBanco(colunas, valores):
+    def insereTransportadoraNoBanco(dados):
+        colunas = list(dados.keys())
+        valores = [f"'{str(valor)}'" for valor in dados.values()]
         query = f"INSERT INTO transportadoras ({', '.join(colunas)}) VALUES ({', '.join(valores)})"
         db.cursor.execute(query)
         db.conn.commit()
-        messagebox.showinfo("Sucesso", "A transportadora foi cadastrado com sucesso!")
+
 
 
     def insereProdutosNoBanco(nome, valorCusto, valorVenda, quantidade, codigoInterno, NCM, CFOP, CEST, origemCST, descricao, CNPJ):

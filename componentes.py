@@ -175,7 +175,6 @@ def criaLabel(frame, texto, relx, rely, width, cor):
 
 def criaEntry(frame, relx, rely, width, variavel):
 
-    
     max_length = 100
     numeric_only = False
 
