@@ -29,15 +29,16 @@ def telaCadastroTransportadoras(self):
         else:
             self.emailTransportadora.configure(state="disabled")
 
-    self.ehAtivo = criaSimouNao(frame, "Ativo?", "Sim", "Não", 0.12, 0.1, comando=meDesmarqueTransportadora)
+    self.ehAtivo = criaSimouNao(frame, "Ativo?", "Sim", "Não", 0.12, 0.1, None)
     self.transpRecebeEmail = criaSimouNao(frame, "Recebe email?", "Sim.", "Não.", 0.28, 0.1, comando=meDesmarqueTransportadora)
 
-
+ 
     self.nomeTransportadora              = criarLabelEntry(frame, "Razão social *",       0.1  - 0.03, 0.25, 0.2, None)
     self.nomeFantasiaTransportadora      = criarLabelEntry(frame, "Nome *",               0.32 - 0.03, 0.25, 0.2, None)
     self.CPFTransportadora               = criarLabelEntry(frame, "CPF/CNPJ *",             0.1  - 0.03, 0.35, 0.2, None)
     self.telefoneTransportadora          = criarLabelEntry(frame, "Telefone *",           0.32 - 0.03, 0.35, 0.2, None)
     self.inscricaoEstadualTransportadora = criarLabelEntry(frame, "Inscrição estadual *", 0.1  - 0.03, 0.45, 0.2, None)
+    
     self.descricaoTransportadora         = criarLabelEntry(frame, "Descrição",            0.32 - 0.03, 0.45, 0.2, None)
     self.emailTransportadora             = criarLabelEntry(frame, "Email *",              0.1  - 0.03, 0.55, 0.2, None)
     

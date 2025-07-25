@@ -6,54 +6,40 @@ from consultas.insert import Insere
 import gc
 
 def registraFornecedorNoBanco(self, frame):
-    cpfoupjVariavel = 0
     if all([
-        self.ativoInativo[3].get(),
-        self.cpfoupj[3].get(),
-        self.Origem[3].get(),
-        self.eFabricante[3].get(),
-        self.recebeEmail[3].get(),
-        self.nomeReal.get(),
-        self.nomeFantasia.get(),
-        self.inscricaoEstadual.get(),
+        self.nomeFornecedor.get(),
+        self.nomeFantasiaFornecedor.get(),
+        self.CPFFornecedor.get(),
+        self.telefoneFornecedor.get(),
+        self.inscricaoEstadualFornecedor.get(),
+        self.emailFornecedor.get(),
+        self.CEPFornecedor.get(),
+        self.rua.get(),
         self.codigoCRT.get(),
-        self.telefone.get()
-
+        self.bairroFornecedor.get(),
+        self.numeroFornecedor.get(),
+        self.cidadeFornecedor.get(),
+        self.estadoFornecedor.get(),
     ]):
-        try:
-            cnpjfornecedor = self.cnpjFornecedor.get()
-            cpfoupjVariavel = cnpjfornecedor
-        except:
-            cpffornecedor = self.cpfFornecedor.get()
-            cpfoupjVariavel = cpffornecedor
-        if self.recebeEmail[3].get() == "Sim." and self.campoRecebeEmail[0].get() == "":
-            messagebox.showerror("erro", "valores estão em branco")
-            condicao = False
-        else:
-            condicao = True
-    else:
-        messagebox.showerror("erro", "valores estão em branco")
-        condicao = False
-    
 
-    if condicao:
         dados = {
-            "ativo": self.ativoInativo[3].get(),
-            "tipo": self.cpfoupj[3].get(),
-            "CPF_CNPJ": cpfoupjVariavel,
-            "origem": self.Origem[3].get(),
-            "fabricante": self.eFabricante[3].get(),
-            "recebe_email": self.recebeEmail[3].get(),
-            
-            "email": self.campoRecebeEmail[0].get() if hasattr(self, "campoRecebeEmail") else None,
-            "nome_real": self.nomeReal.get(),
-            "nome_fantasia": self.nomeFantasia.get(),
-            "inscricao_estadual": self.inscricaoEstadual.get(),
+            "nome_real": self.nomeFornecedor.get(),
+            "nome_fantasia": self.nomeFantasiaFornecedor.get(),
+            "cpf_cnpj": self.CPFFornecedor.get(),
+            "telefone": self.telefoneFornecedor.get(),
+            "inscricao_estadual": self.inscricaoEstadualFornecedor.get(),
+            "descricao": self.descricaoFornecedor.get(),
+            "email": self.emailFornecedor.get(),
+            "cep": self.CEPFornecedor.get(),
             "CRT": self.codigoCRT.get(),
-            "telefone": self.telefone.get()
+            "rua": self.rua.get(),
+            "bairro": self.bairroFornecedor.get(),
+            "numero": self.numeroFornecedor.get(),
+            "cidade": self.cidadeFornecedor.get(),
+            "estado": self.estadoFornecedor.get(),
+            "referencia": self.referencia.get()
         }
 
-        # Remover campos vazios, se quiser deixar o insert dinâmico
         dados = {k: v for k, v in dados.items() if v is not None and v != ""}
 
         # Enviar para o banco
@@ -63,4 +49,7 @@ def registraFornecedorNoBanco(self, frame):
         messagebox.showinfo("Sucesso!", "Fornecedor cadastrado com sucesso!")
         frame.destroy()
         gc.collect()
+    else: 
+        messagebox.showinfo("Erro!", "Preencha todos os campos obrigatórios!")
+        
     

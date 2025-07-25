@@ -7,7 +7,6 @@ import gc
 
 
 def registraTransportadoraNoBanco(self, frame):
-    cpfoupjVariavel=0
     if all([
         self.nomeTransportadora.get(),
         self.nomeFantasiaTransportadora.get(),

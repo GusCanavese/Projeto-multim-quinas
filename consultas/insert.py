@@ -34,11 +34,10 @@ class Insere:
     
 
     def registraFornecedorNoBanco(dados):
-        colunas = ", ".join(dados.keys())
-        placeholders = ", ".join(["%s"] * len(dados))
-        valores = list(dados.values())
-        query = f"INSERT INTO fornecedores ({colunas}) VALUES ({placeholders})"
-        db.cursor.execute(query, valores)
+        colunas = list(dados.keys())
+        valores = [f"'{str(valor)}'" for valor in dados.values()]
+        query = f"INSERT INTO fornecedores ({', '.join(colunas)}) VALUES ({', '.join(valores)})"
+        db.cursor.execute(query)
         db.conn.commit()
 
 
