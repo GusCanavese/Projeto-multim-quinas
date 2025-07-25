@@ -8,7 +8,7 @@ import requests
 from PIL import Image
 import datetime
 from funcoesTerceiras.verificaSeQuerSalvar import salvarPedido
-from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
+from componentes import criaFrameJanela, criaFrameJanela, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
@@ -54,7 +54,7 @@ def telaGerarPedido(self):
     container.pack(fill="x", padx=0, pady=0)
     frameParaItensNoFrame = ctk.CTkFrame(frameParaItens, height=1500, fg_color=self.corFundo)
     frameParaItensNoFrame.place(x=-25, y=-280, relwidth=1.06)
-
+ 
     def formatar_moeda(event):
         entrada = event.widget  # widget que disparou o evento
         texto = entrada.get()
@@ -309,7 +309,6 @@ def telaGerarPedido(self):
 
     def montarValoresDosItens(frame):
         self.valoresDosItens = []
-
         for linha in self.linhas:
             produto = linha["produto"].get()
             quantidade = linha["quantidade"].get()

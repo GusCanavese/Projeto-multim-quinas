@@ -8,10 +8,12 @@ from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvament
 from componentes import criaFrameJanela, criaBotao, criaFrame
 
 def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
+    print(valorDoPedido)
+    self.variavelRepeticao = 0
 
     self.row=1
     self.frameTelaGerarFaturamento = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
-    self.frameValorTotais = ctk.CTkFrame(self.frameTelaGerarFaturamento, fg_color="#48424d")
+    self.frameValorTotais = ctk.CTkFrame(self.frameTelaGerarFaturamento, fg_color=self.cor)
 
 
 
@@ -112,7 +114,7 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
             self.valorDoPedidoVariavel.set(0)
 
         for i in self.listaEntradaValor:
-            print(i.get())
+            pass
         self.frameValorTotais.place(relx=0.2, rely=self.y+0.1, relwidth=0.6, relheight=0.35)
 
 
@@ -167,30 +169,21 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
 
     for i, coluna in enumerate(valores):
         posicaox = 0.2 + i * largura_label  
-        colunas = ctk.CTkLabel(self.frameTelaGerarFaturamento, text=coluna, fg_color="#48424d")
+        colunas = ctk.CTkLabel(self.frameTelaGerarFaturamento, text=coluna, fg_color=self.cor)
         colunas.place(relx=posicaox, rely=posicaoy, relwidth=largura_label-0.001)
 
     botaoVoltar = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Voltar", corner_radius=5, font=("Arial", 15), command=lambda: self.frameTelaGerarFaturamento.destroy())
     botaoVoltar.place(relx=0.1, rely=0.9, relwidth=0.15)
 
     def salvarEFechar(self):
-        confirmarSalvamentoDoFaturamento(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, numero, pedido)
-        # for i in range(len(self.listaEntradaValor)):
-        #     forma_pagamento = self.listaComboboxes[i].get()
-        #     quantidade = self.listaEntradaQuantidade[i].get()
-        #     valor = self.listaEntradaValor[i].get()
-
-
-
+        confirmarSalvamentoDoFaturamento(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, numero, pedido, self.variavelRepeticao)
+        for i in range(len(self.listaEntradaValor)):
+            forma_pagamento = self.listaComboboxes[i].get()
+            quantidade = self.listaEntradaQuantidade[i].get()
+            valor = self.listaEntradaValor[i].get()
+            print(self.data.get())
         self.frameTelaGerarFaturamento.destroy()
-        
-
-    # AO CLICAR NO BOTÃO SALVAR E FECHAR, 
-    # O FATURAMENTO DEVE IR PARA O BANCO DE DADOS, 
-    # EM UMA TABELA CHAMADOA "FATURAMENTO", 
-    # NESSA TABELA DEVEM SER SALVAS SUAS PARCELAS, ONDE NELAS ESTÃO INCLUSAS:
-    # SEU RESPECTIVO VALOR, SUA DATA, E QUANDO A DATA CHEGAR, ELA DEVE SER EXCLUÍDA
-    criaBotao(self.frameTelaGerarFaturamento, "Salvar e fechar", 0.5, 0.95, 0.15, lambda: salvarEFechar(self))
+    criaBotao(self.frameTelaGerarFaturamento, "Salvar e fechar", 0.4, 0.918, 0.15, lambda: salvarEFechar(self))
 
 def modal(self, teste):
     self.frame = criaFrameJanela(self.frameTelaGerarFaturamento, 0.5, 0.5, 0.6, 0.9, self.corModal)
@@ -218,7 +211,7 @@ def modal(self, teste):
 
 
     # campos do modal
-    labels = ["Valor a pagar", "Qtd Parcelas", "repeticao", "Intervalo", "1ª parcela em:"]
+    labels = ["Valor a pagar", "Qtd Parcelas", "Repetição", "Intervalo", "1ª parcela em:"]
     posicaoxb = 0.14
     for i, label in enumerate(labels):
         labelTituloCampo = ctk.CTkLabel(self.frame, text=label, width=100)
@@ -232,6 +225,7 @@ def modal(self, teste):
     for i in enumerate(labels):
         variavel = ctk.StringVar()
         variaveis.append(variavel)
+        print(variaveis[i[0]].get())
 
         if i[0] == 1:
             opcoes=["1","2","3","4","5","6","7","8","9","10","11","12",]
@@ -242,9 +236,9 @@ def modal(self, teste):
             
 
         elif i[0] == 2:
-            opcoes=["Repetição", "Mensal", "Bimestral", "Semestral", "Anual"]
-            campo = ctk.CTkComboBox(self.frame, width=100, values=opcoes, corner_radius=0)
-            campo.place(relx=posicaoxb, rely=0.15)
+            opcoes=["Mensal", "Bimestral", "Semestral", "Anual"]
+            self.campoRepeticao = ctk.CTkComboBox(self.frame, width=100, values=opcoes, corner_radius=0)
+            self.campoRepeticao.place(relx=posicaoxb, rely=0.15)
             posicaoxb += 0.15
             entradasLista.append(campo)
 
@@ -261,17 +255,17 @@ def modal(self, teste):
 
     for labelsModal in enumerate(self.opcoesLabelModal):
         if labelsModal[0] == 0:
-            labelModal = ctk.CTkLabel(self.frame, width=60, text=labelsModal[1], fg_color="#663030")
+            labelModal = ctk.CTkLabel(self.frame, width=60, text=labelsModal[1], fg_color=self.cor)
             labelModal.place(relx=self.posicaoXLabelModal+0.028, rely=0.31)
             self.posicaoXLabelModal+=0.15
 
 
         if labelsModal[0] != 0:
-            labelModal = ctk.CTkLabel(self.frame, width=120, text=labelsModal[1], fg_color="#663030")
+            labelModal = ctk.CTkLabel(self.frame, width=120, text=labelsModal[1], fg_color=self.cor)
             labelModal.place(relx=self.posicaoXLabelModal-0.04, rely=0.31)
             self.posicaoXLabelModal+=0.15
         
-    botaoCalcular = ctk.CTkButton(self.frame, corner_radius=0, width=100, text="Calcular", command= lambda:calculaParcelasFaturamento.calcularParcelasTotais(self, entradasLista[1].get(), entradasLista[0].get()))
+    botaoCalcular = ctk.CTkButton(self.frame, corner_radius=0, width=100, text="Calcular", command= lambda:calculaParcelasFaturamento.calcularParcelasTotais(self, entradasLista[1].get(), entradasLista[0].get(), self.campoRepeticao.get()))
     botaoCalcular.place(relx = 0.14, rely=0.2)
 
     dataHoje = date.today()

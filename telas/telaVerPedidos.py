@@ -4,17 +4,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras import confirmarAlteracoesNoPedido
 from funcoesTerceiras import confirmarExclusaoDoPedido
-from funcoesTerceiras import geradorDePedido
-from telas.telaApresentadorDePdf import telaApresentarPDF
 from telas.telagerarFaturamento import telaGerarFaturamento
-from componentes import criaFrameJanela,  criaBotao, criaFrame, criaLabelDescritivo, criarLabelEntry
+from componentes import criaFrameJanela,  criaBotao, criaLabelDescritivo, criarLabelEntry
 
 def telaVerPedidos(self, p, d, desc):
     frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     if p[5] == "Não confirmado":
-        
-        criaBotao(frame, 'Gerar faturamento', 0.495, 0.48, 0.15, lambda:telaGerarFaturamento(self, p[3], p[0], d[0]))
+        criaBotao(frame, 'Gerar faturamento', 0.495, 0.48, 0.15, lambda:telaGerarFaturamento(self, p[4], p[0], d[0]))
         criaBotao(frame, 'Confirmar alterações',    0.38, 0.95, 0.20, lambda:confirmarAlteracoesNoPedido.confirmarAlteracoesNoPedido(self, self.dataDaVendaTelaVerPedidos.get(), p[0], frame))
         self.status = "Venda em aberto"
         dataDaVendaTelaVerPedidos = ''

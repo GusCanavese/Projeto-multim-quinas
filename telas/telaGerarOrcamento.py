@@ -8,7 +8,8 @@ import requests
 from PIL import Image
 import datetime
 from funcoesTerceiras.verificaSeQuerSalvar import salvarOrcamento
-from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
+from componentes import criaFrameJanela, criaFrameJanela, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
+from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
 def telaGerarOrcamento(self):
@@ -34,7 +35,12 @@ def telaGerarOrcamento(self):
     variavelCtkEntry = ctk.StringVar() 
     variavelFuncionarioAtual = ctk.StringVar()
     dataCriacao = ctk.StringVar()
+    variavelnumeroDoPedido = ctk.StringVar()
     variavelEmAbertoFechado = ctk.StringVar() 
+    variavelCep = ctk.StringVar()
+    variavelEndereco = ctk.StringVar()
+    variavelNumero = ctk.StringVar()
+    variavelReferencia = ctk.StringVar()
 
     variavelFuncionarioAtual.set(usuarioLogado)
     variavelEmAbertoFechado.set("Em aberto")
@@ -48,6 +54,26 @@ def telaGerarOrcamento(self):
     frameParaItensNoFrame = ctk.CTkFrame(frameParaItens,  height=1500)
     frameParaItensNoFrame.place(x=-25, y=-280, relwidth=1.06)
 
+    def formatar_moeda(event):
+        entrada = event.widget  # widget que disparou o evento
+        texto = entrada.get()
+
+        texto_numerico = ''.join(filter(str.isdigit, texto))
+
+        if not texto_numerico:
+            texto_numerico = "0"
+
+        while len(texto_numerico) < 3:
+            texto_numerico = "0" + texto_numerico
+
+        reais = texto_numerico[:-2]
+        centavos = texto_numerico[-2:]
+
+        valor = f"{int(reais)},{centavos}"
+
+        # Evita piscar o cursor para o final
+        entrada.delete(0, "end")
+        entrada.insert(0, valor)
 
     def buscaCliente(event=None): 
         nomeDoCliente = self.nomeDoClienteBuscado.get()
@@ -60,22 +86,39 @@ def telaGerarOrcamento(self):
         self.resultadoLabels = []
         
         yNovo = 0.21  
+
         for i, row in enumerate(dadosCliente):
             if i >= 5:
                 break
-            label = ctk.CTkButton(frameTelaPedido,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cnpj=row[1]: selecionaCliente(nome, cnpj))
+            label = ctk.CTkButton(frameTelaPedido,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cpf=row[1], cnpj=row[2], cep=row[4], endereco=row[5], referencia=row[6], num=row[7], bairro=row[8], rua=row[9]: selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, num, bairro, rua))
             label.place(relx=0.05, rely=yNovo, relwidth=0.27)
             self.resultadoLabels.append(label)  
-            yNovo += 0.039
+            yNovo += 0.0399
 
-    def selecionaCliente(nome, cnpj):
+    def selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, numero, bairro, rua):
+
+        enderecoCliente = f"{rua} - {numero} - {bairro} - {endereco}"
         self.nomeDoClienteBuscado.delete(0, "end")
         self.nomeDoClienteBuscado.insert(0, nome)
-        variavelCnpjBuscado = cnpj
         if cnpj:
-            variavelCtkEntry.set(variavelCnpjBuscado)
+            variavelCtkEntry.set(cnpj)
+        elif cpf:
+            variavelCtkEntry.set(cpf)
         else:
             variavelCtkEntry.set("sem valores")
+        
+        self.entradaCEP.delete(0, "end")
+        self.entradaEnderecoNoPedido.delete(0, "end")
+        self.entradaNumero.delete(0, "end")
+        self.entradaReferenciaEnderecoEntrega.delete(0, "end")
+        if referencia == None:
+            referencia = ""
+
+
+        variavelCep.set(cep)
+        variavelEndereco.set(enderecoCliente)
+        variavelReferencia.set(referencia)
+        variavelNumero.set(numero)
         for label in self.resultadoLabels: 
             label.destroy()
 
@@ -102,12 +145,15 @@ def telaGerarOrcamento(self):
             if linha["produto"] == entradaProduto:
                 linha["preco"].delete(0, "end")
                 linha["preco"].insert(0, valor)
+                linha["preco"].configure(state="disabled")
+
 
                 linha["quantidade"].delete(0, "end")
                 linha["quantidade"].insert(0, "0")
 
                 linha["estoque"].delete(0, "end")
                 linha["estoque"].insert(0, quantidade)
+                linha["estoque"].configure(state="disabled")
 
                 linha["desc_real"].delete(0, "end")
                 linha["desc_real"].insert(0, "0")
@@ -131,6 +177,17 @@ def telaGerarOrcamento(self):
     self.totalSubtotal=criarLabelEntry(frameTelaPedido, "TOTAL:", 0.8, 0.75, 0.15, None)
     self.totalSubtotal.configure(state="disabled")
 
+    def fechar_resultados(event):
+        if hasattr(self, 'resultadoLabels'):
+            for label in self.resultadoLabels:
+                label.destroy()
+        if hasattr(self, 'resultadoLabelsProduto'):
+            for label in self.resultadoLabelsProduto:
+                label.destroy()
+
+    frameParaItens.bind("<Button-1>", fechar_resultados)
+    frameParaItensNoFrame.bind("<Button-1>", fechar_resultados)
+    frameTelaPedido.bind("<Button-1>", fechar_resultados)
 
     def atualizarTotalGeral():
         total = 0.0
@@ -145,7 +202,7 @@ def telaGerarOrcamento(self):
             
             descReal = float(entry_descReal.get().replace(",", ".") or 0)
             descPorc = float(entry_descPorc.get().replace(",", ".") or 0)
-            quantida = float(entry_quantida.get().replace(",", ".") or 0)
+            quantida = float(entry_quantida.get() or 0)
             acrescim = float(entry_acrescim.get().replace(",", ".") or 0)
             descPorc = descPorc/100
 
@@ -209,6 +266,7 @@ def telaGerarOrcamento(self):
         else:
             messagebox.showerror(title="Não encontrado", message="CEP não foi encontrado")
     
+     
     for i, coluna in enumerate(listaLabels):
         if i == 0:
             criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.040, self.cor)
@@ -220,24 +278,27 @@ def telaGerarOrcamento(self):
             criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.096, self.cor)
             self.posicaox +=0.0976
     self.posicaox = 0.024
+    campos_obrigatorios = {"quantidade", "valor", "nome"}
 
-    self.botaoAdicionarItem = criaBotaoPequeno(frameParaItensNoFrame, "Adicionar item", 0.87, self.posicaoyBotao, 0.05,
+
+    self.botaoAdicionarItem = criaBotaoPequeno(frameParaItensNoFrame, "Adicionar item", 0.7, self.posicaoyBotao, 0.07,
         lambda: (
             messagebox.showerror("Campos vazios", "Preencha todos os campos da última linha antes de adicionar um novo item")
             if any(
                 hasattr(widget, "get") and widget.get().strip() == ""
                 for chave, widget in self.linhas[-1].items()
-                if chave != "item"
+                if chave in campos_obrigatorios
             )
             else adicionarItem(self)
         ))
+    
     
    
     self.botaoRemoverItem = ctk.CTkButton(frameParaItensNoFrame, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: removerItem(self))
     self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotao-0.04)
     
 
-    def montarValoresDosItens():
+    def montarValoresDosItens(frame):
         self.valoresDosItens = []
         for linha in self.linhas:
             produto = linha["produto"].get()
@@ -263,7 +324,8 @@ def telaGerarOrcamento(self):
                 "desconto_porcentagem": desc_porcentagem,
             }
             self.valoresDosItens.append(item)
-        salvarOrcamento(self)
+        salvarOrcamento(self, frame)
+
 
 
     def adicionarItem(self):
@@ -271,15 +333,12 @@ def telaGerarOrcamento(self):
         self.posicaoyBotao += 0.02
         self.posicaoyBotaoRemover += 0.02
 
-        self.botaoAdicionarItem.place(relx=0.883, rely=self.posicaoyBotao)
+        self.botaoAdicionarItem.place(relx=0.875, rely=self.posicaoyBotao)
         self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotaoRemover)
         linha_widgets = {}
         
 
         for i, coluna in enumerate(listaLabels):
-            self.totalEstoque = 0
-            self.quantidade = 0
-
             if i == 0:
                 label = criaLabel(frameParaItensNoFrame, int(self.contadorDeLinhas / 9) + 1, self.posicaox, self.posicaoy, 0.040, self.cor)
                 linha_widgets["item"] = label
@@ -287,6 +346,7 @@ def telaGerarOrcamento(self):
             elif i == 1:
                 entradaProduto = criaEntry(frameParaItensNoFrame, self.posicaox, self.posicaoy, 0.16, None)
                 entradaProduto.bind("<KeyRelease>", lambda event, ent=entradaProduto, y=self.posicaoy: buscaProduto(ent.get(), ent, y))
+                entradaProduto.bind("<Button-1>", lambda event, ent=entradaProduto, y=self.posicaoy: buscaProduto(ent.get(), ent, y))
                 linha_widgets["produto"] = entradaProduto
                 self.posicaox += 0.161
                 self.entradaProduto = entradaProduto
@@ -294,25 +354,23 @@ def telaGerarOrcamento(self):
                 entrada = criaEntry(frameParaItensNoFrame, self.posicaox, self.posicaoy, 0.096, None)
                 campo = ["preco", "quantidade", "estoque", "desc_real", "desc_porcentagem", "acrescimo", "subtotal"][i - 2]
                 linha_widgets[campo] = entrada
-
-                if campo == "quantidade":
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada: (
-                        linha_widgets["quantidade"].delete(0, "end") or linha_widgets["quantidade"].insert(0, linha_widgets["estoque"].get())
-                        if linha_widgets.get("estoque") and e.get().isdigit() and int(e.get()) > int(linha_widgets["estoque"].get() or 0)
-                        else None
-                    ))
+                
 
                 if campo == "desc_real":
                     entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == "desc_porcentagem":
                     entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'quantidade':
                     entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'acrescimo':
                     entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'subtotal':
                     entrada.bind("<KeyRelease>", lambda event: atualizarTotalGeral())
@@ -350,22 +408,27 @@ def telaGerarOrcamento(self):
             self.botaoRemoverItem.place_forget()
 
         self.yNovo = self.posicaoy + 0.02
+        self.entradaProduto = ""
+
         atualizarTotalGeral()
     
 
     
-    self.numeroDeVenda = criaLabel(frameTelaPedido, "Orçamento", 0.05, 0.088, 0.12, "#FFA500")
+    self.numeroDeVenda = criarLabelEntry(frameTelaPedido, "Número da venda", 0.05, 0.05, 0.12, variavelnumeroDoPedido)
     self.dataDeCriacao = criarLabelEntry(frameTelaPedido, "Data de criação", 0.20, 0.05, 0.12, dataCriacao)
     self.nomeDoClienteBuscado = criarLabelEntry(frameTelaPedido, "Nome do cliente *", 0.05, 0.15, 0.27, None)
     self.nomeDoClienteBuscado.bind("<KeyRelease>", buscaCliente)
+    self.nomeDoClienteBuscado.bind("<Button-1>", buscaCliente)
 
-    self.funcionariaPedido = criarLabelEntry(frameTelaPedido, "Vendedor(a)", 0.39, 0.05, 0.51, variavelFuncionarioAtual)
+    self.statusDoPedido = criarLabelEntry(frameTelaPedido, "Status", 0.39, 0.05, 0.33, variavelEmAbertoFechado)
+    self.statusDoPedido.configure(state="disabled")
+    self.funcionariaPedido = criarLabelEntry(frameTelaPedido, "Vendedor(a)", 0.75, 0.05, 0.15, variavelFuncionarioAtual)
     self.CPFCliente = criarLabelEntry(frameTelaPedido, "CPF/CNPJ *", 0.39, 0.15, 0.15, variavelCtkEntry)
-    self.entradaCEP = criarLabelEntry(frameTelaPedido, "CEP *", 0.57, 0.15, 0.15, None)
-    self.entradaNumero = criarLabelEntry(frameTelaPedido, "Nº *", 0.75, 0.15, 0.05, None)
+    self.entradaCEP = criarLabelEntry(frameTelaPedido, "CEP *", 0.57, 0.15, 0.15, variavelCep)
+    self.entradaNumero = criarLabelEntry(frameTelaPedido, "Nº *", 0.75, 0.15, 0.05, variavelNumero)
     self.botaoBuscaCEP = criaBotaoPequeno(frameTelaPedido, "Buscar CEP", 0.865, 0.19, 0.07, lambda:buscaCep(self.entradaCEP.get(), self.entradaNumero.get()))
-    self.entradaEnderecoNoPedido = criarLabelEntry(frameTelaPedido, "Endereço *", 0.39, 0.25, 0.33, None)
-    self.entradaReferenciaEnderecoEntrega = criarLabelEntry(frameTelaPedido, "Referencia *", 0.75, 0.25, 0.15, None)
+    self.entradaEnderecoNoPedido = criarLabelEntry(frameTelaPedido, "Endereço *", 0.39, 0.25, 0.33, variavelEndereco)
+    self.entradaReferenciaEnderecoEntrega = criarLabelEntry(frameTelaPedido, "Referencia *", 0.75, 0.25, 0.15, variavelReferencia)
 
     self.totalDescontoPorcentagem = criarLabelEntry(frameTelaPedido, "Desconto total(%)", 0.55, 0.675, 0.08, None)
     self.totalDescontoReal = criarLabelEntry(frameTelaPedido, "Desconto total($)", 0.67, 0.675, 0.08, None)
@@ -382,4 +445,7 @@ def telaGerarOrcamento(self):
     criaBotao(frameTelaPedido, "Voltar", 0.15, 0.95, 0.20, lambda:frameTelaPedido.destroy())
     criaBotao(frameTelaPedido, "Cadastrar", 0.87, 0.95, 0.20, lambda:montarValoresDosItens())
 
-    
+    criaBotao(frameTelaPedido, "Voltar", 0.15, 0.95, 0.20, lambda:frameTelaPedido.destroy())
+    criaBotao(frameTelaPedido, "Gerar Orcamento", 0.87, 0.95, 0.20, lambda:montarValoresDosItens(frameTelaPedido))
+
+    aplicar_maiusculo_em_todos_entries(self)

@@ -19,7 +19,7 @@
 18 - descrição do cadastro de proutos deve ser um capo escrito                      ✅
 19 - alterar os cnpjs de cadastro de produto                                        ✅
 20 - tirar o campo data de venda da tela de gerar pedido                            ✅
-21 - quantidade de itens ta indo com a quantidade existente no estoque              ❓
+21 - quantidade de itens ta indo com a quantidade existente no estoque              ✅
 
 22 - buscar o cep direto de cliente                                                 ✅
 23 - arrumar o tab na tela de cadastros                                             ✅
@@ -27,7 +27,7 @@
 25 - alterar a quantidade para ser possível vender mais que o existente no estoque, ✅
 26 - tela pedidos - campos: acréscimo, descontos nao precisam ser obrigatórios,     ✅ 
 27 - campo preço do produto precisa estar inativo                                   ✅
-28 - alterar cor das tabelas do modo claro
+28 - alterar cor das tabelas do modo claro                                          ✅
 29 - deixar as telas de relatórios da mesma igual  tela de contas a pagar e receber ✅
 30 - colocar nome do cliente na tela relatorio de vendas pedido                     ✅
 31 - tela verpedido tem que ser possível imprimir ele                               ✅
@@ -41,7 +41,7 @@
 40 - referencia nao precisa ser obrigatórios                                        ✅
 41 - alterar dados no pedido solicitados pela bruna                                 ✅
 42 - arrumar o endereço do cliente na telaGerar Pedido                              ✅
-42 - arrumar botão de imprimir pedido na tela "verPedidos"                              
+42 - arrumar botão de imprimir pedido na tela "verPedidos"                          ✅   
 43 - tela gerar faturamento, o valor data ta indo pro campo "valor" total
 
 39 - mandar o excedente dos produtos para a tela de "pedidos fábrica"      1/2❓

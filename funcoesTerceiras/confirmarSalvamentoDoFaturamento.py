@@ -7,7 +7,9 @@ from dateutil.relativedelta import relativedelta
 from consultas.update import Atualiza
 from consultas.insert import Insere
 
-def confirmarSalvamentoDoFaturamento(self, quantidade, valor, formaPag, data, pedido, cliente):
+def confirmarSalvamentoDoFaturamento(self, quantidade, valor, formaPag, data, pedido, cliente, repeticao):
+    print(repeticao)
+
     confirmado = "Não"
     resposta = messagebox.askquestion('Aviso!', 'O faturamento será salvo referente ao pedido tal.', icon='question')
     if resposta == 'yes':
@@ -20,13 +22,22 @@ def confirmarSalvamentoDoFaturamento(self, quantidade, valor, formaPag, data, pe
         dataBase = datetime.strptime(dataFaturamento, "%d/%m/%Y")
         
         valorParcela = round(float(valorTotal) / int(qtdParcelas), 2)
-
         for i in range(int(qtdParcelas)):
-            dataParcela = dataBase + relativedelta(months=+ (i + 1))
-            dataFormatada = dataParcela.strftime("%Y-%m-%d")
+            if repeticao == "Mensal":
+                dataParcela = dataBase + relativedelta(months=i)
+            elif repeticao == "Bimestral":
+                dataParcela = dataBase + relativedelta(months=2 * i)
+            elif repeticao == "Semestral":
+                dataParcela = dataBase + relativedelta(months=6 * i)
+            elif repeticao == "Anual":
+                dataParcela = dataBase + relativedelta(years=i)
 
+            dataFormatada = dataParcela.strftime("%Y-%m-%d")
+ 
             Insere.registraFaturamentoNoBanco(confirmado, dataFormatada, descricao, valorParcela, formaPagamento, 1)
         messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
 
-    else:
+    else:            
+
+
         pass

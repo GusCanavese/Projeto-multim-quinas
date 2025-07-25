@@ -38,6 +38,8 @@ def telaLogin(self):
             self.cor = "#408cd4"
             self.corNegado = "#c83c3c"
             self.corAfirma = "#3cc861"
+            self.corModal = "#6e98c0"
+
 
             self.switch_var.set(False)
         self.frame_login.configure(fg_color=self.corFundo)
@@ -79,6 +81,7 @@ def telaLogin(self):
             self.cor = "#408cd4"
             self.corNegado = "#c83c3c"
             self.corAfirma = "#3cc861"
+            self.corModal = "#6e98c0"
 
         # Atualiza cor do frame manualmente
         self.frame_login.configure(fg_color=self.corFundo)

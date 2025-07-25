@@ -7,6 +7,9 @@ from datetime import datetime
 
 
 def SalvaAlteracoesFaturamento(self, valor, qtdParcelas, datas):
+    self.variavelRepeticao = self.campoRepeticao.get()
+
+    print(datas)
     self.data=datas[4]
 
     for widget in self.frameTelaGerarFaturamento.winfo_children():
@@ -18,7 +21,8 @@ def SalvaAlteracoesFaturamento(self, valor, qtdParcelas, datas):
         self.variavelQuantidade.set(qtdParcelas)
     self.frame.destroy()
 
-def calcularParcelasTotais(self, quantidade, valor):
+def calcularParcelasTotais(self, quantidade, valor, repeticao):
+    print(repeticao)
     valor = float(valor)
     quantidade = int(quantidade)
     valordividido = valor/quantidade
@@ -47,7 +51,7 @@ def calcularParcelasTotais(self, quantidade, valor):
                 posicaoX += 0.15
 
             if j == 0:
-                entryModal = ctk.CTkLabel(self.frame, width=60, corner_radius=0, fg_color="#4d4246", text=i+1)
+                entryModal = ctk.CTkLabel(self.frame, width=60, corner_radius=0, text=i+1, fg_color=self.cor)
                 entryModal.place(relx=posicaoX +0.028, rely=posicaoY)
                 self.listaEntryModal.append(entryModal)
                 posicaoX += 0.15
@@ -57,8 +61,14 @@ def calcularParcelasTotais(self, quantidade, valor):
 
             if j == 3:  
                 dataOriginal = datetime.strptime(dataHoje, "%d/%m/%Y")
-                
-                dataComMaisUmMes = dataOriginal + relativedelta(months=1)
+                if repeticao == "Mensal":
+                    dataComMaisUmMes = dataOriginal + relativedelta(months=1)
+                elif repeticao == "Bimestral":
+                    dataComMaisUmMes = dataOriginal + relativedelta(months=2)
+                elif repeticao == "Semestral":
+                    dataComMaisUmMes = dataOriginal + relativedelta(months=6)
+                elif repeticao == "Anual":
+                    dataComMaisUmMes = dataOriginal + relativedelta(years=1)
                 dataHoje = dataComMaisUmMes.strftime("%d/%m/%Y")
                 variavelEntryModal.set(dataHoje)
 

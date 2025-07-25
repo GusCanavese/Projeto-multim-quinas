@@ -12,7 +12,7 @@ def telaGerarFaturamentoEntradaNota(self, dadosNota):
 
     self.row=1
     self.frameTelaGerarFaturamento = ctk.CTkFrame(self)
-    self.frameValorTotais = ctk.CTkFrame(self.frameTelaGerarFaturamento, fg_color="#48424d")
+    self.frameValorTotais = ctk.CTkFrame(self.frameTelaGerarFaturamento, fg_color=self.cor)
 
     self.frameTelaGerarFaturamento.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
 
@@ -164,7 +164,7 @@ def telaGerarFaturamentoEntradaNota(self, dadosNota):
 
     for i, coluna in enumerate(valores):
         posicaox = 0.2 + i * largura_label  
-        colunas = ctk.CTkLabel(self.frameTelaGerarFaturamento, text=coluna, fg_color="#48424d")
+        colunas = ctk.CTkLabel(self.frameTelaGerarFaturamento, text=coluna, fg_color=self.cor)
         colunas.place(relx=posicaox, rely=posicaoy, relwidth=largura_label-0.001)
 
     proximo = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Próximo - Tela de Produtos", command=lambda:telaTransporte(self, dadosNota))
