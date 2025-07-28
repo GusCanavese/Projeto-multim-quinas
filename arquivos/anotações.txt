@@ -42,18 +42,18 @@
 41 - alterar dados no pedido solicitados pela bruna                                 ✅
 42 - arrumar o endereço do cliente na telaGerar Pedido                              ✅
 42 - arrumar botão de imprimir pedido na tela "verPedidos"                          ✅   
-43 - tela gerar faturamento, o valor data ta indo pro campo "valor" total
-
-44 - colocar cep nas transportadores e fornecedores
-45 - tem que puxar todos os dados da nota que ainda estão em branco
+43 - tela gerar faturamento, o valor data ta indo pro campo "valor" total           ✅
+44 - colocar cep nas transportadores e fornecedores                                 ✅
+45 - botao de proximo no tela contasAPagar e a receber ta no meio da tela           ✅
 46 - perguntar se quer lançar o ipi da nota ficasl em outras despesas (outras é um campo que vai estar na pagina de produtos)
-47 - botao de proximo no tela contasAPagar e a receber ta no meio da tela
+47 - tem que puxar todos os dados da nota que ainda estão em branco
 48 - faltando repetição no gerar faturamento da nota
 49 - formatar as telas, ta saindo pra fora no computador do gabriel, fazer com componentes
 50 - tela de tributação de produto é necessario fazer as 2 telas que exstem ali
 51 - na primeira tela, ao digitar o cfop, tem que puxar a natureza
 52 - data do documento = da nota
 53 - data entrada = data de hoje, também tem que puxar automatico 
+54 - contas a pagar e a receber não está funcionando o próximo                      ✅
 
 
 39 - mandar o excedente dos produtos para a tela de "pedidos fábrica"      1/2❓

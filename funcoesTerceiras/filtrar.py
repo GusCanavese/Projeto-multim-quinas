@@ -9,7 +9,7 @@ from telas.telaVerPedidos import telaVerPedidos
 from telas.telaVercontasApagar import telaVercontasApagar
 from telas.telaVer import telaVer
 import json
-from componentes import criaFrameJanela,  criaLabel, criaBotao
+from componentes import criaLabel, criaBotao
 
 def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=1):
     pedidos = Buscas.buscaPedidos(vendedor, numero, inicio, fim, checkbox)
@@ -75,6 +75,7 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
             'pagina': pagina
         }
 
+
         if pagina > 1:
             btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.9, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']-1))
             self.dadosTelaVerPedidos.append(btnAnterior)
@@ -89,6 +90,7 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
 
 
 def filtrarContas(self, frame, valor, pagina=1):
+    self.valorAtualFiltroContas = valor
     if hasattr(self, "datePickerInicio") and hasattr(self, "datePickerFim"):
         inicio = self.datePickerInicio.get()
         fim = self.datePickerFim.get()
@@ -115,24 +117,25 @@ def filtrarContas(self, frame, valor, pagina=1):
     
     y = 0.1
 
-    for rowProduto, conta in enumerate(contasPagina, start=1):
+    for rowProduto, conta in enumerate(contasPagina, start=5):
         corDeFundo = "#1C60A0"
-        dadosProduto = [conta[0], conta[2], conta[1], conta[3], conta[4]]
-        try:
-            datetime.strptime(conta[1], "%d/%m/%Y")
-        except:
-            dataOriginal = dadosProduto[2]
-            dataOriginal = str(dataOriginal)
-            try:
-                dataFormatada = datetime.strptime(dataOriginal, "%Y-%m-%d").strftime("%d/%m/%Y")
-            except:
-                dataFormatada = datetime.strptime(dataOriginal, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y")
-            dadosProduto[2] = dataFormatada
+        dadosContas = [conta[0], conta[2], conta[1], conta[3], conta[4]]
+        dataOriginal = dadosContas[2]
+        dataOriginal = str(dataOriginal)
+        
+        # except:
+        #     dataOriginal = dadosContas[2]
+        #     dataOriginal = str(dataOriginal)
+        #     try:
+        #         dataFormatada = datetime.strptime(dataOriginal, "%Y-%m-%d").strftime("%d/%m/%Y")
+        #     except:
+        #         dataFormatada = datetime.strptime(dataOriginal, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y")
+        #     dadosContas[2] = dataFormatada
 
         x = 0.03
 
 
-        for colNum, valor in enumerate(dadosProduto):
+        for colNum, valor in enumerate(dadosContas):
             if colNum == 0:
                 if "Não" in conta[0]:
                     corDeFundo = self.corNegado
@@ -172,15 +175,16 @@ def filtrarContas(self, frame, valor, pagina=1):
         
         params = {
             'pagina': pagina,
+            'valor': valor,
         }
-
         if pagina > 1:
-            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.6, 0.2, lambda p=params: filtrarContas(self, frame, p['pagina']-1))
+            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.75, 0.2,lambda: filtrarContas(self, frame, self.valorAtualFiltroContas, pagina - 1))
             self.dadosTelaFiltrarContas.append(btnAnterior)
 
         if fimContas < len(contas):
-            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.6, 0.2, lambda p=params: filtrarContas(self, frame, p['pagina']+1))
+            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.75, 0.2,lambda: filtrarContas(self, frame, self.valorAtualFiltroContas, pagina + 1))
             self.dadosTelaFiltrarContas.append(btnProxima)
+
 
 
 
@@ -204,18 +208,18 @@ def filtrarFuncionarios(self, frame, valor, pagina=1):
 
     for row, funcionarios in enumerate(contasPagina, start=1):
         corDeFundo = "#1C60A0"
-        dadosProduto = [funcionarios[0], funcionarios[1]]
+        dadosContas = [funcionarios[0], funcionarios[1]]
 
         x = 0.03
 
-        for colNum, valor in enumerate(dadosProduto):
+        for colNum, valor in enumerate(dadosContas):
             corDeFundo = "#1C60A0"
             label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
             self.dadosTelaFiltrarFunc.append(label)
             x+=0.175
 
 
-        btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=dadosProduto: telaVer(self, p))
+        btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=dadosContas: telaVer(self, p))
         self.dadosTelaFiltrarFunc.append(btn)
 
         y += 0.059

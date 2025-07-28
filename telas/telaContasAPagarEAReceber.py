@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
 from funcoesTerceiras import filtrar, verificaSeQuerFiltrarPorPeriodo
-from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaLabel, criaBotao, criaComboBox, criarLabelEntry, criarLabelComboBox
+from componentes import criaFrameJanela, criaFrameJanela, criaLabel, criaBotao, criaComboBox, criarLabelEntry, criarLabelComboBox
 
 
 def telaContasAPagarEAReceber(self):
@@ -12,15 +12,16 @@ def telaContasAPagarEAReceber(self):
     frameContas = criaFrameJanela(frame, 0.5, 0.50, 0.95, 0.7, self.corFundo)
     opcoes = ["Nenhum", "Entrada/Débito", "Saída/Crédito"]
 
-    
-
-    
     self.selecionarPeriodoContas = ctk.CTkCheckBox(frame, text="Selecionar período")
     self.selecionarPeriodoContas.place(relx=0.55, rely=0.03, anchor="nw")
     self.selecionarPeriodoContas.bind("<Button-1>", command=lambda event: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodoContas(self, frame, self.selecionarPeriodoContas.get(), event))
     
-    filtrarPorNumero = criarLabelEntry(frame,"Filtrar", 0.25, 0.01, 0.22, None)
-    criaBotao(frame, "Buscar", 0.36, 0.11, 0.22, lambda:filtrar.filtrarContas(self, frameContas, filtrarPorNumero.get()))
+    filtrarPorNumero = criarLabelEntry(frame, "Filtrar", 0.25, 0.01, 0.22, None)
+    if hasattr(self, "datePickerInicio"):
+        criaBotao(frame, "Buscar", 0.36, 0.11, 0.22,lambda: filtrar.filtrarContas(self,frameContas,filtrarPorNumero.get(),self.datePickerInicio.get(), pagina=1))
+    else:
+        criaBotao(frame, "Buscar", 0.36, 0.11, 0.22,lambda: filtrar.filtrarContas(self,frameContas,filtrarPorNumero.get(), pagina=1))
+
 
     def escolheTela(valor):
         if valor=="Entrada/Débito":
