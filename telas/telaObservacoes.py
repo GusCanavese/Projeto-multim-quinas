@@ -6,55 +6,67 @@ from datetime import date
 import json
 from consultas.insert import Insere
 from funcoesTerceiras import calculaParcelasFaturamento
-from componentes import criaFrameJanela,  criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox, criaFrame, criaBotao, criaLabel
+from componentes import criaFrameJanela, criaBotao, criaLabel, criaTextArea
+
+
+def acessar(dados, *caminho, default=""):
+    for chave in caminho:
+        if isinstance(dados, dict) and chave in dados:
+            dados = dados[chave]
+        else:
+            return default
+    if isinstance(dados, dict) and "#text" in dados:
+        return dados["#text"]
+    return dados if isinstance(dados, str) else default
+
 
 
 def telaObservacoes(self, dadosNota):
 
-    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
-    criaLabel(frame, "Observações", 0.05, 0.01, 0.2, "#2C3E50")
+    self.frameTelaObservacoes = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
+    
 
 
-    text_area = ctk.CTkTextbox(frame, width=400, height=150)
-    text_area.pack(pady=20)
-    def safe_get(dados, path, default=""):
-        """Acessa dados aninhados de forma segura"""
-        keys = path.split('.')
-        current = dados
-        for key in keys:
-            if isinstance(current, dict) and key in current:
-                current = current[key]
-            else:
-                return default
-        return current.get("#text", current) if isinstance(current, dict) else current
+    variavelObsFisco = ctk.StringVar()
+    variavelObsFisco.set(acessar(dadosNota, "NFe", "infNFe", "infAdic", "infAdFisco"))
 
+    variavelObsContribuinte = ctk.StringVar()
+    variavelObsContribuinte.set(acessar(dadosNota, "NFe", "infNFe", "infAdic", "infCpl"))
+
+    area1 = criaTextArea(self.frameTelaObservacoes, 0.5, 0.15, 0.4, "INFORMAÇÕES DO INTERESSE DO CONTRIBUINTE", variavelObsContribuinte.get())
+    area1.place(relheight=0.3)
+    area2 = criaTextArea(self.frameTelaObservacoes, 0.05, 0.15, 0.4, "INFORMAÇÕES DO INTERESSE DO FISCO", variavelObsFisco.get())
+    area2.place(relheight=0.3)
+                    
+
+    print(variavelObsContribuinte.get())
+    print(variavelObsFisco.get())
 
     # Extrair todos os dados necessários
     dados_insercao = {
-        'chave_nfe': safe_get(dadosNota, "NFe.infNFe.Id").replace("NFe", ""),
-        'numero_nfe': safe_get(dadosNota, "NFe.infNFe.ide.nNF"),
-        'serie_nfe': safe_get(dadosNota, "NFe.infNFe.ide.serie"),
-        'data_emissao': safe_get(dadosNota, "NFe.infNFe.ide.dhEmi"),
-        'data_saida': safe_get(dadosNota, "NFe.infNFe.ide.dhSaiEnt"),
-        'emitente_cnpj': safe_get(dadosNota, "NFe.infNFe.emit.CNPJ"),
-        'emitente_nome': safe_get(dadosNota, "NFe.infNFe.emit.xNome"),
-        'destinatario_cnpj': safe_get(dadosNota, "NFe.infNFe.dest.CNPJ"),
-        'destinatario_nome': safe_get(dadosNota, "NFe.infNFe.dest.xNome"),
-        'valor_total': safe_get(dadosNota, "NFe.infNFe.total.ICMSTot.vNF", "0"),
-        'valor_produtos': safe_get(dadosNota, "NFe.infNFe.total.ICMSTot.vProd", "0"),
-        'valor_bc_icms': safe_get(dadosNota, "NFe.infNFe.total.ICMSTot.vBC", "0"),
-        'valor_icms': safe_get(dadosNota, "NFe.infNFe.total.ICMSTot.vICMS", "0"),
-        'valor_icms_desonerado': safe_get(dadosNota, "NFe.infNFe.total.ICMSTot.vICMSDeson", "0"),
-        'valor_bc_icms_st': safe_get(dadosNota, "NFe.infNFe.total.ICMSTot.vBCST", "0"),
-        'valor_icms_st': safe_get(dadosNota, "NFe.infNFe.total.ICMSTot.vST", "0"),
-        'valor_ipi': safe_get(dadosNota, "NFe.infNFe.total.ICMSTot.vIPI", "0"),
-        'valor_pis': safe_get(dadosNota, "NFe.infNFe.total.ICMSTot.vPIS", "0"),
-        'valor_cofins': safe_get(dadosNota, "NFe.infNFe.total.ICMSTot.vCOFINS", "0"),
-        'valor_bc_irrf': safe_get(dadosNota, "NFe.infNFe.total.retTrib.vBCIRRF", "0"),
-        'transportadora_cnpj': safe_get(dadosNota, "NFe.infNFe.transp.transporta.CNPJ", ""),
-        'transportadora_nome': safe_get(dadosNota, "NFe.infNFe.transp.transporta.xNome", ""),
-        'data_vencimento': safe_get(dadosNota, "NFe.infNFe.cobr.dup.dVenc", "")
-
+        'chave_nfe': acessar(dadosNota, "NFe", "infNFe", "Id").replace("NFe", ""),
+        'numero_nfe': acessar(dadosNota, "NFe", "infNFe", "ide", "nNF"),
+        'serie_nfe': acessar(dadosNota, "NFe", "infNFe", "ide", "serie"),
+        'data_emissao': acessar(dadosNota, "NFe", "infNFe", "ide", "dhEmi"),
+        'data_saida': acessar(dadosNota, "NFe", "infNFe", "ide", "dhSaiEnt"),
+        'emitente_cnpj': acessar(dadosNota, "NFe", "infNFe", "emit", "CNPJ"),
+        'emitente_nome': acessar(dadosNota, "NFe", "infNFe", "emit", "xNome"),
+        'destinatario_cnpj': acessar(dadosNota, "NFe", "infNFe", "dest", "CNPJ"),
+        'destinatario_nome': acessar(dadosNota, "NFe", "infNFe", "dest", "xNome"),
+        'valor_total': acessar(dadosNota, "NFe", "infNFe", "total", "ICMSTot", "vNF", default="0"),
+        'valor_produtos': acessar(dadosNota, "NFe", "infNFe", "total", "ICMSTot", "vProd", default="0"),
+        'valor_bc_icms': acessar(dadosNota, "NFe", "infNFe", "total", "ICMSTot", "vBC", default="0"),
+        'valor_icms': acessar(dadosNota, "NFe", "infNFe", "total", "ICMSTot", "vICMS", default="0"),
+        'valor_icms_desonerado': acessar(dadosNota, "NFe", "infNFe", "total", "ICMSTot", "vICMSDeson", default="0"),
+        'valor_bc_icms_st': acessar(dadosNota, "NFe", "infNFe", "total", "ICMSTot", "vBCST", default="0"),
+        'valor_icms_st': acessar(dadosNota, "NFe", "infNFe", "total", "ICMSTot", "vST", default="0"),
+        'valor_ipi': acessar(dadosNota, "NFe", "infNFe", "total", "ICMSTot", "vIPI", default="0"),
+        'valor_pis': acessar(dadosNota, "NFe", "infNFe", "total", "ICMSTot", "vPIS", default="0"),
+        'valor_cofins': acessar(dadosNota, "NFe", "infNFe", "total", "ICMSTot", "vCOFINS", default="0"),
+        'valor_bc_irrf': acessar(dadosNota, "NFe", "infNFe", "total", "retTrib", "vBCIRRF", default="0"),
+        'transportadora_cnpj': acessar(dadosNota, "NFe", "infNFe", "transp", "transporta", "CNPJ", default=""),
+        'transportadora_nome': acessar(dadosNota, "NFe", "infNFe", "transp", "transporta", "xNome", default=""),
+        'data_vencimento': acessar(dadosNota, "NFe", "infNFe", "cobr", "dup", "dVenc", default="")
     }
 
     # Preparar itens da nota
@@ -65,24 +77,31 @@ def telaObservacoes(self, dadosNota):
     itens_json = []
     for item in itens:
         itens_json.append({
-            'codigo': safe_get(item, "prod.cProd"),
-            'descricao': safe_get(item, "prod.xProd"),
-            'quantidade': safe_get(item, "prod.qCom"),
-            'unidade': safe_get(item, "prod.uCom"),
-            'valor_unitario': safe_get(item, "prod.vUnCom"),
-            'valor_total': safe_get(item, "prod.vProd"),
-            'cfop': safe_get(item, "prod.CFOP"),
-            'ncm': safe_get(item, "prod.NCM"),
-            'cest': safe_get(item, "prod.CEST", ""),
-            'ean': safe_get(item, "prod.cEAN", ""),
-
+            'codigo': acessar(item, "prod", "cProd"),
+            'descricao': acessar(item, "prod", "xProd"),
+            'quantidade': acessar(item, "prod", "qCom"),
+            'unidade': acessar(item, "prod", "uCom"),
+            'valor_unitario': acessar(item, "prod", "vUnCom"),
+            'valor_total': acessar(item, "prod", "vProd"),
+            'cfop': acessar(item, "prod", "CFOP"),
+            'ncm': acessar(item, "prod", "NCM"),
+            'cest': acessar(item, "prod", "CEST", default=""),
+            'ean': acessar(item, "prod", "cEAN", default="")
         })
 
-    # Adicionar itens ao dicionário de dados
     dados_insercao['itens_json'] = json.dumps(itens_json, ensure_ascii=False)
 
-    # Chamar a função de inserção (que já existe)
-    
-
-    criaBotao(frame, "Prntar", 0.25, 0.94, 0.15, lambda: Insere.inserir_nota_fiscal(**dados_insercao)).place(anchor="nw")
-    criaBotao(frame, "Voltar", 0.05, 0.94, 0.15, lambda: frame.destroy()).place(anchor="nw")
+    def insereRetorna():
+        Insere.inserir_nota_fiscal(**dados_insercao)
+        try:
+            self.frameTelaRegistraCredito.destroy()
+            self.frameTelaProdutos.destroy()
+            self.frameTelaTotais.destroy()
+            self.frameTelaGerarFaturamento.destroy()
+            self.frametelaTransporte.destroy()
+            self.frameTelaObservacoes.destroy()
+            self.frameEscolherNotaFiscal.destroy()
+        except Exception as e:
+            print(f"Erro ao inserir nota fiscal: {e}")
+    criaBotao(self.frameTelaObservacoes, "salvar", 0.25, 0.94, 0.15, lambda: insereRetorna()).place(anchor="nw")
+    criaBotao(self.frameTelaObservacoes, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaObservacoes.destroy()).place(anchor="nw")
