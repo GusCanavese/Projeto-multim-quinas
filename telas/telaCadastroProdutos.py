@@ -26,7 +26,7 @@ def telaCadastroProdutos(self):
         reais = texto_numerico[:-2]
         centavos = texto_numerico[-2:]
 
-        valor = f"{int(reais)},{centavos}"
+        valor = f"{int(reais)}.{centavos}"
 
         # Evita piscar o cursor para o final
         entrada.delete(0, "end")

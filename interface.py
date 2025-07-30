@@ -46,14 +46,9 @@ class App(ctk.CTk):
 
 
     def telas(self):
-        self.configure(fg_color="#242424")
-        self.corFundo = "#2b2b2b"
-        self.cor = "#5a3e3e"
-        self.corNegado = "#922B21"
-        self.corAfirma = "#196F3D"
-        self.corModal = "#404040"
-        # telas.telaLogin.telaLogin(self)
-        funcoesTerceiras.escolherNotaFiscal.escolherNotaFiscal(self)
+
+        telas.telaLogin.telaLogin(self)
+        # funcoesTerceiras.escolherNotaFiscal.escolherNotaFiscal(self)
         # telas.telaRelatorioDeVendas.telaRelatorioDeVendas(self)
         # telas.telaApresentadorDePdf.telaApresentarPDF(self, "Pedido.pdf", True)
         # telas.telaRelatorioDeVendas.telaRelatorioDeVendas(self)
