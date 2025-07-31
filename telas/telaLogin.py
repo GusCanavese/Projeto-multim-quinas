@@ -7,6 +7,7 @@ from componentes import criaFrameJanela,  criaFrame, criaFrameJanela
 
 
 def telaLogin(self):
+
     self.title("GestUp")
     self.switch_var = ctk.BooleanVar()
 

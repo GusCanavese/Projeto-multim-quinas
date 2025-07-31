@@ -50,13 +50,13 @@ def telaCadastroProdutos(self):
     self.Quantidade = criarLabelEntry(frame, "Quantidade *", 0.79, 0.135, 0.10, None)
 
 
-    self.CodigoInterno = criarLabelEntry(frame, "Código interno *", 0.1, 0.26, 0.20, None)
-    self.NCM = criarLabelEntry(frame, "Código NCM *", 0.33, 0.26, 0.17, None)
-    self.CFOP = criarLabelEntry(frame, "Código CFOP *", 0.53, 0.26, 0.17, None)
-    self.CEST = criarLabelEntry(frame, "Código CEST *", 0.73, 0.26, 0.16, None)
+    self.CodigoInterno = criarLabelEntry(frame, "Código interno", 0.1, 0.26, 0.20, None)
+    self.NCM = criarLabelEntry(frame, "Código NCM", 0.33, 0.26, 0.17, None)
+    self.CFOP = criarLabelEntry(frame, "Código CFOP", 0.53, 0.26, 0.17, None)
+    self.CEST = criarLabelEntry(frame, "Código CEST", 0.73, 0.26, 0.16, None)
 
-    self.OrigemCST = criarLabelEntry(frame, "Origem (CST A) *", 0.1, 0.4, 0.20, None)
-    self.Descricao = criarLabelEntry(frame, "Descrição *", 0.33, 0.4, 0.265, None)
+    self.OrigemCST = criarLabelEntry(frame, "Origem (CST A)", 0.1, 0.4, 0.20, None)
+    self.Descricao = criarLabelEntry(frame, "Descrição", 0.33, 0.4, 0.265, None)
     self.CNPJ = criarLabelComboBox(frame, "CNPJ *", 0.63, 0.4, 0.26, opcoesCNPJ)
 
     criaBotao(frame, "◀️ Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())

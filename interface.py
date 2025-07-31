@@ -1,4 +1,6 @@
 import customtkinter as ctk
+import sys
+import traceback 
 import telas 
 import funcoesTerceiras.escolherNotaFiscal
 import telas.telaAcoes
@@ -42,25 +44,34 @@ class App(ctk.CTk):
         self.telas()
 
 
+        self.report_callback_exception = self.exibir_erro_global
+
+
+    def gerar_erro(self):
+        1 / 0
+
+
+    def exibir_erro_global(self, exctype, value, tb):
+        mensagem = f"Ocorreu um erro: {value} \n\nContate o administrador"
+
+        if hasattr(self, "frameErro") and self.frameErro.winfo_exists():
+            self.frameErro.destroy()
+
+        self.frameErro = ctk.CTkFrame(self, height=100, width=500, corner_radius=5, border_width=2, border_color="red", fg_color="transparent")
+        self.frameErro.place(relx=0.5, y=550, anchor="center")
+        label = ctk.CTkLabel(self.frameErro, text=mensagem, font=("Arial", 16))
+        label.place(relx=0.5, rely=0.5, anchor="center")
+
+        traceback.print_exception(exctype, value, tb)
+
+        self.after(5000, lambda: self.frameErro.destroy() if self.frameErro.winfo_exists() else None)
 
 
 
     def telas(self):
 
         telas.telaLogin.telaLogin(self)
-        # funcoesTerceiras.escolherNotaFiscal.escolherNotaFiscal(self)
-        # telas.telaRelatorioDeVendas.telaRelatorioDeVendas(self)
-        # telas.telaApresentadorDePdf.telaApresentarPDF(self, "Pedido.pdf", True)
-        # telas.telaRelatorioDeVendas.telaRelatorioDeVendas(self)
-        # telas.telaCadastroClientes.telaCadastroClientes(self)
-        
 
-
-
-
-
-
-           
 
 if __name__ == "__main__":
     app = App()
