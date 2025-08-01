@@ -27,10 +27,13 @@ def telaCadastroFornecedores(self):
         else:
             self.emailFornecedor.configure(state="disabled")
 
-    self.ativoInativo = criaSimouNao(frame, "Ativo?", "Sim", "Não", 0.12, 0.1, None)
+    def passe(self):
+        pass
+
+    self.ativoInativo = criaSimouNao(frame, "Ativo?", "Sim", "Não", 0.12, 0.1, passe)
     self.transpRecebeEmail = criaSimouNao(frame, "Recebe email?", "Sim.", "Não.", 0.28, 0.1, comando=meDesmarqueFornecedor)
-    self.Origem = criaSimouNao(frame, "Origem", "Nacion.", "Estrang.", 0.44, 0.1, None)
-    self.eFabricante = criaSimouNao(frame, "É fabricante?", "Sim", "Não", 0.60, 0.1, None)
+    self.Origem = criaSimouNao(frame, "Origem", "Nacion.", "Estrang.", 0.44, 0.1, passe)
+    self.eFabricante = criaSimouNao(frame, "É fabricante?", "Sim", "Não", 0.60, 0.1, passe)
 
 
     self.nomeFornecedor              = criarLabelEntry(frame, "Razão social *",       0.1  - 0.03, 0.25, 0.2, None)

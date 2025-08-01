@@ -28,8 +28,10 @@ def telaCadastroTransportadoras(self):
             self.emailTransportadora.configure(state="normal")
         else:
             self.emailTransportadora.configure(state="disabled")
+    def passe(self):
+        pass
 
-    self.ehAtivo = criaSimouNao(frame, "Ativo?", "Sim", "Não", 0.12, 0.1, None)
+    self.ehAtivo = criaSimouNao(frame, "Ativo?", "Sim", "Não", 0.12, 0.1, passe)
     self.transpRecebeEmail = criaSimouNao(frame, "Recebe email?", "Sim.", "Não.", 0.28, 0.1, comando=meDesmarqueTransportadora)
 
  
