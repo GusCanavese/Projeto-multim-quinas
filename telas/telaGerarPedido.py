@@ -76,6 +76,19 @@ def telaGerarPedido(self):
         entrada.delete(0, "end")
         entrada.insert(0, valor)
 
+    self.typing_job = None  # precisa estar aqui antes
+
+    def on_stop_typing(event=None):
+        print("Parou de digitar")
+        buscaCliente()
+
+    def on_key_release(event):
+        if self.typing_job is not None:
+            self.after_cancel(self.typing_job)
+        self.typing_job = self.after(300, on_stop_typing)
+
+
+
     def geraNumeroPedido():
             # self.numeroDoPedido += 1
             maiorNumero = Buscas.selecionaNumeroPedido()[0]
@@ -427,7 +440,7 @@ def telaGerarPedido(self):
     self.numeroDeVenda = criarLabelEntry(frameTelaPedido, "Número da venda", 0.05, 0.05, 0.12, variavelnumeroDoPedido)
     self.dataDeCriacao = criarLabelEntry(frameTelaPedido, "Data de criação", 0.20, 0.05, 0.12, dataCriacao)
     self.nomeDoClienteBuscado = criarLabelEntry(frameTelaPedido, "Nome do cliente *", 0.05, 0.15, 0.27, None)
-    self.nomeDoClienteBuscado.bind("<KeyRelease>", buscaCliente)
+    self.nomeDoClienteBuscado.bind("<KeyRelease>", on_key_release)
     self.nomeDoClienteBuscado.bind("<Button-1>", buscaCliente)
 
     self.statusDoPedido = criarLabelEntry(frameTelaPedido, "Status", 0.39, 0.05, 0.33, variavelEmAbertoFechado)

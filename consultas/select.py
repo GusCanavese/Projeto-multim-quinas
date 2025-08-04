@@ -31,7 +31,7 @@ class Buscas:
         return resultado
     
     def buscaDadosCliente(nomeDoCliente):
-        queryBuscaCliente = "SELECT nome, cpf, cnpj, telefone, cep, cidade, referencia, numero, bairro, rua FROM clientes WHERE nome LIKE %s"
+        queryBuscaCliente = "SELECT nome, cpf, cnpj, telefone, cep, cidade, referencia, numero, bairro, rua FROM clientes WHERE nome LIKE %s ORDER BY nome"
         db.cursor.execute(queryBuscaCliente, (f"%{nomeDoCliente}%",))
         resultado = db.cursor.fetchall()
         return resultado
