@@ -60,10 +60,10 @@
 
 
 ESTÉTICO:
-1 - telas de cadastro, colocar elas um pouco mais no meio
-2 - aumentar o tamanho dos botões da tela de ações 
-3 - colocar icones nos botoes das telas de ações
-4 - colocar um fundo nos labels das telas de cadastros
-5 - PDF - olhar na folha criada
+1 - telas de cadastro, colocar elas um pouco mais no meio ✅
+2 - aumentar o tamanho dos botões da tela de ações        ✅
+3 - colocar icones nos botoes das telas de ações          ✅
+4 - colocar um fundo nos labels das telas de cadastros    ✅
+5 - PDF - olhar na folha criada                           ✅
 
 
