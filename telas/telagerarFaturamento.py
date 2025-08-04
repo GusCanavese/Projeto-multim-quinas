@@ -8,7 +8,6 @@ from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvament
 from componentes import criaFrameJanela, criaBotao, criaFrame
 
 def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
-    print(valorDoPedido)
     self.variavelRepeticao = 0
 
     self.row=1
@@ -30,7 +29,6 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
     self.totaisFormasDePagamento.set(self.totais)
 
     self.descontoTotalVindoDoPedido = ctk.StringVar()
-
     self.acrescimoTotalVindoDoPedido = ctk.StringVar()
 
 
