@@ -4,7 +4,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
 from funcoesTerceiras import filtrar, verificaSeQuerFiltrarPorPeriodo
-from componentes import criaFrameJanela, criaFrameJanela, criaLabel, criaBotao, criaComboBox, criarLabelEntry, criarLabelComboBox
+from componentes import criaFrameJanela, criaFrameJanela, criaLabel, criaBotao, criaComboBox, criarLabelEntry
+from telas.telaNotaFiscalSaida import telaNotaFiscalSaida 
 
 
 def telaContasAPagarEAReceber(self):
@@ -24,9 +25,9 @@ def telaContasAPagarEAReceber(self):
 
 
     def escolheTela(valor):
-        if valor=="Entrada/Débito":
-            pass
         if valor=="Saída/Crédito":
+            telaNotaFiscalSaida()
+        if valor=="Entrada/Débito":
             escolherNotaFiscal(self)
             
     def creditoOuDebito():

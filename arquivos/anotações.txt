@@ -52,7 +52,7 @@
 52 - data do documento = da nota                                                         ✅
 53 - data entrada e data de criação = data de hoje, também tem que puxar automatico      ✅
 54 - contas a pagar e a receber não está funcionando o próximo                           ✅
-55 - somar as parcelas do faturamento (ambos) para setornar somente um valor
+55 - somar as parcelas do faturamento (ambos) para setornar somente um valor             ✅
 
 
 39 - mandar o excedente dos produtos para a tela de "pedidos fábrica"      1/2❓
