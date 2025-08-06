@@ -6,6 +6,7 @@ from consultas.delete import deleta
 
    
 def confirmarExclusaoDoProduto(self, frame, descricao,):
+    print(descricao)
 
     resposta = messagebox.askquestion(
         "Confirmação",

@@ -151,7 +151,7 @@ class Buscas:
 
     def buscaEstoqueProdutos(valor, cnpj):
         if cnpj == "Todos":
-            queryBuscaProdutosEstoque = """SELECT quantidade, descricao, codigo_interno, valor_de_venda, CNPJ, codigo_ncm, codigo_cfop, codigo_cest, valor_de_venda, valor_de_custo, origem_cst, nome_do_produto FROM produtos 
+            queryBuscaProdutosEstoque = """SELECT quantidade, descricao, codigo_interno, valor_de_venda, CNPJ, codigo_ncm, codigo_cfop, codigo_cest, valor_de_venda, valor_de_custo, origem_cst, nome_do_produto, marca, valor_de_custo, id FROM produtos 
             WHERE 
                 descricao like %s
                 or CNPJ like %s
@@ -159,10 +159,11 @@ class Buscas:
                 or nome_do_produto like %s
                 or codigo_interno like %s
                 or valor_de_venda like %s
+                or marca like %s
                 ORDER BY descricao ASC"""
-            db.cursor.execute(queryBuscaProdutosEstoque, (f"%{valor}%", f"%{cnpj}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%"))
+            db.cursor.execute(queryBuscaProdutosEstoque, (f"%{valor}%", f"%{cnpj}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%"))
         else:
-            queryBuscaProdutosEstoque = """SELECT quantidade, descricao, codigo_interno, valor_de_venda, CNPJ, codigo_ncm, codigo_cfop, codigo_cest, valor_de_venda, valor_de_custo, origem_cst, nome_do_produto FROM produtos 
+            queryBuscaProdutosEstoque = """SELECT quantidade, descricao, codigo_interno, valor_de_venda, CNPJ, codigo_ncm, codigo_cfop, codigo_cest, valor_de_venda, valor_de_custo, origem_cst, nome_do_produto, marca, valor_de_custo, id FROM produtos 
             WHERE 
                 CNPJ like %s
                     AND (
@@ -171,9 +172,10 @@ class Buscas:
                         OR nome_do_produto LIKE %s
                         OR codigo_interno LIKE %s
                         OR valor_de_venda LIKE %s
+                        OR marca LIKE %s
                     )
                 ORDER BY descricao ASC"""
-            db.cursor.execute(queryBuscaProdutosEstoque, (cnpj, f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%"))
+            db.cursor.execute(queryBuscaProdutosEstoque, (cnpj, f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%"))
 
         
         resultado = db.cursor.fetchall()

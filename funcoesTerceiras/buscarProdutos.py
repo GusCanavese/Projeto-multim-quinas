@@ -24,7 +24,7 @@ def buscarProdutos(self, frame, nome, cnpj, pagina=1):
     for rowProduto, produto in enumerate(pedidosPagina, start=1):
         corDeFundo = "#1C60A0" 
         dadosProduto = [produto[0], produto[11], produto[2], produto[3], produto[4]]
-        dadosextras = [produto[0], produto[11], produto[2], produto[3], produto[4], produto[5], produto[6], produto[7], produto[8]]
+        dadosextras = [produto[0], produto[11], produto[2], produto[3], produto[4], produto[5], produto[6], produto[7], produto[8], produto[12], produto[13], produto[14]]
 
 
 

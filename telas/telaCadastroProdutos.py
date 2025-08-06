@@ -41,8 +41,9 @@ def telaCadastroProdutos(self):
 
     # Nome
     self.nomeProduto = criarLabelEntry(frame, "Nome do produto *", 0.1, 0.135, 0.20, None)
-    self.ValorCusto = criarLabelEntry(frame, "Valor de custo *", 0.33, 0.135, 0.20, None)
-    self.ValorVenda = criarLabelEntry(frame, "Valor de venda *", 0.56, 0.135, 0.20, None)
+    self.marca = criarLabelEntry(frame, "Marca *", 0.33, 0.135, 0.15, None)
+    self.ValorCusto = criarLabelEntry(frame, "Valor de custo *", 0.51, 0.135, 0.10, None)
+    self.ValorVenda = criarLabelEntry(frame, "Valor de venda *", 0.64, 0.135, 0.12, None)
 
     self.ValorCusto.bind("<KeyRelease>", formatar_moeda)
     self.ValorVenda.bind("<KeyRelease>", formatar_moeda)

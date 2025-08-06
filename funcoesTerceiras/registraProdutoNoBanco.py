@@ -9,6 +9,7 @@ import customtkinter as ctk
 
 def registraProdutoNoBanco(self, frame):
     nome = self.nomeProduto.get()
+    marca = self.marca.get()
     valorCusto = self.ValorCusto.get()
     valorVenda = self.ValorVenda.get()
     quantidade = self.Quantidade.get()
@@ -21,9 +22,9 @@ def registraProdutoNoBanco(self, frame):
     CNPJ = self.CNPJ.get()
 
 
-    if not(nome and valorCusto and valorVenda and quantidade and CNPJ):
+    if not(nome and valorCusto and valorVenda and quantidade and CNPJ and marca):
         messagebox.showerror("erro", "valores estão em branco")
 
     else:
-        Insere.insereProdutosNoBanco(nome, valorCusto, valorVenda, quantidade, codigoInterno, NCM, CFOP, CEST, origemCST, descricao, CNPJ)
+        Insere.insereProdutosNoBanco(nome, valorCusto, valorVenda, quantidade, codigoInterno, NCM, CFOP, CEST, origemCST, descricao, CNPJ, marca)
         frame.destroy()

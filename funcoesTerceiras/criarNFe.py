@@ -3,6 +3,7 @@ from pynfe.processamento.serializacao import SerializacaoXML
 from pynfe.processamento.assinatura import AssinaturaA1
 from pynfe.processamento.comunicacao import ComunicacaoSefaz
 from datetime import datetime
+from lxml import etree
 
 # Configurações do certificado e SEFAZ
 CERTIFICADO_PATH = "arquivos/certificado.pfx"
@@ -96,7 +97,7 @@ def gerar_nfe():
         finalidade_emissao='1',
         processo_emissao='0',
         produtos=[produto],
-        valor_total=100.00,
+        valor_total=1.00,
         valor_icms=12.00,
         valor_pis=0.65,
         valor_cofins=3.00,
@@ -110,20 +111,43 @@ def gerar_nfe():
     # Assinar XML
     assinatura = AssinaturaA1(CERTIFICADO_PATH, CERTIFICADO_SENHA)
     xml_assinado = assinatura.assinar(xml)
+    try:
+        with open("nfe_assinada.xml", "wb") as f:
+            f.write(etree.tostring(xml_assinado, encoding='UTF-8', xml_declaration=True))
+        print("✅ XML assinado salvo em 'nfe_assinada.xml'")
+    except Exception as e:
+        print(f"❌ Erro ao salvar XML: {e}")
 
-    # Enviar para SEFAZ
+    if HOMOLOGACAO:
+        print("\n--- MODO TESTE ATIVADO (não enviado para SEFAZ) ---")
+        print(etree.tostring(xml_assinado, encoding='unicode', pretty_print=True))
+        return  # Encerra aqui sem chamar a SEFAZ
+    
+    print('teste')
     con = ComunicacaoSefaz(UF, CERTIFICADO_PATH, CERTIFICADO_SENHA, HOMOLOGACAO)
-    # if con:
-    #     print("teria enviado")
-    # else:
     envio = con.autorizacao(modelo='nfe', nota_fiscal=xml_assinado)
     print(envio)
-    if envio[0].status == 100:
-        print("✅ NF-e autorizada com sucesso!")
-        print("Chave de acesso:", envio[0].chave)
-        print("Protocolo:", envio[0].protocolo)
 
-        # Consultar recibo
+
+    # Extrai o XML da resposta
+    status_pynfe, http_response, xml_resposta = envio
+
+    # Converte o Element para string (para visualização)
+    xml_str = etree.tostring(xml_resposta, encoding='unicode')
+    print(xml_str)  # Verifique a estrutura completa
+
+    # Namespace do XML da NFe
+    ns = {'ns': 'http://www.portalfiscal.inf.br/nfe'}
+
+    # Extrai o status e motivo da SEFAZ
+    cStat = xml_resposta.xpath('//ns:infProt/ns:cStat/text()', namespaces=ns)
+    xMotivo = xml_resposta.xpath('//ns:infProt/ns:xMotivo/text()', namespaces=ns)
+    chNFe = xml_resposta.xpath('//ns:infProt/ns:chNFe/text()', namespaces=ns)
+    nProt = xml_resposta.xpath('//ns:infProt/ns:nProt/text()', namespaces=ns)
+
+    # Verifica se a NF-e foi autorizada
+    if cStat and cStat[0] == '100':
+        print(f"✅ NF-e autorizada! Chave: {chNFe[0]}, Protocolo: {nProt[0]}")
         consulta = con.consulta_recibo(modelo='nfe', numero_recibo=envio[0].protocolo)
         if consulta[0].status == 100:
             print("Consulta confirmada:", consulta[0].motivo)
@@ -133,12 +157,10 @@ def gerar_nfe():
                 f.write(xml_assinado)
             with open(f"nfe-{envio[0].chave}-proc.xml", "w", encoding="utf-8") as f:
                 f.write(consulta[0].protocolo)
-
-            print("Arquivos XML salvos com sucesso.")
-        else:
-            print("⚠ NF-e enviada, mas problema na consulta:", consulta[0].motivo)
     else:
-        print("❌ Erro no envio:", envio[0].motivo)
+        print(f"❌ Erro: {xMotivo[0] if xMotivo else 'Status desconhecido'}")
+
+
 
 
 if __name__ == '__main__':
