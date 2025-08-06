@@ -26,7 +26,7 @@ def telaContasAPagarEAReceber(self):
 
     def escolheTela(valor):
         if valor=="Saída/Crédito":
-            telaNotaFiscalSaida()
+            telaNotaFiscalSaida(self)
         if valor=="Entrada/Débito":
             escolherNotaFiscal(self)
             
