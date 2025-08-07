@@ -5,10 +5,13 @@ import customtkinter as ctk
 from datetime import date
 from telas.telaTransporte import telaTransporte
 from funcoesTerceiras import calculaParcelasFaturamento
+from telas.telaObservacoesNotaSaida import telaObservacoesNotaSaida
 from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvamentoDoFaturamento
 from componentes import criaFrameJanela, criaBotao
 
-def telaGerarFaturamentoEntradaNota(self, DadosNota, valorDaNota):
+def telaGerarFaturamentoEntradaNota(self):
+    valorDaNota = ctk.StringVar()
+    valorDaNota.set(0)
     self.variavelRepeticao = 0
     self.row = 1
     self.frameTelaGerarFaturamento = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
@@ -172,7 +175,7 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorDaNota):
         colunas.place(relx=posicaox, rely=posicaoy, relwidth=largura_label-0.001)
 
     criaBotao(self.frameTelaGerarFaturamento, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaGerarFaturamento.destroy()).place(anchor="nw")
-    criaBotao(self.frameTelaGerarFaturamento, "Próximo - Transporte", 0.25, 0.94, 0.15, lambda: telaTransporte(self, DadosNota)).place(anchor="nw")
+    criaBotao(self.frameTelaGerarFaturamento, "Próximo - Observações", 0.25, 0.94, 0.15, lambda: telaObservacoesNotaSaida(self)).place(anchor="nw")
 
     def salvarEFechar(self):
         confirmarSalvamentoDoFaturamento(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, self.variavelRepeticao)

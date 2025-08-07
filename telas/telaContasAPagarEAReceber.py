@@ -11,7 +11,7 @@ from telas.telaNotaFiscalSaida import telaNotaFiscalSaida
 def telaContasAPagarEAReceber(self):
     frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     frameContas = criaFrameJanela(frame, 0.5, 0.50, 0.95, 0.7, self.corFundo)
-    opcoes = ["Nenhum", "Entrada/Débito", "Saída/Crédito"]
+    opcoes = ["Nenhum", "Entrada/Débito", "Saída/Crédito", "Importar XML"]
 
     self.selecionarPeriodoContas = ctk.CTkCheckBox(frame, text="Selecionar período")
     self.selecionarPeriodoContas.place(relx=0.55, rely=0.03, anchor="nw")
@@ -26,8 +26,10 @@ def telaContasAPagarEAReceber(self):
 
     def escolheTela(valor):
         if valor=="Saída/Crédito":
-            telaNotaFiscalSaida(self)
+            telaNotaFiscalSaida(self, valor)
         if valor=="Entrada/Débito":
+            telaNotaFiscalSaida(self, valor)
+        if valor=="Importar XML":
             escolherNotaFiscal(self)
             
     def creditoOuDebito():

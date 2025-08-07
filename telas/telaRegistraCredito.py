@@ -97,23 +97,24 @@ def telaRegistroCredito(self, dadosNota):
 
 
     # Variáveis de entrada
-    variavelNumeroDaNota = ctk.StringVar()
-    variavelChaveDaNota = ctk.StringVar()
-    variavelSerieDaNota = ctk.StringVar()
-    variavelRazaoSocialEmitente = ctk.StringVar()
-    variavelCNPJRazaoSocialEmitente = ctk.StringVar()
-    variavelRazaoSocialRemetente = ctk.StringVar()
+    variavelNumeroDaNota             = ctk.StringVar()
+    variavelChaveDaNota              = ctk.StringVar()
+    variavelSerieDaNota              = ctk.StringVar()
+    variavelRazaoSocialEmitente      = ctk.StringVar()
+    variavelCNPJRazaoSocialEmitente  = ctk.StringVar()
+    variavelRazaoSocialRemetente     = ctk.StringVar()
     variavelCNPJRazaoSocialRemetente = ctk.StringVar()
-    variavelDataDocumento = ctk.StringVar()
-    variavelDataEntrada = ctk.StringVar()
-    variavelDataCriacao = ctk.StringVar()
-    variavelHoraEntradaSaida = ctk.StringVar()
-    variavelStatus = ctk.StringVar()
-    variavelDataConfirmacao = ctk.StringVar()
-    variavelCFOP = ctk.StringVar()
-    variavelNatureza = ctk.StringVar()
-    formaDePagamento = ctk.StringVar()
-    data = ctk.StringVar()
+    variavelDataDocumento            = ctk.StringVar()
+    variavelDataEntrada              = ctk.StringVar()
+    variavelDataCriacao              = ctk.StringVar()
+    variavelHoraEntradaSaida         = ctk.StringVar()
+    variavelStatus                   = ctk.StringVar()
+    variavelDataConfirmacao          = ctk.StringVar()
+    variavelCFOP                     = ctk.StringVar()
+    variavelNatureza                 = ctk.StringVar()
+    formaDePagamento                 = ctk.StringVar()
+    variavelEntradaOuSaida           = ctk.StringVar()
+    data                             = ctk.StringVar()
 
     data.set(value=datetime.now().strftime("%d/%m/%Y"))
 
@@ -140,6 +141,12 @@ def telaRegistroCredito(self, dadosNota):
     variavelCNPJRazaoSocialEmitente.set(acessar(dadosNota, "NFe", "infNFe", "emit", "CNPJ"))
     variavelRazaoSocialRemetente.set(acessar(dadosNota, "NFe", "infNFe", "dest", "xNome"))
     variavelCNPJRazaoSocialRemetente.set(acessar(dadosNota, "NFe", "infNFe", "dest", "CNPJ"))
+    var = "Saída" if acessar(dadosNota, "NFe", "infNFe", "ide", "tpNF") == 0 else "Entrada"
+
+    # COLOCAR PARA IDENTIFICAR SOMENTE QUANDO TIVER IMPORTANDO A NOTA FISCAL
+
+
+    variavelEntradaOuSaida.set(var)
     variavelDataDocumento.set(dataDocumento)
     variavelDataEntrada.set(dataEntrada)
     variavelDataCriacao.set(dataCriacao)
@@ -196,8 +203,9 @@ def telaRegistroCredito(self, dadosNota):
     criarLabelLateralEntry(self.frameTelaRegistraCredito, "Hora entrada/saída", 0.75, 0.24, 0.1, variavelHoraEntradaSaida)
     criarLabelLateralEntry(self.frameTelaRegistraCredito, "Data criação",       0.75, 0.29, 0.1, data)
     criarLabelLateralEntry(self.frameTelaRegistraCredito, "Data confirmação",   0.75, 0.34, 0.1, variavelDataConfirmacao)
-    criarLabelLateralComboBox(self.frameTelaRegistraCredito, "Data finalidade", 0.75, 0.39, 0.1, opcoesFinalidade)
-    criarLabelLateralComboBox(self.frameTelaRegistraCredito, "Data situação",   0.75, 0.44, 0.1, opcoesSituacao)
+    criarLabelLateralEntry(self.frameTelaRegistraCredito, "Tipo da nota",       0.75, 0.39, 0.1, variavelEntradaOuSaida)
+    criarLabelLateralComboBox(self.frameTelaRegistraCredito, "Data finalidade", 0.75, 0.44, 0.1, opcoesFinalidade)
+    criarLabelLateralComboBox(self.frameTelaRegistraCredito, "Data situação",   0.75, 0.49, 0.1, opcoesSituacao)
 
     cfop = criarLabelEntry(self.frameTelaRegistraCredito, "CFOP", 0.1, 0.49, 0.07, variavelCFOP)
     cfop.configure(validate="key",validatecommand=(self.register(lambda text: len(text) <= 4), '%P'))

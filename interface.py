@@ -26,6 +26,7 @@ import telas.telaVercontasApagar
 import telas.telagerarFaturamento
 import telas.telaContasAPagarEAReceber
 import telas.telaNotaFiscalSaida
+import telas.telaProdutoNotaSaida
 # import random
 
 # ctk.set_appearance_mode("system")  
@@ -72,6 +73,7 @@ class App(ctk.CTk):
     def telas(self):
 
         telas.telaLogin.telaLogin(self)
+        # telas.telaProdutoNotaSaida.telaProdutosNotaSaida(self)
         # telas.telaNotaFiscalSaida.telaNotaFiscalSaida(self)
 
 

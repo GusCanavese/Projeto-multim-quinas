@@ -9,7 +9,14 @@ from funcoesTerceiras import filtrar, verificaSeQuerFiltrarPorPeriodo
 from componentes import criaFrameJanela, criaBotao, criarLabelComboBox, criarLabelEntry, criarLabelLateralComboBox, criarLabelLateralEntry
 
 
-def telaNotaFiscalSaida(self):
+def telaNotaFiscalSaida(self, valor):
+    variavelEntradaOuSaida = ctk.StringVar()
+    if valor == "Entrada/Débito":
+        variavelEntradaOuSaida.set('Entrada')
+    else:
+        variavelEntradaOuSaida.set('Saída')
+
+
 
     def acessar(dados, *caminho, default=""):
         for chave in caminho:
@@ -28,7 +35,7 @@ def telaNotaFiscalSaida(self):
     self.corAfirma = "#196F3D"
     self.corModal = "#404040"
     self.frameTelaNotaSaida = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
-    usuarioLogado = self.logado
+    usuarioLogado =" self.logado"
     usuarioLogado = usuarioLogado.capitalize()
     def buscaNatureza(cfop):
         variavelCFOPNota = ctk.StringVar()
@@ -82,6 +89,11 @@ def telaNotaFiscalSaida(self):
     variavelNatureza = ctk.StringVar()
     variavelVendedor = ctk.StringVar()
     formaDePagamento = ctk.StringVar()
+    # var = "Saída" if acessar(dadosNota, "NFe", "infNFe", "ide", "tpNF") == 0 else "Entrada"
+
+    # COLOCAR PARA IDENTIFICAR SOMENTE QUANDO TIVER IMPORTANDO A NOTA FISCAL
+
+
     data = ctk.StringVar()
 
     # Preenchimento automático com dados do emitente
@@ -125,6 +137,9 @@ def telaNotaFiscalSaida(self):
     criarLabelLateralEntry(self.frameTelaNotaSaida, "Data criação", 0.75, 0.29, 0.1, variavelDataCriacao)
     criarLabelLateralEntry(self.frameTelaNotaSaida, "Data confirmação", 0.75, 0.34, 0.1, variavelDataConfirmacao)
     criarLabelLateralEntry(self.frameTelaNotaSaida, "Vendedor", 0.75, 0.39, 0.1, variavelVendedor)
+    criarLabelLateralEntry(self.frameTelaNotaSaida, "Tipo da nota",       0.75, 0.39, 0.1, variavelEntradaOuSaida)
+    criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data finalidade", 0.75, 0.44, 0.1, opcoesFinalidade)
+    criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data situação",   0.75, 0.49, 0.1, opcoesSituacao)
 
     criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data finalidade", 0.75, 0.44, 0.1, opcoesFinalidade)
     criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data situação", 0.75, 0.49, 0.1, opcoesSituacao)
@@ -139,5 +154,5 @@ def telaNotaFiscalSaida(self):
     formasPag = criarLabelComboBox(self.frameTelaNotaSaida, "Forma de pagamento", 0.4, 0.64, 0.2, opcoesPagamento)
     formasPag.set(formaDePagamento.get())
 
-    criaBotao(self.frameTelaNotaSaida, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutosNotaSaida(self, {}, cfop)).place(anchor="nw")
+    criaBotao(self.frameTelaNotaSaida, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutosNotaSaida(self, cfop.get())).place(anchor="nw")
     criaBotao(self.frameTelaNotaSaida, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaNotaSaida.destroy()).place(anchor="nw")

@@ -9,8 +9,6 @@ from componentes import criaFrameJanela, criarLabelLateralEntry, criaBotao
 
 def telaTotais(self, dadosNota, IPI):
     self.frameTelaTotais = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
-    # self.frameTelaTotais = self.frameTelaRegistroCredito = ctk.CTkFrame(self)
-    # self.frameTelaTotais.place(relx=0.03, rely=0.05, relwidth=0.94, relheight=0.9)
 
     # variaveis
     none = ctk.StringVar()
