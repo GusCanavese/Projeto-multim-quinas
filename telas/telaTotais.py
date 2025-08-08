@@ -2,7 +2,6 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
-from datetime import datetime
 from telas.telaFaturamentoEntradaNota import telaGerarFaturamentoEntradaNota
 from componentes import criaFrameJanela, criarLabelLateralEntry, criaBotao
 

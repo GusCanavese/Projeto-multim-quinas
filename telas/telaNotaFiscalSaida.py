@@ -28,12 +28,6 @@ def telaNotaFiscalSaida(self, valor):
             return dados["#text"]
         return dados if isinstance(dados, str) else default
 
-    self.configure(fg_color="#242424")
-    self.corFundo = "#2b2b2b"
-    self.cor = "#5a3e3e"
-    self.corNegado = "#922B21"
-    self.corAfirma = "#196F3D"
-    self.corModal = "#404040"
     self.frameTelaNotaSaida = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     usuarioLogado =" self.logado"
     usuarioLogado = usuarioLogado.capitalize()
@@ -117,32 +111,48 @@ def telaNotaFiscalSaida(self, valor):
         "Sem Ocorrência de Transporte"
     ]
 
-    criarLabelEntry(self.frameTelaNotaSaida, "Número da NF", 0.1, 0.05, 0.07, variavelNumeroDaNota)
-    criarLabelEntry(self.frameTelaNotaSaida, "Série", 0.2, 0.05, 0.07, variavelSerieDaNota)
-    criarLabelEntry(self.frameTelaNotaSaida, "Chave da NF", 0.3, 0.05, 0.3, variavelChaveDaNota)
+    self.variavelNumeroDaNota = ctk.StringVar()
+    self.variavelSerieDaNota = ctk.StringVar()
+    self.variavelChaveDaNota = ctk.StringVar()
+    self.variavelRazaoSocialRemetente = ctk.StringVar()
+    self.variavelCNPJRazaoSocialRemetente = ctk.StringVar()
+    self.variavelRazaoSocialEmitente = ctk.StringVar()
+    self.variavelCNPJRazaoSocialEmitente = ctk.StringVar()
+    self.variavelStatus = ctk.StringVar()
+    self.variavelDataDocumento = ctk.StringVar()
+    self.data = ctk.StringVar()
+    self.variavelHoraEntradaSaida = ctk.StringVar()
+    self.variavelDataCriacao = ctk.StringVar()
+    self.variavelDataConfirmacao = ctk.StringVar()
+    self.variavelVendedor = ctk.StringVar()
+    self.variavelEntradaOuSaida = ctk.StringVar()
+    self.opcoesFinalidade = ["Normal", "Complementar", "Ajuste"]
+    self.opcoesSituacao = ["Ativa", "Cancelada", "Inutilizada"]
+
+    criarLabelEntry(self.frameTelaNotaSaida, "Número da NF", 0.1, 0.05, 0.07, self.variavelNumeroDaNota)
+    criarLabelEntry(self.frameTelaNotaSaida, "Série", 0.2, 0.05, 0.07, self.variavelSerieDaNota)
+    criarLabelEntry(self.frameTelaNotaSaida, "Chave da NF", 0.3, 0.05, 0.3, self.variavelChaveDaNota)
 
     ctk.CTkLabel(self.frameTelaNotaSaida, text="Destinatário----------").place(relx=0.1, rely=0.15)
-    criarLabelEntry(self.frameTelaNotaSaida, "Razão social", 0.1, 0.20, 0.3, variavelRazaoSocialRemetente)
-    criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.20, 0.15, variavelCNPJRazaoSocialRemetente)
+    criarLabelEntry(self.frameTelaNotaSaida, "Razão social", 0.1, 0.20, 0.3, self.variavelRazaoSocialRemetente)
+    criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.20, 0.15, self.variavelCNPJRazaoSocialRemetente)
 
     ctk.CTkLabel(self.frameTelaNotaSaida, text="Emitente----------").place(relx=0.1, rely=0.3)
-    criarLabelEntry(self.frameTelaNotaSaida, "Razão social", 0.1, 0.35, 0.3, variavelRazaoSocialEmitente)
-    criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.35, 0.15, variavelCNPJRazaoSocialEmitente)
+    criarLabelEntry(self.frameTelaNotaSaida, "Razão social", 0.1, 0.35, 0.3, self.variavelRazaoSocialEmitente)
+    criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.35, 0.15, self.variavelCNPJRazaoSocialEmitente)
 
-    variavelHoraEntradaSaida.set('')
-    criarLabelLateralEntry(self.frameTelaNotaSaida, "Status", 0.75, 0.09, 0.1, variavelStatus)
-    criarLabelLateralEntry(self.frameTelaNotaSaida, "Data documento", 0.75, 0.14, 0.1, variavelDataDocumento)
-    criarLabelLateralEntry(self.frameTelaNotaSaida, "Data entrada", 0.75, 0.19, 0.1, data)
-    criarLabelLateralEntry(self.frameTelaNotaSaida, "Hora entrada/saída", 0.75, 0.24, 0.1, variavelHoraEntradaSaida)
-    criarLabelLateralEntry(self.frameTelaNotaSaida, "Data criação", 0.75, 0.29, 0.1, variavelDataCriacao)
-    criarLabelLateralEntry(self.frameTelaNotaSaida, "Data confirmação", 0.75, 0.34, 0.1, variavelDataConfirmacao)
-    criarLabelLateralEntry(self.frameTelaNotaSaida, "Vendedor", 0.75, 0.39, 0.1, variavelVendedor)
-    criarLabelLateralEntry(self.frameTelaNotaSaida, "Tipo da nota",       0.75, 0.39, 0.1, variavelEntradaOuSaida)
-    criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data finalidade", 0.75, 0.44, 0.1, opcoesFinalidade)
-    criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data situação",   0.75, 0.49, 0.1, opcoesSituacao)
+    self.variavelHoraEntradaSaida.set('')
+    criarLabelLateralEntry(self.frameTelaNotaSaida, "Status", 0.75, 0.09, 0.1, self.variavelStatus)
+    criarLabelLateralEntry(self.frameTelaNotaSaida, "Data documento", 0.75, 0.14, 0.1, self.variavelDataDocumento)
+    criarLabelLateralEntry(self.frameTelaNotaSaida, "Data entrada", 0.75, 0.19, 0.1, self.data)
+    criarLabelLateralEntry(self.frameTelaNotaSaida, "Hora entrada/saída", 0.75, 0.24, 0.1, self.variavelHoraEntradaSaida)
+    criarLabelLateralEntry(self.frameTelaNotaSaida, "Data criação", 0.75, 0.29, 0.1, self.variavelDataCriacao)
+    criarLabelLateralEntry(self.frameTelaNotaSaida, "Data confirmação", 0.75, 0.34, 0.1, self.variavelDataConfirmacao)
+    criarLabelLateralEntry(self.frameTelaNotaSaida, "Vendedor", 0.75, 0.39, 0.1, self.variavelVendedor)
+    criarLabelLateralEntry(self.frameTelaNotaSaida, "Tipo da nota", 0.75, 0.44, 0.1, self.variavelEntradaOuSaida)
+    criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data finalidade", 0.75, 0.49, 0.1, self.opcoesFinalidade)
+    criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data situação", 0.75, 0.54, 0.1, self.opcoesSituacao)
 
-    criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data finalidade", 0.75, 0.44, 0.1, opcoesFinalidade)
-    criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data situação", 0.75, 0.49, 0.1, opcoesSituacao)
 
     cfop = criarLabelEntry(self.frameTelaNotaSaida, "CFOP", 0.1, 0.49, 0.07, variavelCFOP)
     cfop.configure(validate="key", validatecommand=(self.register(lambda text: len(text) <= 4), '%P'))

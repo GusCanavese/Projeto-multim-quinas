@@ -18,6 +18,7 @@ def telaEstoque(self):
 
     
     criaBotao(frame, "Buscar", 0.15, 0.55, 0.15, lambda:buscarProdutos(self, frameProdutos,self.buscar.get(), self.filtrarPorVendedor.get(), 1))
+    self.buscar.bind("<Return>", lambda event: buscarProdutos(self, frameProdutos,self.buscar.get(), self.filtrarPorVendedor.get(), 1))
     criaBotao(frame, "◀️ Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
 
 

@@ -9,9 +9,9 @@ from telas.telaObservacoesNotaSaida import telaObservacoesNotaSaida
 from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvamentoDoFaturamento
 from componentes import criaFrameJanela, criaBotao
 
-def telaGerarFaturamentoEntradaNota(self):
+def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota):
     valorDaNota = ctk.StringVar()
-    valorDaNota.set(0)
+    valorDaNota.set(valorNota)
     self.variavelRepeticao = 0
     self.row = 1
     self.frameTelaGerarFaturamento = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)

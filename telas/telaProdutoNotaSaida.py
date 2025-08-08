@@ -8,23 +8,11 @@ import requests
 from PIL import Image
 import datetime
 from telas.telaTotaisNota import telaTotaisNotaSaida
-from funcoesTerceiras.verificaSeQuerSalvar import salvarPedido
 from componentes import criaFrameJanela, criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel, criaEntry
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
 def telaProdutosNotaSaida(self, cfop):
-
-    
-    self.configure(fg_color="#242424")
-    self.corFundo = "#2b2b2b"
-    self.cor = "#5a3e3e"
-    self.corNegado = "#922B21"
-    self.corAfirma = "#196F3D"
-    self.corModal = "#404040"
-
-
-
 
     self.row=1
     self.posicaoy = 0.2
@@ -238,36 +226,6 @@ def telaProdutosNotaSaida(self, cfop):
    
     self.botaoRemoverItem = ctk.CTkButton(frameParaItensNoFrame, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: removerItem(self))
     self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotao-0.04)
-    
-
-    def montarValoresDosItens(frame):
-        self.valoresDosItens = []
-        for linha in self.linhas:
-            produto = linha["produto"].get()
-            quantidade = linha["quantidade"].get()
-            preco = linha["preco"].get()
-            subtotal = linha["subtotal"].get()
-            estoque = linha["estoque"].get()
-            acrescimo = linha["acrescimo"].get()
-            desc_real = linha["desc_real"].get()
-            desc_porcentagem = linha["desc_porcentagem"].get()
-
-            if produto.strip() == "":
-                continue
-
-            item = {
-                "descricao": produto,
-                "quantidade": quantidade,
-                "preco": preco,
-                "subtotal": subtotal,
-                "estoque": estoque,
-                "acrescimo": acrescimo,
-                "desconto_reais": desc_real,
-                "desconto_porcentagem": desc_porcentagem,
-            }
-            self.valoresDosItens.append(item)
-        salvarPedido(self, frame)
-
 
     def adicionarItem(self):
         self.posicaoy += 0.02
@@ -361,12 +319,35 @@ def telaProdutosNotaSaida(self, cfop):
         atualizarTotalGeral()
     
 
+    def montarValoresDosItens(frame):
+        self.valoresDosItens = []
+        for linha in self.linhas:
+            produto = linha["produto"].get()
+            quantidade = linha["quantidade"].get()
+            preco = linha["preco"].get()
+            subtotal = linha["subtotal"].get()
+            estoque = linha["estoque"].get()
+            acrescimo = linha["acrescimo"].get()
+            desc_real = linha["desc_real"].get()
+            desc_porcentagem = linha["desc_porcentagem"].get()
+
+            if produto.strip() == "":
+                continue
+
+            item = {
+                "descricao": produto,
+                "quantidade": quantidade,
+                "preco": preco,
+                "subtotal": subtotal,
+                "estoque": estoque,
+                "acrescimo": acrescimo,
+                "desconto_reais": desc_real,
+                "desconto_porcentagem": desc_porcentagem,
+            }
+            self.valoresDosItens.append(item)
 
 
-
-
-
-    criaBotao(frameTelaNotaProduto, "Próximo - Tela totais", 0.25, 0.94, 0.15, lambda: telaTotaisNotaSaida(self)).place(anchor="nw")
+    criaBotao(frameTelaNotaProduto, "Próximo - Tela totais", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto),telaTotaisNotaSaida(self))).place(anchor="nw")
     criaBotao(frameTelaNotaProduto, "Voltar", 0.05, 0.94, 0.15, lambda: frameTelaNotaProduto.destroy()).place(anchor="nw")
 
     aplicar_maiusculo_em_todos_entries(self)
