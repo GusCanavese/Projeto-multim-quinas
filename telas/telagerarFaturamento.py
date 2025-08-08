@@ -103,11 +103,6 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
 
     self.calcularTotal = calcularTotal
 
-
-
-
-
-
     def adicionaParcela(self):
         self.valorDoPedidoVariavel = ctk.StringVar()
         self.valorDoPedidoVariavel.set(valorDoPedido)  # ou valorDaNota.get()
@@ -138,13 +133,8 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
 
         self.frameValorTotais.place(relx=0.2, rely=self.y+0.1, relwidth=0.6, relheight=0.35)
 
-
     adicionaParcela(self)
     
-
-
-
-
     def removerParcela(self):
         if self.row == 1:
             self.botaoRemoverParcela.destroy()
@@ -175,8 +165,6 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
 
             # 🔥 Recalcula o total após remover
             self.calcularTotal()
-
-
 
     def verificaParcelasPreenchidas(self):
         if (self.listaComboboxes[self.row-1].get() and self.listaEntradaQuantidade[self.row-1].get() and self.listaEntradaValor[self.row-1].get()):

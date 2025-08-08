@@ -37,9 +37,6 @@ def telaObservacoesNotaSaida(self):
             if hasattr(self, campo):
                 totais[campo] = getattr(self, campo).get()
 
-        # 🔹 Coleta das parcelas de faturamento
-        parcelas = getattr(self, "valoresFaturamento", [])
-
         # 🔹 Impressão dos dados coletados
         print("🔵 OBSERVAÇÕES CONTRIBUINTE:", obs_contribuinte)
         print("🟣 OBSERVAÇÕES FISCO:", obs_fisco)
@@ -51,27 +48,15 @@ def telaObservacoesNotaSaida(self):
         for k, v in totais.items():
             print(f"   {k}: {v}")
 
-        if parcelas:
-            print("🔴 PARCELAS:")
-            for i, parcela in enumerate(parcelas, 1):
-                if isinstance(parcela, dict):
-                    valor = parcela.get("valor", "N/A")
-                    vencimento = parcela.get("vencimento", "N/A")
-                    print(f"   Parcela {i}: Valor = {valor}, Vencimento = {vencimento}")
-                else:
-                    print(f"   Parcela {i}: {parcela}")
-        else:
-            print("🔴 PARCELAS: Nenhuma parcela registrada.")
 
-        # 🔹 Dicionário geral para uso posterior
         dados_completos = {
             "obs_contribuinte": obs_contribuinte,
             "obs_fisco": obs_fisco,
             "produtos": produtos,
             "totais": totais,
-            "parcelas": parcelas,
+            "parcelas": self.faturamento,
         }
-
+        print(dados_completos['parcelas'])
         # Exibe mensagem visual ao usuário
         messagebox.showinfo("Dados coletados", "Todos os dados foram coletados com sucesso.")
 

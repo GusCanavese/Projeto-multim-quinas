@@ -6,7 +6,7 @@ from datetime import date
 from telas.telaTransporte import telaTransporte
 from funcoesTerceiras import calculaParcelasFaturamento
 from telas.telaObservacoesNotaSaida import telaObservacoesNotaSaida
-from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvamentoDoFaturamento
+from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvamentoDoFaturamentoNota
 from componentes import criaFrameJanela, criaBotao
 
 def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota):
@@ -174,12 +174,14 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota):
         colunas = ctk.CTkLabel(self.frameTelaGerarFaturamento, text=coluna, fg_color=self.cor)
         colunas.place(relx=posicaox, rely=posicaoy, relwidth=largura_label-0.001)
 
-    criaBotao(self.frameTelaGerarFaturamento, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaGerarFaturamento.destroy()).place(anchor="nw")
-    criaBotao(self.frameTelaGerarFaturamento, "Próximo - Observações", 0.25, 0.94, 0.15, lambda: telaObservacoesNotaSaida(self)).place(anchor="nw")
-
     def salvarEFechar(self):
-        confirmarSalvamentoDoFaturamento(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, self.variavelRepeticao)
-        self.frameTelaGerarFaturamento.destroy()
+        confirmarSalvamentoDoFaturamentoNota(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, self.variavelRepeticao)
+        telaObservacoesNotaSaida(self)
+
+    criaBotao(self.frameTelaGerarFaturamento, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaGerarFaturamento.destroy()).place(anchor="nw")
+    criaBotao(self.frameTelaGerarFaturamento, "Próximo - Observações", 0.25, 0.94, 0.15, lambda: salvarEFechar(self)).place(anchor="nw")
+
+
 
     self.descontoTotal.bind("<KeyRelease>", lambda event: self.calcularTotal())
     self.acrescimoTotal.bind("<KeyRelease>", lambda event: self.calcularTotal())
