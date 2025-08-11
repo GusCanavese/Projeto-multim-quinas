@@ -31,6 +31,7 @@ def telaNotaFiscalSaida(self, valor):
     self.frameTelaNotaSaida = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     usuarioLogado =" self.logado"
     usuarioLogado = usuarioLogado.capitalize()
+
     def buscaNatureza(cfop):
         variavelCFOPNota = ctk.StringVar()
         match cfop:
@@ -67,18 +68,11 @@ def telaNotaFiscalSaida(self, valor):
 
     # Variáveis de entrada
     variavelNumeroDaNota = ctk.StringVar()
-    variavelChaveDaNota = ctk.StringVar()
     variavelSerieDaNota = ctk.StringVar()
     variavelRazaoSocialEmitente = ctk.StringVar()
     variavelCNPJRazaoSocialEmitente = ctk.StringVar()
-    variavelRazaoSocialRemetente = ctk.StringVar()
-    variavelCNPJRazaoSocialRemetente = ctk.StringVar()
-    variavelDataDocumento = ctk.StringVar()
-    variavelDataEntrada = ctk.StringVar()
     variavelDataCriacao = ctk.StringVar()
-    variavelHoraEntradaSaida = ctk.StringVar()
     variavelStatus = ctk.StringVar()
-    variavelDataConfirmacao = ctk.StringVar()
     variavelCFOP = ctk.StringVar()
     variavelNatureza = ctk.StringVar()
     variavelVendedor = ctk.StringVar()
@@ -91,13 +85,21 @@ def telaNotaFiscalSaida(self, valor):
     data = ctk.StringVar()
 
     # Preenchimento automático com dados do emitente
-    variavelRazaoSocialEmitente.set("NUTRIGEL DISTRIBUIDORA EIRELI")
-    variavelCNPJRazaoSocialEmitente.set("00.995.044/0001-07")
-    variavelDataCriacao.set(datetime.now().strftime("%d/%m/%Y"))
-    variavelStatus.set("Em Digitação")
-    variavelNumeroDaNota.set("000001")
-    variavelSerieDaNota.set("1")
-    variavelVendedor.set(usuarioLogado)
+
+    def decideEmitente(self, valor):
+        if valor == "Nutrigel":
+            print("entrou aqui")
+            
+
+
+
+            variavelRazaoSocialEmitente.set("NUTRIGEL DISTRIBUIDORA EIRELI")
+            variavelCNPJRazaoSocialEmitente.set("00.995.044/0001-07")
+            variavelDataCriacao.set(datetime.now().strftime("%d/%m/%Y"))
+            variavelStatus.set("Em Digitação")
+            variavelNumeroDaNota.set("000001")
+            variavelSerieDaNota.set("1")
+            variavelVendedor.set(usuarioLogado)
 
     opcoesSituacao = ["Normal", "Extemporâneo"]
     opcoesFinalidade = ["Normal", "complementar", "Ajuste"]
@@ -138,7 +140,9 @@ def telaNotaFiscalSaida(self, valor):
     criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.20, 0.15, self.variavelCNPJRazaoSocialRemetente)
 
     ctk.CTkLabel(self.frameTelaNotaSaida, text="Emitente----------").place(relx=0.1, rely=0.3)
-    criarLabelEntry(self.frameTelaNotaSaida, "Razão social", 0.1, 0.35, 0.3, self.variavelRazaoSocialEmitente)
+    opcoes=["nenhum", "Multimaquinas", "Nutrigel", "Polimáquinas"]
+    emt = criarLabelComboBox(self.frameTelaNotaSaida, "Razão social", 0.1, 0.35, 0.3, opcoes)
+    emt.configure(command= lambda valor: decideEmitente(self, emt.get()))
     criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.35, 0.15, self.variavelCNPJRazaoSocialEmitente)
 
     self.variavelHoraEntradaSaida.set('')

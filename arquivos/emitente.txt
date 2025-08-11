@@ -1,0 +1,18 @@
+[Emitente]
+CRT = 3
+CNPJCPF = 54412549000112
+xNome = Extracao e Com. de Areia Sao Pedro Ltda
+xFant = Mineracao Sao Pedro
+IE = 651008653117
+xLgr = Elpidio Ferraz de Almeida
+nro = 261
+xCpl = 
+xBairro = Jardim Santa Rosa
+cMun = 3550407
+xMun = Sao Pedro
+cUF = 35
+UF = SP
+CEP = 13520-000
+cPais = 1058
+xPais = BRASIL
+Fone = (19) 3481-1011

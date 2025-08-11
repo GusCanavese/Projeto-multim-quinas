@@ -8,7 +8,7 @@ import requests
 from PIL import Image
 import datetime
 from telas.telaTotaisNota import telaTotaisNotaSaida
-from componentes import criaFrameJanela, criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel, criaEntry
+from componentes import criaFrameJanela, criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel, criaEntry, criarLabelEntry
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
@@ -40,8 +40,8 @@ def telaProdutosNotaSaida(self, cfop):
     dataCriacao.set(value=datetime.datetime.now().strftime("%d/%m/%y"))
 
     frameTelaNotaProduto = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
-    frameParaItens = ctk.CTkScrollableFrame(frameTelaNotaProduto, height=200, orientation="vertical", fg_color=self.corFundo)
-    frameParaItens.place(relx=0.5, rely=0.2, relwidth=0.94, anchor="center")
+    frameParaItens = ctk.CTkScrollableFrame(frameTelaNotaProduto, height=800, orientation="vertical", fg_color=self.corFundo)
+    frameParaItens.place(relx=0.5, rely=0.6, relwidth=0.94, anchor="center")
     container = ctk.CTkFrame(frameParaItens, fg_color="red", height=1500)
     container.pack(fill="x", padx=0, pady=0)
     frameParaItensNoFrame = ctk.CTkFrame(frameParaItens, height=1500, fg_color=self.corFundo)
@@ -135,6 +135,74 @@ def telaProdutosNotaSaida(self, cfop):
     frameParaItensNoFrame.bind("<Button-1>", fechar_resultados)
     frameTelaNotaProduto.bind("<Button-1>", fechar_resultados)
 
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+    def botaoTribut(self, linha):
+        # Pegando dados do produto selecionado
+        preco = linha["preco"].get()
+        quantidade = linha["quantidade"].get()
+        subtotal = linha["subtotal"].get()
+        cfop = linha["cfop"].get()
+
+        produto = ctk.StringVar()
+        produto.set(linha["produto"].get())
+
+        # Criar a janela/modal de tributação
+        frame = criaFrameJanela(frameTelaNotaProduto, 0.5, 0.5, 0.6, 0.9, self.corModal)
+
+        # Bloquear tela de trás
+        for widget in frameTelaNotaProduto.winfo_children():
+            try:
+                widget.configure(state="disabled")
+            except:
+                pass
+
+        # Botão fechar
+        def destroyModal():
+            for widget in frameTelaNotaProduto.winfo_children():
+                try:
+                    widget.configure(state="normal")
+                except:
+                    pass
+            frame.destroy()
+
+        ctk.CTkButton(frame, text="X", width=10, height=10, corner_radius=0,command=destroyModal).place(relx=0.989, rely=0.018, anchor="center")
+
+        criarLabelEntry(frame, "Produto:", 0.05, 0.1, 0.18, produto)
+        criarLabelEntry(frame, "Preço:", 0.25, 0.1, 0.18, None)
+        criarLabelEntry(frame, "Quantidade:", 0.05, 0.18, 0.18, None)
+        criarLabelEntry(frame, "Subtotal:", 0.25, 0.18, 0.18, None)
+        criarLabelEntry(frame, "CFOP:", 0.05, 0.26, 0.18, None)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     def atualizarTotalGeral():
         total = 0.0
 
@@ -178,27 +246,6 @@ def telaProdutosNotaSaida(self, cfop):
 
             total += novo_subtotal
 
-            
-       
-            # desconto_total_porc = float(self.totalDescontoPorcentagem.get().replace(",", ".") or 0)
-            # total -= total * (desconto_total_porc / 100)
-
-            # desconto_total_real = float(self.totalDescontoReal.get().replace(",", ".") or 0)
-            # total -= desconto_total_real
-
-            # acrescimo_total = float(self.totalAcrescimo.get().replace(",", ".") or 0)
-            # total += acrescimo_total
-
-            # frete = float(self.valorFrete.get().replace(",", ".") or 0)
-            # total += frete
-
-        # Exibe o TOTAL formatado
-        # self.totalSubtotal.configure(state="normal")
-        # self.totalSubtotal.delete(0, 'end')
-        # self.totalSubtotal.insert(0, f"{total:.2f}")
-        # self.totalSubtotal.configure(state="disabled")
-
-
     for i, coluna in enumerate(listaLabels):
         if i == 0:
             criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.040, self.cor)
@@ -235,9 +282,16 @@ def telaProdutosNotaSaida(self, cfop):
         self.botaoAdicionarItem.place(relx=0.875, rely=self.posicaoyBotao)
         self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotaoRemover)
         linha_widgets = {}
+
+        self.btnTribut = criaBotao(frameParaItensNoFrame, "Tribut", 0.89, self.posicaoyBotaoRemover + 0.0095, 0.03, lambda lw=linha_widgets: botaoTribut(self, lw))
+        self.btnTribut.configure(corner_radius=0)
+        linha_widgets["botao"] = self.btnTribut
         
 
         for i, coluna in enumerate(listaLabels):
+
+
+
             if i == 0:
                 label = criaLabel(frameParaItensNoFrame, int(self.contadorDeLinhas / 9) + 1, self.posicaox, self.posicaoy, 0.040, self.cor)
                 linha_widgets["item"] = label
@@ -253,6 +307,8 @@ def telaProdutosNotaSaida(self, cfop):
                 entrada = criaEntry(frameParaItensNoFrame, self.posicaox, self.posicaoy, 0.08, None)
                 campo = ["preco", "quantidade", "estoque", "desc_real", "desc_porcentagem", "acrescimo", "subtotal", "cfop"][i - 2]
                 linha_widgets[campo] = entrada
+            
+
                 
 
                 if campo == "desc_real":

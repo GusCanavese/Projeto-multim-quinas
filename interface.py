@@ -53,6 +53,8 @@ class App(ctk.CTk):
         1 / 0
 
 
+
+
     def exibir_erro_global(self, exctype, value, tb):
         mensagem = f"Ocorreu um erro: {value} \n\nContate o administrador"
 
@@ -72,9 +74,18 @@ class App(ctk.CTk):
 
     def telas(self):
 
-        telas.telaLogin.telaLogin(self)
+        ctk.set_appearance_mode("dark")
+        self.configure(fg_color="#242424")
+        self.corFundo = "#2b2b2b"
+        self.cor = "#5a3e3e"
+        self.corNegado = "#922B21"
+        self.corAfirma = "#196F3D"
+        self.corModal = "#404040"
+
+
+        # telas.telaLogin.telaLogin(self)
         # telas.telaProdutoNotaSaida.telaProdutosNotaSaida(self)
-        # telas.telaNotaFiscalSaida.telaNotaFiscalSaida(self)
+        telas.telaNotaFiscalSaida.telaNotaFiscalSaida(self, 0)
 
 
 if __name__ == "__main__":

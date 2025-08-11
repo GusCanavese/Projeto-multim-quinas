@@ -52,8 +52,7 @@ def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data
     print("aoooopa")
 
     confirmado = "Não"
-    resposta = messagebox.askquestion('Aviso!', 'O faturamento será salvo referente ao pedido tal.', icon='question')
-    if resposta == 'yes':
+    if 1:
         qtdParcelas = quantidade[0].get()
         valorTotal = valor[0].get()
         formaPagamento = formaPag[0].get()
@@ -61,7 +60,7 @@ def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data
 
         dataBase = datetime.strptime(dataFaturamento, "%d/%m/%Y")
         
-        valorParcela = round(float(valorTotal) / int(qtdParcelas), 2)
+        valorParcela = round(float(valorTotal) / float(qtdParcelas), 2)
         for i in range(int(qtdParcelas)):
             if repeticao == "Mensal":
                 dataParcela = dataBase + relativedelta(months=i)
@@ -82,7 +81,6 @@ def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data
                 "formaPagamento": formaPagamento,
             })
 
-        messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
 
     else:            
 

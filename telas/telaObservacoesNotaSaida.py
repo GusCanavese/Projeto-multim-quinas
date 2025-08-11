@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import messagebox
 from componentes import criaFrameJanela, criaBotao, criaTextArea
+from funcoesTerceiras import criarNFe
 
 
 def telaObservacoesNotaSaida(self):
@@ -16,14 +17,11 @@ def telaObservacoesNotaSaida(self):
 
 
     def pegatudo():
-        # 🔹 Coleta das observações
         obs_contribuinte = area1.get("1.0", "end").strip()
         obs_fisco = area2.get("1.0", "end").strip()
 
-        # 🔹 Coleta dos produtos (valores dos itens adicionados anteriormente)
         produtos = getattr(self, "valoresDosItens", [])
 
-        # 🔹 Coleta dos totais financeiros
         totais = {}
         campos_totais = [
             "totalFrete", "totalSeguro", "totalDesconto", "outrasDespesas",
@@ -37,7 +35,6 @@ def telaObservacoesNotaSaida(self):
             if hasattr(self, campo):
                 totais[campo] = getattr(self, campo).get()
 
-        # 🔹 Impressão dos dados coletados
         print("🔵 OBSERVAÇÕES CONTRIBUINTE:", obs_contribuinte)
         print("🟣 OBSERVAÇÕES FISCO:", obs_fisco)
         print("🟠 PRODUTOS:")
@@ -56,10 +53,11 @@ def telaObservacoesNotaSaida(self):
             "totais": totais,
             "parcelas": self.faturamento,
         }
+        criarNFe.criaJsonNFe(dados_completos)
+
         print(dados_completos['parcelas'])
         # Exibe mensagem visual ao usuário
         messagebox.showinfo("Dados coletados", "Todos os dados foram coletados com sucesso.")
-
 
 
     criaBotao(self.frameTelaObservacoes, "salvar", 0.25, 0.94, 0.15, lambda: pegatudo()).place(anchor="nw")
