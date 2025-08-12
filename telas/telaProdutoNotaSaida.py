@@ -8,7 +8,7 @@ import requests
 from PIL import Image
 import datetime
 from telas.telaTotaisNota import telaTotaisNotaSaida
-from componentes import criaFrameJanela, criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel, criaEntry, criarLabelEntry
+from componentes import criaFrameJanela, criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel, criaEntry, criarLabelEntry, criarLabelComboBox
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
@@ -150,6 +150,17 @@ def telaProdutosNotaSaida(self, cfop):
 
 
     def botaoTribut(self, linha):
+        opcoes = [
+            "0 - Nacional, exceto as indicadas nos códigos 3, 4, 5 e 8",
+            "1 - Estrangeira - Importação direta, exceto a indicada no código 6",
+            "2 - Estrangeira - Adquirida no mercado interno, exceto a indicada no código 7",
+            "3 - Nacional, mercadoria ou bem com Conteúdo de Importação superior a 40% e inferior ou igual a 70%",
+            "4 - Nacional, cuja produção tenha sido feita em conformidade com os processos produtivos básicos de que tratam as legislações citadas nos Ajustes",
+            "5 - Nacional, mercadoria ou bem com Conteúdo de Importação inferior ou igual a 40%",
+            "6 - Estrangeira - Importação direta, sem similar nacional, constante em lista da CAMEX e gás natural",
+            "7 - Estrangeira - Adquirida no mercado interno, sem similar nacional, constante em lista da CAMEX e gás natural",
+            "8 - Nacional, mercadoria ou bem com Conteúdo de Importação superior a 70%"
+        ]
         # Pegando dados do produto selecionado
         preco = linha["preco"].get()
         quantidade = linha["quantidade"].get()
@@ -159,17 +170,14 @@ def telaProdutosNotaSaida(self, cfop):
         produto = ctk.StringVar()
         produto.set(linha["produto"].get())
 
-        # Criar a janela/modal de tributação
         frame = criaFrameJanela(frameTelaNotaProduto, 0.5, 0.5, 0.6, 0.9, self.corModal)
 
-        # Bloquear tela de trás
         for widget in frameTelaNotaProduto.winfo_children():
             try:
                 widget.configure(state="disabled")
             except:
                 pass
 
-        # Botão fechar
         def destroyModal():
             for widget in frameTelaNotaProduto.winfo_children():
                 try:
@@ -180,11 +188,14 @@ def telaProdutosNotaSaida(self, cfop):
 
         ctk.CTkButton(frame, text="X", width=10, height=10, corner_radius=0,command=destroyModal).place(relx=0.989, rely=0.018, anchor="center")
 
-        criarLabelEntry(frame, "Produto:", 0.05, 0.1, 0.18, produto)
-        criarLabelEntry(frame, "Preço:", 0.25, 0.1, 0.18, None)
-        criarLabelEntry(frame, "Quantidade:", 0.05, 0.18, 0.18, None)
-        criarLabelEntry(frame, "Subtotal:", 0.25, 0.18, 0.18, None)
-        criarLabelEntry(frame, "CFOP:", 0.05, 0.26, 0.18, None)
+        produtoEntry    = criarLabelEntry(frame, "Produto:", 0.05, 0.05, 0.25, produto)
+        codigoEntry     = criarLabelEntry(frame, "Código:", 0.31, 0.05, 0.15, None)
+        NCMEntry        = criarLabelEntry(frame, "NCM:", 0.47, 0.05, 0.10, None)
+        CSETEntry       = criarLabelEntry(frame, "CSET:", 0.58, 0.05, 0.10, None)
+        quantidadeEntry = criarLabelEntry(frame, "QTD:", 0.69, 0.05, 0.05, None)
+        beneficioEntry  = criarLabelEntry(frame, "Beneficio Fisc:", 0.75, 0.05, 0.15, None)
+
+        cestAEntry = criarLabelComboBox(frame, "CST A", 0.05, 0.13, 0.85, opcoes)
 
 
 
