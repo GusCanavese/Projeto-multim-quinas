@@ -1,16 +1,27 @@
 import customtkinter as ctk
 import gc
 
+
 def criarLabelEntry(frame, texto, relx, rely, width, variavel):
-    dif = 0.04
-    fonte = ("TkDefaultFont", 15)
+
     
-    if texto == "Desconto total(%)" or texto == "Desconto total($)" or texto == "Acréscimo total" or texto == "Valor frete" or texto == "TOTAL:":
+    if texto in ("Desconto total(%)", "Desconto total($)", "Acréscimo total", 
+                    "Valor frete", "TOTAL:", "Produto:", "Código:", "NCM:", 
+                    "CSET:", "QTD:", "Beneficio Fisc:", "CST A", "CSOSN", 
+                    "Alíq. Cálc. Créd. (%)", "Vr. Cred. ICMS", "Alíq. IOF (%)", 
+                    "Alíq. II (%)", "BC II ", "Vr. IOF", "Vr. II", "Vr. Desp. Aduaneiras"
+                ):
+        y=0.01
+        
         dif = 0.045
         fonte = ("TkDefaultFont", 11)
+    else:
+        dif = 0.04
+        fonte = ("TkDefaultFont", 15)
+        y=0
 
     label = ctk.CTkLabel(frame, text=texto, width=50, font=fonte)
-    label.place(relx=relx, rely=rely, anchor="w")
+    label.place(relx=relx, rely=rely+y, anchor="w")
 
     if texto == "CPF" or texto == "CNPJ" or texto == "CPF/CNPJ *" or texto == "CPF *" or texto == "CNPJ *":
         max_length = 14
@@ -52,8 +63,14 @@ def criarLabelEntry(frame, texto, relx, rely, width, variavel):
     return entry
 
 def criarLabelComboBox(frame, texto, relx, rely, width, lista):
-    label = ctk.CTkLabel(frame, text=texto, width=50, font=("Arial", 15))
-    label.place(relx=relx, rely=rely, anchor="w")
+    if texto in ("CST A", "CSOSN", "CST B"):
+        fonte = ("TkDefaultFont", 11)
+        y=0.01
+    else:
+        fonte = ("TkDefaultFont", 15)
+        y=0
+    label = ctk.CTkLabel(frame, text=texto, width=50, font=fonte)
+    label.place(relx=relx, rely=rely+y, anchor="w")
     entry = ctk.CTkComboBox(frame, values=lista, corner_radius=0)
     entry.bind("<Key>", lambda e: "break")
     entry.place(relx=relx, rely=rely + 0.04, relwidth=width, anchor="w")
@@ -66,7 +83,28 @@ def criaComboBox(frame, relx, rely, width, lista, comando):
     return entry
 
 def criarLabelLateralEntry(frame, texto, relx, rely, width, variavel):
-    label = ctk.CTkLabel(frame, text=texto, anchor="e", width=100, font=("Arial", 15))
+    if texto in (
+        "Mod. BC ICMS",
+        "BC ICMS",
+        "Red. BC ICMS (%)",
+        "Aliq. ICMS (%)",
+        "Vr. ICMS",
+        "Mod. BC ICMS ST",
+        "MVA ICMS ST (%)",
+        "BC ICMS ST",
+        "Red. BC ICMS ST (%)",
+        "Aliq. ICMS ST (%)",
+        "Vr. ICMS ST",
+        "Vr. BC ICMS ST Ret.",
+        "Vr. ICMS ST Ret.",
+        "Mod. BC ICMS",
+        "Mod. BC ICMS ST"
+    ):
+        fonte = ("TkDefaultFont", 11)
+    else:
+        fonte = ("TkDefaultFont", 15)
+
+    label = ctk.CTkLabel(frame, text=texto, anchor="e", width=100, font=fonte)
     label.place(relx=relx, rely=rely, anchor="e")
 
     if texto == "CPF" or texto == "CNPJ" or texto == "CPF/CNPJ *":
@@ -94,15 +132,22 @@ def criarLabelLateralEntry(frame, texto, relx, rely, width, variavel):
                 return False
         
         return True
+    
+
 
     validation_command = frame.register(_validate_input)
+
 
     entry = ctk.CTkEntry(frame, textvariable=variavel, corner_radius=0, validate="key", validatecommand=(validation_command, '%P'))
     entry.place(relx=relx + 0.01, rely=rely, relwidth=width, anchor="w")
     return entry
 
 def criarLabelLateralComboBox(frame, texto, relx, rely, width, opcoes):
-    label = ctk.CTkLabel(frame, text=texto, anchor="e", width=100, font=("Arial", 15))
+    if texto in ("Mod. BC ICMS", "Mod. BC ICMS ST"):
+        fonte = ("TkDefaultFont", 11)
+    else:
+        fonte = ("TkDefaultFont", 15)
+    label = ctk.CTkLabel(frame, text=texto, anchor="e", width=100, font=fonte)
     label.place(relx=relx, rely=rely, anchor="e")
     entry = ctk.CTkComboBox(frame, corner_radius=0, values=opcoes)
     entry.bind("<Key>", lambda e: "break")
@@ -120,12 +165,6 @@ def criaFrame(self, relx, rely, width, height):
     return frame
 
 def criaBotao(frame, texto, relx, rely, width, comando):
-    # if texto == "Voltar":
-    #     texto = "←"
-    #     fonte=("TkDefaultFont", 22)
-    #     width = 0.1
-        
-
     modo_atual = ctk.get_appearance_mode().lower()
     if modo_atual == "dark":
         text = "white"
@@ -135,7 +174,6 @@ def criaBotao(frame, texto, relx, rely, width, comando):
     botao = ctk.CTkButton(frame, text=texto, corner_radius=5, font=fonte, command=lambda:comando(), text_color=text)
     botao.place(relx=relx, rely=rely, relwidth=width,  anchor="center")
     return botao
-
 
 def criaBotaoPequeno(frame, texto, relx, rely, width, comando):
     modo_atual = ctk.get_appearance_mode().lower()
@@ -147,7 +185,6 @@ def criaBotaoPequeno(frame, texto, relx, rely, width, comando):
     botao = ctk.CTkButton(frame, text=texto, corner_radius=5, font=fonte, command=lambda:comando(), text_color=text)
     botao.place(relx=relx, rely=rely, relwidth=width,  anchor="center")
     return botao
-
 
 def criaAviso(self, frame, height, width, texto, relx, rely):
     frameAviso = ctk.CTkFrame(frame, height=height, width=width, corner_radius=5, border_width=2, border_color="red",fg_color="transparent")
@@ -203,6 +240,14 @@ def criaTextArea(frame, relx, rely, width, titulo, texto):
     areaTexto = ctk.CTkTextbox(frame, height=150, corner_radius=0, wrap="word")
     areaTexto.insert("0.0", texto)
     areaTexto.place(relx=relx, rely=rely+0.05, relwidth=width)
+    return areaTexto
+
+def criaTextAreaModal(frame, relx, rely, width, titulo, texto):
+    label = ctk.CTkLabel(frame, text=titulo, height=10, font=("TkDefaultFont", 11))
+    label.place(relx=relx, rely=rely)
+    areaTexto = ctk.CTkTextbox(frame, height=100, corner_radius=0, wrap="word")
+    areaTexto.insert("0.0", texto)
+    areaTexto.place(relx=relx, rely=rely+0.03, relwidth=width)
     return areaTexto
 
 def criaLabelDescritivo(frame, texto, relx, rely, width, cor, variavel):
