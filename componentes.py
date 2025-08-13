@@ -9,7 +9,9 @@ def criarLabelEntry(frame, texto, relx, rely, width, variavel):
                     "Valor frete", "TOTAL:", "Produto:", "Código:", "NCM:", 
                     "CSET:", "QTD:", "Beneficio Fisc:", "CST A", "CSOSN", 
                     "Alíq. Cálc. Créd. (%)", "Vr. Cred. ICMS", "Alíq. IOF (%)", 
-                    "Alíq. II (%)", "BC II ", "Vr. IOF", "Vr. II", "Vr. Desp. Aduaneiras"
+                    "Alíq. II (%)", "BC II ", "Vr. IOF", "Vr. II", "Vr. Desp. Aduaneiras", "Alíq. PIS (%)", "BC PIS", "Vr. PIS",
+                    "Vr. COFINS ST", "BC COFINS ST", "Alíq. COFINS ST (%)","Vr. COFINS", "BC COFINS", "Alíq. COFINS (%)", "Vr. PIS ST",
+                    "BC PIS ST","Alíq. PIS ST (%)"
                 ):
         y=0.01
         
@@ -63,7 +65,7 @@ def criarLabelEntry(frame, texto, relx, rely, width, variavel):
     return entry
 
 def criarLabelComboBox(frame, texto, relx, rely, width, lista):
-    if texto in ("CST A", "CSOSN", "CST B"):
+    if texto in ("CST A", "CSOSN", "CST B", "CST"):
         fonte = ("TkDefaultFont", 11)
         y=0.01
     else:
@@ -221,6 +223,18 @@ def criaSimouNao(frame, texto, textobt1, textobt2, relx, rely, comando):
     botao2.place(relx=relx + 0.05, rely=rely + 0.05)
     return botao1, botao2, label, variavel
 
+
+def criaSimouNaoLateral(frame, texto, textobt1, textobt2, relx, rely, comando):
+    variavel = ctk.StringVar(value="")
+    label = ctk.CTkLabel(frame, text=texto, font=("Arial", 14))
+    label.place(relx=relx, rely=rely)
+    botao1 = ctk.CTkRadioButton(frame,text=textobt1,variable=variavel,value=textobt1,command=lambda: comando(variavel.get()))
+    botao1.place(relx=relx, rely=rely + 0.05)
+    botao2 = ctk.CTkRadioButton(frame,text=textobt2,variable=variavel, value=textobt2,command=lambda: comando(variavel.get()))
+    botao2.place(relx=relx, rely=rely + 0.10) 
+    return botao1, botao2, label, variavel
+
+
 def criaLabel(frame, texto, relx, rely, width, cor):
     label = ctk.CTkLabel(frame, text=texto, fg_color=cor, wraplength=450, text_color="white")
     label.place(relx=relx, rely=rely, relwidth=width, anchor="w")
@@ -261,7 +275,7 @@ def criaTextArea(frame, relx, rely, width, titulo, texto):
 def criaTextAreaModal(frame, relx, rely, width, titulo, texto):
     label = ctk.CTkLabel(frame, text=titulo, height=10, font=("TkDefaultFont", 11))
     label.place(relx=relx, rely=rely)
-    areaTexto = ctk.CTkTextbox(frame, height=100, corner_radius=0, wrap="word")
+    areaTexto = ctk.CTkTextbox(frame, height=80, corner_radius=0, wrap="word")
     areaTexto.insert("0.0", texto)
     areaTexto.place(relx=relx, rely=rely+0.03, relwidth=width)
     return areaTexto
