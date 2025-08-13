@@ -84,8 +84,8 @@ class App(ctk.CTk):
 
 
         # telas.telaLogin.telaLogin(self)
-        # telas.telaProdutoNotaSaida.telaProdutosNotaSaida(self)
-        telas.telaNotaFiscalSaida.telaNotaFiscalSaida(self, 0)
+        telas.telaProdutoNotaSaida.telaProdutosNotaSaida(self, 1)
+        # telas.telaNotaFiscalSaida.telaNotaFiscalSaida(self, 0)
 
 
 if __name__ == "__main__":

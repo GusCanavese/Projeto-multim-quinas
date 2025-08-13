@@ -33,38 +33,7 @@ def telaProdutosNotaSaida(self, cfop):
     dataCriacao = ctk.StringVar()
     variavelEmAbertoFechado = ctk.StringVar()
     variavelCfop = ctk.StringVar()
-    mod_bc_icms = ctk.StringVar()
-    bc_icms = ctk.StringVar()
-    red_bc_icms = ctk.StringVar()
-    aliq_icms = ctk.StringVar()
-    vr_icms = ctk.StringVar()
-
-    mva_icms_st = ctk.StringVar()
-    bc_icms_st = ctk.StringVar()
-    red_bc_icms_st = ctk.StringVar()
-    aliq_icms_st = ctk.StringVar()
-
-    vr_icms_st = ctk.StringVar()
-    vr_bc_icms_st_ret = ctk.StringVar()
-    vr_icms_st_ret  = ctk.StringVar()
-
-    codigoEntry = ctk.StringVar()
-    NCMEntry = ctk.StringVar()
-    CSETEntry = ctk.StringVar()
-    quantidadeEntry = ctk.StringVar()
-    beneficioEntry = ctk.StringVar()
-
-    aliqIOFEntry = ctk.StringVar()
-    aliqIIEntry = ctk.StringVar()
-    BCIIEntry = ctk.StringVar()
-    VrIOFEntry = ctk.StringVar()
-    VrIIEntry = ctk.StringVar()
-    VRDespAduaneira = ctk.StringVar()
-
-    self.pis_cofins_vars = {"campo_teste": ctk.StringVar(value="")}
-
-    aliquEntry =ctk.StringVar()
-    credICMSEntry =ctk.StringVar()
+    
     variavelCfop.set(cfop)
 
 
@@ -182,6 +151,67 @@ def telaProdutosNotaSaida(self, cfop):
 
 
     def botaoTribut(self, linha):
+        mod_bc_icms = ctk.StringVar()
+        bc_icms = ctk.StringVar()
+        red_bc_icms = ctk.StringVar()
+        aliq_icms = ctk.StringVar()
+        vr_icms = ctk.StringVar()
+
+        mva_icms_st = ctk.StringVar()
+        bc_icms_st = ctk.StringVar()
+        red_bc_icms_st = ctk.StringVar()
+        aliq_icms_st = ctk.StringVar()
+
+        vr_icms_st = ctk.StringVar()
+        vr_bc_icms_st_ret = ctk.StringVar()
+        vr_icms_st_ret  = ctk.StringVar()
+        vr_icms_subst = ctk.StringVar()
+        vr_bc_ICMS = ctk.StringVar()
+        vr_icms_st_dest = ctk.StringVar()
+        bc_icms_st_dest = ctk.StringVar()
+        aliq_icms_cfop = ctk.StringVar()
+        bc_FCP = ctk.StringVar()
+        aliq_fcp_porc = ctk.StringVar()
+        vr_FCP = ctk.StringVar()
+        aliq_fcp_dif = ctk.StringVar()
+        bc_fcp_st = ctk.StringVar()
+        aliq_fcp_st = ctk.StringVar()
+        vr_fcp_st = ctk.StringVar()
+        vr_fcp_dif = ctk.StringVar()
+        bc_fcp_st_ret = ctk.StringVar()
+        aliq_fcp_st_ret = ctk.StringVar()
+        vr_fcp_st_ret = ctk.StringVar()
+        vr_fcp_efet = ctk.StringVar()
+
+        codigoEntry = ctk.StringVar()
+        NCMEntry = ctk.StringVar()
+        CSETEntry = ctk.StringVar()
+        quantidadeEntry = ctk.StringVar()
+        beneficioEntry = ctk.StringVar()
+
+        aliqIOFEntry = ctk.StringVar()
+        aliqIIEntry = ctk.StringVar()
+        BCIIEntry = ctk.StringVar()
+        VrIOFEntry = ctk.StringVar()
+        VrIIEntry = ctk.StringVar()
+        VRDespAduaneira = ctk.StringVar()
+
+        self.pis_cofins_vars = {"campo_teste": ctk.StringVar(value="")}
+
+        aliquEntry =ctk.StringVar()
+        credICMSEntry =ctk.StringVar()
+
+        def PisCofins(frame):
+            if hasattr(self, "framePisCofins") and self.framePisCofins.winfo_exists():
+                self.framePisCofins.lift()  
+            else:
+                self.framePisCofins = criaFrameJanela(frameTelaNotaProduto, 0.5, 0.5, 0.8, 0.9, self.corModal)
+
+            criarLabelEntry(self.framePisCofins, "TESTE", 0.1, 0.5, 0.5, self.pis_cofins_vars["campo_teste"])
+            criaBotaoPequeno(self.framePisCofins, "Voltar Tributação", 0.1, 0.6, 0.2, lambda: frame.lift())
+
+
+
         opcoes_CST_A = [
             "0 - Nacional, exceto as indicadas nos códigos 3, 4, 5 e 8",
             "1 - Estrangeira - Importação direta, exceto a indicada no código 6",
@@ -240,7 +270,8 @@ def telaProdutosNotaSaida(self, cfop):
         produto = ctk.StringVar()
         produto.set(linha["produto"].get())
 
-        frame = criaFrameJanela(frameTelaNotaProduto, 0.5, 0.5, 0.6, 0.9, self.corModal)
+
+        frame = criaFrameJanela(frameTelaNotaProduto, 0.5, 0.5, 0.8, 0.9, self.corModal)
 
         for widget in frameTelaNotaProduto.winfo_children():
             try:
@@ -255,70 +286,114 @@ def telaProdutosNotaSaida(self, cfop):
                 except:
                     pass
             frame.destroy()
+            if hasattr(self, "framePisCofins"):
+                self.framePisCofins.destroy()
 
+
+        if hasattr(self, "dadosProdutos") and produto.get() in self.dadosProdutos:
+            dados_salvos = self.dadosProdutos[produto.get()]
+            codigoEntry.set(dados_salvos.get("codigo", ""))
+            NCMEntry.set(dados_salvos.get("ncm", ""))
+            CSETEntry.set(dados_salvos.get("cset", ""))
+            quantidadeEntry.set(dados_salvos.get("quantidade", ""))
+            beneficioEntry.set(dados_salvos.get("beneficio", ""))
+            aliquEntry.set(dados_salvos.get("aliqICMS", ""))
+            credICMSEntry.set(dados_salvos.get("credICMS", ""))
+            bc_icms.set(dados_salvos.get("bc_icms", ""))
+            aliq_icms.set(dados_salvos.get("aliq_icms", ""))
+            vr_icms.set(dados_salvos.get("vr_icms", ""))
+
+
+        def salvar_dados_e_sair():
+            if not hasattr(self, "dadosProdutos"):
+                self.dadosProdutos = {}
+
+            self.dadosProdutos[produto.get()] = {
+                "codigo": codigoEntry.get(),
+                "ncm": NCMEntry.get(),
+                "cset": CSETEntry.get(),
+                "quantidade": quantidadeEntry.get(),
+                "beneficio": beneficioEntry.get(),
+                "aliqICMS": aliquEntry.get(),
+                "credICMS": credICMSEntry.get(),
+                "bc_icms": bc_icms.get(),
+                "aliq_icms": aliq_icms.get(),
+                "vr_icms": vr_icms.get(),
+            }
+
+            destroyModal()
+
+
+
+        posGera=-0.03
+
+        criarLabelEntry(frame, "Produto:",                   0.05, 0.05+posGera, 0.25, produto)
+        criarLabelEntry(frame, "Código:",                    0.31, 0.05+posGera, 0.15, codigoEntry)
+        criarLabelEntry(frame, "NCM:",                       0.47, 0.05+posGera, 0.10, NCMEntry)
+        criarLabelEntry(frame, "CSET:",                      0.58, 0.05+posGera, 0.10, CSETEntry)
+        criarLabelEntry(frame, "QTD:",                       0.69, 0.05+posGera, 0.05, quantidadeEntry)
+        criarLabelEntry(frame, "Beneficio Fisc:",            0.75, 0.05+posGera, 0.15, beneficioEntry)
+        criarLabelComboBox(frame, "CST A",                   0.05, 0.12+posGera, 0.85, opcoes_CST_A)
+
+        criarLabelComboBox(frame, "CSOSN",                   0.05, 0.195+posGera, 0.5, opcoes_csosn)
+        criarLabelEntry(frame, "Alíq. Cálc. Créd. (%)",      0.59, 0.19+posGera, 0.13, aliquEntry)
+        criarLabelEntry(frame, "Vr. Cred. ICMS",             0.77, 0.19+posGera, 0.13, credICMSEntry)
+        criarLabelComboBox(frame, "CST A",                   0.05, 0.27+posGera, 0.85, opcoes_CST_B)
+
+        criarLabelLateralComboBox(frame, "Mod. BC ICMS",     0.11, 0.37+posGera, 0.09, opcoes_MOD_ICMS)
+        criarLabelLateralEntry(frame, "BC ICMS",             0.11, 0.41+posGera, 0.09, bc_icms)
+        criarLabelLateralEntry(frame, "Red. BC ICMS (%)",    0.11, 0.45+posGera, 0.09, red_bc_icms)
+        criarLabelLateralEntry(frame, "Aliq. ICMS (%)",      0.11, 0.49+posGera, 0.09, aliq_icms)
+        criarLabelLateralEntry(frame, "Vr. ICMS",            0.11, 0.53+posGera, 0.09, vr_icms)
+
+        criarLabelLateralComboBox(frame, "Mod. BC ICMS ST",  0.34, 0.37+posGera, 0.09, opcoes_MOD_ICMS)
+        criarLabelLateralEntry(frame, "Valor BC ICMS",       0.34, 0.41+posGera, 0.09, vr_bc_ICMS)
+        criarLabelLateralEntry(frame, "MVA ICMS ST (%)",     0.34, 0.45+posGera, 0.09, mva_icms_st)
+        criarLabelLateralEntry(frame, "BC ICMS ST",          0.34, 0.49+posGera, 0.09, bc_icms_st)
+        criarLabelLateralEntry(frame, "Red. BC ICMS ST (%)", 0.34, 0.53+posGera, 0.09, red_bc_icms_st)
+
+        criarLabelLateralEntry(frame, "Vr. ICMS ST",         0.57, 0.37+posGera, 0.09, vr_icms_st)
+        criarLabelLateralEntry(frame, "Vr. BC ICMS ST Ret.", 0.57, 0.41+posGera, 0.09, vr_bc_icms_st_ret)
+        criarLabelLateralEntry(frame, "Vr. ICMS ST Ret.",    0.57, 0.45+posGera, 0.09, vr_icms_st_ret)
+        criarLabelLateralEntry(frame, "Alíq. ICMS ST c/ FCP",0.57, 0.49+posGera, 0.09, aliq_icms_cfop)
+        criarLabelLateralEntry(frame, "BC ICMS ST Dest.",    0.57, 0.53+posGera, 0.09, bc_icms_st_dest)
+
+        criarLabelLateralEntry(frame, "Vr. ICMS Subst.",     0.80, 0.37+posGera, 0.09, vr_icms_subst)
+        criarLabelLateralEntry(frame, "Aliq. ICMS ST (%)",   0.80, 0.41+posGera, 0.09, aliq_icms_st)
+        criarLabelLateralEntry(frame, "Vr. ICMS ST Dest.",   0.80, 0.45+posGera, 0.09, vr_icms_st_dest)
+
+        destinatario = ctk.CTkLabel(frame,  text="FCP-----------------------------------------------------------------------------", font=("TkDefaultFont", 11))
+        destinatario.place(relx=0.02, rely=0.52, relheight=0.01)
+
+        criarLabelLateralEntry(frame, "BC FCP",               0.11, 0.585+posGera, 0.09, bc_FCP)
+        criarLabelLateralEntry(frame, "Alíq. FCP (%)",        0.11, 0.625+posGera, 0.09, aliq_fcp_porc)
+        criarLabelLateralEntry(frame, "Vr. FCP",              0.11, 0.665+posGera, 0.09, vr_FCP)
+        criarLabelLateralEntry(frame, "Aliq. FCP Dif.(%)",    0.34, 0.585+posGera, 0.09, aliq_fcp_dif)
+        criarLabelLateralEntry(frame, "BC FCP ST",            0.34, 0.625+posGera, 0.09, bc_fcp_st)
+        criarLabelLateralEntry(frame, "Alíq. FCP ST (%)",     0.34, 0.665+posGera, 0.09, aliq_fcp_st)
+        criarLabelLateralEntry(frame, "Vr. FCP ST",           0.57, 0.585+posGera, 0.09, vr_fcp_st)
+        criarLabelLateralEntry(frame, "Vr. FCP Dif.",         0.57, 0.625+posGera, 0.09, vr_fcp_dif)
+        criarLabelLateralEntry(frame, "BC FCP ST Ret.",       0.57, 0.665+posGera, 0.09, bc_fcp_st_ret)
+        criarLabelLateralEntry(frame, "Alíq. FCP ST Ret.(%)", 0.80, 0.585+posGera, 0.09, aliq_fcp_st_ret)
+        criarLabelLateralEntry(frame, "Vr. FCP ST Ret.",      0.80, 0.625+posGera, 0.09, vr_fcp_st_ret)
+        criarLabelLateralEntry(frame, "Vr. FCP Efetivo",      0.80, 0.665+posGera, 0.09, vr_fcp_efet)
+
+
+
+        criarLabelEntry(frame, "Alíq. IOF (%)",              0.05, 0.70+posGera, 0.25, aliqIOFEntry)
+        criarLabelEntry(frame, "Alíq. II (%)",               0.31, 0.70+posGera, 0.15, aliqIIEntry)
+        criarLabelEntry(frame, "BC II ",                     0.47, 0.70+posGera, 0.10, BCIIEntry)
+        criarLabelEntry(frame, "Vr. IOF",                    0.58, 0.70+posGera, 0.10, VrIOFEntry)
+        criarLabelEntry(frame, "Vr. II",                     0.69, 0.70+posGera, 0.05, VrIIEntry)
+        criarLabelEntry(frame, "Vr. Desp. Aduaneiras",       0.75, 0.70+posGera, 0.15, VRDespAduaneira)
+        criaTextAreaModal(frame, 0.05, 0.78, 0.85, 'Observações do item', "")
+
+
+        criaBotaoPequeno(frame, "PIS/COFINS", 0.7, 0.97, 0.1, lambda:PisCofins(frame))
+        criaBotaoPequeno(frame, "Salvar e Sair", 0.1, 0.97, 0.1, lambda:salvar_dados_e_sair())
         ctk.CTkButton(frame, text="X", width=10, height=10, corner_radius=0,command=destroyModal).place(relx=0.989, rely=0.018, anchor="center")
 
-        criarLabelEntry(frame, "Produto:", 0.05, 0.05, 0.25, produto)
 
-
-        criarLabelEntry(frame, "Código:", 0.31, 0.05, 0.15, codigoEntry)
-        criarLabelEntry(frame, "NCM:", 0.47, 0.05, 0.10, NCMEntry)
-        criarLabelEntry(frame, "CSET:", 0.58, 0.05, 0.10, CSETEntry)
-        criarLabelEntry(frame, "QTD:", 0.69, 0.05, 0.05, quantidadeEntry)
-        criarLabelEntry(frame, "Beneficio Fisc:", 0.75, 0.05, 0.15, beneficioEntry)
-        criarLabelComboBox(frame, "CST A", 0.05, 0.13, 0.85, opcoes_CST_A)
-        criarLabelComboBox(frame, "CSOSN", 0.05, 0.21, 0.5, opcoes_csosn)
-        criarLabelEntry(frame, "Alíq. Cálc. Créd. (%)", 0.59, 0.21, 0.13, aliquEntry)
-        criarLabelEntry(frame, "Vr. Cred. ICMS", 0.77, 0.21, 0.13, credICMSEntry)
-        criarLabelComboBox(frame, "CST A", 0.05, 0.29, 0.85, opcoes_CST_B)
-
-
-        criarLabelLateralComboBox(frame, "Mod. BC ICMS",     0.15, 0.39, 0.12, opcoes_MOD_ICMS)
-        criarLabelLateralEntry(frame, "BC ICMS",             0.15, 0.43, 0.12, bc_icms)
-        criarLabelLateralEntry(frame, "Red. BC ICMS (%)",    0.15, 0.47, 0.12, red_bc_icms)
-        criarLabelLateralEntry(frame, "Aliq. ICMS (%)",      0.15, 0.51, 0.12, aliq_icms)
-        criarLabelLateralEntry(frame, "Vr. ICMS",            0.15, 0.55, 0.12, vr_icms)
-        criarLabelLateralComboBox(frame, "Mod. BC ICMS ST",  0.45, 0.39, 0.12, opcoes_MOD_ICMS)
-        criarLabelLateralEntry(frame, "MVA ICMS ST (%)",     0.45, 0.43, 0.12, mva_icms_st)
-        criarLabelLateralEntry(frame, "BC ICMS ST",          0.45, 0.47, 0.12, bc_icms_st)
-        criarLabelLateralEntry(frame, "Red. BC ICMS ST (%)", 0.45, 0.51, 0.12, red_bc_icms_st)
-        criarLabelLateralEntry(frame, "Aliq. ICMS ST (%)",   0.45, 0.55, 0.12, aliq_icms_st)
-        criarLabelLateralEntry(frame, "Vr. ICMS ST",         0.75, 0.39, 0.12, vr_icms_st)
-        criarLabelLateralEntry(frame, "Vr. BC ICMS ST Ret.", 0.75, 0.43, 0.12, vr_bc_icms_st_ret)
-        criarLabelLateralEntry(frame, "Vr. ICMS ST Ret.",    0.75, 0.47, 0.12, vr_icms_st_ret)
-
-
-        criarLabelEntry(frame, "Alíq. IOF (%)",        0.05, 0.60, 0.25, aliqIOFEntry)
-        criarLabelEntry(frame, "Alíq. II (%)",         0.31, 0.60, 0.15, aliqIIEntry)
-        criarLabelEntry(frame, "BC II ",               0.47, 0.60, 0.10, BCIIEntry)
-        criarLabelEntry(frame, "Vr. IOF",              0.58, 0.60, 0.10, VrIOFEntry)
-        criarLabelEntry(frame, "Vr. II",               0.69, 0.60, 0.05, VrIIEntry)
-        criarLabelEntry(frame, "Vr. Desp. Aduaneiras", 0.75, 0.60, 0.15, VRDespAduaneira)
-
-        self.textArea1 = criaTextAreaModal(frame, 0.05, 0.68, 0.85, 'Observações do item', "")
-
-        criaBotaoPequeno(frame, "PIS/COFINS", 0.6, 0.9, 0.1, lambda:PisCofins())
-
-    def PisCofins():
-        if framePisCofins.winfo_exists():
-            framePisCofins.lift()  
-            return
-        
-        framePisCofins = criaFrameJanela(frameTelaNotaProduto, 0.5, 0.5, 0.6, 0.9, self.corModal)
-
-        criarLabelEntry(
-            framePisCofins, 
-            "TESTE", 
-            0.1, 0.5, 0.5, 
-            self.pis_cofins_vars["campo_teste"]
-        )
-
-        criaBotaoPequeno(
-            framePisCofins, 
-            "Voltar Tributação", 
-            0.1, 0.6, 0.2, 
-            lambda: framePisCofins.place_forget()
-        )
 
 
 

@@ -98,13 +98,29 @@ def criarLabelLateralEntry(frame, texto, relx, rely, width, variavel):
         "Vr. BC ICMS ST Ret.",
         "Vr. ICMS ST Ret.",
         "Mod. BC ICMS",
-        "Mod. BC ICMS ST"
+        "Mod. BC ICMS ST",
+        "Vr. ICMS Subst.",
+        "Alíq. ICMS ST c/ FCP",
+        "BC ICMS ST Dest.",
+        "Vr. ICMS ST Dest.",
+        "BC FCP",
+        "Alíq. FCP (%)",
+        "Vr. FCP",
+        "Aliq. FCP Dif.(%)",
+        "BC FCP ST",
+        "Alíq. FCP ST (%)",
+        "Vr. FCP ST",
+        "Vr. FCP Dif.",
+        "BC FCP ST Ret.",
+        "Alíq. FCP ST Ret.(%)",
+        "Vr. FCP ST Ret.",
+        "Vr. FCP Efetivo"
     ):
         fonte = ("TkDefaultFont", 11)
     else:
         fonte = ("TkDefaultFont", 15)
 
-    label = ctk.CTkLabel(frame, text=texto, anchor="e", width=100, font=fonte)
+    label = ctk.CTkLabel(frame, text=texto, width=100, font=fonte)
     label.place(relx=relx, rely=rely, anchor="e")
 
     if texto == "CPF" or texto == "CNPJ" or texto == "CPF/CNPJ *":
