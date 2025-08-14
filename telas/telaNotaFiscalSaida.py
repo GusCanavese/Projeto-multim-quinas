@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
-from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
+import datetime
 from telas.telaProdutoNotaSaida import telaProdutosNotaSaida
 from funcoesTerceiras import filtrar, verificaSeQuerFiltrarPorPeriodo
 from componentes import criaFrameJanela, criaBotao, criarLabelComboBox, criarLabelEntry, criarLabelLateralComboBox, criarLabelLateralEntry
@@ -66,40 +66,14 @@ def telaNotaFiscalSaida(self, valor):
             case _: variavelCFOPNota.set("")
         return variavelCFOPNota.get()
 
-    # Variáveis de entrada
-    variavelNumeroDaNota = ctk.StringVar()
-    variavelSerieDaNota = ctk.StringVar()
-    variavelRazaoSocialEmitente = ctk.StringVar()
-    variavelCNPJRazaoSocialEmitente = ctk.StringVar()
-    variavelDataCriacao = ctk.StringVar()
-    variavelStatus = ctk.StringVar()
-    variavelCFOP = ctk.StringVar()
-    variavelNatureza = ctk.StringVar()
-    variavelVendedor = ctk.StringVar()
-    formaDePagamento = ctk.StringVar()
-    # var = "Saída" if acessar(dadosNota, "NFe", "infNFe", "ide", "tpNF") == 0 else "Entrada"
-
-    # COLOCAR PARA IDENTIFICAR SOMENTE QUANDO TIVER IMPORTANDO A NOTA FISCAL
-
-
-    data = ctk.StringVar()
-
-    # Preenchimento automático com dados do emitente
 
     def decideEmitente(self, valor):
         if valor == "Nutrigel":
             print("entrou aqui")
-            
-
-
-
-            variavelRazaoSocialEmitente.set("NUTRIGEL DISTRIBUIDORA EIRELI")
-            variavelCNPJRazaoSocialEmitente.set("00.995.044/0001-07")
-            variavelDataCriacao.set(datetime.now().strftime("%d/%m/%Y"))
-            variavelStatus.set("Em Digitação")
-            variavelNumeroDaNota.set("000001")
-            variavelSerieDaNota.set("1")
-            variavelVendedor.set(usuarioLogado)
+            self.variavelNumeroDaNota.set("000001")
+            self.variavelSerieDaNota.set("1")
+            self.variavelRazaoSocialEmitente.set("NUTRIGEL DISTRIBUIDORA EIRELI")
+            self.variavelCNPJRazaoSocialEmitente.set("00.995.044/0001-07")
 
     opcoesSituacao = ["Normal", "Extemporâneo"]
     opcoesFinalidade = ["Normal", "complementar", "Ajuste"]
@@ -120,6 +94,8 @@ def telaNotaFiscalSaida(self, valor):
     self.variavelCNPJRazaoSocialRemetente = ctk.StringVar()
     self.variavelRazaoSocialEmitente = ctk.StringVar()
     self.variavelCNPJRazaoSocialEmitente = ctk.StringVar()
+    self.variavelCFOP = ctk.StringVar()
+    self.variavelNatureza = ctk.StringVar()
     self.variavelStatus = ctk.StringVar()
     self.variavelDataDocumento = ctk.StringVar()
     self.data = ctk.StringVar()
@@ -128,8 +104,17 @@ def telaNotaFiscalSaida(self, valor):
     self.variavelDataConfirmacao = ctk.StringVar()
     self.variavelVendedor = ctk.StringVar()
     self.variavelEntradaOuSaida = ctk.StringVar()
+    self.formaDePagamento = ctk.StringVar()
     self.opcoesFinalidade = ["Normal", "Complementar", "Ajuste"]
     self.opcoesSituacao = ["Ativa", "Cancelada", "Inutilizada"]
+    
+    self.variavelVendedor.set(usuarioLogado)
+    self.variavelDataCriacao.set(value=datetime.datetime.now().strftime("%d/%m/%y"))
+    self.variavelStatus.set("Em Digitação")
+
+
+
+
 
     criarLabelEntry(self.frameTelaNotaSaida, "Número da NF", 0.1, 0.05, 0.07, self.variavelNumeroDaNota)
     criarLabelEntry(self.frameTelaNotaSaida, "Série", 0.2, 0.05, 0.07, self.variavelSerieDaNota)
@@ -158,15 +143,15 @@ def telaNotaFiscalSaida(self, valor):
     criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data situação", 0.75, 0.54, 0.1, self.opcoesSituacao)
 
 
-    cfop = criarLabelEntry(self.frameTelaNotaSaida, "CFOP", 0.1, 0.49, 0.07, variavelCFOP)
+    cfop = criarLabelEntry(self.frameTelaNotaSaida, "CFOP", 0.1, 0.49, 0.07, self.variavelCFOP)
     cfop.configure(validate="key", validatecommand=(self.register(lambda text: len(text) <= 4), '%P'))
-    cfop.bind("<KeyRelease>", lambda event: variavelNatureza.set(buscaNatureza(variavelCFOP.get())))
-    criarLabelEntry(self.frameTelaNotaSaida, "Natureza da Operação", 0.2, 0.49, 0.4, variavelNatureza)
+    cfop.bind("<KeyRelease>", lambda event: self.variavelNatureza.set(buscaNatureza(self.variavelCFOP.get())))
+    criarLabelEntry(self.frameTelaNotaSaida, "Natureza da Operação", 0.2, 0.49, 0.4, self.variavelNatureza)
 
     ctk.CTkLabel(self.frameTelaNotaSaida, text="Transporte----------").place(relx=0.1, rely=0.59)
     self.modalidadeDoFrete = criarLabelComboBox(self.frameTelaNotaSaida, "Modalidade do frete", 0.1, 0.64, 0.27, opcoesTransporte)
     formasPag = criarLabelComboBox(self.frameTelaNotaSaida, "Forma de pagamento", 0.4, 0.64, 0.2, opcoesPagamento)
-    formasPag.set(formaDePagamento.get())
+    formasPag.set(self.formaDePagamento.get())
 
     criaBotao(self.frameTelaNotaSaida, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutosNotaSaida(self, cfop.get())).place(anchor="nw")
     criaBotao(self.frameTelaNotaSaida, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaNotaSaida.destroy()).place(anchor="nw")

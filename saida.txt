@@ -1,0 +1,123 @@
+tela inicial
+    self.variavelNumeroDaNota
+    self.variavelSerieDaNota
+    self.variavelChaveDaNota
+    self.variavelRazaoSocialRemetente
+    self.variavelCNPJRazaoSocialRemetente
+    self.variavelRazaoSocialEmitente
+    self.variavelCNPJRazaoSocialEmitente
+    self.variavelCFOP
+    self.variavelNatureza
+    self.variavelStatus
+    self.variavelDataDocumento
+    self.data
+    self.variavelHoraEntradaSaida
+    self.variavelDataCriacao
+    self.variavelDataConfirmacao
+    self.variavelVendedor
+    self.variavelEntradaOuSaida
+    self.formaDePagamento
+    self.opcoesFinalidade <--lista
+    self.opcoesSituacao <--lista
+
+
+
+
+telaProdutos
+    self.codigoEntry
+    self.NCMEntry
+    self.CSETEntry
+    self.quantidadeEntry
+    self.beneficioEntry
+    self.aliquEntry
+    self.credICMSEntry
+    self.bc_icms
+    self.aliq_icms
+    self.vr_icms
+    self.csosn
+    self.cst_a
+    self.cst_b
+    self.mod_bc_icms
+    self.red_bc_icms
+    self.mod_bc_icms_st
+    self.vr_bc_icms
+    self.mva_icms_st
+    self.bc_icms_st
+    self.red_bc_icms_st
+    self.vr_icms_st
+    self.vr_bc_icms_st_ret
+    self.vr_icms_st_ret
+    self.aliq_icms_cfop
+    self.bc_icms_st_dest
+    self.vr_icms_subst
+    self.aliq_icms_st
+    self.vr_icms_st_dest
+    self.bc_FCP
+    self.aliq_fcp_porc
+    self.vr_FCP
+    self.aliq_fcp_dif
+    self.bc_fcp_st
+    self.aliq_fcp_st
+    self.vr_fcp_st
+    self.vr_fcp_dif
+    self.bc_fcp_st_ret
+    self.aliq_fcp_st_ret
+    self.vr_fcp_st_ret
+    self.vr_fcp_efet
+    self.aliqIOFEntry
+    self.aliqIIEntry
+    self.BCIIEntry
+    self.VrIOFEntry
+    self.VrIIEntry
+    self.VRDespAduaneira
+    self.aliq_pis
+    self.bc_pis
+    self.vr_pis
+    self.aliq_pis_st
+    self.bc_pis_st
+    self.vr_pis_st
+    self.aliq_cofins
+    self.bc_cofins
+    self.vr_cofins
+    self.aliq_cofins_st
+    self.bc_cofins_st
+    self.vr_cofins_st
+
+
+tela totais
+    self.totalFrete
+    self.totalSeguro
+    self.totalDesconto
+    self.outrasDespesas
+    self.valorTotalProdutos
+    self.valorServico
+    self.totalBCICMS
+    self.valorICMS
+    self.totalBCICMSST
+    self.totalICMSST
+    self.totalDois
+    self.totalIPI
+    self.totalPIS
+    self.icmsComplementar
+    self.totalCOFINSST
+    self.totalPISST
+    self.totalCOFINS
+    self.valorLiquido
+    self.valorPISRetido
+    self.valorCOFINSRetido
+    self.valorRetidoCSLL
+    self.bcIRRF
+    self.valorRetidoIRRF
+    self.bcPrevidencia
+    self.valorPrevidencia
+
+telaFaturamento
+    self.totaisFormasDePagamento
+    self.descontoTotalVindoDoPedido
+    self.acrescimoTotalVindoDoPedido
+    self.variavelQuantidade
+    self.valorDoPedidoVariavel
+
+telaObservacao
+    variavelObsFisco = ctk.StringVar()
+    variavelObsContribuinte = ctk.StringVar()

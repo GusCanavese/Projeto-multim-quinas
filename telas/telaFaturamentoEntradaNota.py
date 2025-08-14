@@ -112,9 +112,8 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota):
         self.combobox.place(relx=0.2, rely=self.yParcelas, relwidth=0.2)
         self.listaComboboxes.append(self.combobox)
 
-        variavelQuantidade = ctk.StringVar()
-        self.listaVariaveisQuantidade.append(variavelQuantidade)
-        self.entradaQuantidade = ctk.CTkEntry(self.frameTelaGerarFaturamento, width=100, corner_radius=0, textvariable=variavelQuantidade)
+        self.listaVariaveisQuantidade.append(self.variavelQuantidade)
+        self.entradaQuantidade = ctk.CTkEntry(self.frameTelaGerarFaturamento, width=100, corner_radius=0, textvariable=self.variavelQuantidade)
         self.entradaQuantidade.place(relx=0.4, rely=self.yParcelas, relwidth=0.2)
         self.listaEntradaQuantidade.append(self.entradaQuantidade)
 

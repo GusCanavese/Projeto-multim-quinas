@@ -7,12 +7,12 @@ from funcoesTerceiras import criarNFe
 def telaObservacoesNotaSaida(self):
     self.frameTelaObservacoes = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
-    variavelObsFisco = ctk.StringVar()
-    variavelObsContribuinte = ctk.StringVar()
+    self.variavelObsFisco = ctk.StringVar()
+    self.variavelObsContribuinte = ctk.StringVar()
 
-    area1 = criaTextArea(self.frameTelaObservacoes, 0.5, 0.15, 0.4, "INFORMAÇÕES DO INTERESSE DO CONTRIBUINTE", variavelObsContribuinte.get())
+    area1 = criaTextArea(self.frameTelaObservacoes, 0.5, 0.15, 0.4, "INFORMAÇÕES DO INTERESSE DO CONTRIBUINTE", self.variavelObsContribuinte.get())
     area1.place(relheight=0.3)
-    area2 = criaTextArea(self.frameTelaObservacoes, 0.05, 0.15, 0.4, "INFORMAÇÕES DO INTERESSE DO FISCO", variavelObsFisco.get())
+    area2 = criaTextArea(self.frameTelaObservacoes, 0.05, 0.15, 0.4, "INFORMAÇÕES DO INTERESSE DO FISCO", self.variavelObsFisco.get())
     area2.place(relheight=0.3)
 
 
@@ -60,5 +60,5 @@ def telaObservacoesNotaSaida(self):
         messagebox.showinfo("Dados coletados", "Todos os dados foram coletados com sucesso.")
 
 
-    criaBotao(self.frameTelaObservacoes, "salvar", 0.25, 0.94, 0.15, lambda: pegatudo()).place(anchor="nw")
+    criaBotao(self.frameTelaObservacoes, "salvar", 0.25, 0.94, 0.15, lambda: criarNFe.gerarNFe(self)).place(anchor="nw")
     criaBotao(self.frameTelaObservacoes, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaObservacoes.destroy()).place(anchor="nw")

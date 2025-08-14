@@ -1,0 +1,80 @@
+
+
+[nota]
+numero = 123
+serie = 312
+chave = 312
+razaoSocialRemetente = 312
+cnpjRazaoSocialRemetente = 321
+razaoSocialEmitente = 
+cnpjRazaoSocialEmitente = 312
+cfop = 312
+natureza = 312
+status = Em Digitação
+dataDocumento = 321
+horaEntradaSaida = 123
+dataCriacao = 14/08/25
+dataConfirmacao = 312
+vendedor =  self.logado
+entradaOuSaida = 312
+formaDePagamento = 
+opcoesFinalidade = ['Normal', 'Complementar', 'Ajuste']
+opcoesSituacao = ['Ativa', 'Cancelada', 'Inutilizada']
+
+[produtos]
+# Produto 1
+descricao = PICADOR DE LEGUMES GRANDE
+quantidade = 0
+preco = 233.00
+subtotal = 233.00
+estoque = 9
+acrescimo = 0
+desconto_reais = 0
+desconto_porcentagem = 0
+
+# Produto 2
+descricao = PICADOR DE LEGUMES DE PAREDE - FIXO
+quantidade = 0
+preco = 233.00
+subtotal = 233.00
+estoque = 2
+acrescimo = 0
+desconto_reais = 0
+desconto_porcentagem = 0
+
+[totais]
+totalFrete = 0.00
+totalSeguro = 0.00
+totalDesconto = 0.00
+outrasDespesas = 0.00
+valorTotalProdutos = 0.00
+valorServico = 0.00
+totalBCICMS = 0.00
+valorICMS = 0.00
+totalBCICMSST = 0.00
+totalICMSST = 0.00
+totalDois = 0.00
+totalIPI = 0.00
+totalPIS = 0.00
+icmsComplementar = 0.00
+totalCOFINSST = 0.00
+totalPISST = 0.00
+totalCOFINS = 0.00
+valorLiquido = 0.00
+valorPISRetido = 0.00
+valorCOFINSRetido = 0.00
+valorRetidoCSLL = 0.00
+bcIRRF = 0.00
+valorRetidoIRRF = 0.00
+bcPrevidencia = 0.00
+valorPrevidencia = 0.00
+
+[faturamento]
+totaisFormasDePagamento = 123.00
+descontoTotalVindoDoPedido = 
+acrescimoTotalVindoDoPedido = 
+variavelQuantidade = 1
+valorDoPedidoVariavel = 0123
+variavelObsFisco = 
+variavelObsContribuinte = 
+

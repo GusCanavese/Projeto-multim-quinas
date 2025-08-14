@@ -30,15 +30,10 @@ def telaProdutosNotaSaida(self, cfop):
 
     listaLabels = ["Item", "Produto", "Preço", "Quantidade", "Estoque", "Desconto $", "Desconto %", "Acréscimo", "Subtotal", "cfop"]
 
-    dataCriacao = ctk.StringVar()
-    variavelEmAbertoFechado = ctk.StringVar()
     variavelCfop = ctk.StringVar()
-    
     variavelCfop.set(cfop)
 
 
-    variavelEmAbertoFechado.set("Em aberto")
-    dataCriacao.set(value=datetime.datetime.now().strftime("%d/%m/%y"))
 
     frameTelaNotaProduto = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     frameParaItens = ctk.CTkScrollableFrame(frameTelaNotaProduto, height=800, orientation="vertical", fg_color=self.corFundo)
@@ -138,76 +133,64 @@ def telaProdutosNotaSaida(self, cfop):
     frameTelaNotaProduto.bind("<Button-1>", fechar_resultados)
 
 
-    
-
-
-
-
-
-
-
-
-
 
 
 
     def botaoTribut(self, linha):
-        mod_bc_icms = ctk.StringVar()
-        bc_icms = ctk.StringVar()
-        red_bc_icms = ctk.StringVar()
-        aliq_icms = ctk.StringVar()
-        vr_icms = ctk.StringVar()
-        mva_icms_st = ctk.StringVar()
-        bc_icms_st = ctk.StringVar()
-        red_bc_icms_st = ctk.StringVar()
-        aliq_icms_st = ctk.StringVar()
-        vr_icms_st = ctk.StringVar()
-        vr_bc_icms_st_ret = ctk.StringVar()
-        vr_icms_st_ret  = ctk.StringVar()
-        vr_icms_subst = ctk.StringVar()
-        vr_bc_ICMS = ctk.StringVar()
-        vr_icms_st_dest = ctk.StringVar()
-        bc_icms_st_dest = ctk.StringVar()
-        aliq_icms_cfop = ctk.StringVar()
-        bc_FCP = ctk.StringVar()
-        aliq_fcp_porc = ctk.StringVar()
-        vr_FCP = ctk.StringVar()
-        aliq_fcp_dif = ctk.StringVar()
-        bc_fcp_st = ctk.StringVar()
-        aliq_fcp_st = ctk.StringVar()
-        vr_fcp_st = ctk.StringVar()
-        vr_fcp_dif = ctk.StringVar()
-        bc_fcp_st_ret = ctk.StringVar()
-        aliq_fcp_st_ret = ctk.StringVar()
-        vr_fcp_st_ret = ctk.StringVar()
-        vr_fcp_efet = ctk.StringVar()
-        codigoEntry = ctk.StringVar()
-        NCMEntry = ctk.StringVar()
-        CSETEntry = ctk.StringVar()
-        quantidadeEntry = ctk.StringVar()
-        beneficioEntry = ctk.StringVar()
-        aliqIOFEntry = ctk.StringVar()
-        aliqIIEntry = ctk.StringVar()
-        BCIIEntry = ctk.StringVar()
-        VrIOFEntry = ctk.StringVar()
-        VrIIEntry = ctk.StringVar()
-        VRDespAduaneira = ctk.StringVar()
-        aliquEntry =ctk.StringVar()
-        credICMSEntry =ctk.StringVar()
-        
-        aliq_pis = ctk.StringVar()
-        bc_pis = ctk.StringVar()
-        vr_pis = ctk.StringVar()
-        aliq_pis_st = ctk.StringVar()
-        bc_pis_st = ctk.StringVar()
-        vr_pis_st = ctk.StringVar()
-
-        aliq_cofins = ctk.StringVar()
-        bc_cofins = ctk.StringVar()
-        vr_cofins = ctk.StringVar()
-        aliq_cofins_st = ctk.StringVar()
-        bc_cofins_st = ctk.StringVar()
-        vr_cofins_st = ctk.StringVar()
+        self.mod_bc_icms = ctk.StringVar()
+        self.bc_icms = ctk.StringVar()
+        self.red_bc_icms = ctk.StringVar()
+        self.aliq_icms = ctk.StringVar()
+        self.vr_icms = ctk.StringVar()
+        self.mva_icms_st = ctk.StringVar()
+        self.bc_icms_st = ctk.StringVar()
+        self.red_bc_icms_st = ctk.StringVar()
+        self.aliq_icms_st = ctk.StringVar()
+        self.vr_icms_st = ctk.StringVar()
+        self.vr_bc_icms_st_ret = ctk.StringVar()
+        self.vr_icms_st_ret  = ctk.StringVar()
+        self.vr_icms_subst = ctk.StringVar()
+        self.vr_bc_ICMS = ctk.StringVar()
+        self.vr_icms_st_dest = ctk.StringVar()
+        self.bc_icms_st_dest = ctk.StringVar()
+        self.aliq_icms_cfop = ctk.StringVar()
+        self.bc_FCP = ctk.StringVar()
+        self.aliq_fcp_porc = ctk.StringVar()
+        self.vr_FCP = ctk.StringVar()
+        self.aliq_fcp_dif = ctk.StringVar()
+        self.bc_fcp_st = ctk.StringVar()
+        self.aliq_fcp_st = ctk.StringVar()
+        self.vr_fcp_st = ctk.StringVar()
+        self.vr_fcp_dif = ctk.StringVar()
+        self.bc_fcp_st_ret = ctk.StringVar()
+        self.aliq_fcp_st_ret = ctk.StringVar()
+        self.vr_fcp_st_ret = ctk.StringVar()
+        self.vr_fcp_efet = ctk.StringVar()
+        self.codigoEntry = ctk.StringVar()
+        self.NCMEntry = ctk.StringVar()
+        self.CSETEntry = ctk.StringVar()
+        self.quantidadeEntry = ctk.StringVar()
+        self.beneficioEntry = ctk.StringVar()
+        self.aliqIOFEntry = ctk.StringVar()
+        self.aliqIIEntry = ctk.StringVar()
+        self.BCIIEntry = ctk.StringVar()
+        self.VrIOFEntry = ctk.StringVar()
+        self.VrIIEntry = ctk.StringVar()
+        self.VRDespAduaneira = ctk.StringVar()
+        self.aliquEntry =ctk.StringVar()
+        self.credICMSEntry =ctk.StringVar()
+        self.aliq_pis = ctk.StringVar()
+        self.bc_pis = ctk.StringVar()
+        self.vr_pis = ctk.StringVar()
+        self.aliq_pis_st = ctk.StringVar()
+        self.bc_pis_st = ctk.StringVar()
+        self.vr_pis_st = ctk.StringVar()
+        self.aliq_cofins = ctk.StringVar()
+        self.bc_cofins = ctk.StringVar()
+        self.vr_cofins = ctk.StringVar()
+        self.aliq_cofins_st = ctk.StringVar()
+        self.bc_cofins_st = ctk.StringVar()
+        self.vr_cofins_st = ctk.StringVar()
 
         def PisCofins(frame):
             if hasattr(self, "framePisCofins") and self.framePisCofins.winfo_exists():
@@ -254,28 +237,28 @@ def telaProdutosNotaSaida(self, cfop):
                 PIS.place(relx=0.02, rely=0.03, relheight=0.015)
                 criarLabelComboBox(self.framePisCofins, "CST", 0.05, 0.07, 0.9, opcoes)
 
-                criarLabelEntry(self.framePisCofins, "Alíq. PIS (%)", 0.3, 0.18, 0.15, aliq_pis)
-                criarLabelEntry(self.framePisCofins, "BC PIS", 0.5, 0.18, 0.15, bc_pis)
-                criarLabelEntry(self.framePisCofins, "Vr. PIS", 0.7, 0.18, 0.15, vr_pis)
+                criarLabelEntry(self.framePisCofins, "Alíq. PIS (%)", 0.3, 0.18, 0.15, self.aliq_pis)
+                criarLabelEntry(self.framePisCofins, "BC PIS", 0.5, 0.18, 0.15, self.bc_pis)
+                criarLabelEntry(self.framePisCofins, "Vr. PIS", 0.7, 0.18, 0.15, self.vr_pis)
                 criaSimouNaoLateral(self.framePisCofins, "Modalidade PIS", "Percentual", "Valor/Qtd", 0.05, 0.15, passe)
 
-                criarLabelEntry(self.framePisCofins, "Alíq. PIS ST (%)", 0.3, 0.35, 0.15, aliq_pis_st)
-                criarLabelEntry(self.framePisCofins, "BC PIS ST", 0.5, 0.35, 0.15, bc_pis_st)
-                criarLabelEntry(self.framePisCofins, "Vr. PIS ST", 0.7, 0.35, 0.15, vr_pis_st)
+                criarLabelEntry(self.framePisCofins, "Alíq. PIS ST (%)", 0.3, 0.35, 0.15, self.aliq_pis_st)
+                criarLabelEntry(self.framePisCofins, "BC PIS ST", 0.5, 0.35, 0.15, self.bc_pis_st)
+                criarLabelEntry(self.framePisCofins, "Vr. PIS ST", 0.7, 0.35, 0.15, self.vr_pis_st)
                 criaSimouNaoLateral(self.framePisCofins, "Modalidade PIS ST", "Percentual", "Valor/Qtd", 0.05, 0.33, passe)
                 
 
                 COFINS = ctk.CTkLabel(self.framePisCofins,  text="COFINS-----------------------------------------------------------------------------", font=("TkDefaultFont", 11))
                 COFINS.place(relx=0.02, rely=0.54, relheight=0.015)
 
-                criarLabelEntry(self.framePisCofins, "Alíq. COFINS (%)", 0.3, 0.60, 0.15, aliq_cofins)
-                criarLabelEntry(self.framePisCofins, "BC COFINS", 0.5, 0.60, 0.15, bc_cofins)
-                criarLabelEntry(self.framePisCofins, "Vr. COFINS", 0.7, 0.60, 0.15, vr_cofins)
+                criarLabelEntry(self.framePisCofins, "Alíq. COFINS (%)", 0.3, 0.60, 0.15, self.aliq_cofins)
+                criarLabelEntry(self.framePisCofins, "BC COFINS", 0.5, 0.60, 0.15, self.bc_cofins)
+                criarLabelEntry(self.framePisCofins, "Vr. COFINS", 0.7, 0.60, 0.15, self.vr_cofins)
                 criaSimouNaoLateral(self.framePisCofins, "Modalidade COFINS", "Percentual", "Valor/Qtd", 0.05, 0.58, passe)
 
-                aliqCOF = criarLabelEntry(self.framePisCofins, "Alíq. COFINS ST (%)", 0.3, 0.77, 0.15, aliq_cofins_st)
-                bcCOF = criarLabelEntry(self.framePisCofins, "BC COFINS ST", 0.5, 0.77, 0.15, bc_cofins_st)
-                pisCOF = criarLabelEntry(self.framePisCofins, "Vr. COFINS ST", 0.7, 0.77, 0.15, vr_cofins_st)
+                aliqCOF = criarLabelEntry(self.framePisCofins, "Alíq. COFINS ST (%)", 0.3, 0.77, 0.15, self.aliq_cofins_st)
+                bcCOF = criarLabelEntry(self.framePisCofins, "BC COFINS ST", 0.5, 0.77, 0.15, self.bc_cofins_st)
+                pisCOF = criarLabelEntry(self.framePisCofins, "Vr. COFINS ST", 0.7, 0.77, 0.15, self.vr_cofins_st)
                 criaSimouNaoLateral(self.framePisCofins, "Modalidade COFINS ST", "Percentual", "Valor/Qtd", 0.05, 0.76, passe)
 
 
@@ -372,64 +355,73 @@ def telaProdutosNotaSaida(self, cfop):
         posGera=-0.03
 
         criarLabelEntry(frame, "Produto:",                   0.05, 0.05+posGera, 0.25, produto)
-        criarLabelEntry(frame, "Código:",                    0.31, 0.05+posGera, 0.15, codigoEntry)
-        criarLabelEntry(frame, "NCM:",                       0.47, 0.05+posGera, 0.10, NCMEntry)
-        criarLabelEntry(frame, "CSET:",                      0.58, 0.05+posGera, 0.10, CSETEntry)
-        criarLabelEntry(frame, "QTD:",                       0.69, 0.05+posGera, 0.05, quantidadeEntry)
-        criarLabelEntry(frame, "Beneficio Fisc:",            0.75, 0.05+posGera, 0.15, beneficioEntry)
-        cst_a = criarLabelComboBox(frame, "CST A",            0.05, 0.12+posGera, 0.85, opcoes_CST_A)
+        criarLabelEntry(frame, "Código:",                    0.31, 0.05+posGera, 0.15, self.codigoEntry)
+        criarLabelEntry(frame, "NCM:",                       0.47, 0.05+posGera, 0.10, self.NCMEntry)
+        criarLabelEntry(frame, "CSET:",                      0.58, 0.05+posGera, 0.10, self.CSETEntry)
+        criarLabelEntry(frame, "QTD:",                       0.69, 0.05+posGera, 0.05, self.quantidadeEntry)
+        criarLabelEntry(frame, "Beneficio Fisc:",            0.75, 0.05+posGera, 0.15, self.beneficioEntry)
+        self.cst_a = criarLabelComboBox(frame, "CST A",      0.05, 0.12+posGera, 0.85, opcoes_CST_A)
 
-        csosn = criarLabelComboBox(frame, "CSOSN",                   0.05, 0.195+posGera, 0.5, opcoes_csosn)
-        criarLabelEntry(frame, "Alíq. Cálc. Créd. (%)",      0.59, 0.19+posGera, 0.13, aliquEntry)
-        criarLabelEntry(frame, "Vr. Cred. ICMS",             0.77, 0.19+posGera, 0.13, credICMSEntry)
-        cst_b = criarLabelComboBox(frame, "CST B",                   0.05, 0.27+posGera, 0.85, opcoes_CST_B)
+        self.csosn = criarLabelComboBox(frame, "CSOSN",      0.05, 0.195+posGera, 0.5, opcoes_csosn)
+        criarLabelEntry(frame, "Alíq. Cálc. Créd. (%)",      0.59, 0.19+posGera, 0.13, self.aliquEntry)
+        criarLabelEntry(frame, "Vr. Cred. ICMS",             0.77, 0.19+posGera, 0.13, self.credICMSEntry)
+        self.cst_b = criarLabelComboBox(frame, "CST B",      0.05, 0.27+posGera, 0.85, opcoes_CST_B)
 
-        criarLabelLateralComboBox(frame, "Mod. BC ICMS",     0.11, 0.37+posGera, 0.09, opcoes_MOD_ICMS)
-        criarLabelLateralEntry(frame, "BC ICMS",             0.11, 0.41+posGera, 0.09, bc_icms)
-        criarLabelLateralEntry(frame, "Red. BC ICMS (%)",    0.11, 0.45+posGera, 0.09, red_bc_icms)
-        criarLabelLateralEntry(frame, "Aliq. ICMS (%)",      0.11, 0.49+posGera, 0.09, aliq_icms)
-        criarLabelLateralEntry(frame, "Vr. ICMS",            0.11, 0.53+posGera, 0.09, vr_icms)
 
-        mod_bc_icms_st = criarLabelLateralComboBox(frame, "Mod. BC ICMS ST",  0.34, 0.37+posGera, 0.09, opcoes_MOD_ICMS)
-        vr_bc_icms = criarLabelLateralEntry(frame, "Valor BC ICMS",       0.34, 0.41+posGera, 0.09, vr_bc_ICMS)
-        criarLabelLateralEntry(frame, "MVA ICMS ST (%)",     0.34, 0.45+posGera, 0.09, mva_icms_st)
-        criarLabelLateralEntry(frame, "BC ICMS ST",          0.34, 0.49+posGera, 0.09, bc_icms_st)
-        criarLabelLateralEntry(frame, "Red. BC ICMS ST (%)", 0.34, 0.53+posGera, 0.09, red_bc_icms_st)
 
-        criarLabelLateralEntry(frame, "Vr. ICMS ST",         0.57, 0.37+posGera, 0.09, vr_icms_st)
-        criarLabelLateralEntry(frame, "Vr. BC ICMS ST Ret.", 0.57, 0.41+posGera, 0.09, vr_bc_icms_st_ret)
-        criarLabelLateralEntry(frame, "Vr. ICMS ST Ret.",    0.57, 0.45+posGera, 0.09, vr_icms_st_ret)
-        criarLabelLateralEntry(frame, "Alíq. ICMS ST c/ FCP",0.57, 0.49+posGera, 0.09, aliq_icms_cfop)
-        criarLabelLateralEntry(frame, "BC ICMS ST Dest.",    0.57, 0.53+posGera, 0.09, bc_icms_st_dest)
+        self.mod_bc_icms = criarLabelLateralComboBox(frame, "Mod. BC ICMS",     0.11, 0.37+posGera, 0.09, opcoes_MOD_ICMS)
+        criarLabelLateralEntry(frame, "BC ICMS",             0.11, 0.41+posGera, 0.09, self.bc_icms)
+        criarLabelLateralEntry(frame, "Red. BC ICMS (%)",    0.11, 0.45+posGera, 0.09, self.red_bc_icms)
+        criarLabelLateralEntry(frame, "Aliq. ICMS (%)",      0.11, 0.49+posGera, 0.09, self.aliq_icms)
+        criarLabelLateralEntry(frame, "Vr. ICMS",            0.11, 0.53+posGera, 0.09, self.vr_icms)
 
-        criarLabelLateralEntry(frame, "Vr. ICMS Subst.",     0.80, 0.37+posGera, 0.09, vr_icms_subst)
-        criarLabelLateralEntry(frame, "Aliq. ICMS ST (%)",   0.80, 0.41+posGera, 0.09, aliq_icms_st)
-        criarLabelLateralEntry(frame, "Vr. ICMS ST Dest.",   0.80, 0.45+posGera, 0.09, vr_icms_st_dest)
+        self.mod_bc_icms_st = criarLabelLateralComboBox(frame, "Mod. BC ICMS ST",  0.34, 0.37+posGera, 0.09, opcoes_MOD_ICMS)
+        self.vr_bc_icms = criarLabelLateralEntry(frame, "Valor BC ICMS",       0.34, 0.41+posGera, 0.09, self.vr_bc_ICMS)
+
+        self.valor_csosn    = self.csosn.get()
+        self.valor_cst_a    = self.cst_a.get()
+        self.valor_cst_b    = self.cst_b.get()
+        self.valor_mod_bc_icms    = self.mod_bc_icms.get()
+        self.valor_mod_bc_icms_st = self.mod_bc_icms_st.get()
+        self.valor_vr_bc_icms     = self.vr_bc_icms.get()
+        criarLabelLateralEntry(frame, "MVA ICMS ST (%)",     0.34, 0.45+posGera, 0.09, self.mva_icms_st)
+        criarLabelLateralEntry(frame, "BC ICMS ST",          0.34, 0.49+posGera, 0.09, self.bc_icms_st)
+        criarLabelLateralEntry(frame, "Red. BC ICMS ST (%)", 0.34, 0.53+posGera, 0.09, self.red_bc_icms_st)
+
+        criarLabelLateralEntry(frame, "Vr. ICMS ST",         0.57, 0.37+posGera, 0.09, self.vr_icms_st)
+        criarLabelLateralEntry(frame, "Vr. BC ICMS ST Ret.", 0.57, 0.41+posGera, 0.09, self.vr_bc_icms_st_ret)
+        criarLabelLateralEntry(frame, "Vr. ICMS ST Ret.",    0.57, 0.45+posGera, 0.09, self.vr_icms_st_ret)
+        criarLabelLateralEntry(frame, "Alíq. ICMS ST c/ FCP",0.57, 0.49+posGera, 0.09, self.aliq_icms_cfop)
+        criarLabelLateralEntry(frame, "BC ICMS ST Dest.",    0.57, 0.53+posGera, 0.09, self.bc_icms_st_dest)
+
+        criarLabelLateralEntry(frame, "Vr. ICMS Subst.",     0.80, 0.37+posGera, 0.09, self.vr_icms_subst)
+        criarLabelLateralEntry(frame, "Aliq. ICMS ST (%)",   0.80, 0.41+posGera, 0.09, self.aliq_icms_st)
+        criarLabelLateralEntry(frame, "Vr. ICMS ST Dest.",   0.80, 0.45+posGera, 0.09, self.vr_icms_st_dest)
 
         destinatario = ctk.CTkLabel(frame,  text="FCP-----------------------------------------------------------------------------", font=("TkDefaultFont", 11))
         destinatario.place(relx=0.02, rely=0.52, relheight=0.01)
 
-        criarLabelLateralEntry(frame, "BC FCP",               0.11, 0.585+posGera, 0.09, bc_FCP)
-        criarLabelLateralEntry(frame, "Alíq. FCP (%)",        0.11, 0.625+posGera, 0.09, aliq_fcp_porc)
-        criarLabelLateralEntry(frame, "Vr. FCP",              0.11, 0.665+posGera, 0.09, vr_FCP)
-        criarLabelLateralEntry(frame, "Aliq. FCP Dif.(%)",    0.34, 0.585+posGera, 0.09, aliq_fcp_dif)
-        criarLabelLateralEntry(frame, "BC FCP ST",            0.34, 0.625+posGera, 0.09, bc_fcp_st)
-        criarLabelLateralEntry(frame, "Alíq. FCP ST (%)",     0.34, 0.665+posGera, 0.09, aliq_fcp_st)
-        criarLabelLateralEntry(frame, "Vr. FCP ST",           0.57, 0.585+posGera, 0.09, vr_fcp_st)
-        criarLabelLateralEntry(frame, "Vr. FCP Dif.",         0.57, 0.625+posGera, 0.09, vr_fcp_dif)
-        criarLabelLateralEntry(frame, "BC FCP ST Ret.",       0.57, 0.665+posGera, 0.09, bc_fcp_st_ret)
-        criarLabelLateralEntry(frame, "Alíq. FCP ST Ret.(%)", 0.80, 0.585+posGera, 0.09, aliq_fcp_st_ret)
-        criarLabelLateralEntry(frame, "Vr. FCP ST Ret.",      0.80, 0.625+posGera, 0.09, vr_fcp_st_ret)
-        criarLabelLateralEntry(frame, "Vr. FCP Efetivo",      0.80, 0.665+posGera, 0.09, vr_fcp_efet)
+        criarLabelLateralEntry(frame, "BC FCP",               0.11, 0.585+posGera, 0.09, self.bc_FCP)
+        criarLabelLateralEntry(frame, "Alíq. FCP (%)",        0.11, 0.625+posGera, 0.09, self.aliq_fcp_porc)
+        criarLabelLateralEntry(frame, "Vr. FCP",              0.11, 0.665+posGera, 0.09, self.vr_FCP)
+        criarLabelLateralEntry(frame, "Aliq. FCP Dif.(%)",    0.34, 0.585+posGera, 0.09, self.aliq_fcp_dif)
+        criarLabelLateralEntry(frame, "BC FCP ST",            0.34, 0.625+posGera, 0.09, self.bc_fcp_st)
+        criarLabelLateralEntry(frame, "Alíq. FCP ST (%)",     0.34, 0.665+posGera, 0.09, self.aliq_fcp_st)
+        criarLabelLateralEntry(frame, "Vr. FCP ST",           0.57, 0.585+posGera, 0.09, self.vr_fcp_st)
+        criarLabelLateralEntry(frame, "Vr. FCP Dif.",         0.57, 0.625+posGera, 0.09, self.vr_fcp_dif)
+        criarLabelLateralEntry(frame, "BC FCP ST Ret.",       0.57, 0.665+posGera, 0.09, self.bc_fcp_st_ret)
+        criarLabelLateralEntry(frame, "Alíq. FCP ST Ret.(%)", 0.80, 0.585+posGera, 0.09, self.aliq_fcp_st_ret)
+        criarLabelLateralEntry(frame, "Vr. FCP ST Ret.",      0.80, 0.625+posGera, 0.09, self.vr_fcp_st_ret)
+        criarLabelLateralEntry(frame, "Vr. FCP Efetivo",      0.80, 0.665+posGera, 0.09, self.vr_fcp_efet)
 
 
 
-        criarLabelEntry(frame, "Alíq. IOF (%)",              0.05, 0.70+posGera, 0.25, aliqIOFEntry)
-        criarLabelEntry(frame, "Alíq. II (%)",               0.31, 0.70+posGera, 0.15, aliqIIEntry)
-        criarLabelEntry(frame, "BC II ",                     0.47, 0.70+posGera, 0.10, BCIIEntry)
-        criarLabelEntry(frame, "Vr. IOF",                    0.58, 0.70+posGera, 0.10, VrIOFEntry)
-        criarLabelEntry(frame, "Vr. II",                     0.69, 0.70+posGera, 0.05, VrIIEntry)
-        criarLabelEntry(frame, "Vr. Desp. Aduaneiras",       0.75, 0.70+posGera, 0.15, VRDespAduaneira)
+        criarLabelEntry(frame, "Alíq. IOF (%)",              0.05, 0.70+posGera, 0.25, self.aliqIOFEntry)
+        criarLabelEntry(frame, "Alíq. II (%)",               0.31, 0.70+posGera, 0.15, self.aliqIIEntry)
+        criarLabelEntry(frame, "BC II ",                     0.47, 0.70+posGera, 0.10, self.BCIIEntry)
+        criarLabelEntry(frame, "Vr. IOF",                    0.58, 0.70+posGera, 0.10, self.VrIOFEntry)
+        criarLabelEntry(frame, "Vr. II",                     0.69, 0.70+posGera, 0.05, self.VrIIEntry)
+        criarLabelEntry(frame, "Vr. Desp. Aduaneiras",       0.75, 0.70+posGera, 0.15, self.VRDespAduaneira)
         criaTextAreaModal(frame, 0.05, 0.75, 0.85, 'Observações do item', "")
 
 
@@ -443,64 +435,64 @@ def telaProdutosNotaSaida(self, cfop):
             dados_salvos = self.dadosProdutos[produto.get()]
 
             # Já existentes
-            codigoEntry.set(dados_salvos.get("codigo", ""))
-            NCMEntry.set(dados_salvos.get("ncm", ""))
-            CSETEntry.set(dados_salvos.get("cset", ""))
-            quantidadeEntry.set(dados_salvos.get("quantidade", ""))
-            beneficioEntry.set(dados_salvos.get("beneficio", ""))
-            aliquEntry.set(dados_salvos.get("aliqICMS", ""))
-            credICMSEntry.set(dados_salvos.get("credICMS", ""))
-            bc_icms.set(dados_salvos.get("bc_icms", ""))
-            aliq_icms.set(dados_salvos.get("aliq_icms", ""))
-            vr_icms.set(dados_salvos.get("vr_icms", ""))
-            csosn.set(dados_salvos.get("csosn", ""))
-            cst_a.set(dados_salvos.get("cst_a", ""))
-            cst_b.set(dados_salvos.get("cst_b", ""))
-            mod_bc_icms.set(dados_salvos.get("mod_bc_icms", ""))
-            red_bc_icms.set(dados_salvos.get("red_bc_icms", ""))
-            mod_bc_icms_st.set(dados_salvos.get("mod_bc_icms_st", ""))
-            vr_bc_icms.insert(0, dados_salvos.get("vr_bc_icms", ""))
-            mva_icms_st.set(dados_salvos.get("mva_icms_st", ""))
-            bc_icms_st.set(dados_salvos.get("bc_icms_st", ""))
-            red_bc_icms_st.set(dados_salvos.get("red_bc_icms_st", ""))
-            vr_icms_st.set(dados_salvos.get("vr_icms_st", ""))
-            vr_bc_icms_st_ret.set(dados_salvos.get("vr_bc_icms_st_ret", ""))
-            vr_icms_st_ret.set(dados_salvos.get("vr_icms_st_ret", ""))
-            aliq_icms_cfop.set(dados_salvos.get("aliq_icms_cfop", ""))
-            bc_icms_st_dest.set(dados_salvos.get("bc_icms_st_dest", ""))
-            vr_icms_subst.set(dados_salvos.get("vr_icms_subst", ""))
-            aliq_icms_st.set(dados_salvos.get("aliq_icms_st", ""))
-            vr_icms_st_dest.set(dados_salvos.get("vr_icms_st_dest", ""))
-            bc_FCP.set(dados_salvos.get("bc_FCP", ""))
-            aliq_fcp_porc.set(dados_salvos.get("aliq_fcp_porc", ""))
-            vr_FCP.set(dados_salvos.get("vr_FCP", ""))
-            aliq_fcp_dif.set(dados_salvos.get("aliq_fcp_dif", ""))
-            bc_fcp_st.set(dados_salvos.get("bc_fcp_st", ""))
-            aliq_fcp_st.set(dados_salvos.get("aliq_fcp_st", ""))
-            vr_fcp_st.set(dados_salvos.get("vr_fcp_st", ""))
-            vr_fcp_dif.set(dados_salvos.get("vr_fcp_dif", ""))
-            bc_fcp_st_ret.set(dados_salvos.get("bc_fcp_st_ret", ""))
-            aliq_fcp_st_ret.set(dados_salvos.get("aliq_fcp_st_ret", ""))
-            vr_fcp_st_ret.set(dados_salvos.get("vr_fcp_st_ret", ""))
-            vr_fcp_efet.set(dados_salvos.get("vr_fcp_efet", ""))
-            aliqIOFEntry.set(dados_salvos.get("aliq_iof", ""))
-            aliqIIEntry.set(dados_salvos.get("aliq_ii", ""))
-            BCIIEntry.set(dados_salvos.get("bc_ii", ""))
-            VrIOFEntry.set(dados_salvos.get("vr_iof", ""))
-            VrIIEntry.set(dados_salvos.get("vr_ii", ""))
-            VRDespAduaneira.set(dados_salvos.get("vr_desp_aduaneiras", ""))
-            aliq_pis.set(dados_salvos.get("aliq_pis",""))
-            bc_pis.set(dados_salvos.get("bc_pis",""))
-            vr_pis.set(dados_salvos.get("vr_pis",""))
-            aliq_pis_st.set(dados_salvos.get("aliq_pis_st",""))
-            bc_pis_st.set(dados_salvos.get("bc_pis_st",""))
-            vr_pis_st.set(dados_salvos.get("vr_pis_st",""))
-            aliq_cofins.set(dados_salvos.get("aliq_cofins",""))
-            bc_cofins.set(dados_salvos.get("bc_cofins",""))
-            vr_cofins.set(dados_salvos.get("vr_cofins",""))
-            aliq_cofins_st.set(dados_salvos.get("aliq_cofins_st",""))
-            bc_cofins_st.set(dados_salvos.get("bc_cofins_st",""))
-            vr_cofins_st.set(dados_salvos.get("vr_cofins_st",""))
+            self.codigoEntry.set(dados_salvos.get("codigo", ""))
+            self.NCMEntry.set(dados_salvos.get("ncm", ""))
+            self.CSETEntry.set(dados_salvos.get("cset", ""))
+            self.quantidadeEntry.set(dados_salvos.get("quantidade", ""))
+            self.beneficioEntry.set(dados_salvos.get("beneficio", ""))
+            self.aliquEntry.set(dados_salvos.get("aliqICMS", ""))
+            self.credICMSEntry.set(dados_salvos.get("credICMS", ""))
+            self.bc_icms.set(dados_salvos.get("bc_icms", ""))
+            self.aliq_icms.set(dados_salvos.get("aliq_icms", ""))
+            self.vr_icms.set(dados_salvos.get("vr_icms", ""))
+            self.csosn.set(dados_salvos.get("csosn", ""))
+            self.cst_a.set(dados_salvos.get("cst_a", ""))
+            self.cst_b.set(dados_salvos.get("cst_b", ""))
+            self.mod_bc_icms.set(dados_salvos.get("mod_bc_icms", ""))
+            self.red_bc_icms.set(dados_salvos.get("red_bc_icms", ""))
+            self.mod_bc_icms_st.set(dados_salvos.get("mod_bc_icms_st", ""))
+            self.vr_bc_icms.insert(0, dados_salvos.get("vr_bc_icms", ""))
+            self.mva_icms_st.set(dados_salvos.get("mva_icms_st", ""))
+            self.bc_icms_st.set(dados_salvos.get("bc_icms_st", ""))
+            self.red_bc_icms_st.set(dados_salvos.get("red_bc_icms_st", ""))
+            self.vr_icms_st.set(dados_salvos.get("vr_icms_st", ""))
+            self.vr_bc_icms_st_ret.set(dados_salvos.get("vr_bc_icms_st_ret", ""))
+            self.vr_icms_st_ret.set(dados_salvos.get("vr_icms_st_ret", ""))
+            self.aliq_icms_cfop.set(dados_salvos.get("aliq_icms_cfop", ""))
+            self.bc_icms_st_dest.set(dados_salvos.get("bc_icms_st_dest", ""))
+            self.vr_icms_subst.set(dados_salvos.get("vr_icms_subst", ""))
+            self.aliq_icms_st.set(dados_salvos.get("aliq_icms_st", ""))
+            self.vr_icms_st_dest.set(dados_salvos.get("vr_icms_st_dest", ""))
+            self.bc_FCP.set(dados_salvos.get("bc_FCP", ""))
+            self.aliq_fcp_porc.set(dados_salvos.get("aliq_fcp_porc", ""))
+            self.vr_FCP.set(dados_salvos.get("vr_FCP", ""))
+            self.aliq_fcp_dif.set(dados_salvos.get("aliq_fcp_dif", ""))
+            self.bc_fcp_st.set(dados_salvos.get("bc_fcp_st", ""))
+            self.aliq_fcp_st.set(dados_salvos.get("aliq_fcp_st", ""))
+            self.vr_fcp_st.set(dados_salvos.get("vr_fcp_st", ""))
+            self.vr_fcp_dif.set(dados_salvos.get("vr_fcp_dif", ""))
+            self.bc_fcp_st_ret.set(dados_salvos.get("bc_fcp_st_ret", ""))
+            self.aliq_fcp_st_ret.set(dados_salvos.get("aliq_fcp_st_ret", ""))
+            self.vr_fcp_st_ret.set(dados_salvos.get("vr_fcp_st_ret", ""))
+            self.vr_fcp_efet.set(dados_salvos.get("vr_fcp_efet", ""))
+            self.aliqIOFEntry.set(dados_salvos.get("aliq_iof", ""))
+            self.aliqIIEntry.set(dados_salvos.get("aliq_ii", ""))
+            self.BCIIEntry.set(dados_salvos.get("bc_ii", ""))
+            self.VrIOFEntry.set(dados_salvos.get("vr_iof", ""))
+            self.VrIIEntry.set(dados_salvos.get("vr_ii", ""))
+            self.VRDespAduaneira.set(dados_salvos.get("vr_desp_aduaneiras", ""))
+            self.aliq_pis.set(dados_salvos.get("aliq_pis",""))
+            self.bc_pis.set(dados_salvos.get("bc_pis",""))
+            self.vr_pis.set(dados_salvos.get("vr_pis",""))
+            self.aliq_pis_st.set(dados_salvos.get("aliq_pis_st",""))
+            self.bc_pis_st.set(dados_salvos.get("bc_pis_st",""))
+            self.vr_pis_st.set(dados_salvos.get("vr_pis_st",""))
+            self.aliq_cofins.set(dados_salvos.get("aliq_cofins",""))
+            self.bc_cofins.set(dados_salvos.get("bc_cofins",""))
+            self.vr_cofins.set(dados_salvos.get("vr_cofins",""))
+            self.aliq_cofins_st.set(dados_salvos.get("aliq_cofins_st",""))
+            self.bc_cofins_st.set(dados_salvos.get("bc_cofins_st",""))
+            self.vr_cofins_st.set(dados_salvos.get("vr_cofins_st",""))
 
 
 
@@ -511,66 +503,65 @@ def telaProdutosNotaSaida(self, cfop):
                 self.dadosProdutos = {}
 
             self.dadosProdutos[produto.get()] = {
-                "codigo": codigoEntry.get(),
-                "ncm": NCMEntry.get(),
-                "cset": CSETEntry.get(),
-                "quantidade": quantidadeEntry.get(),
-                "beneficio": beneficioEntry.get(),
-                "cestA": cst_a.get(),
-                "aliqICMS": aliquEntry.get(),
-                "credICMS": credICMSEntry.get(),
-                "bc_icms": bc_icms.get(),
-                "aliq_icms": aliq_icms.get(),
-                "vr_icms": vr_icms.get(),
-                "csosn": csosn.get(),
-                "cst_a": cst_a.get(),
-                "cst_b": cst_b.get(),
-                "mod_bc_icms": mod_bc_icms.get(),
-                "red_bc_icms": red_bc_icms.get(),
-                "mod_bc_icms_st": mod_bc_icms_st.get(),
-                "vr_bc_icms": vr_bc_icms.get(),
-                "mva_icms_st": mva_icms_st.get(),
-                "bc_icms_st": bc_icms_st.get(),
-                "red_bc_icms_st": red_bc_icms_st.get(),
-                "vr_icms_st": vr_icms_st.get(),
-                "vr_bc_icms_st_ret": vr_bc_icms_st_ret.get(),
-                "vr_icms_st_ret": vr_icms_st_ret.get(),
-                "aliq_icms_cfop": aliq_icms_cfop.get(),
-                "bc_icms_st_dest": bc_icms_st_dest.get(),
-                "vr_icms_subst": vr_icms_subst.get(),
-                "aliq_icms_st": aliq_icms_st.get(),
-                "vr_icms_st_dest": vr_icms_st_dest.get(),
-                "bc_FCP": bc_FCP.get(),
-                "aliq_fcp_porc": aliq_fcp_porc.get(),
-                "vr_FCP": vr_FCP.get(),
-                "aliq_fcp_dif": aliq_fcp_dif.get(),
-                "bc_fcp_st": bc_fcp_st.get(),
-                "aliq_fcp_st": aliq_fcp_st.get(),
-                "vr_fcp_st": vr_fcp_st.get(),
-                "vr_fcp_dif": vr_fcp_dif.get(),
-                "bc_fcp_st_ret": bc_fcp_st_ret.get(),
-                "aliq_fcp_st_ret": aliq_fcp_st_ret.get(),
-                "vr_fcp_st_ret": vr_fcp_st_ret.get(),
-                "vr_fcp_efet": vr_fcp_efet.get(),
-                "aliq_iof": aliqIOFEntry.get(),
-                "aliq_ii": aliqIIEntry.get(),
-                "bc_ii": BCIIEntry.get(),
-                "vr_iof": VrIOFEntry.get(),
-                "vr_ii": VrIIEntry.get(),
-                "vr_desp_aduaneiras": VRDespAduaneira.get(),
-
-                "aliq_pis": aliq_pis.get(),
-                "bc_pis": bc_pis.get(),
-                "vr_pis": vr_pis.get(),
-                "aliq_pis_st": aliq_pis_st.get(),
-                "bc_pis_st": bc_pis_st.get(),
-                "vr_pis_st": vr_pis_st.get(),
-                "aliq_cofins": aliq_cofins.get(),
-                "bc_cofins": bc_cofins.get(),
-                "vr_cofins": vr_cofins.get(),
-                "aliq_cofins_st": aliq_cofins_st.get(),
-                "bc_cofins_st": bc_cofins_st.get(),
-                "vr_cofins_st": vr_cofins_st.get()
+                "codigo": self.codigoEntry.get(),
+                "ncm": self.NCMEntry.get(),
+                "cset": self.CSETEntry.get(),
+                "quantidade": self.quantidadeEntry.get(),
+                "beneficio": self.beneficioEntry.get(),
+                "cestA": self.cst_a.get(),
+                "aliqICMS": self.aliquEntry.get(),
+                "credICMS": self.credICMSEntry.get(),
+                "bc_icms": self.bc_icms.get(),
+                "aliq_icms": self.aliq_icms.get(),
+                "vr_icms": self.vr_icms.get(),
+                "csosn": self.csosn.get(),
+                "cst_a": self.cst_a.get(),
+                "cst_b": self.cst_b.get(),
+                "mod_bc_icms": self.mod_bc_icms.get(),
+                "red_bc_icms": self.red_bc_icms.get(),
+                "mod_bc_icms_st": self.mod_bc_icms_st.get(),
+                "vr_bc_icms": self.vr_bc_icms.get(),
+                "mva_icms_st": self.mva_icms_st.get(),
+                "bc_icms_st": self.bc_icms_st.get(),
+                "red_bc_icms_st": self.red_bc_icms_st.get(),
+                "vr_icms_st": self.vr_icms_st.get(),
+                "vr_bc_icms_st_ret": self.vr_bc_icms_st_ret.get(),
+                "vr_icms_st_ret": self.vr_icms_st_ret.get(),
+                "aliq_icms_cfop": self.aliq_icms_cfop.get(),
+                "bc_icms_st_dest": self.bc_icms_st_dest.get(),
+                "vr_icms_subst": self.vr_icms_subst.get(),
+                "aliq_icms_st": self.aliq_icms_st.get(),
+                "vr_icms_st_dest": self.vr_icms_st_dest.get(),
+                "bc_FCP": self.bc_FCP.get(),
+                "aliq_fcp_porc": self.aliq_fcp_porc.get(),
+                "vr_FCP": self.vr_FCP.get(),
+                "aliq_fcp_dif": self.aliq_fcp_dif.get(),
+                "bc_fcp_st": self.bc_fcp_st.get(),
+                "aliq_fcp_st": self.aliq_fcp_st.get(),
+                "vr_fcp_st": self.vr_fcp_st.get(),
+                "vr_fcp_dif": self.vr_fcp_dif.get(),
+                "bc_fcp_st_ret": self.bc_fcp_st_ret.get(),
+                "aliq_fcp_st_ret": self.aliq_fcp_st_ret.get(),
+                "vr_fcp_st_ret": self.vr_fcp_st_ret.get(),
+                "vr_fcp_efet": self.vr_fcp_efet.get(),
+                "aliq_iof": self.aliqIOFEntry.get(),
+                "aliq_ii": self.aliqIIEntry.get(),
+                "bc_ii": self.BCIIEntry.get(),
+                "vr_iof": self.VrIOFEntry.get(),
+                "vr_ii": self.VrIIEntry.get(),
+                "vr_desp_aduaneiras": self.VRDespAduaneira.get(),
+                "aliq_pis": self.aliq_pis.get(),
+                "bc_pis": self.bc_pis.get(),
+                "vr_pis": self.vr_pis.get(),
+                "aliq_pis_st": self.aliq_pis_st.get(),
+                "bc_pis_st": self.bc_pis_st.get(),
+                "vr_pis_st": self.vr_pis_st.get(),
+                "aliq_cofins": self.aliq_cofins.get(),
+                "bc_cofins": self.bc_cofins.get(),
+                "vr_cofins": self.vr_cofins.get(),
+                "aliq_cofins_st": self.aliq_cofins_st.get(),
+                "bc_cofins_st": self.bc_cofins_st.get(),
+                "vr_cofins_st": self.vr_cofins_st.get()
 
             }
 
