@@ -1,248 +1,119 @@
-def criaTXT(nome_arquivo, self):
-    produtos_completos = []
-
-    for i, prod_basico in enumerate(getattr(self, "valoresDosItens", [])):
-        tributacao = {}
-        # Se houver dados de tributação correspondentes
-        if hasattr(self, "dadosProduto") and i < len(self.dadosProduto):
-            tributacao = self.dadosProduto[i]
-
-        # Junta os dois dicionários (básico + tributação)
-        produto_final = {**prod_basico, **tributacao}
-        produtos_completos.append(produto_final)
-
-        
-    dados = {
-        "nota": {
-            "numero": self.variavelNumeroDaNota.get(),
-            "serie": self.variavelSerieDaNota.get(),
-            "chave": self.variavelChaveDaNota.get(),
-            "razaoSocialRemetente": self.variavelRazaoSocialRemetente.get(),
-            "cnpjRazaoSocialRemetente": self.variavelCNPJRazaoSocialRemetente.get(),
-            "razaoSocialEmitente": self.variavelRazaoSocialEmitente.get(),
-            "cnpjRazaoSocialEmitente": self.variavelCNPJRazaoSocialEmitente.get(),
-            "cfop": self.variavelCFOP.get(),
-            "natureza": self.variavelNatureza.get(),
-            "status": self.variavelStatus.get(),
-            "dataDocumento": self.variavelDataDocumento.get(),
-            "horaEntradaSaida": self.variavelHoraEntradaSaida.get(),
-            "dataCriacao": self.variavelDataCriacao.get(),
-            "dataConfirmacao": self.variavelDataConfirmacao.get(),
-            "vendedor": self.variavelVendedor.get(),
-            "entradaOuSaida": self.variavelEntradaOuSaida.get(),
-            "formaDePagamento": self.formaDePagamento.get(),
-            "opcoesFinalidade": self.opcoesFinalidade,  # lista
-            "opcoesSituacao": self.opcoesSituacao       # lista
-        },
-        "produtos":produtos_completos,
-        "totais": {
-            "totalFrete": self.totalFrete.get(),
-            "totalSeguro": self.totalSeguro.get(),
-            "totalDesconto": self.totalDesconto.get(),
-            "outrasDespesas": self.outrasDespesas.get(),
-            "valorTotalProdutos": self.valorTotalProdutos.get(),
-            "valorServico": self.valorServico.get(),
-            "totalBCICMS": self.totalBCICMS.get(),
-            "valorICMS": self.valorICMS.get(),
-            "totalBCICMSST": self.totalBCICMSST.get(),
-            "totalICMSST": self.totalICMSST.get(),
-            "totalDois": self.totalDois.get(),
-            "totalIPI": self.totalIPI.get(),
-            "totalPIS": self.totalPIS.get(),
-            "icmsComplementar": self.icmsComplementar.get(),
-            "totalCOFINSST": self.totalCOFINSST.get(),
-            "totalPISST": self.totalPISST.get(),
-            "totalCOFINS": self.totalCOFINS.get(),
-            "valorLiquido": self.valorLiquido.get(),
-            "valorPISRetido": self.valorPISRetido.get(),
-            "valorCOFINSRetido": self.valorCOFINSRetido.get(),
-            "valorRetidoCSLL": self.valorRetidoCSLL.get(),
-            "bcIRRF": self.bcIRRF.get(),
-            "valorRetidoIRRF": self.valorRetidoIRRF.get(),
-            "bcPrevidencia": self.bcPrevidencia.get(),
-            "valorPrevidencia": self.valorPrevidencia.get()
-        },
-        "faturamento": {
-            "totaisFormasDePagamento": self.totaisFormasDePagamento.get(),
-            "descontoTotalVindoDoPedido": self.descontoTotalVindoDoPedido.get(),
-            "acrescimoTotalVindoDoPedido": self.acrescimoTotalVindoDoPedido.get(),
-            "variavelQuantidade": self.variavelQuantidade.get(),
-            "valorDoPedidoVariavel": self.valorDoPedidoVariavel.get(),
-            "variavelObsFisco": self.variavelObsFisco.get(),
-            "variavelObsContribuinte": self.variavelObsContribuinte.get()
-        }
-    }
-
-
-
-
-
+def criaTXT_ACBr(self, nome_arquivo):
     with open(nome_arquivo, "w", encoding="utf-8") as f:
-        f.write('\n\n')
         
-        for secao, campos in dados.items():
-            f.write(f"[{secao}]\n")
-            
-            if secao == "produtos":
-                # campos é uma lista de produtos
-                for i, produto in enumerate(campos, start=1):
-                    f.write(f"# Produto {i}\n")
-                    for chave, valor in produto.items():
-                        f.write(f"{chave} = {valor}\n")
-                    f.write("\n")
-            else:
-                # demais seções são dicionários
-                for chave, valor in campos.items():
-                    f.write(f"{chave} = {valor}\n")
-                f.write("\n")
+        # ------------------- Identificacao -------------------
+        f.write("[Identificacao]\n")
+        f.write(f"cNF=\n")  # Código aleatório de 8 dígitos - você pode gerar se quiser
+        f.write(f"natOp={self.variavelNatureza.get()}\n")
+        f.write(f"indPag=0\n")
+        f.write(f"mod=55\n")
+        f.write(f"serie={self.variavelSerieDaNota.get()}\n")
+        f.write(f"nNF={self.variavelNumeroDaNota.get()}\n")
+        f.write(f"dhEmi={self.variavelDataDocumento.get()} {self.variavelHoraEntradaSaida.get()}\n")
+        f.write(f"tpNF={self.variavelEntradaOuSaida.get()}\n")
+        f.write(f"idDest=1\n")
+        f.write(f"tpAmb=2\n")
+        f.write(f"tpImp=1\n")
+        f.write(f"tpEmis=1\n")
+        f.write(f"finNFe=0\n")
+        f.write(f"indFinal=0\n")
+        f.write(f"indPres=9\n")
+        f.write(f"procEmi=0\n")
+        f.write(f"verProc=Sistema Python\n\n")
 
-    # # dados da nota
-    # self.variavelNumeroDaNota
-    # self.variavelSerieDaNota
-    # self.variavelChaveDaNota
-    # self.variavelRazaoSocialRemetente
-    # self.variavelCNPJRazaoSocialRemetente
-    # self.variavelRazaoSocialEmitente
-    # self.variavelCNPJRazaoSocialEmitente
-    # self.variavelCFOP
-    # self.variavelNatureza
-    # self.variavelStatus
-    # self.variavelDataDocumento
-    # self.data
-    # self.variavelHoraEntradaSaida
-    # self.variavelDataCriacao
-    # self.variavelDataConfirmacao
-    # self.variavelVendedor
-    # self.variavelEntradaOuSaida
-    # self.formaDePagamento
-    # self.opcoesFinalidade #<--lista
-    # self.opcoesSituacao #<--lista
+        # ------------------- Emitente -------------------
+        f.write("[Emitente]\n")
+        f.write(f"CNPJCPF={self.variavelCNPJRazaoSocialEmitente.get()}\n")
+        f.write(f"xNome={self.variavelRazaoSocialEmitente.get()}\n")
+        f.write(f"xFant=\n")
+        f.write(f"IE=\n")
+        f.write(f"xLgr=\n")
+        f.write(f"nro=\n")
+        f.write(f"xBairro=\n")
+        f.write(f"cMun=\n")
+        f.write(f"xMun=\n")
+        f.write(f"UF=\n")
+        f.write(f"CEP=\n")
+        f.write(f"cPais=1058\n")
+        f.write(f"xPais=BRASIL\n")
+        f.write(f"Fone=\n\n")
 
-    # # dados produto 
-    # self.codigoEntry
-    # self.NCMEntry
-    # self.CSETEntry
-    # self.quantidadeEntry
-    # self.beneficioEntry
-    # self.aliquEntry
-    # self.credICMSEntry
-    # self.bc_icms
-    # self.aliq_icms
-    # self.vr_icms
-    # self.csosn
-    # self.cst_a
-    # self.cst_b
-    # self.mod_bc_icms
-    # self.red_bc_icms
-    # self.mod_bc_icms_st
-    # self.vr_bc_icms
-    # self.mva_icms_st
-    # self.bc_icms_st
-    # self.red_bc_icms_st
-    # self.vr_icms_st
-    # self.vr_bc_icms_st_ret
-    # self.vr_icms_st_ret
-    # self.aliq_icms_cfop
-    # self.bc_icms_st_dest
-    # self.vr_icms_subst
-    # self.aliq_icms_st
-    # self.vr_icms_st_dest
-    # self.bc_FCP
-    # self.aliq_fcp_porc
-    # self.vr_FCP
-    # self.aliq_fcp_dif
-    # self.bc_fcp_st
-    # self.aliq_fcp_st
-    # self.vr_fcp_st
-    # self.vr_fcp_dif
-    # self.bc_fcp_st_ret
-    # self.aliq_fcp_st_ret
-    # self.vr_fcp_st_ret
-    # self.vr_fcp_efet
-    # self.aliqIOFEntry
-    # self.aliqIIEntry
-    # self.BCIIEntry
-    # self.VrIOFEntry
-    # self.VrIIEntry
-    # self.VRDespAduaneira
-    # self.aliq_pis
-    # self.bc_pis
-    # self.vr_pis
-    # self.aliq_pis_st
-    # self.bc_pis_st
-    # self.vr_pis_st
-    # self.aliq_cofins
-    # self.bc_cofins
-    # self.vr_cofins
-    # self.aliq_cofins_st
-    # self.bc_cofins_st
-    # self.vr_cofins_st
+        # ------------------- Destinatario -------------------
+        f.write("[Destinatario]\n")
+        f.write(f"CNPJCPF={self.variavelCNPJRazaoSocialRemetente.get()}\n")
+        f.write(f"xNome={self.variavelRazaoSocialRemetente.get()}\n")
+        f.write(f"indIEDest=3\n")
+        f.write(f"IE=\n")
+        f.write(f"xLgr=\n")
+        f.write(f"nro=\n")
+        f.write(f"xBairro=\n")
+        f.write(f"cMun=\n")
+        f.write(f"xMun=\n")
+        f.write(f"UF=\n")
+        f.write(f"CEP=\n")
+        f.write(f"cPais=1058\n")
+        f.write(f"xPais=BRASIL\n")
+        f.write(f"Fone=\n\n")
 
-    # # dados totais
-    # self.totalFrete
-    # self.totalSeguro
-    # self.totalDesconto
-    # self.outrasDespesas
-    # self.valorTotalProdutos
-    # self.valorServico
-    # self.totalBCICMS
-    # self.valorICMS
-    # self.totalBCICMSST
-    # self.totalICMSST
-    # self.totalDois
-    # self.totalIPI
-    # self.totalPIS
-    # self.icmsComplementar
-    # self.totalCOFINSST
-    # self.totalPISST
-    # self.totalCOFINS
-    # self.valorLiquido
-    # self.valorPISRetido
-    # self.valorCOFINSRetido
-    # self.valorRetidoCSLL
-    # self.bcIRRF
-    # self.valorRetidoIRRF
-    # self.bcPrevidencia
-    # self.valorPrevidencia
+        # ------------------- Produtos e Tributos -------------------
+        produtos_completos = []
+        for i, prod_basico in enumerate(getattr(self, "valoresDosItens", []), start=1):
+            tributacao = {}
+            if hasattr(self, "dadosProduto") and (i-1) < len(self.dadosProduto):
+                tributacao = self.dadosProduto[i-1]
+            produto_final = {**prod_basico, **tributacao}
+            produtos_completos.append(produto_final)
 
-    # # tela faturmento
-    # self.totaisFormasDePagamento
-    # self.descontoTotalVindoDoPedido
-    # self.acrescimoTotalVindoDoPedido
-    # self.variavelQuantidade
-    # self.valorDoPedidoVariavel
-    # self.variavelObsFisco
-    # self.variavelObsContribuinte
+            idx = str(i).zfill(3)
 
+            # Produto
+            f.write(f"[Produto{idx}]\n")
+            f.write(f"cProd={produto_final.get('codigo','')}\n")
+            f.write(f"xProd={produto_final.get('descricao','')}\n")
+            f.write(f"NCM={produto_final.get('ncm','')}\n")
+            f.write(f"CFOP={produto_final.get('cfop','')}\n")
+            f.write(f"uCom={produto_final.get('unidade','')}\n")
+            f.write(f"qCom={produto_final.get('quantidade','')}\n")
+            f.write(f"vUnCom={produto_final.get('valor_unitario','')}\n")
+            f.write(f"vProd={produto_final.get('valor_total','')}\n")
+            f.write(f"indTot=1\n\n")
 
+            # ICMS
+            f.write(f"[ICMS{idx}]\n")
+            f.write(f"CSOSN={produto_final.get('csosn','')}\n")
+            f.write(f"orig={produto_final.get('origem','')}\n")
+            f.write(f"CST={produto_final.get('cst','')}\n")
+            f.write(f"vBC={produto_final.get('bc_icms','')}\n")
+            f.write(f"pICMS={produto_final.get('aliq_icms','')}\n")
+            f.write(f"vICMS={produto_final.get('valor_icms','')}\n\n")
 
+            # PIS
+            f.write(f"[PIS{idx}]\n")
+            f.write(f"CST={produto_final.get('cst_pis','')}\n")
+            f.write(f"vBC={produto_final.get('bc_pis','')}\n")
+            f.write(f"pPIS={produto_final.get('aliq_pis','')}\n")
+            f.write(f"vPIS={produto_final.get('valor_pis','')}\n\n")
 
-# dados = {
-#     "infNFe": {
-#         "versao": "4.00"
-#     },
-#     "Identificacao": {
-#         "cNF": 18,
-#         "natOp": "Venda",
-#         "mod": 55
-#     },
-#     "Destinatario": {
-#         "CNPJCPF": "45098699835",
-#         "xNome": "Vitor Kaique de Lariva Penteado"
-#     },
-#     "Produto001": {
-#         "cProd": 4,
-#         "xProd": "Areia grossa",
-#         "vProd": 540.00
-#     }
-# }
+            # COFINS
+            f.write(f"[COFINS{idx}]\n")
+            f.write(f"CST={produto_final.get('cst_cofins','')}\n")
+            f.write(f"vBC={produto_final.get('bc_cofins','')}\n")
+            f.write(f"pCOFINS={produto_final.get('aliq_cofins','')}\n")
+            f.write(f"vCOFINS={produto_final.get('valor_cofins','')}\n\n")
 
-# # Gerar o arquivo
-# criaTXT("saida.txt", dados)
-# print("Arquivo 'saida.txt' gerado com sucesso!")
-
-
+        # ------------------- Total -------------------
+        f.write("[Total]\n")
+        f.write(f"vProd={self.valorTotalProdutos.get()}\n")
+        f.write(f"vNF={self.valorLiquido.get()}\n")
+        f.write(f"vFrete={self.totalFrete.get()}\n")
+        f.write(f"vSeg={self.totalSeguro.get()}\n")
+        f.write(f"vDesc={self.totalDesconto.get()}\n")
+        f.write(f"vOutro={self.outrasDespesas.get()}\n")
+        f.write(f"vICMS={self.valorICMS.get()}\n")
+        f.write(f"vIPI={self.totalIPI.get()}\n")
+        f.write(f"vPIS={self.totalPIS.get()}\n")
+        f.write(f"vCOFINS={self.totalCOFINS.get()}\n\n")
 
 def gerarNFe(self):
     print("chegou no gerarNfe")
-    criaTXT("base.txt", self)
+    criaTXT_ACBr (self, "base.txt")
