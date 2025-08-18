@@ -1,14 +1,16 @@
+NFe.CriarEnviarNFe("
+[infNFe]
+versao=4.00
+
 [Identificacao]
-cNF=
+cNF=42902639
 natOp=
-indPag=0
 mod=55
 serie=
 nNF=
 dhEmi= 
 tpNF=
 idDest=1
-tpAmb=2
 tpImp=1
 tpEmis=1
 finNFe=0
@@ -20,7 +22,6 @@ verProc=Sistema Python
 [Emitente]
 CNPJCPF=
 xNome=
-xFant=
 IE=
 xLgr=
 nro=
@@ -61,3 +62,12 @@ vIPI=0.00
 vPIS=0.00
 vCOFINS=0.00
 
+[Transportador]
+modFrete=9
+
+[pag001]
+tpag=01
+vPag=0.00
+
+"
+,1,1, , ,1)

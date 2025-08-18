@@ -59,6 +59,8 @@ def telaObservacoesNotaSaida(self):
         # Exibe mensagem visual ao usuário
         messagebox.showinfo("Dados coletados", "Todos os dados foram coletados com sucesso.")
 
+    self.variavelObservacoes = ctk.StringVar()
+    self.variavelObservacoes.set(0)
 
     criaBotao(self.frameTelaObservacoes, "salvar", 0.25, 0.94, 0.15, lambda: criarNFe.gerarNFe(self)).place(anchor="nw")
     criaBotao(self.frameTelaObservacoes, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaObservacoes.destroy()).place(anchor="nw")

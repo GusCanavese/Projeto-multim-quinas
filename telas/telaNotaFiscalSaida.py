@@ -74,6 +74,7 @@ def telaNotaFiscalSaida(self, valor):
             self.variavelSerieDaNota.set("1")
             self.variavelRazaoSocialEmitente.set("NUTRIGEL DISTRIBUIDORA EIRELI")
             self.variavelCNPJRazaoSocialEmitente.set("00.995.044/0001-07")
+            self.variavelInscEstadualEmitente.set(0)
 
     opcoesSituacao = ["Normal", "Extemporâneo"]
     opcoesFinalidade = ["Normal", "complementar", "Ajuste"]
@@ -94,6 +95,8 @@ def telaNotaFiscalSaida(self, valor):
     self.variavelCNPJRazaoSocialRemetente = ctk.StringVar()
     self.variavelRazaoSocialEmitente = ctk.StringVar()
     self.variavelCNPJRazaoSocialEmitente = ctk.StringVar()
+    self.variavelInscEstadualEmitente = ctk.StringVar()
+    self.variavelInscEstadualRemetente = ctk.StringVar()
     self.variavelCFOP = ctk.StringVar()
     self.variavelNatureza = ctk.StringVar()
     self.variavelStatus = ctk.StringVar()
@@ -105,6 +108,8 @@ def telaNotaFiscalSaida(self, valor):
     self.variavelVendedor = ctk.StringVar()
     self.variavelEntradaOuSaida = ctk.StringVar()
     self.formaDePagamento = ctk.StringVar()
+    self.variavelModalidadeFrete = ctk.StringVar()
+    self.variavelValorTotal = ctk.StringVar()
     self.opcoesFinalidade = ["Normal", "Complementar", "Ajuste"]
     self.opcoesSituacao = ["Ativa", "Cancelada", "Inutilizada"]
     
@@ -112,8 +117,10 @@ def telaNotaFiscalSaida(self, valor):
     self.variavelDataCriacao.set(value=datetime.datetime.now().strftime("%d/%m/%y"))
     self.variavelStatus.set("Em Digitação")
 
-
-
+    #ATRIBUIR VALOR CORRETO PARA ESSAS VARIAVEIS
+    self.variavelInscEstadualRemetente.set(0)
+    self.variavelModalidadeFrete.set(0)
+    self.variavelValorTotal.set(0)
 
 
     criarLabelEntry(self.frameTelaNotaSaida, "Número da NF", 0.1, 0.05, 0.07, self.variavelNumeroDaNota)
