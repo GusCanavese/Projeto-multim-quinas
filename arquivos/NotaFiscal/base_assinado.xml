@@ -1,0 +1,234 @@
+<?xml version='1.0' encoding='utf-8'?>
+<nfeProc xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+  <infNFe Id="NFe3525080000000000000055001000000001508849462" versao="4.00">
+    <ide>
+      <cUF>35</cUF>
+      <cNF>50884946</cNF>
+      <natOp>VENDA</natOp>
+      <mod>55</mod>
+      <serie>001</serie>
+      <nNF>000000001</nNF>
+      <dhEmi>2025-08-19T16:58:03-03:00</dhEmi>
+      <tpNF>1</tpNF>
+      <idDest>1</idDest>
+      <cMunFG>3550308</cMunFG>
+      <tpImp>1</tpImp>
+      <tpEmis>1</tpEmis>
+      <cDV>2</cDV>
+      <tpAmb>2</tpAmb>
+      <finNFe>1</finNFe>
+      <indFinal>1</indFinal>
+      <indPres>1</indPres>
+      <procEmi>0</procEmi>
+      <verProc>MeuSistema_1.0</verProc>
+    </ide>
+    <emit>
+      <CNPJ>00000000000000</CNPJ>
+      <xNome>Empresa Exemplo LTDA</xNome>
+      <IE>123456789</IE>
+      <enderEmit>
+        <xLgr>Rua Exemplo</xLgr>
+        <nro>100</nro>
+        <xBairro>Centro</xBairro>
+        <cMun>3550308</cMun>
+        <xMun>São Paulo</xMun>
+        <UF>SP</UF>
+        <CEP>01000000</CEP>
+        <cPais>1058</cPais>
+        <xPais>BRASIL</xPais>
+        <fone>11999999999</fone>
+      </enderEmit>
+    </emit>
+    <dest>
+      <CNPJ>11111111111111</CNPJ>
+      <xNome>Cliente Teste</xNome>
+      <indIEDest>9</indIEDest>
+      <enderDest>
+        <xLgr>Rua Cliente</xLgr>
+        <nro>200</nro>
+        <xBairro>Bairro Teste</xBairro>
+        <cMun>3550308</cMun>
+        <xMun>São Paulo</xMun>
+        <UF>SP</UF>
+        <CEP>02000000</CEP>
+        <cPais>1058</cPais>
+        <xPais>BRASIL</xPais>
+        <fone>1188888888</fone>
+      </enderDest>
+    </dest>
+    <total>
+      <ICMSTot>
+        <vBC>0.00</vBC>
+        <vICMS>0.00</vICMS>
+        <vICMSDeson>0.00</vICMSDeson>
+        <vProd>0.00</vProd>
+        <vFrete>PY_VAR32</vFrete>
+        <vSeg>PY_VAR33</vSeg>
+        <vDesc>PY_VAR34</vDesc>
+        <vII>0.00</vII>
+        <vIPI>0.00</vIPI>
+        <vPIS>0.00</vPIS>
+        <vCOFINS>0.00</vCOFINS>
+        <vOutro>PY_VAR35</vOutro>
+        <vNF>0.00</vNF>
+      </ICMSTot>
+    </total>
+    <transp>
+      <modFrete>9</modFrete>
+    </transp>
+    <pag>
+      <detPag>
+        <tPag>01</tPag>
+        <vPag>0.00</vPag>
+      </detPag>
+    </pag>
+    <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+      <ds:SignedInfo>
+        <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+        <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+        <ds:Reference URI="#NFe3525080000000000000055001000000001508849462">
+          <ds:Transforms>
+            <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+            <ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+          </ds:Transforms>
+          <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+          <ds:DigestValue>cgsV0HtS99raa5XsaY4b9UtYTtCb1OlwDZGXaLNFIfA=</ds:DigestValue>
+        </ds:Reference>
+      </ds:SignedInfo>
+      <ds:SignatureValue>OfSh04o4ks12t2MZzOnUOwSTHP5kqhUjMY2+OK6pd3fdMQVF9jjhjJQ7Zf7dEfzaNUWDojHIcDM2TdqcDkpEIfds5rWoKkTERJLjJ/qNbwaYd9MT3WXu6/oo+bUsxdrODefNrsa7bEq+0FD/Ts+qoec6YOc32CANJTAX1aah6+SCsqTfxOHDuGiV8ZxWgT9IqVtdlL3c3CQulJRd2JIYMvoQqjFveUUhL1CYvR87zwob0MSdfKTwnO6y5x562NG1k0WRwzpLAm7NkcrKhPxg/HRhv0PYPnXiQ4NZeUK9a8aJ+hJ/QSqlTddCSBaPCSrbU7DQrWE3vi6rNEo+HrUPKw==</ds:SignatureValue>
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIH7zCCBdegAwIBAgIIS9uaSFijwHMwDQYJKoZIhvcNAQELBQAwezELMAkGA1UE
+BhMCQlIxEzARBgNVBAoTCklDUC1CcmFzaWwxNjA0BgNVBAsTLVNlY3JldGFyaWEg
+ZGEgUmVjZWl0YSBGZWRlcmFsIGRvIEJyYXNpbCAtIFJGQjEfMB0GA1UEAxMWQUMg
+Q09OU1VMVEkgQlJBU0lMIFJGQjAeFw0yNTAxMjcxMjI2MTdaFw0yNjAxMjcxMjI2
+MTdaMIIBAzELMAkGA1UEBhMCQlIxEzARBgNVBAoTCklDUC1CcmFzaWwxCzAJBgNV
+BAgTAk1HMRkwFwYDVQQHExBTQU8gSk9BTyBERUwgUkVJMRcwFQYDVQQLEw40ODky
+NTk3OTAwMDEzNTE2MDQGA1UECxMtU2VjcmV0YXJpYSBkYSBSZWNlaXRhIEZlZGVy
+YWwgZG8gQnJhc2lsIC0gUkZCMRYwFAYDVQQLEw1SRkIgZS1DTlBKIEExMRkwFwYD
+VQQLExB2aWRlb2NvbmZlcmVuY2lhMTMwMQYDVQQDEypOVVRSSUdFTCBESVNUUklC
+VUlET1JBIExUREE6MDA5OTUwNDQwMDAxMDcwggEiMA0GCSqGSIb3DQEBAQUAA4IB
+DwAwggEKAoIBAQCe1ez4Ot3SMU5+xUefoY9t4v/MRv8fmOPCDMJZL59jbxw6u+bA
+oqVXkJMgRD662Z96RyKDrv3NB3MdUYiLWFrJC8wEVBGxB8BH8adhXksIbVsuYHSa
+qJ0NRRWfGlymQE4e0RrYLeGQDP0jUf5W8IlM38WJ9iyLRGGLStWaQUipLXis6Ctv
+8AuWDlMnPztJyhtHu5pSgsibLoout8Zy5dGTT3TVuwh01n1AqqqaYwbwyu0mcURA
+42exaxvCZ8OoYfpSNGp5LVV0dHU/HOb82Ui+W6bU23HhWK7YvI6+Sqocqy2mnoqZ
+RNlIGH1JvOlrqC7A1exsq6cKyVhypa4fn8zVAgMBAAGjggLrMIIC5zAfBgNVHSME
+GDAWgBSu8aFwdhNq++eUd5wyLFfLFDhZ3zAOBgNVHQ8BAf8EBAMCBeAwgYAGA1Ud
+IAR5MHcwdQYGYEwBAgFBMGswaQYIKwYBBQUHAgEWXWh0dHA6Ly9yZXBvc2l0b3Jp
+by5hY2NvbnN1bHRpYnJhc2lsLmNvbS5ici9hYy1hY2NvbnN1bHRpYnJhc2lscmZi
+L2RwYy1hY2NvbnN1bHRpYnJhc2lscmZiLnBkZjCB4AYDVR0fBIHYMIHVMGigZqBk
+hmJodHRwOi8vcmVwb3NpdG9yaW8uYWNjb25zdWx0aWJyYXNpbC5jb20uYnIvYWMt
+YWNjb25zdWx0aWJyYXNpbHJmYi9sY3ItYWMtYWNjb25zdWx0aWJyYXNpbHJmYnY0
+LmNybDBpoGegZYZjaHR0cDovL3JlcG9zaXRvcmlvMi5hY2NvbnN1bHRpYnJhc2ls
+LmNvbS5ici9hYy1hY2NvbnN1bHRpYnJhc2lscmZiL2xjci1hYy1hY2NvbnN1bHRp
+YnJhc2lscmZidjQuY3JsMHoGCCsGAQUFBwEBBG4wbDBqBggrBgEFBQcwAoZeaHR0
+cDovL3JlcG9zaXRvcmlvLmFjY29uc3VsdGlicmFzaWwuY29tLmJyL2FjLWFjY29u
+c3VsdGlicmFzaWxyZmIvYWMtYWNjb25zdWx0aWJyYXNpbHJmYnY0LnA3YjCBsgYD
+VR0RBIGqMIGngRdBTkFSQVFVRUxHQkBIT1RNQUlMLkNPTaAeBgVgTAEDAqAVExNB
+TkEgUkFRVUVMIENBTkFWRVNFoBkGBWBMAQMDoBATDjAwOTk1MDQ0MDAwMTA3oDgG
+BWBMAQMEoC8TLTAyMTExOTY3NjAxODA1MDE2MTUwMDAwMDAwMDAwMDAwMDAwMDAw
+MDAwMDAwMKAXBgVgTAEDB6AOEwwwMDAwMDAwMDAwMDAwHQYDVR0lBBYwFAYIKwYB
+BQUHAwIGCCsGAQUFBwMEMA0GCSqGSIb3DQEBCwUAA4ICAQARH4jpYOV95H+aB9d7
+vuRsGkQdAtFt8P24P9RqSJiZyCYwPU+tx5GAgyflNY74JIbfj26ma8aFIpm/mH5q
+TJW2oi9YQQIHocguWvGngqu85CNU+/s+Mp37SfcUlZmltgOVrQd7IE8gonmBVCeu
+hnglw8VpxJmYq9yYdno05RNs+niTRbQ34CaAqSnttaZ8wH9LtTFu01sh2G7Xg6Qy
+0H2MpS+jpxiEmMTQAdT88Cnn5wBAX8odo4s0Pvn/d3iGsug5c24A85WrGOPATqZV
+gdjgzdsw5PSvr+7TWkmBZaCQOD5PsaAqDkOXRn28BBpqQ9uCGK3i1ZyICY2gO57v
+6vVaHPPBPRcPZCtD8iVj0kQoI8zmzYSWdDzqBJ2lp/jEKZdEqDZyg/FFcq3ad3Zw
+g0BFb4Ctl8+oj3cyre4XUpdgQLUr+3jvbZIn2aTGppdwmxdRXl6lch66trNE4uzX
+8bTpJRxsHRgjQtmV5jZ4rTK//lRnbNBw4vPGzy15EjIDRvDVSvWETRoHtI81tfy0
+EomL+kj+kA7KEbacxtlHPYvFS3NZjPh1/bbRvxWnrA95r5TWVagGKT5SMUSF3tZt
+w5YR5ANeIdmjtJMmF7GkFdh6Ek5dPNCbT4yYdlRzjvh/PTzbQVjZwIOj/TF1KqdA
+1KuintKwtFPvf+26oHKF54qq4A==
+</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </ds:Signature>
+  </infNFe>
+  <NFe>
+    <infNFe Id="NFe3525080000000000000055001000000001508849462" versao="4.00">
+      <ide>
+        <cUF>35</cUF>
+        <cNF>50884946</cNF>
+        <natOp>VENDA</natOp>
+        <mod>55</mod>
+        <serie>001</serie>
+        <nNF>000000001</nNF>
+        <dhEmi>2025-08-19T16:58:03-03:00</dhEmi>
+        <tpNF>1</tpNF>
+        <idDest>1</idDest>
+        <cMunFG>3550308</cMunFG>
+        <tpImp>1</tpImp>
+        <tpEmis>1</tpEmis>
+        <cDV>2</cDV>
+        <tpAmb>2</tpAmb>
+        <finNFe>1</finNFe>
+        <indFinal>1</indFinal>
+        <indPres>1</indPres>
+        <procEmi>0</procEmi>
+        <verProc>MeuSistema_1.0</verProc>
+      </ide>
+      <emit>
+        <CNPJ>00000000000000</CNPJ>
+        <xNome>Empresa Exemplo LTDA</xNome>
+        <IE>123456789</IE>
+        <enderEmit>
+          <xLgr>Rua Exemplo</xLgr>
+          <nro>100</nro>
+          <xBairro>Centro</xBairro>
+          <cMun>3550308</cMun>
+          <xMun>São Paulo</xMun>
+          <UF>SP</UF>
+          <CEP>01000000</CEP>
+          <cPais>1058</cPais>
+          <xPais>BRASIL</xPais>
+          <fone>11999999999</fone>
+        </enderEmit>
+      </emit>
+      <dest>
+        <CNPJ>11111111111111</CNPJ>
+        <xNome>Cliente Teste</xNome>
+        <indIEDest>9</indIEDest>
+        <enderDest>
+          <xLgr>Rua Cliente</xLgr>
+          <nro>200</nro>
+          <xBairro>Bairro Teste</xBairro>
+          <cMun>3550308</cMun>
+          <xMun>São Paulo</xMun>
+          <UF>SP</UF>
+          <CEP>02000000</CEP>
+          <cPais>1058</cPais>
+          <xPais>BRASIL</xPais>
+          <fone>1188888888</fone>
+        </enderDest>
+      </dest>
+      <total>
+        <ICMSTot>
+          <vBC>0.00</vBC>
+          <vICMS>0.00</vICMS>
+          <vICMSDeson>0.00</vICMSDeson>
+          <vProd>0.00</vProd>
+          <vFrete>PY_VAR32</vFrete>
+          <vSeg>PY_VAR33</vSeg>
+          <vDesc>PY_VAR34</vDesc>
+          <vII>0.00</vII>
+          <vIPI>0.00</vIPI>
+          <vPIS>0.00</vPIS>
+          <vCOFINS>0.00</vCOFINS>
+          <vOutro>PY_VAR35</vOutro>
+          <vNF>0.00</vNF>
+        </ICMSTot>
+      </total>
+      <transp>
+        <modFrete>9</modFrete>
+      </transp>
+      <pag>
+        <detPag>
+          <tPag>01</tPag>
+          <vPag>0.00</vPag>
+        </detPag>
+      </pag>
+    </infNFe>
+  </NFe>
+</nfeProc>

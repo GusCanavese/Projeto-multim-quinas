@@ -435,11 +435,11 @@ def criaXML_ACBr(self, nome_arquivo):
     detPag.appendChild(vPag)
 
     # ================== Salvando arquivo ==================
-    with open(nome_arquivo, "w", encoding="utf-8") as f:
-        f.write(doc.toprettyxml(indent="  "))
+    with open(nome_arquivo, "wb") as f:
+        f.write(doc.toxml(encoding="utf-8"))
 
 # 3ª executado
-def gerarEnvioLote(self, xml_assinado_path="base_assinado.xml", output_path="envio_lote.xml"):
+def gerarEnvioLote(self, xml_assinado_path="arquivos/NotaFiscal/base_assinado.xml", output_path="arquivos/NotaFiscal/envio_lote.xml"):
     """Gera o XML de envio de lote (enviNFe) para envio ao WebService"""
     
     # Carrega o XML assinado
@@ -504,11 +504,12 @@ def get_cert_and_key_from_pfx(pfx_path, pfx_password):
 
 
 
+
 def gerarNFe(self):
     print("chegou no gerarNfe")
-    criaTXT_ACBr(self, "base.txt")
-    criaXML_ACBr(self, "base.xml")
-    criaComandoACBr(self, "NotaFiscal/EnviarComando/enviar.txt")
+    criaTXT_ACBr(self, "arquivos/NotaFiscal/base.txt")
+    criaXML_ACBr(self, "arquivos/NotaFiscal/base.xml")
+    criaComandoACBr(self, "arquivos/NotaFiscal/enviar.txt")
 
     # ============================
     # 1. Carregar o certificado PFX
@@ -536,12 +537,12 @@ def gerarNFe(self):
     # ============================
     # 2. Assinar o XML da NFe
     # ============================
-    xml_tree = etree.parse("base.xml")
+    xml_tree = etree.parse("arquivos/NotaFiscal/base.xml")
     infNFe = xml_tree.find(".//{http://www.portalfiscal.inf.br/nfe}infNFe")
 
     signer = XMLSigner(
         method=methods.enveloped,
-        signature_algorithm="rsa-sha256",   # SEFAZ exige SHA1
+        signature_algorithm="rsa-sha256",   # ⚠️ SEFAZ exige SHA1
         digest_algorithm="sha256",
         c14n_algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
     )
@@ -555,28 +556,72 @@ def gerarNFe(self):
     xml_root = xml_tree.getroot()
     xml_root.insert(0, signed_xml)
 
-    with open("base_assinado.xml", "wb") as f:
+    with open("arquivos/NotaFiscal/base_assinado.xml", "wb") as f:
         f.write(etree.tostring(xml_tree, pretty_print=True, xml_declaration=True, encoding="utf-8"))
 
     print("✅ XML assinado com sucesso!")
 
+
+
+
+
+
+
     # ============================
     # 3. Montar envelope enviNFe
     # ============================
-    enviNFe = etree.Element("enviNFe", xmlns="http://www.portalfiscal.inf.br/nfe", versao="4.00")
+    nfe_node = parseString(etree.tostring(xml_root)).documentElement
 
-    idLote = etree.SubElement(enviNFe, "idLote")
-    idLote.text = str(random.randint(100000000000000, 999999999999999))
+    doc = Document()
+    enviNFe = doc.createElement("enviNFe")
+    enviNFe.setAttribute("xmlns", "http://www.portalfiscal.inf.br/nfe")
+    enviNFe.setAttribute("versao", "4.00")
+    doc.appendChild(enviNFe)
 
-    indSinc = etree.SubElement(enviNFe, "indSinc")
-    indSinc.text = "1"  # síncrono
+    idLote = doc.createElement("idLote")
+    idLote.appendChild(doc.createTextNode(str(random.randint(100000000000000, 999999999999999))))
+    enviNFe.appendChild(idLote)
 
-    enviNFe.append(xml_root)
+    indSinc = doc.createElement("indSinc")
+    indSinc.appendChild(doc.createTextNode("1"))  # síncrono
+    enviNFe.appendChild(indSinc)
 
-    with open("enviNFe.xml", "wb") as f:
-        f.write(etree.tostring(enviNFe, pretty_print=True, xml_declaration=True, encoding="utf-8"))
+    enviNFe.appendChild(doc.importNode(nfe_node, True))
 
-    print("✅ Envelope enviNFe.xml gerado!")
+    # Salvar envelope inicial
+    with open("arquivos/NotaFiscal/enviNFe.xml", "w", encoding="utf-8") as f:
+        f.write(doc.toprettyxml(indent="  "))
+
+    # ============================
+    # 3.1. Limpar namespaces (remover ns0, ns1...)
+    # ============================
+    tree_env = etree.parse("arquivos/NotaFiscal/enviNFe.xml")
+    root_env = tree_env.getroot()
+    etree.cleanup_namespaces(root_env)
+
+    with open("arquivos/NotaFiscal/enviNFe.xml", "wb") as f:
+        f.write(etree.tostring(root_env, pretty_print=True, xml_declaration=True, encoding="utf-8"))
+
+
+
+    def remove_prefixes(xml_path_in, xml_path_out):
+        parser = etree.XMLParser(remove_blank_text=True)
+        tree = etree.parse(xml_path_in, parser)
+        root = tree.getroot()
+
+        # Remove namespace "ds"
+        for elem in root.xpath("//*[namespace-uri()='http://www.w3.org/2000/09/xmldsig#']"):
+            elem.tag = etree.QName(elem).localname  # mantém só o nome da tag
+
+        # Limpar declaração do namespace ds
+        etree.cleanup_namespaces(root)
+
+        # Salvar XML sem os ds:
+        with open(xml_path_out, "wb") as f:
+            f.write(etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="utf-8"))
+
+    # Uso depois de assinar
+    remove_prefixes("arquivos/NotaFiscal/enviNFe.xml", "arquivos/NotaFiscal/enviNFe.xml")
 
     # ============================
     # 4. Enviar para SEFAZ
@@ -589,48 +634,33 @@ def gerarNFe(self):
 
     # MG Homologação - NFe v4.00
     WSDL = "https://hnfe.fazenda.mg.gov.br/nfe2/services/NFeAutorizacao4?wsdl"
-    WSDL_RET = "https://hnfe.fazenda.mg.gov.br/nfe2/services/NFeRetAutorizacao4?wsdl"
 
     client = Client(wsdl=WSDL, transport=transport)
 
-    with open("enviNFe.xml", "rb") as f:
-        xml_envio = f.read()
-
+    with open("arquivos/NotaFiscal/enviNFe.xml", "rb") as f:
+        xml_envio = f.read().strip()
     xml_element = etree.fromstring(xml_envio)
 
-    # Envio do lote
+    # Chamada correta
     response = client.service.nfeAutorizacaoLote(xml_element)
-
-
-
-
-    if isinstance(response, list):
-        if response:  # Check if list is not empty
-            # Print all elements or just the first one
-            for i, element in enumerate(response):
-                print(f"--- Element {i} ---")
-                print(etree.tostring(element, pretty_print=True, encoding="utf-8").decode())
-        else:
-            print("Response list is empty")
-    else:
-        print(etree.tostring(response, pretty_print=True, encoding="utf-8").decode())
-
-
-
-
-
 
     print("📨 Resposta SEFAZ (envio):", response)
 
     # ============================
-    # 5. Consulta do recibo (se disponível)
+    # 5. Interpretar resposta SEFAZ
     # ============================
-    if hasattr(response, "infRec") and hasattr(response.infRec, "nRec"):
-        nRec = response.infRec.nRec
-        print("🔎 Consultando recibo:", nRec)
+    if isinstance(response, list) and len(response) > 0:
+        resp_xml = response[0]  # Element lxml
+        cStat = resp_xml.findtext(".//{http://www.portalfiscal.inf.br/nfe}cStat")
+        xMotivo = resp_xml.findtext(".//{http://www.portalfiscal.inf.br/nfe}xMotivo")
+        nRec = resp_xml.findtext(".//{http://www.portalfiscal.inf.br/nfe}nRec")
 
-        client_ret = Client(wsdl=WSDL_RET, transport=transport)
-        ret = client_ret.service.nfeRetAutorizacaoLote(nRec=nRec)
-        print("📨 Resposta SEFAZ (retorno):", ret)
+        print("➡️ Código:", cStat)
+        print("➡️ Motivo:", xMotivo)
+        if nRec:
+            print("➡️ Número do recibo:", nRec)
+        else:
+            print("⚠️ Não foi retornado número de recibo.")
+
     else:
-        print("⚠️ Não foi possível obter número de recibo da resposta.")
+        print("⚠️ Resposta inesperada da SEFAZ:", response)
