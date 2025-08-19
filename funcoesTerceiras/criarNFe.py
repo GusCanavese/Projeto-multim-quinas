@@ -1,57 +1,20 @@
 import xml.dom.minidom as minidom
-import random
-from datetime import datetime
-import random
 import datetime
-from xml.dom.minidom import Document
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
-from signxml import XMLSigner
 from cryptography.hazmat.primitives.serialization import pkcs12
-from signxml import XMLSigner
-from cryptography.hazmat.primitives.serialization import pkcs12
-from lxml import etree
 from signxml import XMLSigner, methods
-
 from brazilfiscalreport.danfe import Danfe
+from lxml import etree
+from xml.dom.minidom import Document, parseString
+from zeep import Client
+from zeep.transports import Transport
+import requests, random, os
+import tempfile
+from cryptography.hazmat.primitives.serialization import pkcs12, Encoding, PrivateFormat, NoEncryption
+from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_certificates
 
-def gerarEnvioLote(self, xml_assinado_path="base_assinado.xml", output_path="envio_lote.xml"):
-    """Gera o XML de envio de lote (enviNFe) para envio ao WebService"""
-    
-    # Carrega o XML assinado
-    with open(xml_assinado_path, "r", encoding="utf-8") as f:
-        xml_content = f.read()
-    
-    # Cria o documento XML do lote
-    doc = Document()
-    
-    # Elemento raiz
-    enviNFe = doc.createElement("enviNFe")
-    enviNFe.setAttribute("xmlns", "http://www.portalfiscal.inf.br/nfe")
-    enviNFe.setAttribute("versao", "4.00")
-    doc.appendChild(enviNFe)
-    
-    # ID do lote (gerar um número aleatório)
-    idLote = doc.createElement("idLote")
-    idLote.appendChild(doc.createTextNode(str(random.randint(100000000, 999999999))))
-    enviNFe.appendChild(idLote)
-    
-    # Indicador de sincronização (1 para sincrono)
-    indSinc = doc.createElement("indSinc")
-    indSinc.appendChild(doc.createTextNode("1"))
-    enviNFe.appendChild(indSinc)
-    
-    # Adiciona a NFe assinada ao lote
-    nfe = doc.createElement("NFe")
-    nfe_xml = minidom.parseString(xml_content)
-    nfe.appendChild(doc.importNode(nfe_xml.documentElement, True))
-    enviNFe.appendChild(nfe)
-    
-    # Salva o arquivo
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(doc.toprettyxml(indent="  "))
-    
-    print(f"Arquivo de lote gerado em: {output_path}")
+
 
 def criaComandoACBr(self, nome_arquivo):
     with open(nome_arquivo, "w", encoding="utf-8") as f:
@@ -172,6 +135,7 @@ def criaComandoACBr(self, nome_arquivo):
         # Finaliza o comando ACBr
         f.write('"\n,1,1, , ,1)')
 
+# 1ª executado
 def criaTXT_ACBr(self, nome_arquivo):
     with open(nome_arquivo, "w", encoding="utf-8") as f:
         
@@ -288,6 +252,7 @@ def criaTXT_ACBr(self, nome_arquivo):
         f.write(f"vPIS={self.totalPIS.get()}\n")
         f.write(f"vCOFINS={self.totalCOFINS.get()}\n\n")
 
+# 2ª executado
 def criaXML_ACBr(self, nome_arquivo):
     doc = Document()
 
@@ -473,52 +438,199 @@ def criaXML_ACBr(self, nome_arquivo):
     with open(nome_arquivo, "w", encoding="utf-8") as f:
         f.write(doc.toprettyxml(indent="  "))
 
+# 3ª executado
+def gerarEnvioLote(self, xml_assinado_path="base_assinado.xml", output_path="envio_lote.xml"):
+    """Gera o XML de envio de lote (enviNFe) para envio ao WebService"""
+    
+    # Carrega o XML assinado
+    with open(xml_assinado_path, "r", encoding="utf-8") as f:
+        xml_content = f.read()
+    
+    nfe_xml = minidom.parseString(xml_content)
+    nfe_node = nfe_xml.documentElement  # aqui pega diretamente o <NFe>
+    
+    doc = Document()
+    
+    # Elemento raiz
+    enviNFe = doc.createElement("enviNFe")
+    enviNFe.setAttribute("xmlns", "http://www.portalfiscal.inf.br/nfe")
+    enviNFe.setAttribute("versao", "4.00")
+    doc.appendChild(enviNFe)
+    
+    # ID do lote
+    idLote = doc.createElement("idLote")
+    idLote.appendChild(doc.createTextNode(str(random.randint(100000000, 999999999))))
+    enviNFe.appendChild(idLote)
+    
+    # Indicador síncrono
+    indSinc = doc.createElement("indSinc")
+    indSinc.appendChild(doc.createTextNode("1"))
+    enviNFe.appendChild(indSinc)
+    
+    # Insere o nó <NFe> assinado diretamente
+    enviNFe.appendChild(doc.importNode(nfe_node, True))
+    
+    # Salva o arquivo
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(doc.toprettyxml(indent="  "))
+    
+    print(f"Arquivo de lote gerado em: {output_path}")
+
+def get_cert_and_key_from_pfx(pfx_path, pfx_password):
+    """Carrega o .pfx e gera arquivos temporários .pem e .key"""
+    with open(pfx_path, "rb") as f:
+        pfx_data = f.read()
+
+    # Carrega chave privada + certificado público
+    private_key, certificate, _ = load_key_and_certificates(pfx_data, pfx_password.encode())
+
+    # Arquivos temporários
+    cert_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pem")
+    key_file = tempfile.NamedTemporaryFile(delete=False, suffix=".key")
+
+    # Escreve o certificado
+    cert_file.write(certificate.public_bytes(Encoding.PEM))
+    cert_file.flush()
+
+    # Escreve a chave privada
+    key_file.write(private_key.private_bytes(
+        Encoding.PEM,
+        PrivateFormat.TraditionalOpenSSL,
+        NoEncryption()
+    ))
+    key_file.flush()
+
+    return cert_file.name, key_file.name
+
+
+
 def gerarNFe(self):
     print("chegou no gerarNfe")
     criaTXT_ACBr(self, "base.txt")
     criaXML_ACBr(self, "base.xml")
-    criaComandoACBr(self, "NotaFiscal/EnviarComando/enviar.txt")  # Novo
+    criaComandoACBr(self, "NotaFiscal/EnviarComando/enviar.txt")
 
-    # Carregar certificado .pfx
+    # ============================
+    # 1. Carregar o certificado PFX
+    # ============================
     with open("arquivos/certificado.pfx", "rb") as f:
         pfx_data = f.read()
 
-    private_key, certificate, additional_certificates = pkcs12.load_key_and_certificates(pfx_data, b"nutri@00995")
+    private_key, certificate, _ = load_key_and_certificates(
+        pfx_data, b"nutri@00995"  # senha do PFX
+    )
 
-    # Carregar XML da NFe
+    # Criar arquivos temporários PEM e KEY
+    cert_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pem")
+    key_file = tempfile.NamedTemporaryFile(delete=False, suffix=".key")
+
+    cert_file.write(certificate.public_bytes(Encoding.PEM))
+    key_file.write(private_key.private_bytes(
+        Encoding.PEM,
+        PrivateFormat.TraditionalOpenSSL,
+        NoEncryption()
+    ))
+    cert_file.close()
+    key_file.close()
+
+    # ============================
+    # 2. Assinar o XML da NFe
+    # ============================
     xml_tree = etree.parse("base.xml")
-
-    # Localizar nó <infNFe>
     infNFe = xml_tree.find(".//{http://www.portalfiscal.inf.br/nfe}infNFe")
 
-    # Assinar o XML (nó infNFe)
     signer = XMLSigner(
         method=methods.enveloped,
-        signature_algorithm="rsa-sha256",
+        signature_algorithm="rsa-sha256",   # SEFAZ exige SHA1
         digest_algorithm="sha256",
         c14n_algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
     )
-   
-    signed_xml = signer.sign(infNFe, key=private_key, cert=[certificate])
 
-    # Substituir o nó no XML original
-    xml_tree.getroot().insert(0, signed_xml)
+    signed_xml = signer.sign(
+        infNFe,
+        key=private_key,
+        cert=[certificate]
+    )
 
-    # Salvar XML assinado
+    xml_root = xml_tree.getroot()
+    xml_root.insert(0, signed_xml)
+
     with open("base_assinado.xml", "wb") as f:
         f.write(etree.tostring(xml_tree, pretty_print=True, xml_declaration=True, encoding="utf-8"))
 
-    print("XML assinado com sucesso!")
+    print("✅ XML assinado com sucesso!")
+
+    # ============================
+    # 3. Montar envelope enviNFe
+    # ============================
+    enviNFe = etree.Element("enviNFe", xmlns="http://www.portalfiscal.inf.br/nfe", versao="4.00")
+
+    idLote = etree.SubElement(enviNFe, "idLote")
+    idLote.text = str(random.randint(100000000000000, 999999999999999))
+
+    indSinc = etree.SubElement(enviNFe, "indSinc")
+    indSinc.text = "1"  # síncrono
+
+    enviNFe.append(xml_root)
+
+    with open("enviNFe.xml", "wb") as f:
+        f.write(etree.tostring(enviNFe, pretty_print=True, xml_declaration=True, encoding="utf-8"))
+
+    print("✅ Envelope enviNFe.xml gerado!")
+
+    # ============================
+    # 4. Enviar para SEFAZ
+    # ============================
+    session = requests.Session()
+    session.cert = (cert_file.name, key_file.name)
+    session.verify = False  # homologação, em produção usar cadeia da ICP-Brasil
+
+    transport = Transport(session=session)
+
+    # MG Homologação - NFe v4.00
+    WSDL = "https://hnfe.fazenda.mg.gov.br/nfe2/services/NFeAutorizacao4?wsdl"
+    WSDL_RET = "https://hnfe.fazenda.mg.gov.br/nfe2/services/NFeRetAutorizacao4?wsdl"
+
+    client = Client(wsdl=WSDL, transport=transport)
+
+    with open("enviNFe.xml", "rb") as f:
+        xml_envio = f.read()
+
+    xml_element = etree.fromstring(xml_envio)
+
+    # Envio do lote
+    response = client.service.nfeAutorizacaoLote(xml_element)
 
 
 
 
-    # xml_file_path = "base.xml"   # seu XML de prévia
+    if isinstance(response, list):
+        if response:  # Check if list is not empty
+            # Print all elements or just the first one
+            for i, element in enumerate(response):
+                print(f"--- Element {i} ---")
+                print(etree.tostring(element, pretty_print=True, encoding="utf-8").decode())
+        else:
+            print("Response list is empty")
+    else:
+        print(etree.tostring(response, pretty_print=True, encoding="utf-8").decode())
 
-    # with open(xml_file_path, "r", encoding="utf-8") as f:
-    #     xml_content = f.read()
-
-    # danfe = Danfe(xml=xml_content)
-    # danfe.output("danfe_preview.pdf")  # gera o PDF da DANFE
 
 
+
+
+
+    print("📨 Resposta SEFAZ (envio):", response)
+
+    # ============================
+    # 5. Consulta do recibo (se disponível)
+    # ============================
+    if hasattr(response, "infRec") and hasattr(response.infRec, "nRec"):
+        nRec = response.infRec.nRec
+        print("🔎 Consultando recibo:", nRec)
+
+        client_ret = Client(wsdl=WSDL_RET, transport=transport)
+        ret = client_ret.service.nfeRetAutorizacaoLote(nRec=nRec)
+        print("📨 Resposta SEFAZ (retorno):", ret)
+    else:
+        print("⚠️ Não foi possível obter número de recibo da resposta.")
