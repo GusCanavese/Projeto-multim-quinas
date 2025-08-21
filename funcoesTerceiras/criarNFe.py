@@ -1,6 +1,8 @@
 import re
 import xml.dom.minidom as minidom
 import datetime
+from xml.etree.ElementTree import QName
+from attr import s
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from cryptography.hazmat.primitives.serialization import pkcs12
@@ -15,6 +17,7 @@ import tempfile
 from cryptography.hazmat.primitives.serialization import pkcs12, Encoding, PrivateFormat, NoEncryption
 from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_certificates
 import warnings
+from requests_pkcs12 import Pkcs12Adapter
 
 
 class XMLSignerWithSHA1(XMLSigner):
@@ -621,35 +624,25 @@ def gerarNFe(self):
     criaComandoACBr(self, "arquivos/NotaFiscal/enviar.txt")
 
     # ============================
-    # 1. Carregar o certificado PFX
+    # 1) Carregar CHAVE e CERT (PEM) para ASSINAR a NFe
     # ============================
-    with open("arquivos/certificado.pfx", "rb") as f:
-        pfx_data = f.read()
+    from cryptography.hazmat.primitives import serialization
+    from cryptography import x509
 
-    private_key, certificate, _ = load_key_and_certificates(
-        pfx_data, b"nutri@00995"  # senha do PFX
-    )
+    with open("arquivos/chave.key", "rb") as f:
+        key_data = f.read()
+    # Se sua chave estiver protegida por senha, passe password=b"SENHA_AQUI"
+    private_key = serialization.load_pem_private_key(key_data, password=None)
 
-    # Criar arquivos temporários PEM e KEY
-    cert_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pem")
-    key_file = tempfile.NamedTemporaryFile(delete=False, suffix=".key")
-
-    cert_file.write(certificate.public_bytes(Encoding.PEM))
-    key_file.write(private_key.private_bytes(
-        Encoding.PEM,
-        PrivateFormat.TraditionalOpenSSL,
-        NoEncryption()
-    ))
-    cert_file.close()
-    key_file.close()
+    with open("arquivos/certificado.pem", "rb") as f:
+        cert_pem = f.read()
+    certificate = x509.load_pem_x509_certificate(cert_pem)
 
     # ============================
-    # 2. Assinar o XML da NFe
+    # 2) Assinar o XML da NFe (rsa-sha1 / sha1 / c14n20010315)
     # ============================
-
     xml_tree = etree.parse("arquivos/NotaFiscal/base.xml")
 
-    # Localiza <NFe> e <infNFe> ignorando namespaces
     nfe_list = xml_tree.xpath('//*[local-name()="NFe" and ./*[local-name()="infNFe"]]')
     if not nfe_list:
         raise ValueError("Não encontrei <NFe> com filho <infNFe> no XML.")
@@ -660,173 +653,224 @@ def gerarNFe(self):
         raise ValueError("Não encontrei <infNFe> dentro de <NFe>.")
     infNFe = infNFe_list[0]
 
-    # Id do infNFe (obrigatório)
     nfe_id = infNFe.get("Id")
     if not nfe_id:
         raise ValueError('O atributo Id de <infNFe> é obrigatório (ex.: Id="NFe3519...").')
 
-    
-
-    # Assinador com algoritmos exigidos pelo schema da NFe 4.00
     signer = XMLSignerWithSHA1(
-        method=methods.enveloped,  # <Signature> dentro de <NFe>
-        signature_algorithm=SignatureMethod.RSA_SHA1,  # URI rsa-sha1
-        digest_algorithm=DigestAlgorithm.SHA1,         # URI sha1
+        method=methods.enveloped,
+        signature_algorithm=SignatureMethod.RSA_SHA1,
+        digest_algorithm=DigestAlgorithm.SHA1,
         c14n_algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
     )
 
+    # Aqui usamos a CHAVE privada e o CERTIFICADO em PEM para assinar
     signed_nfe = signer.sign(
         nfe,
         key=private_key,
-        cert=[certificate],
-        reference_uri=f"#{nfe_id}",  # referencia o Id do <infNFe>
+        cert=cert_pem,  # passa o certificado em PEM (bytes)
+        reference_uri=f"#{nfe_id}",
     )
 
-    # Substitui a árvore
     nfe_parent = nfe.getparent()
     if nfe_parent is None:
         xml_tree._setroot(signed_nfe)
     else:
         nfe_parent.replace(nfe, signed_nfe)
 
-    # Salva sem mexer nos prefixos ds:
     xml_tree.write(
         "arquivos/NotaFiscal/base_assinado.xml",
         pretty_print=True,
         xml_declaration=True,
         encoding="utf-8",
     )
-
-    print("✅ Assinado com rsa-sha1/sha1, c14n 20010315; <Signature> em <NFe>; Reference -> #Id do infNFe.")
+    print("✅ Assinado com rsa-sha1/sha1; c14n 20010315; Reference -> #Id de infNFe.")
 
     # ============================
-    # 3. Montar envelope enviNFe
+    # 3) Montar enviNFe (lote)
     # ============================
-    # Carregar o XML assinado
     xml_tree_assinado = etree.parse("arquivos/NotaFiscal/base_assinado.xml")
-    xml_root = xml_tree_assinado.getroot()  # ← DEFINIR xml_root AQUI
+    xml_root = xml_tree_assinado.getroot()  # <NFe> assinado
 
     enviNFe = etree.Element("enviNFe", xmlns="http://www.portalfiscal.inf.br/nfe", versao="4.00")
 
     idLote = etree.SubElement(enviNFe, "idLote")
-    idLote.text = str(random.randint(100000000000000, 999999999999999))
+    idLote.text = str(random.randint(10**14, 10**15 - 1))  # 15 dígitos
 
     indSinc = etree.SubElement(enviNFe, "indSinc")
-    indSinc.text = "1"  # síncrono
+    indSinc.text = "1"  # síncrono (pode retornar 104 direto)
 
-    # Insere o nó <NFe> assinado
-    enviNFe.append(xml_root)  # ← AGORA xml_root ESTÁ DEFINIDO
+    enviNFe.append(xml_root)
 
-    # Salva o envelope de envio
     tree_env = etree.ElementTree(enviNFe)
     tree_env.write("arquivos/NotaFiscal/enviNFe.xml", encoding="utf-8", xml_declaration=True)
+
+    # Normaliza o conteúdo do enviNFe para colocar dentro do nfeDadosMsg (sem prólogo)
+    xml_envio_content_bytes = open("arquivos/NotaFiscal/enviNFe.xml", "rb").read()
+    _envi = etree.fromstring(xml_envio_content_bytes)
+    xml_envio_content = etree.tostring(_envi, encoding="unicode", xml_declaration=False)
+
     # ============================
-    # 4. Enviar para SEFAZ
+    # 4) Enviar para SEFAZ - Autorização 4.00 (robusto com QNames)
     # ============================
-    parser = etree.XMLParser(remove_blank_text=True)
+        # ============================
+    # 4) Enviar para SEFAZ - Autorização 4.00 (apenas SOAP 1.2)
+    # ============================
 
-    # enviNFe é o elemento já com <NFe> assinado dentro
-    xml_envio_content = etree.tostring(
-        enviNFe, encoding="utf-8", xml_declaration=False, pretty_print=False, with_tail=False
-    ).decode("utf-8")
 
-    xml_envio_content = re.sub(r">\s+<", "><", xml_envio_content.strip())
+    SOAP12_NS = "http://www.w3.org/2003/05/soap-envelope"
+    WSDL_AUT  = "http://www.portalfiscal.inf.br/nfe/wsdl/NFeAutorizacao4"
 
-    # Criar o envelope SOAP adequado
-    soap_envelope = (
-        '<?xml version="1.0" encoding="utf-8"?>'
-        '<soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">'
-        '<soap12:Header>'
-            '<nfeCabecMsg xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NFeAutorizacao4">'
-            '<cUF>31</cUF>'
-            '<versaoDados>4.00</versaoDados>'
-            '</nfeCabecMsg>'
-        '</soap12:Header>'
-        '<soap12:Body>'
-            '<nfeAutorizacaoLote xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NFeAutorizacao4">'
-            '<nfeDadosMsg xmlns="http://www.portalfiscal.inf.br/nfe">'
-                + xml_envio_content +
-            '</nfeDadosMsg>'
-            '</nfeAutorizacaoLote>'
-        '</soap12:Body>'
-        '</soap12:Envelope>'
+    # payload_elem já é o seu enviNFe normalizado:
+    payload_elem = etree.fromstring(
+        xml_envio_content if isinstance(xml_envio_content, (bytes, bytearray))
+        else xml_envio_content.encode("utf-8")
     )
+
+    SOAP12_NS = "http://www.w3.org/2003/05/soap-envelope"
+    WSDL_AUT  = "http://www.portalfiscal.inf.br/nfe/wsdl/NFeAutorizacao4"
+
+    def build_envelope_soap12_prefix(payload_el):
+        # Usa Clark notation: "{NS}Tag"
+        env  = etree.Element(f"{{{SOAP12_NS}}}Envelope", nsmap={"soap12": SOAP12_NS, "nfe4": WSDL_AUT})
+        hdr  = etree.SubElement(env,  f"{{{SOAP12_NS}}}Header")
+        cab  = etree.SubElement(hdr,  f"{{{WSDL_AUT}}}nfeCabecMsg")
+        etree.SubElement(cab,        f"{{{WSDL_AUT}}}cUF").text = "31"
+        etree.SubElement(cab,        f"{{{WSDL_AUT}}}versaoDados").text = "4.00"
+        body = etree.SubElement(env, f"{{{SOAP12_NS}}}Body")
+        op = etree.SubElement(body, f"{{{WSDL_AUT}}}nfeAutorizacaoLoteRequest")
+        dados= etree.SubElement(op,  f"{{{WSDL_AUT}}}nfeDadosMsg")
+        dados.append(payload_el)  # seu <enviNFe ... xmlns="http://www.portalfiscal.inf.br/nfe">
+        return env
+
     url = "https://hnfe.fazenda.mg.gov.br/nfe2/services/NFeAutorizacao4"
     headers = {
         "Content-Type": "application/soap+xml; charset=utf-8",
-        "SOAPAction": "http://www.portalfiscal.inf.br/nfe/wsdl/NFeAutorizacao4/nfeAutorizacaoLote",  # opcional no SOAP 1.2
+        "Accept": "application/soap+xml",
     }
 
-    # Certificado A1 (já convertido em .pem e .key)
-    cert = (cert_file.name, key_file.name)
+    # Cert mTLS (PEM + KEY)
+    cert = ("arquivos/certificado.pem", "arquivos/chave.key")
 
-    response = requests.post(url, data=soap_envelope.encode("utf-8"), headers=headers, cert=cert, verify=False)
+    # Monta o envelope (apenas 1 variação)
+    env_elem = build_envelope_soap12_prefix(payload_elem)
+    soap_envelope = etree.tostring(env_elem, encoding="utf-8", xml_declaration=True).decode("utf-8")
+    open("arquivos/NotaFiscal/ultimo_envelope_enviado.xml", "w", encoding="utf-8").write(soap_envelope)
 
-   # --- ENVIO ---
-    response = requests.post(
-        url,
-        data=soap_envelope.encode("utf-8"),
-        headers=headers,
-        cert=cert,
-        verify=False
-    )
+    # POST
+    try:
+        response = requests.post(
+            url,
+            data=soap_envelope.encode("utf-8"),
+            headers=headers,
+            cert=cert,
+            verify=False,   # em prod, use cadeia ICP-Brasil
+            timeout=30
+        )
+    except Exception as e:
+        open("arquivos/NotaFiscal/ultimo_erro_envio.txt", "w", encoding="utf-8").write(f"{type(e).__name__}: {e}")
+        print("❌ Erro no POST (mTLS/conexão). Detalhes em arquivos/NotaFiscal/ultimo_erro_envio.txt")
+        return
 
-    print("📨 Resposta SEFAZ (envio):")
-    print(response.text)
+    # Guarda a resposta
+    open("arquivos/NotaFiscal/ultima_resposta_sefaz.xml", "w", encoding="utf-8").write(response.text or "")
 
-    # Extrai número do recibo
-    tree = etree.fromstring(response.content)
-    nRec_nodes = tree.xpath('//ns:nRec', namespaces={'ns': 'http://www.portalfiscal.inf.br/nfe'})
+    print("HTTP:", response.status_code, response.headers.get("Content-Type"))
+    if not response.text:
+        print("⚠️ Corpo da resposta vazio. Verifique Content-Type/headers no envio.")
+        return
+
+    # Se houver SOAP Fault, mostre e pare
+    if "<Fault" in response.text or "<S:Fault" in response.text or "<soapenv:Fault" in response.text:
+        print("📨 Resposta SEFAZ (envio) — primeiras linhas:")
+        print(response.text[:1500])
+        print("❌ SOAP Fault. Abra os arquivos de depuração para comparar com o WSDL:")
+        print("   - arquivos/NotaFiscal/ultimo_envelope_enviado.xml")
+        print("   - arquivos/NotaFiscal/ultima_resposta_sefaz.xml")
+        return
+
+    print("📨 Resposta SEFAZ (envio) — primeiras linhas:")
+    print(response.text[:1500])
+    # ============================
+    # 5) Interpretar retorno da Autorização
+    # ============================
+    try:
+        root = etree.fromstring(response.content)
+    except Exception as e:
+        print("❌ Resposta inválida:", e)
+        return
+
+    cStat_nodes = root.xpath('//*[local-name()="cStat"]')
+    xMotivo_nodes = root.xpath('//*[local-name()="xMotivo"]')
+    cStat = cStat_nodes[0].text if cStat_nodes else None
+    xMotivo = xMotivo_nodes[0].text if xMotivo_nodes else None
+    if cStat and xMotivo:
+        print(f"↩️ cStat={cStat} - {xMotivo}")
+
+    if cStat == "104":
+        prot = root.xpath('//*[local-name()="protNFe"]')
+        if prot:
+            open("arquivos/NotaFiscal/protocolo_autorizacao.xml", "wb").write(etree.tostring(prot[0], encoding="utf-8", pretty_print=True))
+            print("✅ Lote processado (104). Protocolo salvo em arquivos/NotaFiscal/protocolo_autorizacao.xml")
+            return
+
+    # Se tiver número do recibo, consulta no RetAutorizacao
+    nRec_nodes = root.xpath('//*[local-name()="nRec"]')
     if not nRec_nodes:
-        print("❌ Nenhum número de recibo retornado. Verifique se a nota foi aceita.")
+        print("❌ Nenhum número de recibo retornado. Verifique os arquivos de depuração:")
+        print("   - arquivos/NotaFiscal/ultimo_envelope_enviado.xml")
+        print("   - arquivos/NotaFiscal/ultima_resposta_sefaz.xml")
         return
 
     nRec = nRec_nodes[0].text
     print("📌 Número do recibo:", nRec)
 
-    # --- CONSULTA RECIBO ---
-    soap_consulta = f"""
-    <soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope" xmlns:nfe4="http://www.portalfiscal.inf.br/nfe/wsdl/NFeRetAutorizacao4">
-    <soap12:Header>
-        <nfe4:nfeCabecMsg>
-        <nfe4:cUF>31</nfe4:cUF>
-        <nfe4:versaoDados>4.00</nfe4:versaoDados>
-        </nfe4:nfeCabecMsg>
-    </soap12:Header>
-    <soap12:Body>
-        <nfe4:nfeRetAutorizacaoLote>
-        <nfe4:nfeDadosMsg>
-            <![CDATA[
-            <consReciNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
-            <tpAmb>2</tpAmb>
-            <nRec>{nRec}</nRec>
-            </consReciNFe>
-            ]]>
-        </nfe4:nfeDadosMsg>
-        </nfe4:nfeRetAutorizacaoLote>
-    </soap12:Body>
-    </soap12:Envelope>
-    """
+    # ============================
+    # 6) Consultar recibo (RetAutorizacao4)
+    # ============================
+    url_ret = "https://hnfe.fazenda.mg.gov.br/nfe2/services/NFeRetAutorizacao4"
+    cons = f'''<?xml version="1.0" encoding="utf-8"?>
+<soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope"
+                 xmlns:nfe4="http://www.portalfiscal.inf.br/nfe/wsdl/NFeRetAutorizacao4">
+  <soap12:Header>
+    <nfe4:nfeCabecMsg>
+      <nfe4:cUF>31</nfe4:cUF>
+      <nfe4:versaoDados>4.00</nfe4:versaoDados>
+    </nfe4:nfeCabecMsg>
+  </soap12:Header>
+  <soap12:Body>
+    <nfe4:nfeRetAutorizacaoLoteRequest>
+      <nfe4:nfeDadosMsg>
+        <consReciNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+          <tpAmb>2</tpAmb>
+          <nRec>{nRec}</nRec>
+        </consReciNFe>
+      </nfe4:nfeDadosMsg>
+    </nfe4:nfeRetAutorizacaoLoteRequest>
+  </soap12:Body>
+</soap12:Envelope>'''
 
-    url_consulta = "https://hnfe.fazenda.mg.gov.br/nfe2/services/NFeRetAutorizacao4"
+    hdr_ret = {
+        "Content-Type": 'application/soap+xml; charset=utf-8; action="http://www.portalfiscal.inf.br/nfe/wsdl/NFeRetAutorizacao4/nfeRetAutorizacaoLoteRequest"',
+        "SOAPAction": "http://www.portalfiscal.inf.br/nfe/wsdl/NFeRetAutorizacao4/nfeRetAutorizacaoLoteRequest",
+        "Accept": "application/soap+xml",
+    }
 
-    response_consulta = requests.post(
-        url_consulta,
-        data=soap_consulta.encode("utf-8"),
-        headers={"Content-Type": "application/soap+xml; charset=utf-8"},
-        cert=cert,
-        verify=False
-    )
+    open("arquivos/NotaFiscal/ultimo_envelope_enviado_consulta.xml", "w", encoding="utf-8").write(cons)
+    r2 = requests.post(url_ret, data=cons.encode("utf-8"), headers=hdr_ret, cert=cert, verify=False, timeout=30)
+    open("arquivos/NotaFiscal/ultima_resposta_sefaz_consulta.xml", "w", encoding="utf-8").write(r2.text or "")
 
-    print("📨 Resposta SEFAZ (consulta recibo):")
-    print(response_consulta.text)
+    print("📨 Resposta SEFAZ (consulta recibo) — primeiras linhas:")
+    print((r2.text or "")[:1500])
 
-    # Extrai código e motivo
-    tree_consulta = etree.fromstring(response_consulta.content)
-    cStat_nodes = tree_consulta.xpath('//ns:cStat', namespaces={'ns': 'http://www.portalfiscal.inf.br/nfe'})
-    xMotivo_nodes = tree_consulta.xpath('//ns:xMotivo', namespaces={'ns': 'http://www.portalfiscal.inf.br/nfe'})
+    root2 = etree.fromstring(r2.content)
+    cStat2 = (root2.xpath('//*[local-name()="cStat"]')[0].text) if root2.xpath('//*[local-name()="cStat"]') else "???"
+    xMotivo2 = (root2.xpath('//*[local-name()="xMotivo"]')[0].text) if root2.xpath('//*[local-name()="xMotivo"]') else "???"
+    print(f"🔎 RetAutorizacao: {cStat2} - {xMotivo2}")
 
-    cStat = cStat_nodes[0].text if cStat_nodes else "???"
-    xMotivo = xMotivo_nodes[0].text if xMotivo_nodes else "???"
-
-    print(f"✅ Status da NFe: {cStat} - {xMotivo}")
+    prot = root2.xpath('//*[local-name()="protNFe"]')
+    if prot:
+        open("arquivos/NotaFiscal/protocolo_autorizacao.xml", "wb").write(etree.tostring(prot[0], encoding="utf-8", pretty_print=True))
+        print("✅ Protocolo salvo em arquivos/NotaFiscal/protocolo_autorizacao.xml")
+    else:
+        print("ℹ️ Sem <protNFe> no retorno da consulta. Veja os arquivos de depuração.")
