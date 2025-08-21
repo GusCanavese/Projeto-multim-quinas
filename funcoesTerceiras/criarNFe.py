@@ -261,293 +261,288 @@ def criaTXT_ACBr(self, nome_arquivo):
 
 # 2ª executado
 def criaXML_ACBr(self, nome_arquivo):
-    doc = Document()
+    """
+    NFe 4.00 (Homologação)
+    - Evita 225: ordem correta de tags em <prod> e campos obrigatórios.
+    - Evita 209: IE do emitente obrigatória, numérica e obtida com segurança (sem depender do atributo existir).
+    - Evita 232: destinatário com indIEDest/IE consistentes (padrão: ISENTO).
+    - Simples Nacional: ICMS via ICMSSN102 (CSOSN=102).
+    - PIS/COFINS mínimos (PISNT/COFINSNT).
+    """
+    import datetime, random, re
+    from xml.dom.minidom import Document
 
-    # Elemento raiz
+    # ---------------- Helpers ----------------
+    def only_digits(s): return re.sub(r"\D", "", str(s or ""))
+
+    def txt(tag, val, parent):
+        el = doc.createElement(tag)
+        el.appendChild(doc.createTextNode(str(val)))
+        parent.appendChild(el)
+        return el
+
+    def fmt2(x):  return f"{float(str(x).replace(',', '.')):.2f}"
+    def fmt4(x):  return f"{float(str(x).replace(',', '.')):.4f}"
+    def fmt10(x): return f"{float(str(x).replace(',', '.')):.10f}"
+
+    # ---------------- Emitente (preencha IE real se quiser fixar aqui) ----------------
+    EMIT = {
+        "CNPJ": "00995044000107",                  # 14 dígitos
+        "xNome": "NUTRIGEL DISTRIBUIDORA EIRELI",
+        "xLgr": "R DOUTOR OSCAR DA CUNHA",
+        "nro": "126",
+        "xBairro": "FABRICAS",
+        "cMun": "3162500",                         # IBGE São João del-Rei
+        "xMun": "SAO JOAO DEL REI",
+        "UF": "MG",
+        "CEP": "36301194",
+        "cPais": "1058",
+        "xPais": "BRASIL",
+        "fone": "3233713382",
+        "IE": "6259569630086",  # <- se quiser, coloque a IE verdadeira aqui como string numérica; senão pegamos da UI
+    }
+
+    # ---------------- Raiz ----------------
+    doc = Document()
     NFe = doc.createElement("NFe")
     NFe.setAttribute("xmlns", "http://www.portalfiscal.inf.br/nfe")
     doc.appendChild(NFe)
 
     infNFe = doc.createElement("infNFe")
+    infNFe.setAttribute("versao", "4.00")
     NFe.appendChild(infNFe)
 
-    uf = getattr(self, "cUF", "31")
+    # ---------------- Chave de acesso ----------------
+    cUF = getattr(self, "cUF", "31")  # MG
     ano_mes = datetime.datetime.now().strftime("%y%m")
-    cnpj = getattr(self, "cnpjEmitente", "00000000000000").get() if hasattr(self, "cnpjEmitente") else "00000000000000"
+    cnpj_emit = only_digits(EMIT["CNPJ"]).zfill(14)
+    mod = "55"
 
-    # serie e nNF: sem zeros à esquerda na TAG, com zeros na chave
-    serie_raw = getattr(self, "serie", "1").get() if hasattr(self, "serie") else "1"
-    serie_num = max(1, int(serie_raw))
-    serie_xml = str(serie_num)
+    # série
+    try:
+        serie_raw = self.serie.get()
+    except Exception:
+        serie_raw = getattr(self, "serie", "1")
+    serie_xml = str(max(1, int(str(serie_raw or "1"))))
     serie_key = serie_xml.zfill(3)
 
-    nNF_raw = getattr(self, "nNF", "1").get() if hasattr(self, "nNF") else "1"
-    nNF_xml = str(int(nNF_raw))
+    # número
+    try:
+        nNF_raw = self.nNF.get()
+    except Exception:
+        nNF_raw = getattr(self, "nNF", "1")
+    nNF_xml = str(int(str(nNF_raw or "1")))
     nNF_key = nNF_xml.zfill(9)
 
-    mod = "55"
     tpEmis = "1"
     cNF = str(random.randint(10000000, 99999999))
+    chave_sem_dv = cUF + ano_mes + cnpj_emit + mod + serie_key + nNF_key + tpEmis + cNF
 
-    # chave sem DV (43 dígitos) + DV
-    chave_sem_dv = uf + ano_mes + cnpj.zfill(14) + mod + serie_key + nNF_key + tpEmis + cNF
-
-    def calcula_dv(chave):
-        pesos = [2,3,4,5,6,7,8,9]
-        soma = 0
-        for i, d in enumerate(reversed(chave)):
+    def calc_dv(ch):
+        pesos = [2,3,4,5,6,7,8,9]; soma = 0
+        for i, d in enumerate(reversed(ch)):
             soma += int(d) * pesos[i % len(pesos)]
-        resto = soma % 11
-        dv = 11 - resto
+        dv = 11 - (soma % 11)
         return "0" if dv >= 10 else str(dv)
 
-    dv = calcula_dv(chave_sem_dv)
-    chave_acesso = chave_sem_dv + dv
+    dv = calc_dv(chave_sem_dv)
+    infNFe.setAttribute("Id", f"NFe{chave_sem_dv}{dv}")
 
-    # Atributos do infNFe
-    infNFe.setAttribute("Id", f"NFe{chave_acesso}")
-    infNFe.setAttribute("versao", "4.00")
+    # ---------------- ide ----------------
+    ide = doc.createElement("ide"); infNFe.appendChild(ide)
+    now_iso = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S-03:00")
+    for k, v in [
+        ("cUF", cUF),
+        ("cNF", cNF),
+        ("natOp", (self.naturezaOperacao.get() if hasattr(self, "naturezaOperacao") and hasattr(self.naturezaOperacao, "get")
+                   else getattr(self, "naturezaOperacao", "VENDA")) or "VENDA"),
+        ("mod", mod),
+        ("serie", serie_xml),
+        ("nNF", nNF_xml),
+        ("dhEmi", now_iso),
+        ("tpNF", "1"),
+        ("idDest", "1"),
+        ("cMunFG", EMIT["cMun"]),
+        ("tpImp", "1"),
+        ("tpEmis", tpEmis),
+        ("cDV", dv),
+        ("tpAmb", "2"),
+        ("finNFe", "1"),
+        ("indFinal", "1"),
+        ("indPres", "1"),
+        ("procEmi", "0"),
+        ("verProc", "MeuSistema_1.0"),
+    ]:
+        txt(k, v, ide)
 
-    # =============== ide ===============
-    ide = doc.createElement("ide")
-    infNFe.appendChild(ide)
-    elementos_ide = {
-        "cUF": uf,
-        "cNF": cNF,
-        "natOp": getattr(self, "naturezaOperacao", "VENDA").get() if hasattr(self, "naturezaOperacao") else "VENDA",
-        "mod": mod,
-        "serie": serie_xml,
-        "nNF": nNF_xml,
-        "dhEmi": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S-03:00"),
-        "tpNF": "1",
-        "idDest": "1",
-        "cMunFG": getattr(self, "cMunFG", "3106200"),
-        "tpImp": "1",
-        "tpEmis": "1",
-        "cDV": dv,
-        "tpAmb": "2",
-        "finNFe": "1",
-        "indFinal": "1",
-        "indPres": "1",
-        "procEmi": "0",
-        "verProc": "MeuSistema_1.0"
-    }
-    for k, v in elementos_ide.items():
-        el = doc.createElement(k)
-        el.appendChild(doc.createTextNode(str(v)))
-        ide.appendChild(el)
-
-    # =============== emit ===============
+    # ---------------- emit ----------------
     emit = doc.createElement("emit")
     infNFe.appendChild(emit)
-    for k in ["CNPJ", "xNome", "xFant"]:
-        if k == "CNPJ":
-            v = cnpj
-        elif k == "xNome":
-            v = getattr(self, "razaoSocialEmitente", "Empresa Exemplo LTDA").get() if hasattr(self, "razaoSocialEmitente") else "Empresa Exemplo LTDA"
-        else:
-            v = "Teste"
-        el = doc.createElement(k)
-        el.appendChild(doc.createTextNode(str(v)))
-        emit.appendChild(el)
 
+    txt("CNPJ", cnpj_emit, emit)
+    txt("xNome", EMIT["xNome"], emit)
+    txt("xFant", EMIT["xNome"], emit)
+
+    # Endereço do emitente
     enderEmit = doc.createElement("enderEmit")
     emit.appendChild(enderEmit)
-    end_emit_dict = {
-        "xLgr": "Rua Exemplo",
-        "nro": "100",
-        "xBairro": "Centro",
-        "cMun": "3106200",
-        "xMun": "Belo Horizonte",
-        "UF": "MG",
-        "CEP": "30000000",
-        "cPais": "1058",
-        "xPais": "BRASIL",
-        "fone": "3133333333"
-    }
-    for k, v in end_emit_dict.items():
-        el = doc.createElement(k)
-        el.appendChild(doc.createTextNode(str(v)))
-        enderEmit.appendChild(el)
+    for k, v in [
+        ("xLgr", EMIT["xLgr"]), ("nro", EMIT["nro"]), ("xBairro", EMIT["xBairro"]),
+        ("cMun", EMIT["cMun"]), ("xMun", EMIT["xMun"]), ("UF", EMIT["UF"]),
+        ("CEP", EMIT["CEP"]), ("cPais", EMIT["cPais"]), ("xPais", EMIT["xPais"]),
+        ("fone", EMIT["fone"]),
+    ]:
+        txt(k, v, enderEmit)
 
-    for k, v in {"IE": getattr(self, "inscricaoEstadualEmitente", "123456789").get() if hasattr(self, "inscricaoEstadualEmitente") else "123456789",
-                 "CRT": "1"}.items():
-        el = doc.createElement(k)
-        el.appendChild(doc.createTextNode(str(v)))
-        emit.appendChild(el)
+    # ▼ COLE AQUI (IE do emitente)
+    ie_emit = None
+    if hasattr(self, "inscricaoEstadualEmitente"):
+        try:
+            ie_emit = self.inscricaoEstadualEmitente.get()
+        except Exception:
+            ie_emit = getattr(self, "inscricaoEstadualEmitente", None)
+    if not ie_emit:
+        ie_emit = EMIT["IE"]  # caso tenha definido acima
 
-    # =============== dest ===============
+    ie_emit = only_digits(ie_emit)
+    if not ie_emit:
+        # Melhor falhar aqui do que tomar 209 no SEFAZ
+        raise ValueError("IE do emitente ausente. Defina a IE real (apenas números) em self.inscricaoEstadualEmitente ou EMIT['IE'].")
+
+    txt("IE", ie_emit, emit)   # <-- ANTES do CRT
+    txt("CRT", "1", emit)      # Simples Nacional
+
+    # ---------------- dest (Homologação) ----------------
+    xNomeDest = "NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL"
+    cnpj_dest = cnpj_emit  # CNPJ válido só para passar validação em homologação
     dest = doc.createElement("dest")
     infNFe.appendChild(dest)
-    for k in ["CNPJ", "xNome"]:
-        v = getattr(self, "cnpjDestinatario", "11111111111111").get() if (k=="CNPJ" and hasattr(self,"cnpjDestinatario")) else (
-            getattr(self, "nomeDestinatario", "Cliente Teste").get() if (k=="xNome" and hasattr(self,"nomeDestinatario")) else ("11111111111111" if k=="CNPJ" else "Cliente Teste")
-        )
-        el = doc.createElement(k)
-        el.appendChild(doc.createTextNode(str(v)))
-        dest.appendChild(el)
 
+    txt("CNPJ", only_digits(cnpj_dest).zfill(14), dest)
+    txt("xNome", xNomeDest, dest)
+
+    # Endereço do destinatário
     enderDest = doc.createElement("enderDest")
     dest.appendChild(enderDest)
-    end_dest_dict = {
-        "xLgr": "Rua Cliente",
-        "nro": "200",
-        "xBairro": "Bairro Teste",
-        "cMun": "3106200",
-        "xMun": "Belo Horizonte",
-        "UF": "MG",
-        "CEP": "30000000",
-        "cPais": "1058",
-        "xPais": "BRASIL",
-        "fone": "3133333333"
-    }
-    for k, v in end_dest_dict.items():
-        el = doc.createElement(k)
-        el.appendChild(doc.createTextNode(str(v)))
-        enderDest.appendChild(el)
+    for k, v in [
+        ("xLgr", EMIT["xLgr"]), ("nro", EMIT["nro"]), ("xBairro", EMIT["xBairro"]),
+        ("cMun", EMIT["cMun"]), ("xMun", EMIT["xMun"]), ("UF", EMIT["UF"]),
+        ("CEP", EMIT["CEP"]), ("cPais", EMIT["cPais"]), ("xPais", EMIT["xPais"]),
+    ]:
+        txt(k, v, enderDest)
 
-    for k, v in {"indIEDest": "9", "email": "cliente@email.com"}.items():
-        el = doc.createElement(k)
-        el.appendChild(doc.createTextNode(str(v)))
-        dest.appendChild(el)
+    # ▼▼▼ COLE ESTE BLOCO AQUI ▼▼▼
 
-    # =============== det/prod ===============
+    # Homologação: tratar destinatário como NÃO CONTRIBUINTE (indIEDest=9)
+    # txt("indIEDest", "1", dest)
+    # txt("IE", ie_emit, dest)
+
+    # Garantir que NENHUMA tag <IE> fique no destinatário (evita 232/225)
+    txt("indIEDest", "1", dest)
+
+    # Use a MESMA IE numérica que você já usou no <emit> (ex.: a variável ie_emit)
+    txt("IE", ie_emit, dest)
+
+    # ▲▲▲ FIM DO BLOCO ▲▲▲
+
+    # ---------------- det/prod ----------------
     total_vProd = 0.0
 
-    def add_produto(prod_dict, index):
+    def add_item(idx, prod_dict):
         nonlocal total_vProd
-        det = doc.createElement("det")
-        det.setAttribute("nItem", str(index))
-        infNFe.appendChild(det)
+        det = doc.createElement("det"); det.setAttribute("nItem", str(idx)); infNFe.appendChild(det)
 
-        prodEl = doc.createElement("prod")
-        det.appendChild(prodEl)
+        prod = doc.createElement("prod"); det.appendChild(prod)
 
-        # ORDEM **OBRIGATÓRIA**
-        seq = [
-            ("cProd",    prod_dict.get("codigo", f"P{index}")),
-            ("cEAN",     prod_dict.get("ean", "SEM GTIN") or "SEM GTIN"),
-            ("xProd",    prod_dict.get("descricao", "Produto")),
-            ("NCM",      prod_dict.get("ncm", "00000000")),
-            # ("CEST",   prod_dict.get("cest","")),  # se tiver, insira aqui
-            ("CFOP",     prod_dict.get("cfop", "5102")),
-            ("uCom",     prod_dict.get("unidade", "UN")),
-            ("qCom",     f"{float(prod_dict.get('quantidade', 1)):.4f}"),
-            ("vUnCom",   f"{float(prod_dict.get('valorUnitario', prod_dict.get('valor_unitario', 0))) :.10f}"),
-            ("vProd",    f"{float(prod_dict.get('valorTotal',  prod_dict.get('valor_total',   0))) :.2f}"),
-            ("cEANTrib", prod_dict.get("ean_trib", "SEM GTIN") or "SEM GTIN"),
-            ("uTrib",    prod_dict.get("unidade", "UN")),
-            ("qTrib",    f"{float(prod_dict.get('quantidade', 1)):.4f}"),
-            ("vUnTrib",  f"{float(prod_dict.get('valorUnitario', prod_dict.get('valor_unitario', 0))) :.10f}"),
-            ("indTot",   "1"),
-        ]
-        vprod_value = 0.0
-        for tag, valor in seq:
-            el = doc.createElement(tag)
-            el.appendChild(doc.createTextNode(str(valor).strip()))
-            prodEl.appendChild(el)
-            if tag == "vProd":
-                try:
-                    vprod_value = float(str(valor).replace(",", "."))
-                except:
-                    vprod_value = 0.0
+        cProd = prod_dict.get("codigo", f"P{idx}")
+        cEAN = prod_dict.get("ean", "") or "SEM GTIN"
+        xProd = prod_dict.get("descricao", "PRODUTO")
+        NCM = prod_dict.get("ncm", "00000000")
+        CFOP = prod_dict.get("cfop", "5102")
+        uCom = prod_dict.get("unidade", "UN")
+        qCom = prod_dict.get("quantidade", 1)
+        vUnCom = prod_dict.get("valorUnitario", prod_dict.get("valor_unitario", 0))
+        vProd_val = prod_dict.get("valorTotal", float(qCom) * float(vUnCom))
+        cEANTrib = prod_dict.get("ean_trib", "") or "SEM GTIN"
+        uTrib = uCom; qTrib = qCom; vUnTrib = vUnCom
 
-        total_vProd += vprod_value
+        for k, v in [
+            ("cProd", cProd),
+            ("cEAN", cEAN),
+            ("xProd", xProd),
+            ("NCM", NCM),
+            ("CFOP", CFOP),
+            ("uCom", uCom),
+            ("qCom", fmt4(qCom)),
+            ("vUnCom", fmt10(vUnCom)),
+            ("vProd", fmt2(vProd_val)),
+            ("cEANTrib", cEANTrib),
+            ("uTrib", uTrib),
+            ("qTrib", fmt4(qTrib)),
+            ("vUnTrib", fmt10(vUnTrib)),
+            ("indTot", "1"),
+        ]:
+            txt(k, v, prod)
 
-        # ====== impostos (mínimo para schema) ======
-        imposto = doc.createElement("imposto")
-        det.appendChild(imposto)
+        try: total_vProd += float(str(vProd_val).replace(",", "."))
+        except Exception: pass
 
-        icms = doc.createElement("ICMS")
-        imposto.appendChild(icms)
+        # Impostos
+        imposto = doc.createElement("imposto"); det.appendChild(imposto)
 
-        icms00 = doc.createElement("ICMS00")
-        icms.appendChild(icms00)
+        ICMS = doc.createElement("ICMS"); imposto.appendChild(ICMS)
+        ICMSSN102 = doc.createElement("ICMSSN102"); ICMS.appendChild(ICMSSN102)
+        txt("orig", "0", ICMSSN102); txt("CSOSN", "102", ICMSSN102)
 
-        for k, v in {
-            "orig": "0",
-            "CST": "00",
-            "modBC": "0",
-            "vBC": "0.00",
-            "pICMS": "0.00",
-            "vICMS": "0.00"
-        }.items():
-            el = doc.createElement(k)
-            el.appendChild(doc.createTextNode(v))
-            icms00.appendChild(el)
+        PIS = doc.createElement("PIS"); imposto.appendChild(PIS)
+        PISNT = doc.createElement("PISNT"); PIS.appendChild(PISNT)
+        txt("CST", "07", PISNT)
+
+        COFINS = doc.createElement("COFINS"); imposto.appendChild(COFINS)
+        COFINSNT = doc.createElement("COFINSNT"); COFINS.appendChild(COFINSNT)
+        txt("CST", "07", COFINSNT)
 
     itens = getattr(self, "valoresDosItens", [])
-    if itens:
-        for i, prod in enumerate(itens, start=1):
-            add_produto(prod, i)
+    if isinstance(itens, list) and itens:
+        for i, p in enumerate(itens, start=1): add_item(i, p or {})
     else:
-        # Produto default também na ORDEM correta e com cEAN/cEANTrib
-        add_produto({
-            "codigo": "000",
-            "descricao": "Produto Default",
-            "ncm": "00000000",
-            "cfop": "5102",
-            "unidade": "UN",
-            "quantidade": 1,
-            "valorUnitario": 0.00,
-            "valorTotal": 0.00,
-            "ean": "SEM GTIN",
-            "ean_trib": "SEM GTIN",
-        }, 1)
+        add_item(1, {
+            "codigo": "0001", "descricao": "PRODUTO TESTE",
+            "ncm": "00000000", "cfop": "5102", "unidade": "UN",
+            "quantidade": 1, "valorUnitario": 1.00, "valorTotal": 1.00,
+            "ean": "SEM GTIN", "ean_trib": "SEM GTIN",
+        })
 
-    # =============== total ===============
-    total = doc.createElement("total")
-    infNFe.appendChild(total)
+    # ---------------- total/ICMSTot ----------------
+    total = doc.createElement("total"); infNFe.appendChild(total)
+    ICMSTot = doc.createElement("ICMSTot"); total.appendChild(ICMSTot)
+    for k, v in [
+        ("vBC", "0.00"), ("vICMS", "0.00"), ("vICMSDeson", "0.00"),
+        ("vFCP", "0.00"), ("vBCST", "0.00"), ("vST", "0.00"),
+        ("vFCPST", "0.00"), ("vFCPSTRet", "0.00"),
+        ("vProd", fmt2(total_vProd)),
+        ("vFrete", "0.00"), ("vSeg", "0.00"), ("vDesc", "0.00"),
+        ("vII", "0.00"), ("vIPI", "0.00"), ("vIPIDevol", "0.00"),
+        ("vPIS", "0.00"), ("vCOFINS", "0.00"),
+        ("vOutro", "0.00"), ("vNF", fmt2(total_vProd)),
+        ("vTotTrib", "0.00"),
+    ]: txt(k, v, ICMSTot)
 
-    icmsTot = doc.createElement("ICMSTot")
-    total.appendChild(icmsTot)
+    # ---------------- transp ----------------
+    transp = doc.createElement("transp"); infNFe.appendChild(transp)
+    txt("modFrete", "9", transp)
 
-    for k, v in {
-        "vBC": "0.00",
-        "vICMS": "0.00",
-        "vICMSDeson": "0.00",
-        "vFCP": "0.00",
-        "vBCST": "0.00",
-        "vST": "0.00",
-        "vFCPST": "0.00",
-        "vFCPSTRet": "0.00",
-        "vProd": f"{total_vProd:.2f}",
-        "vFrete": "0.00",
-        "vSeg": "0.00",
-        "vDesc": "0.00",
-        "vII": "0.00",
-        "vIPI": "0.00",
-        "vIPIDevol": "0.00",
-        "vPIS": "0.00",
-        "vCOFINS": "0.00",
-        "vOutro": "0.00",
-        "vNF": f"{total_vProd:.2f}",
-        "vTotTrib": "0.00"
-    }.items():
-        el = doc.createElement(k)
-        el.appendChild(doc.createTextNode(v))
-        icmsTot.appendChild(el)
+    # ---------------- pag ----------------
+    pag = doc.createElement("pag"); infNFe.appendChild(pag)
+    detPag = doc.createElement("detPag"); pag.appendChild(detPag)
+    txt("tPag", "01", detPag)
+    txt("vPag", fmt2(total_vProd), detPag)
 
-    # =============== transp ===============
-    transp = doc.createElement("transp")
-    infNFe.appendChild(transp)
-    modFrete = doc.createElement("modFrete")
-    modFrete.appendChild(doc.createTextNode("9"))
-    transp.appendChild(modFrete)
+    # ---------------- infAdic ----------------
+    infAdic = doc.createElement("infAdic"); infNFe.appendChild(infAdic)
+    txt("infCpl", "DOCUMENTO EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL", infAdic)
 
-    # =============== pag ===============
-    pag = doc.createElement("pag")
-    infNFe.appendChild(pag)
-    detPag = doc.createElement("detPag")
-    pag.appendChild(detPag)
-    tPag = doc.createElement("tPag")
-    tPag.appendChild(doc.createTextNode("01"))
-    detPag.appendChild(tPag)
-    vPag = doc.createElement("vPag")
-    vPag.appendChild(doc.createTextNode(f"{total_vProd:.2f}"))
-    detPag.appendChild(vPag)
-
-    # Salvar arquivo
+    # ---------------- salvar ----------------
     with open(nome_arquivo, "wb") as f:
         f.write(doc.toprettyxml(indent="  ", encoding="utf-8"))
 
