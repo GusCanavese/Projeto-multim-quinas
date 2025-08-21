@@ -63,4 +63,5 @@ def telaObservacoesNotaSaida(self):
     self.variavelObservacoes.set(0)
 
     criaBotao(self.frameTelaObservacoes, "salvar", 0.25, 0.94, 0.15, lambda: criarNFe.gerarNFe(self)).place(anchor="nw")
+    # criaBotao(self.frameTelaObservacoes, "consultar", 0.55, 0.94, 0.15, lambda: criarNFe.consultar_ultimo_recibo(self)).place(anchor="nw")
     criaBotao(self.frameTelaObservacoes, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaObservacoes.destroy()).place(anchor="nw")

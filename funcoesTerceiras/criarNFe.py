@@ -1,9 +1,10 @@
+import re
 import xml.dom.minidom as minidom
 import datetime
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from cryptography.hazmat.primitives.serialization import pkcs12
-from signxml import XMLSigner, methods
+from signxml import XMLSigner, methods, SignatureMethod, DigestAlgorithm
 from brazilfiscalreport.danfe import Danfe
 from lxml import etree
 from xml.dom.minidom import Document, parseString
@@ -13,7 +14,13 @@ import requests, random, os
 import tempfile
 from cryptography.hazmat.primitives.serialization import pkcs12, Encoding, PrivateFormat, NoEncryption
 from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_certificates
+import warnings
 
+
+class XMLSignerWithSHA1(XMLSigner):
+    # Desabilita o bloqueio interno de SHA1 do signxml
+    def check_deprecated_methods(self):
+        pass
 
 
 def criaComandoACBr(self, nome_arquivo):
@@ -257,50 +264,68 @@ def criaXML_ACBr(self, nome_arquivo):
     doc = Document()
 
     # Elemento raiz
-    nfeProc = doc.createElement("nfeProc")
-    nfeProc.setAttribute("xmlns", "http://www.portalfiscal.inf.br/nfe")
-    nfeProc.setAttribute("versao", "4.00")
-    doc.appendChild(nfeProc)
-
     NFe = doc.createElement("NFe")
-    nfeProc.appendChild(NFe)
+    NFe.setAttribute("xmlns", "http://www.portalfiscal.inf.br/nfe")
+    doc.appendChild(NFe)
 
     infNFe = doc.createElement("infNFe")
     NFe.appendChild(infNFe)
 
-    # ================== Geração da chave de acesso ==================
-    uf = getattr(self, "cUF", "35")  # exemplo SP
+    uf = getattr(self, "cUF", "31")
     ano_mes = datetime.datetime.now().strftime("%y%m")
     cnpj = getattr(self, "cnpjEmitente", "00000000000000").get() if hasattr(self, "cnpjEmitente") else "00000000000000"
+
+    # serie e nNF: sem zeros à esquerda na TAG, com zeros na chave
+    serie_raw = getattr(self, "serie", "1").get() if hasattr(self, "serie") else "1"
+    serie_num = max(1, int(serie_raw))
+    serie_xml = str(serie_num)
+    serie_key = serie_xml.zfill(3)
+
+    nNF_raw = getattr(self, "nNF", "1").get() if hasattr(self, "nNF") else "1"
+    nNF_xml = str(int(nNF_raw))
+    nNF_key = nNF_xml.zfill(9)
+
     mod = "55"
-    serie = str(getattr(self, "serie", "1").get() if hasattr(self, "serie") else "1").zfill(3)
-    nNF = str(getattr(self, "nNF", "1").get() if hasattr(self, "nNF") else "1").zfill(9)
-    cNF = str(random.randint(10000000, 99999999)).zfill(8)
+    tpEmis = "1"
+    cNF = str(random.randint(10000000, 99999999))
 
-    chave_sem_dv = uf + ano_mes + cnpj.zfill(14) + mod + serie + nNF + cNF
-    dv = str(sum(int(d) for d in chave_sem_dv) % 11 % 10)  # cálculo simples de DV
+    # chave sem DV (43 dígitos) + DV
+    chave_sem_dv = uf + ano_mes + cnpj.zfill(14) + mod + serie_key + nNF_key + tpEmis + cNF
 
+    def calcula_dv(chave):
+        pesos = [2,3,4,5,6,7,8,9]
+        soma = 0
+        for i, d in enumerate(reversed(chave)):
+            soma += int(d) * pesos[i % len(pesos)]
+        resto = soma % 11
+        dv = 11 - resto
+        return "0" if dv >= 10 else str(dv)
+
+    dv = calcula_dv(chave_sem_dv)
     chave_acesso = chave_sem_dv + dv
+
+    # Atributos do infNFe
     infNFe.setAttribute("Id", f"NFe{chave_acesso}")
     infNFe.setAttribute("versao", "4.00")
 
-    # ================== ide ==================
-    ide = doc.createElement("ide"); infNFe.appendChild(ide)
+    # =============== ide ===============
+    ide = doc.createElement("ide")
+    infNFe.appendChild(ide)
     elementos_ide = {
         "cUF": uf,
         "cNF": cNF,
         "natOp": getattr(self, "naturezaOperacao", "VENDA").get() if hasattr(self, "naturezaOperacao") else "VENDA",
         "mod": mod,
-        "serie": serie,
-        "nNF": nNF,
+        "serie": serie_xml,
+        "nNF": nNF_xml,
         "dhEmi": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S-03:00"),
         "tpNF": "1",
         "idDest": "1",
-        "cMunFG": getattr(self, "cMunFG", "3550308"),  # SP São Paulo
+        "cMunFG": getattr(self, "cMunFG", "3106200"),
         "tpImp": "1",
         "tpEmis": "1",
         "cDV": dv,
-        "tpAmb": "2",  # homologação
+        "tpAmb": "2",
         "finNFe": "1",
         "indFinal": "1",
         "indPres": "1",
@@ -312,131 +337,219 @@ def criaXML_ACBr(self, nome_arquivo):
         el.appendChild(doc.createTextNode(str(v)))
         ide.appendChild(el)
 
-    # ================== emit ==================
-    emit = doc.createElement("emit"); infNFe.appendChild(emit)
-    elementos_emit = {
-        "CNPJ": cnpj,
-        "xNome": getattr(self, "razaoSocialEmitente", "Empresa Exemplo LTDA").get() if hasattr(self, "razaoSocialEmitente") else "Empresa Exemplo LTDA",
-        "IE": getattr(self, "inscricaoEstadualEmitente", "123456789").get() if hasattr(self, "inscricaoEstadualEmitente") else "123456789"
-    }
-    for k, v in elementos_emit.items():
+    # =============== emit ===============
+    emit = doc.createElement("emit")
+    infNFe.appendChild(emit)
+    for k in ["CNPJ", "xNome", "xFant"]:
+        if k == "CNPJ":
+            v = cnpj
+        elif k == "xNome":
+            v = getattr(self, "razaoSocialEmitente", "Empresa Exemplo LTDA").get() if hasattr(self, "razaoSocialEmitente") else "Empresa Exemplo LTDA"
+        else:
+            v = "Teste"
         el = doc.createElement(k)
         el.appendChild(doc.createTextNode(str(v)))
         emit.appendChild(el)
 
-    # Endereço do emitente
-    enderEmit = doc.createElement("enderEmit"); emit.appendChild(enderEmit)
+    enderEmit = doc.createElement("enderEmit")
+    emit.appendChild(enderEmit)
     end_emit_dict = {
         "xLgr": "Rua Exemplo",
         "nro": "100",
         "xBairro": "Centro",
-        "cMun": "3550308",
-        "xMun": "São Paulo",
-        "UF": "SP",
-        "CEP": "01000000",
+        "cMun": "3106200",
+        "xMun": "Belo Horizonte",
+        "UF": "MG",
+        "CEP": "30000000",
         "cPais": "1058",
         "xPais": "BRASIL",
-        "fone": "11999999999"
+        "fone": "3133333333"
     }
     for k, v in end_emit_dict.items():
         el = doc.createElement(k)
         el.appendChild(doc.createTextNode(str(v)))
         enderEmit.appendChild(el)
 
-    # ================== dest ==================
-    dest = doc.createElement("dest"); infNFe.appendChild(dest)
-    elementos_dest = {
-        "CNPJ": getattr(self, "cnpjDestinatario", "11111111111111").get() if hasattr(self, "cnpjDestinatario") else "11111111111111",
-        "xNome": getattr(self, "nomeDestinatario", "Cliente Teste").get() if hasattr(self, "nomeDestinatario") else "Cliente Teste",
-        "indIEDest": "9"
-    }
-    for k, v in elementos_dest.items():
+    for k, v in {"IE": getattr(self, "inscricaoEstadualEmitente", "123456789").get() if hasattr(self, "inscricaoEstadualEmitente") else "123456789",
+                 "CRT": "1"}.items():
+        el = doc.createElement(k)
+        el.appendChild(doc.createTextNode(str(v)))
+        emit.appendChild(el)
+
+    # =============== dest ===============
+    dest = doc.createElement("dest")
+    infNFe.appendChild(dest)
+    for k in ["CNPJ", "xNome"]:
+        v = getattr(self, "cnpjDestinatario", "11111111111111").get() if (k=="CNPJ" and hasattr(self,"cnpjDestinatario")) else (
+            getattr(self, "nomeDestinatario", "Cliente Teste").get() if (k=="xNome" and hasattr(self,"nomeDestinatario")) else ("11111111111111" if k=="CNPJ" else "Cliente Teste")
+        )
         el = doc.createElement(k)
         el.appendChild(doc.createTextNode(str(v)))
         dest.appendChild(el)
 
-    enderDest = doc.createElement("enderDest"); dest.appendChild(enderDest)
+    enderDest = doc.createElement("enderDest")
+    dest.appendChild(enderDest)
     end_dest_dict = {
         "xLgr": "Rua Cliente",
         "nro": "200",
         "xBairro": "Bairro Teste",
-        "cMun": "3550308",
-        "xMun": "São Paulo",
-        "UF": "SP",
-        "CEP": "02000000",
+        "cMun": "3106200",
+        "xMun": "Belo Horizonte",
+        "UF": "MG",
+        "CEP": "30000000",
         "cPais": "1058",
         "xPais": "BRASIL",
-        "fone": "1188888888"
+        "fone": "3133333333"
     }
     for k, v in end_dest_dict.items():
         el = doc.createElement(k)
         el.appendChild(doc.createTextNode(str(v)))
         enderDest.appendChild(el)
 
-    # ================== Produtos ==================
-    total_vProd = 0
-    for i, prod in enumerate(getattr(self, "valoresDosItens", []), start=1):
+    for k, v in {"indIEDest": "9", "email": "cliente@email.com"}.items():
+        el = doc.createElement(k)
+        el.appendChild(doc.createTextNode(str(v)))
+        dest.appendChild(el)
+
+    # =============== det/prod ===============
+    total_vProd = 0.0
+
+    def add_produto(prod_dict, index):
+        nonlocal total_vProd
         det = doc.createElement("det")
-        det.setAttribute("nItem", str(i))
+        det.setAttribute("nItem", str(index))
         infNFe.appendChild(det)
 
-        prodEl = doc.createElement("prod"); det.appendChild(prodEl)
-        campos_prod = {
-            "cProd": prod.get("codigo", f"P{i}"),
-            "xProd": prod.get("descricao", ""),
-            "NCM": prod.get("ncm", "00000000"),
-            "CFOP": prod.get("cfop", "5102"),
-            "uCom": prod.get("unidade", "UN"),
-            "qCom": prod.get("quantidade", "1"),
-            "vUnCom": prod.get("valorUnitario", "0.00"),
-            "vProd": prod.get("valorTotal", "0.00")
-        }
-        total_vProd += float(campos_prod["vProd"])
-        for k, v in campos_prod.items():
-            el = doc.createElement(k)
-            el.appendChild(doc.createTextNode(str(v)))
-            prodEl.appendChild(el)
+        prodEl = doc.createElement("prod")
+        det.appendChild(prodEl)
 
-    # ================== Totais ==================
-    total = doc.createElement("total"); infNFe.appendChild(total)
-    icmsTot = doc.createElement("ICMSTot"); total.appendChild(icmsTot)
-    campos_totais = {
+        # ORDEM **OBRIGATÓRIA**
+        seq = [
+            ("cProd",    prod_dict.get("codigo", f"P{index}")),
+            ("cEAN",     prod_dict.get("ean", "SEM GTIN") or "SEM GTIN"),
+            ("xProd",    prod_dict.get("descricao", "Produto")),
+            ("NCM",      prod_dict.get("ncm", "00000000")),
+            # ("CEST",   prod_dict.get("cest","")),  # se tiver, insira aqui
+            ("CFOP",     prod_dict.get("cfop", "5102")),
+            ("uCom",     prod_dict.get("unidade", "UN")),
+            ("qCom",     f"{float(prod_dict.get('quantidade', 1)):.4f}"),
+            ("vUnCom",   f"{float(prod_dict.get('valorUnitario', prod_dict.get('valor_unitario', 0))) :.10f}"),
+            ("vProd",    f"{float(prod_dict.get('valorTotal',  prod_dict.get('valor_total',   0))) :.2f}"),
+            ("cEANTrib", prod_dict.get("ean_trib", "SEM GTIN") or "SEM GTIN"),
+            ("uTrib",    prod_dict.get("unidade", "UN")),
+            ("qTrib",    f"{float(prod_dict.get('quantidade', 1)):.4f}"),
+            ("vUnTrib",  f"{float(prod_dict.get('valorUnitario', prod_dict.get('valor_unitario', 0))) :.10f}"),
+            ("indTot",   "1"),
+        ]
+        vprod_value = 0.0
+        for tag, valor in seq:
+            el = doc.createElement(tag)
+            el.appendChild(doc.createTextNode(str(valor).strip()))
+            prodEl.appendChild(el)
+            if tag == "vProd":
+                try:
+                    vprod_value = float(str(valor).replace(",", "."))
+                except:
+                    vprod_value = 0.0
+
+        total_vProd += vprod_value
+
+        # ====== impostos (mínimo para schema) ======
+        imposto = doc.createElement("imposto")
+        det.appendChild(imposto)
+
+        icms = doc.createElement("ICMS")
+        imposto.appendChild(icms)
+
+        icms00 = doc.createElement("ICMS00")
+        icms.appendChild(icms00)
+
+        for k, v in {
+            "orig": "0",
+            "CST": "00",
+            "modBC": "0",
+            "vBC": "0.00",
+            "pICMS": "0.00",
+            "vICMS": "0.00"
+        }.items():
+            el = doc.createElement(k)
+            el.appendChild(doc.createTextNode(v))
+            icms00.appendChild(el)
+
+    itens = getattr(self, "valoresDosItens", [])
+    if itens:
+        for i, prod in enumerate(itens, start=1):
+            add_produto(prod, i)
+    else:
+        # Produto default também na ORDEM correta e com cEAN/cEANTrib
+        add_produto({
+            "codigo": "000",
+            "descricao": "Produto Default",
+            "ncm": "00000000",
+            "cfop": "5102",
+            "unidade": "UN",
+            "quantidade": 1,
+            "valorUnitario": 0.00,
+            "valorTotal": 0.00,
+            "ean": "SEM GTIN",
+            "ean_trib": "SEM GTIN",
+        }, 1)
+
+    # =============== total ===============
+    total = doc.createElement("total")
+    infNFe.appendChild(total)
+
+    icmsTot = doc.createElement("ICMSTot")
+    total.appendChild(icmsTot)
+
+    for k, v in {
         "vBC": "0.00",
         "vICMS": "0.00",
         "vICMSDeson": "0.00",
+        "vFCP": "0.00",
+        "vBCST": "0.00",
+        "vST": "0.00",
+        "vFCPST": "0.00",
+        "vFCPSTRet": "0.00",
         "vProd": f"{total_vProd:.2f}",
-        "vFrete": str(getattr(self, "totalFrete", 0)),
-        "vSeg": str(getattr(self, "totalSeguro", 0)),
-        "vDesc": str(getattr(self, "totalDesconto", 0)),
+        "vFrete": "0.00",
+        "vSeg": "0.00",
+        "vDesc": "0.00",
         "vII": "0.00",
         "vIPI": "0.00",
+        "vIPIDevol": "0.00",
         "vPIS": "0.00",
         "vCOFINS": "0.00",
-        "vOutro": str(getattr(self, "outrasDespesas", 0)),
-        "vNF": f"{total_vProd:.2f}"
-    }
-    for k, v in campos_totais.items():
+        "vOutro": "0.00",
+        "vNF": f"{total_vProd:.2f}",
+        "vTotTrib": "0.00"
+    }.items():
         el = doc.createElement(k)
-        el.appendChild(doc.createTextNode(str(v)))
+        el.appendChild(doc.createTextNode(v))
         icmsTot.appendChild(el)
 
-    # ================== Transporte ==================
-    transp = doc.createElement("transp"); infNFe.appendChild(transp)
+    # =============== transp ===============
+    transp = doc.createElement("transp")
+    infNFe.appendChild(transp)
     modFrete = doc.createElement("modFrete")
     modFrete.appendChild(doc.createTextNode("9"))
     transp.appendChild(modFrete)
 
-    # ================== Pagamento ==================
-    pag = doc.createElement("pag"); infNFe.appendChild(pag)
-    detPag = doc.createElement("detPag"); pag.appendChild(detPag)
-    tPag = doc.createElement("tPag"); tPag.appendChild(doc.createTextNode("01"))
+    # =============== pag ===============
+    pag = doc.createElement("pag")
+    infNFe.appendChild(pag)
+    detPag = doc.createElement("detPag")
+    pag.appendChild(detPag)
+    tPag = doc.createElement("tPag")
+    tPag.appendChild(doc.createTextNode("01"))
     detPag.appendChild(tPag)
-    vPag = doc.createElement("vPag"); vPag.appendChild(doc.createTextNode(f"{total_vProd:.2f}"))
+    vPag = doc.createElement("vPag")
+    vPag.appendChild(doc.createTextNode(f"{total_vProd:.2f}"))
     detPag.appendChild(vPag)
 
-    # ================== Salvando arquivo ==================
+    # Salvar arquivo
     with open(nome_arquivo, "wb") as f:
-        f.write(doc.toxml(encoding="utf-8"))
+        f.write(doc.toprettyxml(indent="  ", encoding="utf-8"))
 
 # 3ª executado
 def gerarEnvioLote(self, xml_assinado_path="arquivos/NotaFiscal/base_assinado.xml", output_path="arquivos/NotaFiscal/envio_lote.xml"):
@@ -475,6 +588,7 @@ def gerarEnvioLote(self, xml_assinado_path="arquivos/NotaFiscal/base_assinado.xm
         f.write(doc.toprettyxml(indent="  "))
     
     print(f"Arquivo de lote gerado em: {output_path}")
+
 
 def get_cert_and_key_from_pfx(pfx_path, pfx_password):
     """Carrega o .pfx e gera arquivos temporários .pem e .key"""
@@ -537,130 +651,187 @@ def gerarNFe(self):
     # ============================
     # 2. Assinar o XML da NFe
     # ============================
+
     xml_tree = etree.parse("arquivos/NotaFiscal/base.xml")
-    infNFe = xml_tree.find(".//{http://www.portalfiscal.inf.br/nfe}infNFe")
 
-    signer = XMLSigner(
-        method=methods.enveloped,
-        signature_algorithm="rsa-sha256",   # ⚠️ SEFAZ exige SHA1
-        digest_algorithm="sha256",
-        c14n_algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+    # Localiza <NFe> e <infNFe> ignorando namespaces
+    nfe_list = xml_tree.xpath('//*[local-name()="NFe" and ./*[local-name()="infNFe"]]')
+    if not nfe_list:
+        raise ValueError("Não encontrei <NFe> com filho <infNFe> no XML.")
+    nfe = nfe_list[0]
+
+    infNFe_list = nfe.xpath('./*[local-name()="infNFe"]')
+    if not infNFe_list:
+        raise ValueError("Não encontrei <infNFe> dentro de <NFe>.")
+    infNFe = infNFe_list[0]
+
+    # Id do infNFe (obrigatório)
+    nfe_id = infNFe.get("Id")
+    if not nfe_id:
+        raise ValueError('O atributo Id de <infNFe> é obrigatório (ex.: Id="NFe3519...").')
+
+    
+
+    # Assinador com algoritmos exigidos pelo schema da NFe 4.00
+    signer = XMLSignerWithSHA1(
+        method=methods.enveloped,  # <Signature> dentro de <NFe>
+        signature_algorithm=SignatureMethod.RSA_SHA1,  # URI rsa-sha1
+        digest_algorithm=DigestAlgorithm.SHA1,         # URI sha1
+        c14n_algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
     )
 
-    signed_xml = signer.sign(
-        infNFe,
+    signed_nfe = signer.sign(
+        nfe,
         key=private_key,
-        cert=[certificate]
+        cert=[certificate],
+        reference_uri=f"#{nfe_id}",  # referencia o Id do <infNFe>
     )
 
-    xml_root = xml_tree.getroot()
-    xml_root.insert(0, signed_xml)
+    # Substitui a árvore
+    nfe_parent = nfe.getparent()
+    if nfe_parent is None:
+        xml_tree._setroot(signed_nfe)
+    else:
+        nfe_parent.replace(nfe, signed_nfe)
 
-    with open("arquivos/NotaFiscal/base_assinado.xml", "wb") as f:
-        f.write(etree.tostring(xml_tree, pretty_print=True, xml_declaration=True, encoding="utf-8"))
+    # Salva sem mexer nos prefixos ds:
+    xml_tree.write(
+        "arquivos/NotaFiscal/base_assinado.xml",
+        pretty_print=True,
+        xml_declaration=True,
+        encoding="utf-8",
+    )
 
-    print("✅ XML assinado com sucesso!")
-
-
-
-
-
-
+    print("✅ Assinado com rsa-sha1/sha1, c14n 20010315; <Signature> em <NFe>; Reference -> #Id do infNFe.")
 
     # ============================
     # 3. Montar envelope enviNFe
     # ============================
-    nfe_node = parseString(etree.tostring(xml_root)).documentElement
+    # Carregar o XML assinado
+    xml_tree_assinado = etree.parse("arquivos/NotaFiscal/base_assinado.xml")
+    xml_root = xml_tree_assinado.getroot()  # ← DEFINIR xml_root AQUI
 
-    doc = Document()
-    enviNFe = doc.createElement("enviNFe")
-    enviNFe.setAttribute("xmlns", "http://www.portalfiscal.inf.br/nfe")
-    enviNFe.setAttribute("versao", "4.00")
-    doc.appendChild(enviNFe)
+    enviNFe = etree.Element("enviNFe", xmlns="http://www.portalfiscal.inf.br/nfe", versao="4.00")
 
-    idLote = doc.createElement("idLote")
-    idLote.appendChild(doc.createTextNode(str(random.randint(100000000000000, 999999999999999))))
-    enviNFe.appendChild(idLote)
+    idLote = etree.SubElement(enviNFe, "idLote")
+    idLote.text = str(random.randint(100000000000000, 999999999999999))
 
-    indSinc = doc.createElement("indSinc")
-    indSinc.appendChild(doc.createTextNode("1"))  # síncrono
-    enviNFe.appendChild(indSinc)
+    indSinc = etree.SubElement(enviNFe, "indSinc")
+    indSinc.text = "1"  # síncrono
 
-    enviNFe.appendChild(doc.importNode(nfe_node, True))
+    # Insere o nó <NFe> assinado
+    enviNFe.append(xml_root)  # ← AGORA xml_root ESTÁ DEFINIDO
 
-    # Salvar envelope inicial
-    with open("arquivos/NotaFiscal/enviNFe.xml", "w", encoding="utf-8") as f:
-        f.write(doc.toprettyxml(indent="  "))
-
-    # ============================
-    # 3.1. Limpar namespaces (remover ns0, ns1...)
-    # ============================
-    tree_env = etree.parse("arquivos/NotaFiscal/enviNFe.xml")
-    root_env = tree_env.getroot()
-    etree.cleanup_namespaces(root_env)
-
-    with open("arquivos/NotaFiscal/enviNFe.xml", "wb") as f:
-        f.write(etree.tostring(root_env, pretty_print=True, xml_declaration=True, encoding="utf-8"))
-
-
-
-    def remove_prefixes(xml_path_in, xml_path_out):
-        parser = etree.XMLParser(remove_blank_text=True)
-        tree = etree.parse(xml_path_in, parser)
-        root = tree.getroot()
-
-        # Remove namespace "ds"
-        for elem in root.xpath("//*[namespace-uri()='http://www.w3.org/2000/09/xmldsig#']"):
-            elem.tag = etree.QName(elem).localname  # mantém só o nome da tag
-
-        # Limpar declaração do namespace ds
-        etree.cleanup_namespaces(root)
-
-        # Salvar XML sem os ds:
-        with open(xml_path_out, "wb") as f:
-            f.write(etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="utf-8"))
-
-    # Uso depois de assinar
-    remove_prefixes("arquivos/NotaFiscal/enviNFe.xml", "arquivos/NotaFiscal/enviNFe.xml")
-
+    # Salva o envelope de envio
+    tree_env = etree.ElementTree(enviNFe)
+    tree_env.write("arquivos/NotaFiscal/enviNFe.xml", encoding="utf-8", xml_declaration=True)
     # ============================
     # 4. Enviar para SEFAZ
     # ============================
-    session = requests.Session()
-    session.cert = (cert_file.name, key_file.name)
-    session.verify = False  # homologação, em produção usar cadeia da ICP-Brasil
+    parser = etree.XMLParser(remove_blank_text=True)
 
-    transport = Transport(session=session)
+    # enviNFe é o elemento já com <NFe> assinado dentro
+    xml_envio_content = etree.tostring(
+        enviNFe, encoding="utf-8", xml_declaration=False, pretty_print=False, with_tail=False
+    ).decode("utf-8")
 
-    # MG Homologação - NFe v4.00
-    WSDL = "https://hnfe.fazenda.mg.gov.br/nfe2/services/NFeAutorizacao4?wsdl"
+    xml_envio_content = re.sub(r">\s+<", "><", xml_envio_content.strip())
 
-    client = Client(wsdl=WSDL, transport=transport)
+    # Criar o envelope SOAP adequado
+    soap_envelope = (
+        '<?xml version="1.0" encoding="utf-8"?>'
+        '<soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">'
+        '<soap12:Header>'
+            '<nfeCabecMsg xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NFeAutorizacao4">'
+            '<cUF>31</cUF>'
+            '<versaoDados>4.00</versaoDados>'
+            '</nfeCabecMsg>'
+        '</soap12:Header>'
+        '<soap12:Body>'
+            '<nfeAutorizacaoLote xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NFeAutorizacao4">'
+            '<nfeDadosMsg xmlns="http://www.portalfiscal.inf.br/nfe">'
+                + xml_envio_content +
+            '</nfeDadosMsg>'
+            '</nfeAutorizacaoLote>'
+        '</soap12:Body>'
+        '</soap12:Envelope>'
+    )
+    url = "https://hnfe.fazenda.mg.gov.br/nfe2/services/NFeAutorizacao4"
+    headers = {
+        "Content-Type": "application/soap+xml; charset=utf-8",
+        "SOAPAction": "http://www.portalfiscal.inf.br/nfe/wsdl/NFeAutorizacao4/nfeAutorizacaoLote",  # opcional no SOAP 1.2
+    }
 
-    with open("arquivos/NotaFiscal/enviNFe.xml", "rb") as f:
-        xml_envio = f.read().strip()
-    xml_element = etree.fromstring(xml_envio)
+    # Certificado A1 (já convertido em .pem e .key)
+    cert = (cert_file.name, key_file.name)
 
-    # Chamada correta
-    response = client.service.nfeAutorizacaoLote(xml_element)
+    response = requests.post(url, data=soap_envelope.encode("utf-8"), headers=headers, cert=cert, verify=False)
 
-    print("📨 Resposta SEFAZ (envio):", response)
+   # --- ENVIO ---
+    response = requests.post(
+        url,
+        data=soap_envelope.encode("utf-8"),
+        headers=headers,
+        cert=cert,
+        verify=False
+    )
 
-    # ============================
-    # 5. Interpretar resposta SEFAZ
-    # ============================
-    if isinstance(response, list) and len(response) > 0:
-        resp_xml = response[0]  # Element lxml
-        cStat = resp_xml.findtext(".//{http://www.portalfiscal.inf.br/nfe}cStat")
-        xMotivo = resp_xml.findtext(".//{http://www.portalfiscal.inf.br/nfe}xMotivo")
-        nRec = resp_xml.findtext(".//{http://www.portalfiscal.inf.br/nfe}nRec")
+    print("📨 Resposta SEFAZ (envio):")
+    print(response.text)
 
-        print("➡️ Código:", cStat)
-        print("➡️ Motivo:", xMotivo)
-        if nRec:
-            print("➡️ Número do recibo:", nRec)
-        else:
-            print("⚠️ Não foi retornado número de recibo.")
+    # Extrai número do recibo
+    tree = etree.fromstring(response.content)
+    nRec_nodes = tree.xpath('//ns:nRec', namespaces={'ns': 'http://www.portalfiscal.inf.br/nfe'})
+    if not nRec_nodes:
+        print("❌ Nenhum número de recibo retornado. Verifique se a nota foi aceita.")
+        return
 
-    else:
-        print("⚠️ Resposta inesperada da SEFAZ:", response)
+    nRec = nRec_nodes[0].text
+    print("📌 Número do recibo:", nRec)
+
+    # --- CONSULTA RECIBO ---
+    soap_consulta = f"""
+    <soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope" xmlns:nfe4="http://www.portalfiscal.inf.br/nfe/wsdl/NFeRetAutorizacao4">
+    <soap12:Header>
+        <nfe4:nfeCabecMsg>
+        <nfe4:cUF>31</nfe4:cUF>
+        <nfe4:versaoDados>4.00</nfe4:versaoDados>
+        </nfe4:nfeCabecMsg>
+    </soap12:Header>
+    <soap12:Body>
+        <nfe4:nfeRetAutorizacaoLote>
+        <nfe4:nfeDadosMsg>
+            <![CDATA[
+            <consReciNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+            <tpAmb>2</tpAmb>
+            <nRec>{nRec}</nRec>
+            </consReciNFe>
+            ]]>
+        </nfe4:nfeDadosMsg>
+        </nfe4:nfeRetAutorizacaoLote>
+    </soap12:Body>
+    </soap12:Envelope>
+    """
+
+    url_consulta = "https://hnfe.fazenda.mg.gov.br/nfe2/services/NFeRetAutorizacao4"
+
+    response_consulta = requests.post(
+        url_consulta,
+        data=soap_consulta.encode("utf-8"),
+        headers={"Content-Type": "application/soap+xml; charset=utf-8"},
+        cert=cert,
+        verify=False
+    )
+
+    print("📨 Resposta SEFAZ (consulta recibo):")
+    print(response_consulta.text)
+
+    # Extrai código e motivo
+    tree_consulta = etree.fromstring(response_consulta.content)
+    cStat_nodes = tree_consulta.xpath('//ns:cStat', namespaces={'ns': 'http://www.portalfiscal.inf.br/nfe'})
+    xMotivo_nodes = tree_consulta.xpath('//ns:xMotivo', namespaces={'ns': 'http://www.portalfiscal.inf.br/nfe'})
+
+    cStat = cStat_nodes[0].text if cStat_nodes else "???"
+    xMotivo = xMotivo_nodes[0].text if xMotivo_nodes else "???"
+
+    print(f"✅ Status da NFe: {cStat} - {xMotivo}")
