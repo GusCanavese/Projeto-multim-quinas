@@ -9,3 +9,111 @@ ERRO: Invalid date
 ERRO: "2025/08/2215:42:00" is not a valid time
 ERRO: "2025/08/22T15:44:08" is not a valid time
 ERRO: "2025/08/22T15:48:22" is not a valid time
+ERRO: Tempo de Uso Expirou!
+OK: C:\ACBrMonitorPLUS\Logs\31250800995044000107550010000000011348582718-nfe.xml
+Alertas:TAG:%TAGNIVEL% ID:E02/CNPJ(CNPJ) - Conteúdo inválido.
+
+
+[Envio]
+CStat=104
+CUF=31
+DhRecbto=
+Msg=Lote processado
+NProt=
+NRec=
+TMed=0
+VerAplic=W-3.3.2
+Versao=4.00
+XMotivo=Lote processado
+tpAmb=2
+
+OK: C:\ACBrMonitorPLUS\Logs\31250800995044000107550010000000011657711210-nfe.xml
+Alertas:TAG:%TAGNIVEL% ID:E02/CNPJ(CNPJ) - Conteúdo inválido.
+
+
+[Envio]
+CStat=104
+CUF=31
+DhRecbto=
+Msg=Lote processado
+NProt=
+NRec=
+TMed=0
+VerAplic=W-3.3.2
+Versao=4.00
+XMotivo=Lote processado
+tpAmb=2
+
+OK: C:\ACBrMonitorPLUS\Logs\31250800995044000107550010000000011323250800-nfe.xml
+Alertas:TAG:%TAGNIVEL% ID:E02/CNPJ(CNPJ) - Conteúdo inválido.
+
+
+[Envio]
+CStat=104
+CUF=31
+DhRecbto=
+Msg=Lote processado
+NProt=
+NRec=
+TMed=0
+VerAplic=W-3.3.2
+Versao=4.00
+XMotivo=Lote processado
+tpAmb=2
+
+OK: C:\ACBrMonitorPLUS\Logs\31250800995044000107550010000000011433053902-nfe.xml
+Alertas:TAG:%TAGNIVEL% ID:E02/CNPJ(CNPJ) - Conteúdo inválido.
+
+
+[Envio]
+CStat=104
+CUF=31
+DhRecbto=
+Msg=Lote processado
+NProt=
+NRec=
+TMed=0
+VerAplic=W-3.3.2
+Versao=4.00
+XMotivo=Lote processado
+tpAmb=2
+
+OK: C:\ACBrMonitorPLUS\Logs\31250800995044000107550010000000011464337783-nfe.xml
+Alertas:TAG:%TAGNIVEL% ID:E02/CNPJ(CNPJ) - Conteúdo inválido.
+
+
+[Envio]
+CStat=104
+CUF=31
+DhRecbto=
+Msg=Lote processado
+NProt=
+NRec=
+TMed=0
+VerAplic=W-3.3.2
+Versao=4.00
+XMotivo=Lote processado
+tpAmb=2
+
+OK: C:\ACBrMonitorPLUS\Logs\31250800995044000107550010000000011319564545-nfe.xml
+Alertas:TAG:%TAGNIVEL% ID:E02/CNPJ(CNPJ) - Conteúdo inválido.
+
+
+[Envio]
+CStat=104
+CUF=31
+DhRecbto=
+Msg=Lote processado
+NProt=
+NRec=
+TMed=0
+VerAplic=W-3.3.2
+Versao=4.00
+XMotivo=Lote processado
+tpAmb=2
+
+ERRO: Arquivo C:\ACBrMonitorPLUS\Logs\31250800995044000107550010000000011XXXXXXXX-nfe.xml nao encontrado.
+Arquivo C:\ACBrMonitorPLUS\Logs\C:\ACBrMonitorPLUS\Logs\31250800995044000107550010000000011XXXXXXXX-nfe.xml nao encontrado.
+Arquivo C:\ACBrMonitorPLUS\Logs\C:\ACBrMonitorPLUS\Logs\31250800995044000107550010000000011XXXXXXXX-nfe.xml-nfe.xml nao encontrado.
+
+OK: Arquivo criado em: C:\ACBrMonitorPLUS\PDF\00995044000107\NFe\202508\NFe\31250800995044000107550010000000011159785760-nfe.pdf

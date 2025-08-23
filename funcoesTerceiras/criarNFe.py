@@ -5,8 +5,7 @@ import os
 import re
 import time
 import random
-import re
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 
 try:
     from PyQt5.QtCore import QDate
@@ -17,11 +16,10 @@ except Exception:
         QDate = None
 
 
-
 ACBR_CMD_DIR = "NotaFiscal/EnviarComando"
 ACBR_RSP_DIR = "NotaFiscal/ReceberComando"
 
-def _so_digitos(s): 
+def _so_digitos(s):
     return re.sub(r"\D", "", s or "")
 
 
@@ -81,11 +79,11 @@ def _carregar_emit_dest(self):
 
     EMIT["CNPJ"] = _so_digitos(EMIT.get("CNPJ"))
     if len(EMIT["CNPJ"]) != 14:
-        EMIT["CNPJ"] = "00995044000107"  # fallback
+        EMIT["CNPJ"] = "00995044000107"  # fallback sempre em dígitos
 
     # Razão social do emitente: obrigatório
     if not (EMIT.get("xNome") or "").strip():
-        EMIT["xNome"] = "NUTRIGEL DISTRIBUIDORA LTDA"
+        EMIT["xNome"] = "NUTRIGEL DISTRIBUIDORA EIRELI"
 
     # IE em dígitos (mantém 'ISENTO' se for o caso)
     if (EMIT.get("IE","").strip().upper() != "ISENTO"):
@@ -144,29 +142,23 @@ def aguarda_acbr_resposta(resp_path, timeout=120, interval=1.0):
 
 # ------------------------- geração do comando -------------------------
 
-
 def criaComandoACBr(self, nome_arquivo):
     """
     Gera UM ÚNICO arquivo de comando contendo:
-      1) NFe.SetCertificado("arquivos/certificado.pfx","nutri@00995")
-      2) NFe.CriarEnviarNFe("...INI...", 1, 1, 1, , 1)
+      NFe.CriarEnviarNFe("...INI...", 1, 1, 1, , 1)
     """
     EMIT, DEST = _carregar_emit_dest(self)
     itens = list(getattr(self, "valoresDosItens", []) or [])
 
     os.makedirs(os.path.dirname(nome_arquivo), exist_ok=True)
     with open(nome_arquivo, "w", encoding="utf-8", newline="\r\n") as f:
-        # 1) Certificado — conforme solicitado (mesmo arquivo; sem absolutos)
         f.write('NFe.CriarEnviarNFe(\r\n"\r\n')
 
-
-
-
-        
         # [infNFe] + [Identificacao]
         f.write("[infNFe]\r\nversao=4.00\r\n\r\n")
         f.write("[Identificacao]\r\n")
         f.write(f"cNF={random.randint(10_000_000, 99_999_999)}\r\n")
+
         natop = ""
         try:
             natop = getattr(self, "variavelNatureza").get().strip()
@@ -177,47 +169,33 @@ def criaComandoACBr(self, nome_arquivo):
         f.write(f"natOp={natop}\r\n")
         f.write("mod=55\r\n")
 
-
-
-        # --- SERIE: precisa ser 0..999, sem zeros à esquerda ---
+        # --- SERIE: 0..999, sem zeros à esquerda ---
         raw_serie = None
         if hasattr(self, "variavelSerieDaNota") and hasattr(self.variavelSerieDaNota, "get"):
             raw_serie = (self.variavelSerieDaNota.get() or "").strip()
         elif hasattr(self, "serie"):
             raw_serie = str(getattr(self, "serie"))
-
-        # default seguro se vier vazio: 1
         if not raw_serie or not raw_serie.isdigit():
             raw_serie = "1"
-
         serie_int = int(raw_serie)
         if not (0 <= serie_int <= 999):
             raise ValueError(f"Série inválida: {serie_int} (esperado 0..999)")
+        f.write(f"serie={serie_int}\r\n")
 
-        serie_fmt = str(serie_int)  # remove zeros à esquerda
-        f.write(f"serie={serie_fmt}\r\n")
-
-        # --- nNF: precisa ser 1..999999999, sem zeros à esquerda ---
+        # --- nNF: 1..999999999 (sem zeros à esquerda) ---
         raw_nnf = None
         if hasattr(self, "variavelNumeroDaNota") and hasattr(self.variavelNumeroDaNota, "get"):
             raw_nnf = (self.variavelNumeroDaNota.get() or "").strip()
         elif hasattr(self, "nNF"):
             raw_nnf = str(getattr(self, "nNF"))
-
-        # default seguro se vier vazio/zero: 1
         if not raw_nnf or not raw_nnf.isdigit() or int(raw_nnf) == 0:
             raw_nnf = "1"
-
         nnf_int = int(raw_nnf)
         if not (1 <= nnf_int <= 999_999_999):
             raise ValueError(f"nNF inválido: {nnf_int} (esperado 1..999999999)")
+        f.write(f"nNF={nnf_int}\r\n")
 
-        nnf_fmt = str(nnf_int)  # remove zeros à esquerda
-        f.write(f"nNF={nnf_fmt}\r\n")
-
-
-
-        # --- dhEmi no formato esperado pelo ACBrMonitor: "dd/MM/yyyy HH:mm:ss" ---
+        # --- dhEmi: "dd/MM/yyyy HH:mm:ss" (formato ACBrMonitor) ---
         try:
             if QDate is not None and hasattr(self, "data_emissao") and hasattr(self.data_emissao, "setDate"):
                 dia = datetime.now().day
@@ -232,24 +210,19 @@ def criaComandoACBr(self, nome_arquivo):
                 data_ptbr = datetime.now().strftime("%d/%m/%Y")
         except Exception:
             data_ptbr = datetime.now().strftime("%d/%m/%Y")
-
         hora = datetime.now().strftime("%H:%M:%S")
-        dhEmi = f"{data_ptbr} {hora}"
-        f.write(f"dhEmi={dhEmi}\r\n")
-        # --- fim dhEmi ---
+        f.write(f"dhEmi={data_ptbr} {hora}\r\n")
 
+        # tpNF: 1=saída (default) | 0=entrada
+        tpnf = ""
+        try:
+            tpnf = getattr(self, "variavelEntradaOuSaida").get().strip()
+        except Exception:
+            pass
+        if tpnf not in {"0", "1"}:
+            tpnf = "1"
+        f.write(f"tpNF={tpnf}\r\n")
 
-
-
-
-
-
-
-
-
-
-
-        f.write(f"tpNF={getattr(self, 'variavelEntradaOuSaida').get()}\r\n")
         idDest = "1" if (DEST.get("UF") == EMIT.get("UF")) else "2"
         f.write(f"idDest={idDest}\r\n")
         f.write("tpImp=1\r\n")
@@ -262,22 +235,21 @@ def criaComandoACBr(self, nome_arquivo):
 
         # Emitente
         f.write("[Emitente]\r\n")
-
         cnpj_emit = _so_digitos(EMIT.get('CNPJ'))
         if len(cnpj_emit) != 14:
-            cnpj_emit = "00995044000107"  # fallback
+            cnpj_emit = "00995044000107"  # fallback somente dígitos
         f.write(f"CNPJ={cnpj_emit}\r\n")
 
-        # Razão social (garantia)
+        # Razão social
         xnome = (EMIT.get('xNome') or "").strip()
         if not xnome:
             xnome = "NUTRIGEL DISTRIBUIDORA EIRELI"
         f.write(f"xNome={xnome}\r\n")
 
-        # IE do emitente: 2–14 dígitos ou 'ISENTO' (nunca deixar vazio)
+        # IE do emitente: 2–14 dígitos ou 'ISENTO'
         ie_emit = (EMIT.get('IE', '') or '').strip()
         if ie_emit.upper() != 'ISENTO':
-            ie_emit = re.sub(r'\D', '', ie_emit)  # somente dígitos
+            ie_emit = _so_digitos(ie_emit)
         if not ie_emit:
             ie_emit = 'ISENTO'
         f.write(f"IE={ie_emit}\r\n")
@@ -285,14 +257,13 @@ def criaComandoACBr(self, nome_arquivo):
         # CRT do emitente: 1=Simples; 2=Simples excesso sublimite; 3=Regime Normal
         crt = str(getattr(self, 'crt', '') or '').strip()
         if crt not in {'1', '2', '3'}:
-            # tenta pegar do configuracoes.txt; se não houver, defaulta 1
             crt_cfg = _ler_kv(os.path.join('NotaFiscal', 'configuracoes.txt')).get('CRT', '1')
             crt = str(crt_cfg).strip()
             if crt not in {'1', '2', '3'}:
                 crt = '1'
         f.write(f"CRT={crt}\r\n")
 
-        # Endereço (mantendo o que você já usa)
+        # Endereço
         f.write(f"xLgr={EMIT.get('xLgr','R DOUTOR OSCAR DA CUNHA')}\r\n")
         f.write(f"nro={EMIT.get('nro','126')}\r\n")
         f.write("xCpl=LETRA B\r\n")
@@ -322,8 +293,6 @@ def criaComandoACBr(self, nome_arquivo):
         f.write("cPais=1058\r\nxPais=BRASIL\r\n")
         f.write(f"Fone={DEST.get('fone','')}\r\n\r\n")
 
-
-
         # Itens
         for i, prod in enumerate(itens, start=1):
             idx = str(i).zfill(3)
@@ -331,7 +300,7 @@ def criaComandoACBr(self, nome_arquivo):
             # defaults mínimos para schema/regra
             cProd  = (prod.get("codigo")          or "1")
             xProd  = (prod.get("descricao")       or "ITEM")
-            NCM    = (prod.get("ncm")             or "00000000")
+            NCM    = (prod.get("ncm")             or "00000000")  # ajuste com um NCM válido
             CFOP   = (prod.get("cfop")            or "5102")
             uCom   = (prod.get("unidade")         or "UN")
             qCom   = (prod.get("quantidade")      or "1.0000")
@@ -349,13 +318,38 @@ def criaComandoACBr(self, nome_arquivo):
             f.write(f"vProd={vProd}\r\n")
             f.write("indTot=1\r\n\r\n")
 
-            f.write(f"[ICMS{idx}]\r\n")
-            f.write(f"CSOSN={(prod.get('csosn') or '')}\r\n")
-            f.write(f"orig={(prod.get('origem') or '')}\r\n")
-            f.write(f"CST={(prod.get('cst') or '')}\r\n")
-            f.write(f"vBC={(prod.get('bc_icms') or '0.00')}\r\n")
-            f.write(f"pICMS={(prod.get('aliq_icms') or '0.00')}\r\n")
-            f.write(f"vICMS={(prod.get('valor_icms') or '0.00')}\r\n\r\n")
+            # --- ICMS por item conforme o CRT ---
+            crt_item = crt  # usa o já definido
+            f.write("[ICMS001]\r\n")
+
+            if crt_item in {'1', '2'}:
+                # Simples Nacional -> usar CSOSN, não usar CST
+                csosn = (getattr(self, 'csosn_padrao', '') or '').strip()
+                if csosn not in {'101','102','103','201','202','203','300','400','500','900'}:
+                    csosn = '102'  # venda interna sem crédito
+                orig = str(getattr(self, 'orig_padrao', '0')).strip() or '0'
+                f.write(f"orig={orig}\r\n")
+                f.write(f"CSOSN={csosn}\r\n")
+                if csosn in {'101', '201', '900'}:
+                    pCredSN = getattr(self, 'pCredSN', '0.00')
+                    vCredICMSSN = getattr(self, 'vCredICMSSN', '0.00')
+                    f.write(f"pCredSN={pCredSN}\r\n")
+                    f.write(f"vCredICMSSN={vCredICMSSN}\r\n")
+            else:
+                # Regime Normal -> usar CST e base/aliquota/valor
+                cst = (getattr(self, 'cst_padrao', '') or '').strip()
+                if cst not in {'00','02','10','15','20','30','40','51','53','60'}:
+                    cst = '00'  # tributação integral
+                orig = str(getattr(self, 'orig_padrao', '0')).strip() or '0'
+                vBC = getattr(self, 'vBC', '0.00')
+                pICMS = getattr(self, 'pICMS', '0.00')
+                vICMS = getattr(self, 'vICMS', '0.00')
+                f.write(f"orig={orig}\r\n")
+                f.write(f"CST={cst}\r\n")
+                f.write(f"vBC={vBC}\r\n")
+                f.write(f"pICMS={pICMS}\r\n")
+                f.write(f"vICMS={vICMS}\r\n")
+            # --- fim ICMS ---
 
             f.write(f"[PIS{idx}]\r\n")
             f.write(f"CST={(prod.get('cst_pis') or '99')}\r\n")
@@ -369,7 +363,7 @@ def criaComandoACBr(self, nome_arquivo):
             f.write(f"pCOFINS={(prod.get('aliq_cofins') or '0.00')}\r\n")
             f.write(f"vCOFINS={(prod.get('valor_cofins') or '0.00')}\r\n\r\n")
 
-        # Totais (uma vez só, após todos os itens)
+        # Totais
         f.write("[Total]\r\n")
         f.write(f"vProd={getattr(self, 'valorTotalProdutos').get()}\r\n")
         f.write(f"vNF={getattr(self, 'valorLiquido').get()}\r\n")
@@ -391,14 +385,14 @@ def criaComandoACBr(self, nome_arquivo):
         f.write("tpag=01\r\n")
         f.write(f"vPag={getattr(self, 'valorLiquido').get()}\r\n\r\n")
 
-        # Fecha o comando (igual ao projeto de referência)
+        # Fecha o comando (formato do ACBr)
         f.write('"\r\n,1,1, , ,1)')
 
 # ------------------------- execução -------------------------
 
 def gerarNFe(self):
     """
-    Cria NotaFiscal/EnviarComando/enviar.txt (SetCertificado + CriarEnviarNFe) e
+    Cria NotaFiscal/EnviarComando/enviar.txt (CriarEnviarNFe) e
     aguarda NotaFiscal/ReceberComando/enviar-resp.txt.
     """
     os.makedirs(ACBR_CMD_DIR, exist_ok=True)
@@ -416,36 +410,17 @@ def gerarNFe(self):
     itens = list(getattr(self, "valoresDosItens", []) or [])
     if len(itens) == 0:
         return {"ok": False, "mensagem": "NF-e sem itens: adicione ao menos 1 produto antes de enviar."}
-    
+
     criaComandoACBr(self, cmd_path)
 
-
-
+    # Debugs úteis
     with open(cmd_path, "r", encoding="utf-8", errors="ignore") as _f:
         _txt = _f.read()
-
     print("DEBUG: enviar.txt absoluto:", os.path.abspath(cmd_path))
-
     _dhemi = re.findall(r"^dhEmi=(.*)$", _txt, flags=re.MULTILINE)
     print("DEBUG: dhEmi encontrado:", _dhemi)
 
-    if re.search(r"^dhEmi=\d{4}/\d{2}/\d{2}T", _txt, flags=re.MULTILINE):
-        print("ATENÇÃO: existe dhEmi com BARRAS no arquivo!")
-
-    # Opcional: cheque dEmi/hEmi também
-    if re.search(r"^(dEmi|hEmi)=.*/", _txt, flags=re.MULTILINE):
-        print("ATENÇÃO: dEmi/hEmi com BARRAS detectado!")
-
-
-
-
-
-
-    print(f"📤 Comando escrito em: {cmd_path}")
-    print("➡️  Deixe o ACBrMonitorPLUS aberto e monitorando a pasta de comandos.")
-
     resultado = aguarda_acbr_resposta(resp_path)
-
     print(f"↩️ cStat={resultado.get('cStat')} - {resultado.get('xMotivo')}")
     if resultado.get("xml"):
         print(f"📄 XML: {resultado['xml']}")

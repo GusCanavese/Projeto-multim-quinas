@@ -1,31 +1,8 @@
-    def botaoTribut(self):
-        frame = criaFrameJanela(frameTelaNotaProduto, 0.5, 0.5, 0.6, 0.9, self.corModal)
-        
-        nomeDoProduto = ctk.StringVar()
-        nomeDoProduto.set()
+from brazilfiscalreport.danfe import Danfe
 
-        for widget in frameTelaNotaProduto.winfo_children():
-            try:
-                widget.configure(state="disabled")
-            except:
-                pass
+xml_path = r"C:\ACBrMonitorPLUS\Logs\31250800995044000107550010000000011159785760-nfe.xml"  # <-- ajuste aqui
+with open(xml_path, "r", encoding="utf-8") as f:
+    xml_content = f.read()
 
-        for widget in frame.winfo_children():
-            try:
-                widget.configure(state="normal")
-            except:
-                pass
-        
-        def destroyModal(self):
-            for widget in frameTelaNotaProduto.winfo_children():
-                try:
-                    widget.configure(state="normal")
-                except:
-                    pass
-            frame.destroy()
-
-        criaEntry
-
-
-        botaoFechar = ctk.CTkButton(frame, text="X", width=10, height=10, corner_radius=0, command=lambda:destroyModal(self))
-        botaoFechar.place(relx=0.989, rely=0.018, anchor="center")
+danfe = Danfe(xml=xml_content)
+danfe.output("danfe.pdf")  # cria danfe.pdf na mesma pasta onde rodar o script
