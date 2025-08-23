@@ -8,6 +8,14 @@ import random
 import re
 from datetime import datetime, timezone, timedelta
 
+try:
+    from PyQt5.QtCore import QDate
+except Exception:
+    try:
+        from PySide6.QtCore import QDate
+    except Exception:
+        QDate = None
+
 
 
 ACBR_CMD_DIR = "NotaFiscal/EnviarComando"
@@ -136,6 +144,7 @@ def aguarda_acbr_resposta(resp_path, timeout=120, interval=1.0):
 
 # ------------------------- geração do comando -------------------------
 
+
 def criaComandoACBr(self, nome_arquivo):
     """
     Gera UM ÚNICO arquivo de comando contendo:
@@ -167,22 +176,75 @@ def criaComandoACBr(self, nome_arquivo):
             natop = "VENDA DE MERCADORIA"
         f.write(f"natOp={natop}\r\n")
         f.write("mod=55\r\n")
-        f.write(f"serie={getattr(self, 'variavelSerieDaNota').get()}\r\n")
-        f.write(f"nNF={getattr(self, 'variavelNumeroDaNota').get()}\r\n")
 
 
-        data_comando = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
-        # Para campo dhEmi da NF-e:
-        data_dhemi = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        # --- SERIE: precisa ser 0..999, sem zeros à esquerda ---
+        raw_serie = None
+        if hasattr(self, "variavelSerieDaNota") and hasattr(self.variavelSerieDaNota, "get"):
+            raw_serie = (self.variavelSerieDaNota.get() or "").strip()
+        elif hasattr(self, "serie"):
+            raw_serie = str(getattr(self, "serie"))
 
-        # Exemplo de uso:
-        comando = f'NFE.Emitir {data_comando}'
-        # ou
-        comando = f'NFE.dhEmi={data_dhemi}'
+        # default seguro se vier vazio: 1
+        if not raw_serie or not raw_serie.isdigit():
+            raw_serie = "1"
+
+        serie_int = int(raw_serie)
+        if not (0 <= serie_int <= 999):
+            raise ValueError(f"Série inválida: {serie_int} (esperado 0..999)")
+
+        serie_fmt = str(serie_int)  # remove zeros à esquerda
+        f.write(f"serie={serie_fmt}\r\n")
+
+        # --- nNF: precisa ser 1..999999999, sem zeros à esquerda ---
+        raw_nnf = None
+        if hasattr(self, "variavelNumeroDaNota") and hasattr(self.variavelNumeroDaNota, "get"):
+            raw_nnf = (self.variavelNumeroDaNota.get() or "").strip()
+        elif hasattr(self, "nNF"):
+            raw_nnf = str(getattr(self, "nNF"))
+
+        # default seguro se vier vazio/zero: 1
+        if not raw_nnf or not raw_nnf.isdigit() or int(raw_nnf) == 0:
+            raw_nnf = "1"
+
+        nnf_int = int(raw_nnf)
+        if not (1 <= nnf_int <= 999_999_999):
+            raise ValueError(f"nNF inválido: {nnf_int} (esperado 1..999999999)")
+
+        nnf_fmt = str(nnf_int)  # remove zeros à esquerda
+        f.write(f"nNF={nnf_fmt}\r\n")
 
 
-        f.write(f"dhEmi={data_dhemi}\r\n")
+
+        # --- dhEmi no formato esperado pelo ACBrMonitor: "dd/MM/yyyy HH:mm:ss" ---
+        try:
+            if QDate is not None and hasattr(self, "data_emissao") and hasattr(self.data_emissao, "setDate"):
+                dia = datetime.now().day
+                mes = datetime.now().month
+                ano = datetime.now().year
+                qdate = QDate(ano, mes, dia)
+                self.data_emissao.setDate(qdate)
+                dataEmissaoGeral = (self.data_emissao.text() or "").strip()  # dd/MM/yyyy
+                d, m, y = dataEmissaoGeral.split("/")
+                data_ptbr = f"{d.zfill(2)}/{m.zfill(2)}/{y}"
+            else:
+                data_ptbr = datetime.now().strftime("%d/%m/%Y")
+        except Exception:
+            data_ptbr = datetime.now().strftime("%d/%m/%Y")
+
+        hora = datetime.now().strftime("%H:%M:%S")
+        dhEmi = f"{data_ptbr} {hora}"
+        f.write(f"dhEmi={dhEmi}\r\n")
+        # --- fim dhEmi ---
+
+
+
+
+
+
+
+
 
 
 
@@ -206,17 +268,41 @@ def criaComandoACBr(self, nome_arquivo):
             cnpj_emit = "00995044000107"  # fallback
         f.write(f"CNPJ={cnpj_emit}\r\n")
 
-        f.write(f"xNome={EMIT.get('xNome','')}\r\n")
-        f.write(f"IE={EMIT.get('IE','')}\r\n")
-        f.write(f"xLgr={EMIT.get('xLgr','')}\r\n")
-        f.write(f"nro={EMIT.get('nro','')}\r\n")
-        f.write(f"xBairro={EMIT.get('xBairro','')}\r\n")
-        f.write(f"cMun={EMIT.get('cMun','')}\r\n")
-        f.write(f"xMun={EMIT.get('xMun','')}\r\n")
-        f.write(f"UF={EMIT.get('UF','')}\r\n")
-        f.write(f"CEP={EMIT.get('CEP','')}\r\n")
+        # Razão social (garantia)
+        xnome = (EMIT.get('xNome') or "").strip()
+        if not xnome:
+            xnome = "NUTRIGEL DISTRIBUIDORA EIRELI"
+        f.write(f"xNome={xnome}\r\n")
+
+        # IE do emitente: 2–14 dígitos ou 'ISENTO' (nunca deixar vazio)
+        ie_emit = (EMIT.get('IE', '') or '').strip()
+        if ie_emit.upper() != 'ISENTO':
+            ie_emit = re.sub(r'\D', '', ie_emit)  # somente dígitos
+        if not ie_emit:
+            ie_emit = 'ISENTO'
+        f.write(f"IE={ie_emit}\r\n")
+
+        # CRT do emitente: 1=Simples; 2=Simples excesso sublimite; 3=Regime Normal
+        crt = str(getattr(self, 'crt', '') or '').strip()
+        if crt not in {'1', '2', '3'}:
+            # tenta pegar do configuracoes.txt; se não houver, defaulta 1
+            crt_cfg = _ler_kv(os.path.join('NotaFiscal', 'configuracoes.txt')).get('CRT', '1')
+            crt = str(crt_cfg).strip()
+            if crt not in {'1', '2', '3'}:
+                crt = '1'
+        f.write(f"CRT={crt}\r\n")
+
+        # Endereço (mantendo o que você já usa)
+        f.write(f"xLgr={EMIT.get('xLgr','R DOUTOR OSCAR DA CUNHA')}\r\n")
+        f.write(f"nro={EMIT.get('nro','126')}\r\n")
+        f.write("xCpl=LETRA B\r\n")
+        f.write(f"xBairro={EMIT.get('xBairro','FABRICAS')}\r\n")
+        f.write(f"cMun={EMIT.get('cMun','3162500')}\r\n")
+        f.write(f"xMun={EMIT.get('xMun','SAO JOAO DEL REI')}\r\n")
+        f.write(f"UF={EMIT.get('UF','MG')}\r\n")
+        f.write(f"CEP={EMIT.get('CEP','36301194')}\r\n")
         f.write("cPais=1058\r\nxPais=BRASIL\r\n")
-        f.write(f"Fone={EMIT.get('fone','')}\r\n\r\n")
+        f.write(f"Fone={EMIT.get('fone','3233713382')}\r\n\r\n")
 
         # Destinatário
         f.write("[Destinatario]\r\n")
