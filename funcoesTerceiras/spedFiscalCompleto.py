@@ -32,6 +32,7 @@ import os
 import re
 from collections import defaultdict, Counter
 
+
 # ------------------- helpers -------------------
 def _sd(x):
     return re.sub(r"\D", "", str(x or ""))
@@ -422,6 +423,10 @@ def _bloco_9(linhas, rc: RegCount):
 
 # ------------------- orquestrador -------------------
 
+
+
+
+
 def gerar_sped_fiscal_completo(self,
                                caminho_txt="sped_fiscal_COMPLETO.txt",
                                dt_ini=None, dt_fin=None,
@@ -447,6 +452,7 @@ def gerar_sped_fiscal_completo(self,
 
     Retorna: caminho absoluto do TXT gerado.
     """
+
     hoje = datetime.now()
     if not dt_ini or not dt_fin:
         dt_ini = hoje.replace(day=1).strftime("%Y%m01")
@@ -471,3 +477,18 @@ def gerar_sped_fiscal_completo(self,
         f.writelines(linhas)
 
     return os.path.abspath(caminho_txt)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -10,13 +10,6 @@ from componentes import criaFrameJanela, criaBotao, criarLabelComboBox, criarLab
 
 
 def telaNotaFiscalSaida(self, valor):
-    variavelEntradaOuSaida = ctk.StringVar()
-    if valor == "Entrada/Débito":
-        variavelEntradaOuSaida.set('Entrada')
-    else:
-        variavelEntradaOuSaida.set('Saída')
-
-
 
     def acessar(dados, *caminho, default=""):
         for chave in caminho:
@@ -121,6 +114,7 @@ def telaNotaFiscalSaida(self, valor):
     self.variavelInscEstadualRemetente.set(0)
     self.variavelModalidadeFrete.set(0)
     self.variavelValorTotal.set(0)
+    self.variavelEntradaOuSaida.set("Saída") if valor else self.variavelEntradaOuSaida.set("Entrada")
 
 
     criarLabelEntry(self.frameTelaNotaSaida, "Número da NF", 0.1, 0.05, 0.07, self.variavelNumeroDaNota)

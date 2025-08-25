@@ -1,0 +1,20 @@
+OK: C:\ACBrMonitorPLUS\Logs\31250800995044000107550010000000011217084056-nfe.xml
+
+[Envio]
+CStat=104
+CUF=31
+DhRecbto=
+Msg=Lote processado
+NProt=
+NRec=
+TMed=0
+VerAplic=W-3.3.2
+Versao=4.00
+XMotivo=Lote processado
+tpAmb=2
+
+ERRO: Tempo de Uso Expirou!
+ERRO: Nome do Município deve ser informado
+ERRO: Nome do Município deve ser informado
+ERRO: Nome do Município deve ser informado
+ERRO: Erro CNPJ Documento: CNPJ inválido.

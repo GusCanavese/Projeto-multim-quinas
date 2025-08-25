@@ -1,5 +1,8 @@
-# criarNFe.py — Integração ACBrMonitorPLUS via arquivo único enviar.txt
-# Mantém o formato de envio desejado e remove código não utilizado.
+# criarNFe.py — ACBrMonitorPLUS (dinâmico a partir das variáveis das telas)
+# Mantém as funções já usadas no projeto e corrige:
+# - xMun sempre preenchido em Emitente/Destinatario (derivado de cMun quando faltar)
+# - Numeração Produto/ICMS/PIS/COFINS casada por item (001, 002, 003...)
+# - dhEmi único
 
 import os
 import re
@@ -7,329 +10,268 @@ import time
 import random
 from datetime import datetime
 
-try:
-    from PyQt5.QtCore import QDate
-except Exception:
-    try:
-        from PySide6.QtCore import QDate
-    except Exception:
-        QDate = None
-
-
+# Diretórios padrão do ACBr Monitor (ajuste se necessário)
 ACBR_CMD_DIR = "NotaFiscal/EnviarComando"
 ACBR_RSP_DIR = "NotaFiscal/ReceberComando"
 
+# ------------------------ UTIL ------------------------
+
 def _so_digitos(s):
-    return re.sub(r"\D", "", s or "")
+    try:
+        return re.sub(r'\D+', '', str(s or ""))
+    except Exception:
+        return ""
 
+# ------------------------ ACBr I/O ------------------------
 
-# ------------------------- util -------------------------
-
-def _ler_kv(caminho):
-    """Lê arquivo chave=valor simples (ignora linhas vazias/comentários)."""
-    m = {}
-    if not os.path.exists(caminho):
-        return m
-    with open(caminho, "r", encoding="utf-8", errors="ignore") as f:
-        for ln in f:
-            ln = ln.strip()
-            if not ln or ln.startswith("#") or "=" not in ln:
-                continue
-            k, v = ln.split("=", 1)
-            m[k.strip()] = v.strip()
-    return m
-
-def _carregar_emit_dest(self):
+def aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5):
     """
-    Preenche Emitente/Destinatário a partir de NotaFiscal/configuracoes.txt (se existir),
-    senão usa as variáveis da UI e fallbacks seguros (homologação).
+    Espera o arquivo .../enviar-resp.txt que o Monitor grava.
+    Retorna dict com {ok, cStat, xMotivo, xml, resposta_bruta}.
     """
-    cfg = _ler_kv(os.path.join("NotaFiscal", "configuracoes.txt"))
-
-    # Emitente (prioridade: config -> UI -> fallback)
-    EMIT = {
-        "CNPJ": cfg.get("CNPJ", getattr(self, "variavelCNPJRazaoSocialEmitente").get() if hasattr(self, "variavelCNPJRazaoSocialEmitente") else ""),
-        "xNome": cfg.get("xNome", getattr(self, "variavelRazaoSocialEmitente").get() if hasattr(self, "variavelRazaoSocialEmitente") else ""),
-        "IE": cfg.get("IE", getattr(self, "inscricaoEstadualEmitente").get() if hasattr(self, "inscricaoEstadualEmitente") else ""),
-        "xLgr": cfg.get("xLgr", "R DOUTOR OSCAR DA CUNHA"),
-        "nro": cfg.get("nro", "126"),
-        "xBairro": cfg.get("xBairro", "FABRICAS"),
-        "cMun": cfg.get("cMun", "3162500"),
-        "xMun": cfg.get("xMun", "SAO JOAO DEL REI"),
-        "UF": cfg.get("UF", "MG"),
-        "CEP": cfg.get("CEP", "36301194"),
-        "fone": cfg.get("fone", "3233713382"),
-    }
-
-    # Destinatário (usa prefixo Dest_ no configuracoes.txt; se faltar, herda emitente/valores da UI)
-    DEST = {
-        "CNPJ": cfg.get("Dest_CNPJ", getattr(self, "variavelCNPJRazaoSocialRemetente").get() if hasattr(self, "variavelCNPJRazaoSocialRemetente") else ""),
-        "xNome": cfg.get("Dest_xNome", getattr(self, "variavelRazaoSocialRemetente").get() if hasattr(self, "variavelRazaoSocialRemetente") else ""),
-        "IE": cfg.get("Dest_IE", ""),
-        "indIEDest": cfg.get("Dest_indIEDest", "9"),  # 1=Contrib, 2=Isento, 9=Não contrib.
-        "xLgr": cfg.get("Dest_xLgr", EMIT["xLgr"]),
-        "nro": cfg.get("Dest_nro", EMIT["nro"]),
-        "xBairro": cfg.get("Dest_xBairro", EMIT["xBairro"]),
-        "cMun": cfg.get("Dest_cMun", EMIT["cMun"]),
-        "xMun": cfg.get("Dest_xMun", EMIT["xMun"]),
-        "UF": cfg.get("Dest_UF", EMIT["UF"]),
-        "CEP": cfg.get("Dest_CEP", EMIT["CEP"]),
-        "fone": cfg.get("Dest_fone", ""),
-    }
-
-    EMIT["CNPJ"] = _so_digitos(EMIT.get("CNPJ"))
-    if len(EMIT["CNPJ"]) != 14:
-        EMIT["CNPJ"] = "00995044000107"  # fallback sempre em dígitos
-
-    # Razão social do emitente: obrigatório
-    if not (EMIT.get("xNome") or "").strip():
-        EMIT["xNome"] = "NUTRIGEL DISTRIBUIDORA EIRELI"
-
-    # IE em dígitos (mantém 'ISENTO' se for o caso)
-    if (EMIT.get("IE","").strip().upper() != "ISENTO"):
-        EMIT["IE"] = _so_digitos(EMIT.get("IE"))
-
-    # Destinatário (se houver)
-    DEST["CNPJ"] = _so_digitos(DEST.get("CNPJ"))
-    if (DEST.get("IE","").strip().upper() != "ISENTO"):
-        DEST["IE"] = _so_digitos(DEST.get("IE"))
-
-    if not EMIT.get("IE"):
-        EMIT["IE"] = "ISENTO"
-
-    # Se destinatário for isento (indIEDest=2) e IE vier vazia, define ISENTO
-    if (DEST.get("indIEDest") == "2") and not DEST.get("IE"):
-        DEST["IE"] = "ISENTO"
-
-    # saneia mínimos obrigatórios
-    for d in (EMIT, DEST):
-        for k in ("xMun", "UF", "cMun", "CEP"):
-            d[k] = (d.get(k) or "").strip()
-    return EMIT, DEST
-
-def aguarda_acbr_resposta(resp_path, timeout=120, interval=1.0):
-    """Aguarda enviar-resp.txt e retorna dict com cStat/xMotivo/chNFe/xml."""
     t0 = time.time()
-    last = ""
+    ultimo = ""
     while time.time() - t0 < timeout:
         if os.path.exists(resp_path):
             try:
                 with open(resp_path, "r", encoding="utf-8", errors="ignore") as f:
                     txt = f.read()
-                if txt and txt != last:
-                    last = txt
-                    if "[Retorno]" in txt or "CStat=" in txt or txt.startswith("OK"):
+                if txt and txt != ultimo:
+                    ultimo = txt
+                    if ("[Retorno]" in txt) or ("CStat=" in txt) or txt.startswith("OK"):
                         break
             except Exception:
                 pass
         time.sleep(interval)
 
-    if not last:
-        return {"ok": False, "mensagem": "Sem resposta do ACBr no tempo limite.", "cStat": None, "resposta_bruta": ""}
+    if not ultimo:
+        return {"ok": False, "mensagem": "Sem resposta do ACBr no tempo limite.", "cStat": None, "xMotivo": None, "xml": None, "resposta_bruta": ""}
 
     def _find(pat, default=None, flags=re.IGNORECASE):
-        m = re.search(pat, last, flags)
+        m = re.search(pat, ultimo, flags)
         return m.group(1).strip() if m else default
 
-    cstat  = _find(r"\bCStat\s*=\s*([0-9]{2,3})")
-    xmot   = _find(r"\bxMotivo\s*=\s*(.+)")
-    chave  = _find(r"\b(ChaveNFe|chNFe)\s*=\s*([0-9]{44})") or _find(r"\b([0-9]{44})\b")
-    arqxml = _find(r"\bArquivo(?:NFe|XML)?\s*=\s*(.+)") or _find(r"\\Logs\\.*?-nfe\.xml")
+    cstat = _find(r"\bCStat\s*=\s*([0-9]{2,3})")
+    xmot  = _find(r"\bxMotivo\s*=\s*(.+)")
+    xml   = _find(r"\bArquivo\s*=\s*(.+)")
+    return {"ok": True, "cStat": cstat, "xMotivo": xmot, "xml": xml, "resposta_bruta": ultimo}
 
-    ok = cstat in {"100", "104"} or last.upper().startswith("OK")
-    return {"ok": ok, "cStat": cstat, "xMotivo": (xmot or "").splitlines()[0].strip() if xmot else None,
-            "chNFe": chave, "xml": arqxml, "resposta_bruta": last}
-
-# ------------------------- geração do comando -------------------------
+# ------------------------ COMANDO ------------------------
 
 def criaComandoACBr(self, nome_arquivo):
     """
-    Gera UM ÚNICO arquivo de comando contendo:
-      NFe.CriarEnviarNFe("...INI...", 1, 1, 1, , 1)
+    Gera um ÚNICO arquivo de comando contendo:
+        NFe.CriarEnviarNFe("...INI...", 1, 1, 1, , 1)
+    usando SOMENTE as variáveis já preenchidas no fluxo das telas.
     """
-    EMIT, DEST = _carregar_emit_dest(self)
-    itens = list(getattr(self, "valoresDosItens", []) or [])
 
     os.makedirs(os.path.dirname(nome_arquivo), exist_ok=True)
+
+    # atalho para pegar StringVar/valores das telas
+    def V(attr, default=""):
+        val = getattr(self, attr, default)
+        try:
+            if hasattr(val, "get"):
+                return str(val.get())
+            return str(val)
+        except Exception:
+            return str(default)
+
+    # ---------------- Cabeçalho / Identificacao ----------------
+    natop     = V("variavelNatureza", "VENDA DE MERCADORIA") or "VENDA DE MERCADORIA"
+    raw_serie = V("variavelSerieDaNota", "") or V("serie", "") or "1"
+    raw_nnf   = V("variavelNumeroDaNota", "") or V("nNF", "") or "1"
+    try:    serie_int = int(raw_serie)
+    except: serie_int = 1
+    try:    nnf_int   = int(raw_nnf)
+    except: nnf_int   = 1
+
+    # Data/Hora
+    data_ptbr = V("variavelDataDocumento", "")
+    if not data_ptbr:
+        # tenta QDate (ex.: self.data_emissao)
+        try:
+            d = getattr(self, "data_emissao")
+            if hasattr(d, "date"):
+                d = d.date()
+            if hasattr(d, "toString"):
+                data_ptbr = d.toString("dd/MM/yyyy")
+        except Exception:
+            data_ptbr = ""
+    if not data_ptbr:
+        data_ptbr = datetime.now().strftime("%d/%m/%Y")
+    hora = V("variavelHoraEntradaSaida", "") or datetime.now().strftime("%H:%M:%S")
+
+    ent_saida = (V("variavelEntradaOuSaida", "Saída") or "Saída").lower()
+    tpnf      = 0 if "entra" in ent_saida else 1  # 0=Entrada, 1=Saída
+
+    # ---------------- Emitente ----------------
+    xNomeEmit    = V("variavelRazaoSocialEmitente")
+    cnpjEmit     = _so_digitos(V("variavelCNPJRazaoSocialEmitente"))
+    ieEmit       = V("variavelInscEstadualEmitente") or "ISENTO"
+
+    emit_xLgr    = V("emit_xLgr")
+    emit_nro     = V("emit_nro")
+    emit_xCpl    = V("emit_xCpl")
+    emit_xBairro = V("emit_xBairro")
+    emit_cMun    = _so_digitos(V("emit_cMun"))
+    emit_xMun    = V("emit_xMun")
+    emit_UF      = V("emit_UF")
+    emit_CEP     = _so_digitos(V("emit_CEP"))
+    emit_fone    = _so_digitos(V("emit_fone"))
+
+    # ---------------- Destinatário ----------------
+    xNomeDest    = V("variavelRazaoSocialRemetente")
+    cnpjDest     = _so_digitos(V("variavelCNPJRazaoSocialRemetente"))
+    ieDest       = V("variavelInscEstadualRemetente") or "ISENTO"
+
+    dest_xLgr    = V("dest_xLgr")
+    dest_nro     = V("dest_nro")
+    dest_xBairro = V("dest_xBairro")
+    dest_cMun    = _so_digitos(V("dest_cMun"))
+    dest_xMun    = V("dest_xMun")
+    dest_UF      = V("dest_UF")
+    dest_CEP     = _so_digitos(V("dest_CEP"))
+    dest_fone    = _so_digitos(V("dest_fone"))
+
+    # idDest: 1=op. interna, 2=interestadual, 3=exterior
+    if emit_UF and dest_UF and emit_UF != dest_UF:
+        idDest = 2
+    elif dest_UF:
+        idDest = 1
+    else:
+        idDest = 1
+
+    # --------- Garantia de xMun (derivando de cMun quando necessário) ----------
+    # Mapeamento mínimo; adicione os municípios que você usa:
+    _IBGE2MUN = {
+        "3162500": "SAO JOAO DEL REI",
+        "3106200": "BELO HORIZONTE",
+    }
+    # Emitente
+    if not emit_xMun:
+        if emit_cMun and emit_cMun in _IBGE2MUN:
+            emit_xMun = _IBGE2MUN[emit_cMun]
+    emit_xMun = re.sub(r"[^ -ÿ]", "", (emit_xMun or "").upper()).strip()
+
+    # Destinatário
+    if not dest_xMun:
+        if dest_cMun and dest_cMun in _IBGE2MUN:
+            dest_xMun = _IBGE2MUN[dest_cMun]
+        elif not dest_cMun and emit_cMun:
+            dest_cMun = emit_cMun
+            dest_xMun = _IBGE2MUN.get(dest_cMun, emit_xMun)
+    dest_xMun = re.sub(r"[^ -ÿ]", "", (dest_xMun or "").upper()).strip()
+
+    # ---------------- Totais / Pagamento ----------------
+    vNF      = V("valorLiquido", "0.00") or "0.00"
+    vDesc    = V("totalDesconto", "0.00") or "0.00"
+    vFrete   = V("totalFrete", "0.00") or "0.00"
+    vSeg     = V("totalSeguro", "0.00") or "0.00"
+    vOutro   = V("outrasDespesas", "0.00") or "0.00"
+    vICMS    = V("valorICMS", "0.00") or V("totalICMS", "0.00") or "0.00"
+    vIPI     = V("totalIPI", "0.00") or "0.00"
+    vPIS     = V("totalPIS", "0.00") or "0.00"
+    vCOFINS  = V("totalCOFINS", "0.00") or "0.00"
+    vProdTot = V("valorTotalProdutos", "") or V("valorSubtotal", "")  # pode vir vazio
+
+    itens    = list(getattr(self, "valoresDosItens", []) or [])
+    dadosTrib = list(getattr(self, "dadosProduto", []) or [])  # opcional
+
+    # Modalidade de frete
+    modFrete = _so_digitos(V("variavelModalidadeFrete", "")) or "9"  # 9 = sem frete
+
+    # ---------------- Escrever arquivo ----------------
     with open(nome_arquivo, "w", encoding="utf-8", newline="\r\n") as f:
         f.write('NFe.CriarEnviarNFe(\r\n"\r\n')
 
-        # [infNFe] + [Identificacao]
+        # [infNFe] / [Identificacao]
         f.write("[infNFe]\r\nversao=4.00\r\n\r\n")
         f.write("[Identificacao]\r\n")
         f.write(f"cNF={random.randint(10_000_000, 99_999_999)}\r\n")
-
-        natop = ""
-        try:
-            natop = getattr(self, "variavelNatureza").get().strip()
-        except Exception:
-            pass
-        if not natop:
-            natop = "VENDA DE MERCADORIA"
         f.write(f"natOp={natop}\r\n")
         f.write("mod=55\r\n")
-
-        # --- SERIE: 0..999, sem zeros à esquerda ---
-        raw_serie = None
-        if hasattr(self, "variavelSerieDaNota") and hasattr(self.variavelSerieDaNota, "get"):
-            raw_serie = (self.variavelSerieDaNota.get() or "").strip()
-        elif hasattr(self, "serie"):
-            raw_serie = str(getattr(self, "serie"))
-        if not raw_serie or not raw_serie.isdigit():
-            raw_serie = "1"
-        serie_int = int(raw_serie)
-        if not (0 <= serie_int <= 999):
-            raise ValueError(f"Série inválida: {serie_int} (esperado 0..999)")
         f.write(f"serie={serie_int}\r\n")
-
-        # --- nNF: 1..999999999 (sem zeros à esquerda) ---
-        raw_nnf = None
-        if hasattr(self, "variavelNumeroDaNota") and hasattr(self.variavelNumeroDaNota, "get"):
-            raw_nnf = (self.variavelNumeroDaNota.get() or "").strip()
-        elif hasattr(self, "nNF"):
-            raw_nnf = str(getattr(self, "nNF"))
-        if not raw_nnf or not raw_nnf.isdigit() or int(raw_nnf) == 0:
-            raw_nnf = "1"
-        nnf_int = int(raw_nnf)
-        if not (1 <= nnf_int <= 999_999_999):
-            raise ValueError(f"nNF inválido: {nnf_int} (esperado 1..999999999)")
         f.write(f"nNF={nnf_int}\r\n")
-
-        # --- dhEmi: "dd/MM/yyyy HH:mm:ss" (formato ACBrMonitor) ---
-        try:
-            if QDate is not None and hasattr(self, "data_emissao") and hasattr(self.data_emissao, "setDate"):
-                dia = datetime.now().day
-                mes = datetime.now().month
-                ano = datetime.now().year
-                qdate = QDate(ano, mes, dia)
-                self.data_emissao.setDate(qdate)
-                dataEmissaoGeral = (self.data_emissao.text() or "").strip()  # dd/MM/yyyy
-                d, m, y = dataEmissaoGeral.split("/")
-                data_ptbr = f"{d.zfill(2)}/{m.zfill(2)}/{y}"
-            else:
-                data_ptbr = datetime.now().strftime("%d/%m/%Y")
-        except Exception:
-            data_ptbr = datetime.now().strftime("%d/%m/%Y")
-        hora = datetime.now().strftime("%H:%M:%S")
-        f.write(f"dhEmi={data_ptbr} {hora}\r\n")
-
-
-
-
-
-
-
-        # tpNF: 1=saída (default) | 0=entrada
-        f.write(f"dhEmi={data_ptbr} {hora}\r\n")
-
-        # tpNF: 1=saída (default) | 0=entrada
-        tpnf = ""
-        try:
-            tpnf = getattr(self, "variavelEntradaOuSaida").get().strip()
-        except Exception:
-            pass
-        if tpnf not in {"0", "1"}:
-            tpnf = "1"
+        f.write(f"dhEmi={data_ptbr} {hora}\r\n")  # única ocorrência
         f.write(f"tpNF={tpnf}\r\n")
-
-        idDest = "1" if (DEST.get("UF") == EMIT.get("UF")) else "2"
         f.write(f"idDest={idDest}\r\n")
-
-        # >>>>>>>>>>>>>> AQUI adiciona o ambiente <<<<<<<<<<<<<<
-        # 1 = Produção | 2 = Homologação
         f.write("tpAmb=2\r\n")
-
         f.write("tpImp=1\r\n")
         f.write("tpEmis=1\r\n")
-        f.write("finNFe=1\r\n")   # ajuste também: finNFe=1 para NF-e normal
+        f.write("finNFe=1\r\n")
         f.write("indFinal=0\r\n")
         f.write("indPres=9\r\n")
         f.write("procEmi=0\r\n")
         f.write("verProc=Sistema Python\r\n\r\n")
 
-
-
-
-
-
-
-
-
-        # Emitente
+        # [Emitente]
         f.write("[Emitente]\r\n")
-        cnpj_emit = _so_digitos(EMIT.get('CNPJ'))
-        if len(cnpj_emit) != 14:
-            cnpj_emit = "00995044000107"  # fallback somente dígitos
-        f.write(f"CNPJ={cnpj_emit}\r\n")
-
-        # Razão social
-        xnome = (EMIT.get('xNome') or "").strip()
-        if not xnome:
-            xnome = "NUTRIGEL DISTRIBUIDORA EIRELI"
-        f.write(f"xNome={xnome}\r\n")
-
-        # IE do emitente: 2–14 dígitos ou 'ISENTO'
-        ie_emit = (EMIT.get('IE', '') or '').strip()
-        if ie_emit.upper() != 'ISENTO':
-            ie_emit = _so_digitos(ie_emit)
-        if not ie_emit:
-            ie_emit = 'ISENTO'
-        f.write(f"IE={ie_emit}\r\n")
-
-        # CRT do emitente: 1=Simples; 2=Simples excesso sublimite; 3=Regime Normal
-        crt = str(getattr(self, 'crt', '') or '').strip()
-        if crt not in {'1', '2', '3'}:
-            crt_cfg = _ler_kv(os.path.join('NotaFiscal', 'configuracoes.txt')).get('CRT', '1')
-            crt = str(crt_cfg).strip()
-            if crt not in {'1', '2', '3'}:
-                crt = '1'
+        cnpj_ok = cnpjEmit if len(cnpjEmit) == 14 else ""
+        f.write(f"CNPJ={cnpj_ok}\r\n")
+        f.write(f"xNome={xNomeEmit}\r\n")
+        ie_ok = ieEmit if (ieEmit.upper() == "ISENTO" or _so_digitos(ieEmit)) else "ISENTO"
+        f.write(f"IE={ie_ok}\r\n")
+        # CRT se existir nas telas; se não, 1 (Simples) por padrão
+        crt = str(getattr(self, "crt", "") or "").strip()
+        if crt not in {"1", "2", "3"}:
+            crt = "1"
         f.write(f"CRT={crt}\r\n")
-
-        # Endereço
-        f.write(f"xLgr={EMIT.get('xLgr','R DOUTOR OSCAR DA CUNHA')}\r\n")
-        f.write(f"nro={EMIT.get('nro','126')}\r\n")
-        f.write("xCpl=LETRA B\r\n")
-        f.write(f"xBairro={EMIT.get('xBairro','FABRICAS')}\r\n")
-        f.write(f"cMun={EMIT.get('cMun','3162500')}\r\n")
-        f.write(f"xMun={EMIT.get('xMun','SAO JOAO DEL REI')}\r\n")
-        f.write(f"UF={EMIT.get('UF','MG')}\r\n")
-        f.write(f"CEP={EMIT.get('CEP','36301194')}\r\n")
+        if emit_xLgr:    f.write(f"xLgr={emit_xLgr}\r\n")
+        if emit_nro:     f.write(f"nro={emit_nro}\r\n")
+        if emit_xCpl:    f.write(f"xCpl={emit_xCpl}\r\n")
+        if emit_xBairro: f.write(f"xBairro={emit_xBairro}\r\n")
+        f.write(f"cMun={emit_cMun or '3162500'}\r\n")
+        f.write(f"xMun={emit_xMun or 'SAO JOAO DEL REI'}\r\n")
+        f.write(f"UF={emit_UF or 'MG'}\r\n")
+        f.write(f"CEP={emit_CEP}\r\n")
         f.write("cPais=1058\r\nxPais=BRASIL\r\n")
-        f.write(f"Fone={EMIT.get('fone','3233713382')}\r\n\r\n")
+        if emit_fone: f.write(f"Fone={emit_fone}\r\n")
+        f.write("\r\n")
 
-        # Destinatário
+        # [Destinatario]
         f.write("[Destinatario]\r\n")
-        f.write(f"CNPJCPF={DEST.get('CNPJ','')}\r\n")
-        f.write(f"xNome={DEST.get('xNome','')}\r\n")
-        f.write(f"indIEDest={(DEST.get('indIEDest') or '9')}\r\n")
-        ie_dest = (DEST.get('IE','') or '').strip()
-        if ie_dest:
-            f.write(f"IE={ie_dest}\r\n")
-        f.write(f"xLgr={DEST.get('xLgr','')}\r\n")
-        f.write(f"nro={DEST.get('nro','')}\r\n")
-        f.write(f"xBairro={DEST.get('xBairro','')}\r\n")
-        f.write(f"cMun={DEST.get('cMun','')}\r\n")
-        f.write(f"xMun={DEST.get('xMun','')}\r\n")
-        f.write(f"UF={DEST.get('UF','')}\r\n")
-        f.write(f"CEP={DEST.get('CEP','')}\r\n")
+        if cnpjDest:
+            f.write(f"CNPJCPF={cnpjDest}\r\n")
+        f.write(f"xNome={xNomeDest}\r\n")
+        indIEDest = "2" if str(ieDest).strip().upper()=="ISENTO" else ("1" if cnpjDest else "9")
+        f.write(f"indIEDest={indIEDest}\r\n")
+        if ieDest and str(ieDest).strip().upper()!="ISENTO":
+            f.write(f"IE={ieDest}\r\n")
+        if dest_xLgr:    f.write(f"xLgr={dest_xLgr}\r\n")
+        if dest_nro:     f.write(f"nro={dest_nro}\r\n")
+        if dest_xBairro: f.write(f"xBairro={dest_xBairro}\r\n")
+        f.write(f"cMun={dest_cMun or emit_cMun or '3162500'}\r\n")
+        f.write(f"xMun={dest_xMun or emit_xMun or 'SAO JOAO DEL REI'}\r\n")
+        f.write(f"UF={dest_UF or emit_UF or 'MG'}\r\n")
+        f.write(f"CEP={dest_CEP}\r\n")
         f.write("cPais=1058\r\nxPais=BRASIL\r\n")
-        f.write(f"Fone={DEST.get('fone','')}\r\n\r\n")
+        if dest_fone: f.write(f"Fone={dest_fone}\r\n")
+        f.write("\r\n")
 
-        # Itens
-        for i, prod in enumerate(itens, start=1):
-            idx = str(i).zfill(3)
+        # ---------------- [Produtos] + tributos por item ----------------
+        for idx, base in enumerate(itens, start=1):
+            prod = dict(base)
+            # mescla tributação paralela se houver
+            if idx-1 < len(dadosTrib):
+                try:
+                    trib = dict(dadosTrib[idx-1])
+                    for k,v in trib.items():
+                        if v not in (None, "", "None"):
+                            prod[k] = v
+                except Exception:
+                    pass
 
-            # defaults mínimos para schema/regra
-            cProd  = (prod.get("codigo")          or "1")
-            xProd  = (prod.get("descricao")       or "ITEM")
-            NCM    = (prod.get("ncm")             or "00000000")  # ajuste com um NCM válido
-            CFOP   = (prod.get("cfop")            or "5102")
-            uCom   = (prod.get("unidade")         or "UN")
-            qCom   = (prod.get("quantidade")      or "1.0000")
-            vUnCom = (prod.get("valor_unitario")  or "0.01")
-            vProd  = (prod.get("valor_total")     or vUnCom)
+            cProd  = prod.get("codigo",     prod.get("cProd",    str(idx)))
+            xProd  = prod.get("descricao",  prod.get("xProd",    "ITEM"))
+            NCM    = prod.get("ncm",        prod.get("NCM",      "00000000"))
+            CFOP   = prod.get("cfop",       prod.get("CFOP",     V("variavelCFOP", "5102") or "5102"))
+            uCom   = prod.get("unidade",    prod.get("uCom",     "UN"))
+            qCom   = prod.get("quantidade", prod.get("qCom",     "1"))
+            vUnCom = prod.get("valor_unitario", prod.get("vUnCom",  "0.01"))
+            vProd  = prod.get("valor_total",    prod.get("vProd",   vUnCom))
 
-            f.write(f"[Produto{idx}]\r\n")
+            f.write(f"[Produto{idx:03d}]\r\n")
             f.write(f"cProd={cProd}\r\n")
             f.write(f"xProd={xProd}\r\n")
             f.write(f"NCM={NCM}\r\n")
@@ -340,86 +282,73 @@ def criaComandoACBr(self, nome_arquivo):
             f.write(f"vProd={vProd}\r\n")
             f.write("indTot=1\r\n\r\n")
 
-            # --- ICMS por item conforme o CRT ---
-            crt_item = crt  # usa o já definido
-            f.write("[ICMS001]\r\n")
+            # ---- ICMS
+            orig  = prod.get("orig",  prod.get("origem", "0"))
+            csosn = prod.get("csosn") or prod.get("CSOSN")
+            cst   = prod.get("cst")   or prod.get("CST")
 
-            if crt_item in {'1', '2'}:
-                # Simples Nacional -> usar CSOSN, não usar CST
-                csosn = (getattr(self, 'csosn_padrao', '') or '').strip()
-                if csosn not in {'101','102','103','201','202','203','300','400','500','900'}:
-                    csosn = '102'  # venda interna sem crédito
-                orig = str(getattr(self, 'orig_padrao', '0')).strip() or '0'
-                f.write(f"orig={orig}\r\n")
-                f.write(f"CSOSN={csosn}\r\n")
-                if csosn in {'101', '201', '900'}:
-                    pCredSN = getattr(self, 'pCredSN', '0.00')
-                    vCredICMSSN = getattr(self, 'vCredICMSSN', '0.00')
-                    f.write(f"pCredSN={pCredSN}\r\n")
-                    f.write(f"vCredICMSSN={vCredICMSSN}\r\n")
+            f.write(f"[ICMS{idx:03d}]\r\n")
+            f.write(f"orig={orig}\r\n")
+            if csosn:
+                f.write(f"CSOSN={csosn}\r\n\r\n")
             else:
-                # Regime Normal -> usar CST e base/aliquota/valor
-                cst = (getattr(self, 'cst_padrao', '') or '').strip()
-                if cst not in {'00','02','10','15','20','30','40','51','53','60'}:
-                    cst = '00'  # tributação integral
-                orig = str(getattr(self, 'orig_padrao', '0')).strip() or '0'
-                vBC = getattr(self, 'vBC', '0.00')
-                pICMS = getattr(self, 'pICMS', '0.00')
-                vICMS = getattr(self, 'vICMS', '0.00')
-                f.write(f"orig={orig}\r\n")
-                f.write(f"CST={cst}\r\n")
+                vBC   = prod.get("vBC",   prod.get("bc_icms", "0.00"))
+                pICMS = prod.get("pICMS", prod.get("aliq_icms", "0.00"))
+                vICMS = prod.get("vICMS", prod.get("valor_icms", "0.00"))
+                f.write(f"CST={cst or '00'}\r\n")
                 f.write(f"vBC={vBC}\r\n")
                 f.write(f"pICMS={pICMS}\r\n")
-                f.write(f"vICMS={vICMS}\r\n")
-            # --- fim ICMS ---
+                f.write(f"vICMS={vICMS}\r\n\r\n")
 
-            f.write(f"[PIS{idx}]\r\n")
-            f.write(f"CST={(prod.get('cst_pis') or '99')}\r\n")
-            f.write(f"vBC={(prod.get('bc_pis') or '0.00')}\r\n")
-            f.write(f"pPIS={(prod.get('aliq_pis') or '0.00')}\r\n")
-            f.write(f"vPIS={(prod.get('valor_pis') or '0.00')}\r\n\r\n")
+            # ---- PIS
+            f.write(f"[PIS{idx:03d}]\r\n")
+            f.write(f"CST={(prod.get('cst_pis') or prod.get('CST_PIS') or '99')}\r\n")
+            f.write(f"vBC={(prod.get('bc_pis') or prod.get('vBC_PIS') or '0.00')}\r\n")
+            f.write(f"pPIS={(prod.get('aliq_pis') or prod.get('pPIS') or '0.00')}\r\n")
+            f.write(f"vPIS={(prod.get('valor_pis') or prod.get('vPIS') or '0.00')}\r\n\r\n")
 
-            f.write(f"[COFINS{idx}]\r\n")
-            f.write(f"CST={(prod.get('cst_cofins') or '99')}\r\n")
-            f.write(f"vBC={(prod.get('bc_cofins') or '0.00')}\r\n")
-            f.write(f"pCOFINS={(prod.get('aliq_cofins') or '0.00')}\r\n")
-            f.write(f"vCOFINS={(prod.get('valor_cofins') or '0.00')}\r\n\r\n")
+            # ---- COFINS
+            f.write(f"[COFINS{idx:03d}]\r\n")
+            f.write(f"CST={(prod.get('cst_cofins') or prod.get('CST_COFINS') or '99')}\r\n")
+            f.write(f"vBC={(prod.get('bc_cofins') or prod.get('vBC_COFINS') or '0.00')}\r\n")
+            f.write(f"pCOFINS={(prod.get('aliq_cofins') or prod.get('pCOFINS') or '0.00')}\r\n")
+            f.write(f"vCOFINS={(prod.get('valor_cofins') or prod.get('vCOFINS') or '0.00')}\r\n\r\n")
 
-        # Totais
+        # ---------------- [Total] ----------------
         f.write("[Total]\r\n")
-        f.write(f"vProd={getattr(self, 'valorTotalProdutos').get()}\r\n")
-        f.write(f"vNF={getattr(self, 'valorLiquido').get()}\r\n")
-        f.write(f"vFrete={getattr(self, 'totalFrete').get()}\r\n")
-        f.write(f"vSeg={getattr(self, 'totalSeguro').get()}\r\n")
-        f.write(f"vDesc={getattr(self, 'totalDesconto').get()}\r\n")
-        f.write(f"vOutro={getattr(self, 'outrasDespesas').get()}\r\n")
-        f.write(f"vICMS={getattr(self, 'valorICMS').get()}\r\n")
-        f.write(f"vIPI={getattr(self, 'totalIPI').get()}\r\n")
-        f.write(f"vPIS={getattr(self, 'totalPIS').get()}\r\n")
-        f.write(f"vCOFINS={getattr(self, 'totalCOFINS').get()}\r\n\r\n")
+        if vProdTot:
+            f.write(f"vProd={vProdTot}\r\n")
+        f.write(f"vNF={vNF}\r\n")
+        f.write(f"vFrete={vFrete}\r\n")
+        f.write(f"vSeg={vSeg}\r\n")
+        f.write(f"vDesc={vDesc}\r\n")
+        f.write(f"vOutro={vOutro}\r\n")
+        f.write(f"vICMS={vICMS}\r\n")
+        f.write(f"vIPI={vIPI}\r\n")
+        f.write(f"vPIS={vPIS}\r\n")
+        f.write(f"vCOFINS={vCOFINS}\r\n\r\n")
 
-        # Transporte
+        # ---------------- [Transportador] ----------------
         f.write("[Transportador]\r\n")
-        f.write("modFrete=9\r\n\r\n")  # sem frete
+        f.write(f"modFrete={modFrete}\r\n\r\n")
 
-        # Pagamento
+        # ---------------- [pag001] ----------------
         f.write("[pag001]\r\n")
         f.write("tpag=01\r\n")
-        f.write(f"vPag={getattr(self, 'valorLiquido').get()}\r\n\r\n")
+        f.write(f"vPag={vNF}\r\n\r\n")
 
-        # Fecha o comando (formato do ACBr)
+        # Encerramento do comando
         f.write('"\r\n,1,1, , ,1)')
 
-# ------------------------- execução -------------------------
-
-def gerarNFe(self):
+def criarNFE(self):
     """
-    Cria NotaFiscal/EnviarComando/enviar.txt (CriarEnviarNFe) e
-    aguarda NotaFiscal/ReceberComando/enviar-resp.txt.
+    Cria NotaFiscal/EnviarComando/enviar.txt (CriarEnviarNFe),
+    garante normalizações essenciais e aguarda o retorno do ACBr.
     """
     os.makedirs(ACBR_CMD_DIR, exist_ok=True)
     os.makedirs(ACBR_RSP_DIR, exist_ok=True)
 
+    cmd_path  = os.path.join(ACBR_CMD_DIR, "enviar.txt")
     resp_path = os.path.join(ACBR_RSP_DIR, "enviar-resp.txt")
     try:
         if os.path.exists(resp_path):
@@ -427,25 +356,13 @@ def gerarNFe(self):
     except Exception:
         pass
 
-    cmd_path = os.path.join(ACBR_CMD_DIR, "enviar.txt")
-
-    itens = list(getattr(self, "valoresDosItens", []) or [])
-    if len(itens) == 0:
-        return {"ok": False, "mensagem": "NF-e sem itens: adicione ao menos 1 produto antes de enviar."}
-
     criaComandoACBr(self, cmd_path)
 
-    # Debugs úteis
-    with open(cmd_path, "r", encoding="utf-8", errors="ignore") as _f:
-        _txt = _f.read()
-    print("DEBUG: enviar.txt absoluto:", os.path.abspath(cmd_path))
-    _dhemi = re.findall(r"^dhEmi=(.*)$", _txt, flags=re.MULTILINE)
-    print("DEBUG: dhEmi encontrado:", _dhemi)
+    # pequeno delay para o Monitor consumir
+    time.sleep(0.5)
 
-    resultado = aguarda_acbr_resposta(resp_path)
-    print(f"↩️ cStat={resultado.get('cStat')} - {resultado.get('xMotivo')}")
-    if resultado.get("xml"):
-        print(f"📄 XML: {resultado['xml']}")
-    if not resultado["ok"]:
-        print("❌ Falha no envio. Veja 'resposta_bruta' para diagnóstico.")
+    resultado = aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5)
     return resultado
+
+# compatibilidade (se alguma parte do seu app ainda chamar gerarNFe)
+gerarNFe = criarNFE

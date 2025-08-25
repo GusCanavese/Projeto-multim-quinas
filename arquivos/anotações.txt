@@ -55,6 +55,14 @@
 55 - somar as parcelas do faturamento (ambos) para setornar somente um valor             ✅
 
 
+
+
+
+PRIMEIRO CADASTRAR A NOTA NO BANCO DE DADOS
+
+DEPOIS FAZER O SPED
+
+
 39 - mandar o excedente dos produtos para a tela de "pedidos fábrica"      1/2❓
 
 

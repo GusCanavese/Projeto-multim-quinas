@@ -10,6 +10,7 @@ from telas.telaEstoque import telaEstoque
 from telas.telaGerenciar import telaGerenciar
 from telas.telaGerarOrcamento  import telaGerarOrcamento
 from telas.telaContasAPagarEAReceber import telaContasAPagarEAReceber
+from telas.telaFiscal import telaFiscal
 from componentes import criaFrameJanela, criaFrameJanela, criaBotao
 from PIL import Image, ImageTk
 from funcoesTerceiras.carregamentoDasImagens import resource_path
@@ -78,8 +79,6 @@ def telaAcoes(self):
 
         gerenciar = criaBotao(frame, "Gerenciar ", 0.33, 0.57, 0.24, lambda: telaGerenciar(self))
         gerenciar.configure(height=50, image=fotoGerenciar, compound="left")
-        
-
 
         relatorioDeVendas = criaBotao(frame, "Relatório de vendas", 0.66, 0.24, 0.24, lambda: telaRelatorioDeVendas(self))
         relatorioDeVendas.configure(height=50, image=fotoRelatorio, compound="left")
@@ -89,6 +88,9 @@ def telaAcoes(self):
         
         estoque = criaBotao(frame, "Estoque/Produtos", 0.66, 0.46, 0.24, lambda: telaEstoque(self))
         estoque.configure(height=50, image=fotoEstoque, compound="left")
+
+        fiscal = criaBotao(frame, "Fiscal", 0.66, 0.57, 0.24, lambda: telaFiscal(self))
+        fiscal.configure(height=50, image=None, compound="left")
 
         criaBotao(frame, "Trocar usuário", 0.33, 0.80, 0.18, lambda: frame.destroy())
     aplicar_maiusculo_em_todos_entries(self)
