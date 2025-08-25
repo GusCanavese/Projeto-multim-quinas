@@ -1,0 +1,26 @@
+# --- EMITENTE ---
+CNPJ=00.995.044/0001-07
+xNome=MINHA EMPRESA LTDA
+IE=ISENTO
+UF=MG
+xLgr=RUA EXEMPLO
+nro=100
+xBairro=CENTRO
+cMun=3162500
+xMun=SAO JOAO DEL REI
+CEP=36301194
+Fone=3233713000
+
+# --- DESTINATÁRIO ---
+Dest_CNPJ=11222333000181
+Dest_xNome=CLIENTE EXEMPLO LTDA
+Dest_indIEDest=9
+# (opcionais, se quiser definir endereço do destinatário:)
+# Dest_xLgr=
+# Dest_nro=
+# Dest_xBairro=
+# Dest_cMun=
+# Dest_xMun=
+# Dest_UF=
+# Dest_CEP=
+# Dest_fone=

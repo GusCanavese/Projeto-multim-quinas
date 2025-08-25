@@ -213,6 +213,15 @@ def criaComandoACBr(self, nome_arquivo):
         hora = datetime.now().strftime("%H:%M:%S")
         f.write(f"dhEmi={data_ptbr} {hora}\r\n")
 
+
+
+
+
+
+
+        # tpNF: 1=saída (default) | 0=entrada
+        f.write(f"dhEmi={data_ptbr} {hora}\r\n")
+
         # tpNF: 1=saída (default) | 0=entrada
         tpnf = ""
         try:
@@ -225,13 +234,26 @@ def criaComandoACBr(self, nome_arquivo):
 
         idDest = "1" if (DEST.get("UF") == EMIT.get("UF")) else "2"
         f.write(f"idDest={idDest}\r\n")
+
+        # >>>>>>>>>>>>>> AQUI adiciona o ambiente <<<<<<<<<<<<<<
+        # 1 = Produção | 2 = Homologação
+        f.write("tpAmb=2\r\n")
+
         f.write("tpImp=1\r\n")
         f.write("tpEmis=1\r\n")
-        f.write("finNFe=0\r\n")
+        f.write("finNFe=1\r\n")   # ajuste também: finNFe=1 para NF-e normal
         f.write("indFinal=0\r\n")
         f.write("indPres=9\r\n")
         f.write("procEmi=0\r\n")
         f.write("verProc=Sistema Python\r\n\r\n")
+
+
+
+
+
+
+
+
 
         # Emitente
         f.write("[Emitente]\r\n")
