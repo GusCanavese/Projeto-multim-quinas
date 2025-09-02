@@ -3,6 +3,7 @@
 # - xMun sempre preenchido em Emitente/Destinatario (derivado de cMun quando faltar)
 # - Numeração Produto/ICMS/PIS/COFINS casada por item (001, 002, 003...)
 # - dhEmi único
+# - indIntermed conforme indPres (NT 2020.006): indIntermed=0/1 e bloco [infIntermed] quando houver marketplace
 
 import os
 import pathlib
@@ -219,6 +220,11 @@ def criaComandoACBr(self, nome_arquivo):
     ent_saida = (V("variavelEntradaOuSaida", "Saída") or "Saída").lower()
     tpnf      = 0 if "entra" in ent_saida else 1  # 0=Entrada, 1=Saída
 
+    # Indicador de presença (permite sobrescrever por variável da tela)
+    indPres = (V("indPres", "") or
+               V("variavelIndicadorPresenca", "") or
+               "9").strip()  # 9 = operação não presencial (outros)
+
     # ---------------- Emitente ----------------
     xNomeEmit    = V("variavelRazaoSocialEmitente")
     cnpjEmit     = _so_digitos(V("variavelCNPJRazaoSocialEmitente"))
@@ -295,6 +301,23 @@ def criaComandoACBr(self, nome_arquivo):
     # Modalidade de frete
     modFrete = _so_digitos(V("variavelModalidadeFrete", "")) or "9"  # 9 = sem frete
 
+    # ---------------- Intermediador (marketplace) ----------------
+    # Captura possíveis nomes de variáveis usadas no seu app
+    marketplace_cnpj = _so_digitos(
+        (V("marketplace_cnpj", "") or
+         V("cnpjIntermediador", "") or
+         V("variavelCNPJIntermediador", "") or
+         V("variavelCNPJMarketplace", "") or
+         V("CNPJ_intermediador", "") or
+         V("CNPJMarketplace", ""))
+    )
+    marketplace_id = (
+        V("marketplace_id", "") or
+        V("idCadIntTran", "") or
+        V("variavelIdIntermediador", "") or
+        V("variavelIdMarketplace", "")
+    ).strip()
+
     # ---------------- Escrever arquivo ----------------
     with open(nome_arquivo, "w", encoding="utf-8", newline="\r\n") as f:
         f.write('NFe.CriarEnviarNFe(\r\n"\r\n')
@@ -315,9 +338,27 @@ def criaComandoACBr(self, nome_arquivo):
         f.write("tpEmis=1\r\n")
         f.write("finNFe=1\r\n")
         f.write("indFinal=0\r\n")
-        f.write("indPres=9\r\n")
+        f.write(f"indPres={indPres}\r\n")
         f.write("procEmi=0\r\n")
-        f.write("verProc=Sistema Python\r\n\r\n")
+        f.write("verProc=Sistema Python\r\n")
+
+        # >>> NOVO: indicativo do intermediador conforme indPres
+        if indPres in {"2", "3", "4", "9"}:
+            if len(marketplace_cnpj) == 14:
+                # Houve marketplace/intermediador
+                f.write("indIntermed=1\r\n\r\n")
+                f.write("[infIntermed]\r\n")
+                f.write(f"CNPJ={marketplace_cnpj}\r\n")
+                if marketplace_id:
+                    f.write(f"idCadIntTran={marketplace_id}\r\n")
+                f.write("\r\n")
+            else:
+                # Sem marketplace (operação não presencial direta)
+                f.write("indIntermed=0\r\n\r\n")
+        else:
+            # Para 0,1,5 não deve enviar indIntermed
+            f.write("\r\n")
+        # <<< NOVO
 
         # [Emitente]
         f.write("[Emitente]\r\n")
@@ -460,7 +501,7 @@ def criaComandoACBr(self, nome_arquivo):
         f.write(f"vPag={vNF}\r\n\r\n")
 
         # Encerramento do comando
-        f.write('"\r\n,1,1, , ,1)')
+        f.write('"\r\n,1,1,1, ,1)')
 
 def criarNFE(self):
     """
