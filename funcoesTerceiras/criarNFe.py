@@ -5,10 +5,124 @@
 # - dhEmi único
 
 import os
+import pathlib
 import re
 import time
 import random
 from datetime import datetime
+
+
+# --- helper injetado: preenche campos faltantes de endereço nos blocos [Emitente] e [Destinatario]
+def _V_get(self, attr, default=""):
+    val = getattr(self, attr, default)
+    try:
+        if hasattr(val, "get"):
+            return str(val.get())
+        return str(val)
+    except Exception:
+        return default
+
+def _first_nonempty(*vals):
+    for v in vals:
+        if isinstance(v, str):
+            if v.strip():
+                return v.strip()
+        elif v:
+            return str(v)
+    return ""
+
+def _ensure_key_in_section(section_text, key, value):
+    # Se não houver valor, não mexe
+    if value is None or str(value).strip() == "":
+        return section_text
+    # Se já existir com valor, mantém
+    pat_line = re.compile(rf'(?mi)^{re.escape(key)}\s*=\s*(.*)$')
+    m = pat_line.search(section_text)
+    if m:
+        # Só preenche se estava vazio
+        if m.group(1).strip() == "":
+            start, end = m.span(1)
+            return section_text[:start] + str(value) + section_text[end:]
+        return section_text
+    # Caso não exista a chave, adiciona ao final da seção
+    if not section_text.endswith("\r\n"):
+        section_text += "\r\n"
+    section_text += f"{key}={value}\r\n"
+    return section_text
+
+def _preencher_enderecos_faltantes_arquivo(self, ini_path):
+    try:
+        txt = pathlib.Path(ini_path).read_text(encoding="utf-8")
+    except Exception:
+        return
+
+    # Helper para editar uma seção específica
+    def patch_section(txt, section_name, pairs):
+        # captura a seção inteira até a próxima seção ou fim
+        # preserva CRLF
+        sec_pat = re.compile(rf'(\[{re.escape(section_name)}\]\r?\n)(.*?)(?=(\r?\n\[)|\Z)', re.S | re.M)
+        m = sec_pat.search(txt)
+        if not m:
+            return txt  # seção não existe, não mexe
+        header, body = m.group(1), m.group(2)
+        for key, value in pairs:
+            body = _ensure_key_in_section(body, key, value)
+        new_sec = header + body
+        start, end = m.span()
+        return txt[:start] + new_sec + txt[end:]
+
+    # Coleta valores possíveis a partir do self
+    emit_xLgr = _first_nonempty(
+        _V_get(self, "emit_xLgr", ""),
+        _V_get(self, "variavelLogradouroEmitente", ""),
+        _V_get(self, "variavelEnderecoEmitente", ""),
+        _V_get(self, "variavelEnderecoRazaoSocialEmitente", "")
+    )
+    emit_xBairro = _first_nonempty(
+        _V_get(self, "emit_xBairro", ""),
+        _V_get(self, "variavelBairroEmitente", ""),
+        _V_get(self, "variavelBairroRazaoSocialEmitente", "")
+    )
+    dest_xLgr = _first_nonempty(
+        _V_get(self, "dest_xLgr", ""),
+        _V_get(self, "variavelLogradouroDestinatario", ""),
+        _V_get(self, "variavelEnderecoDestinatario", ""),
+        _V_get(self, "variavelEnderecoCliente", "")
+    )
+    dest_nro = _first_nonempty(
+        _V_get(self, "dest_nro", ""),
+        _V_get(self, "variavelNumeroDestinatario", ""),
+        _V_get(self, "variavelNumeroCliente", "")
+    ) or "S/N"
+    dest_xBairro = _first_nonempty(
+        _V_get(self, "dest_xBairro", ""),
+        _V_get(self, "variavelBairroDestinatario", ""),
+        _V_get(self, "variavelBairroCliente", "")
+    )
+
+    # Fallbacks para não deixar vazio (apenas quando a tag está ausente ou vazia)
+    if not emit_xLgr: emit_xLgr = "NAO INFORMADO"
+    if not emit_xBairro: emit_xBairro = "NAO INFORMADO"
+    if not dest_xLgr: dest_xLgr = "NAO INFORMADO"
+    if not dest_xBairro: dest_xBairro = "NAO INFORMADO"
+    if not dest_nro: dest_nro = "S/N"
+
+    # Aplica patches SOMENTE se a seção existir
+    txt = patch_section(txt, "Emitente", [
+        ("xLgr", emit_xLgr),
+        ("xBairro", emit_xBairro),
+    ])
+    txt = patch_section(txt, "Destinatario", [
+        ("xLgr", dest_xLgr),
+        ("nro", dest_nro),
+        ("xBairro", dest_xBairro),
+    ])
+
+    try:
+        pathlib.Path(ini_path).write_text(txt, encoding="utf-8")
+    except Exception:
+        pass
+# --- fim helper injetado ---
 
 # Diretórios padrão do ACBr Monitor (ajuste se necessário)
 ACBR_CMD_DIR = "NotaFiscal/EnviarComando"
@@ -357,7 +471,9 @@ def criarNFE(self):
         pass
 
     criaComandoACBr(self, cmd_path)
-
+    # >>> PATCH: preenche campos faltantes de endereço
+    _preencher_enderecos_faltantes_arquivo(self, cmd_path)
+    # <<< PATCH
     # pequeno delay para o Monitor consumir
     time.sleep(0.5)
 
