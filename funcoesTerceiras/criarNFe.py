@@ -324,8 +324,11 @@ def criaComandoACBr(self, nome_arquivo):
         cnpj_ok = cnpjEmit if len(cnpjEmit) == 14 else ""
         f.write(f"CNPJ={cnpj_ok}\r\n")
         f.write(f"xNome={xNomeEmit}\r\n")
-        ie_ok = ieEmit if (ieEmit.upper() == "ISENTO" or _so_digitos(ieEmit)) else "ISENTO"
-        f.write(f"IE={ie_ok}\r\n")
+        ie_num = _so_digitos(ieEmit)
+        if ie_num and 2 <= len(ie_num) <= 14 and int(ie_num) > 0:
+            f.write(f"IE={ie_num}\r\n")
+        else:
+            f.write("IE=ISENTO\r\n")
         # CRT se existir nas telas; se não, 1 (Simples) por padrão
         crt = str(getattr(self, "crt", "") or "").strip()
         if crt not in {"1", "2", "3"}:
@@ -348,10 +351,13 @@ def criaComandoACBr(self, nome_arquivo):
         if cnpjDest:
             f.write(f"CNPJCPF={cnpjDest}\r\n")
         f.write(f"xNome={xNomeDest}\r\n")
-        indIEDest = "2" if str(ieDest).strip().upper()=="ISENTO" else ("1" if cnpjDest else "9")
-        f.write(f"indIEDest={indIEDest}\r\n")
-        if ieDest and str(ieDest).strip().upper()!="ISENTO":
-            f.write(f"IE={ieDest}\r\n")
+        ie_dest_num = _so_digitos(ieDest)
+        if ie_dest_num and 2 <= len(ie_dest_num) <= 14 and int(ie_dest_num) > 0:
+            indIEDest = "1" if cnpjDest else "9"
+            f.write(f"indIEDest={indIEDest}\r\n")
+            f.write(f"IE={ie_dest_num}\r\n")
+        else:
+            f.write("indIEDest=2\r\n")
         if dest_xLgr:    f.write(f"xLgr={dest_xLgr}\r\n")
         if dest_nro:     f.write(f"nro={dest_nro}\r\n")
         if dest_xBairro: f.write(f"xBairro={dest_xBairro}\r\n")
@@ -403,9 +409,11 @@ def criaComandoACBr(self, nome_arquivo):
 
             f.write(f"[ICMS{idx:03d}]\r\n")
             f.write(f"orig={orig}\r\n")
-            if csosn:
-                f.write(f"CSOSN={csosn}\r\n\r\n")
-            else:
+            # Corrigido: respeita CRT do Emitente
+            if crt in ("1", "2"):  # Simples Nacional
+                csosn_val = csosn or str(getattr(self, "csosn_padrao", "") or "102")
+                f.write(f"CSOSN={csosn_val}\r\n\r\n")
+            else:  # Regime Normal
                 vBC   = prod.get("vBC",   prod.get("bc_icms", "0.00"))
                 pICMS = prod.get("pICMS", prod.get("aliq_icms", "0.00"))
                 vICMS = prod.get("vICMS", prod.get("valor_icms", "0.00"))
