@@ -192,7 +192,7 @@ class Buscas:
         return resultado
     
     def buscaClientesFiscal(valor):
-        queryBuscaClientes = """SELECT  
+        queryBuscaClientes = """SELECT nome_razao_social, CPF_CNPJ, inscricao_estadual, Logradouro, Numero, CEP, Bairro, Cidade, Estado
         FROM clientes_fiscal"""
         db.cursor.execute(queryBuscaClientes)
         resultado = db.cursor.fetchall()

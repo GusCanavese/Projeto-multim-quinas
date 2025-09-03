@@ -248,18 +248,32 @@ def criaComandoACBr(self, nome_arquivo):
 
 
     # ---------------- Destinatário ----------------
-    xNomeDest    = V("variavelRazaoSocialRemetente")
-    cnpjDest     = _so_digitos(V("variavelCNPJRazaoSocialRemetente"))
-    ieDest       = V("variavelInscEstadualRemetente") or "ISENTO"
+    # xNomeDest    = V("variavelRazaoSocialRemetente")
+    # cnpjDest     = _so_digitos(V("variavelCNPJRazaoSocialRemetente"))
+    # ieDest       = V("variavelInscEstadualRemetente") or "ISENTO"
+    # dest_xLgr    = V("dest_xLgr")
+    # dest_nro     = V("dest_nro")
+    # dest_xBairro = V("dest_xBairro")
+    # dest_cMun    = _so_digitos(V("dest_cMun"))
+    # dest_xMun    = V("dest_xMun")
+    # dest_UF      = V("dest_UF")
+    # dest_CEP     = _so_digitos(V("dest_CEP"))
+    # dest_fone    = _so_digitos(V("dest_fone"))
 
-    dest_xLgr    = V("dest_xLgr")
-    dest_nro     = V("dest_nro")
-    dest_xBairro = V("dest_xBairro")
-    dest_cMun    = _so_digitos(V("dest_cMun"))
-    dest_xMun    = V("dest_xMun")
-    dest_UF      = V("dest_UF")
-    dest_CEP     = _so_digitos(V("dest_CEP"))
-    dest_fone    = _so_digitos(V("dest_fone"))
+
+    xNomeDest = self.nomeDestinatario
+    cnpjDest  = self.documentoDestinatario
+    ieDest    = self.inscricaoEstadualDestinatario.get()
+    dest_xLgr = self.ruaDestinatario
+    dest_nro  = self.numeroDestinatario
+    dest_xBairro = self.bairroDestinatario
+    dest_cMun = ''
+    dest_xMun = self.cidadeDestinatario
+    dest_UF = self.estadoDestinatario
+    dest_CEP = self.cepDestinatario
+    dest_fone = ''
+
+    print(xNomeDest, cnpjDest, ieDest, dest_xLgr, dest_nro, dest_xBairro, dest_cMun, dest_xMun, dest_UF, dest_CEP, dest_fone)
 
     # idDest: 1=op. interna, 2=interestadual, 3=exterior
     if emit_UF and dest_UF and emit_UF != dest_UF:

@@ -27,43 +27,79 @@ def telaNotaFiscalSaida(self, valor):
                 label.destroy()
         self.resultadoLabels = []
             
-        yNovo = 0.21  
+        yNovo = 0.16
         for i, row in enumerate(dadosCliente):
             if i >= 5:
                 break
-            label = ctk.CTkButton(self.frameTelaNotaSaida,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cpf=row[1], cnpj=row[2], cep=row[4], endereco=row[5], referencia=row[6], num=row[7], bairro=row[8], rua=row[9]: selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, num, bairro, rua))
-            label.place(relx=0.05, rely=yNovo, relwidth=0.27)
+            label = ctk.CTkButton(self.frameTelaNotaSaida,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], documento=row[1], ie=row[2], rua=row[3], num=row[4], cep=row[5], bairro=row[6], cidade=row[7], estado=row[8]: selecionaCliente(nome, documento, ie, rua, num, cep, bairro, cidade, estado))
+            label.place(relx=0.1, rely=yNovo, relwidth=0.3)
             self.resultadoLabels.append(label)  
             yNovo += 0.0399
 
 
-    def selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, numero, bairro, rua):
+    def selecionaCliente(nome, documento, ie, rua, num, cep, bairro, cidade, estado):
+        print("Cliente selecionado:", nome, documento, ie, rua, num, cep, bairro, cidade, estado)
 
-        # enderecoCliente = f"{rua} - {numero} - {bairro} - {endereco}"
-        # self.nomeDoClienteBuscado.delete(0, "end")
-        # self.nomeDoClienteBuscado.insert(0, nome)
-        # if cnpj:
-        #     variavelCtkEntry.set(cnpj)
-        # elif cpf:
-        #     variavelCtkEntry.set(cpf)
-        # else:
-        #     variavelCtkEntry.set("sem valores")
-        
-        # self.entradaCEP.delete(0, "end")
-        # self.entradaEnderecoNoPedido.delete(0, "end")
-        # self.entradaNumero.delete(0, "end")
-        # self.entradaReferenciaEnderecoEntrega.delete(0, "end")
-        # if referencia == None:
-        #     referencia = ""
+        # --- normaliza 'estado' (nome completo) para UF ---
+        import unicodedata
+        est_str = (estado or "").strip()
+        if len(est_str) == 2 and est_str.isalpha():
+            uf = est_str.upper()
+        else:
+            est_norm = ''.join(
+                c for c in unicodedata.normalize('NFD', est_str)
+                if unicodedata.category(c) != 'Mn'
+            ).lower()
+            mapa_ufs = {
+                'acre': 'AC',
+                'alagoas': 'AL',
+                'amapa': 'AP',
+                'amazonas': 'AM',
+                'bahia': 'BA',
+                'ceara': 'CE',
+                'distrito federal': 'DF',
+                'espirito santo': 'ES',
+                'goias': 'GO',
+                'maranhao': 'MA',
+                'mato grosso': 'MT',
+                'mato grosso do sul': 'MS',
+                'minas gerais': 'MG',
+                'para': 'PA',
+                'paraiba': 'PB',
+                'parana': 'PR',
+                'pernambuco': 'PE',
+                'piaui': 'PI',
+                'rio de janeiro': 'RJ',
+                'rio grande do norte': 'RN',
+                'rio grande do sul': 'RS',
+                'rondonia': 'RO',
+                'roraima': 'RR',
+                'santa catarina': 'SC',
+                'sao paulo': 'SP',
+                'sergipe': 'SE',
+                'tocantins': 'TO',
+            }
+            uf = mapa_ufs.get(est_norm, est_str[:2].upper() if len(est_str) >= 2 else "")
+        # --------------------------------------------------
 
+        self.nomeDestinatario = nome
+        self.documentoDestinatario = documento
+        self.bairroDestinatario = bairro
+        self.cidadeDestinatario = cidade
+        self.estadoDestinatario = uf  # <- agora usa a sigla
+        self.ruaDestinatario = rua
+        self.numeroDestinatario = num
+        self.cidadeDestinatario = cidade
+        self.cepDestinatario = cep
 
-        # variavelCep.set(cep)
-        # variavelEndereco.set(enderecoCliente)
-        # variavelReferencia.set(referencia)
-        # variavelNumero.set(numero)
-        # for label in self.resultadoLabels: 
-        #     label.destroy()
-        pass
+        self.variavelRazaoSocialRemetente.set(nome)
+        self.inscricaoEstadualDestinatario.set(ie)
+        self.variavelCNPJRazaoSocialRemetente.set(documento)
+
+        for label in self.resultadoLabels: 
+            label.destroy()
+
+        # pass
 
 
 
@@ -171,6 +207,7 @@ def telaNotaFiscalSaida(self, valor):
         "Sem Ocorrência de Transporte"
     ]
 
+    self.inscricaoEstadualDestinatario = ctk.StringVar()
     self.variavelNumeroDaNota = ctk.StringVar()
     self.variavelSerieDaNota = ctk.StringVar()
     self.variavelChaveDaNota = ctk.StringVar()
@@ -214,7 +251,7 @@ def telaNotaFiscalSaida(self, valor):
     self.Rs.bind("<Button-1>", buscaCliente)
 
 
-    criarLabelEntry(self.frameTelaNotaSaida, "Inscrição Estadual", 0.1, 0.20, 0.15, None)
+    criarLabelEntry(self.frameTelaNotaSaida, "Inscrição Estadual", 0.1, 0.20, 0.15, self.inscricaoEstadualDestinatario)
 
     ctk.CTkLabel(self.frameTelaNotaSaida, text="Emitente----------").place(relx=0.1, rely=0.3)
     opcoes=["nenhum", "Multimaquinas", "Nutrigel", "Polimáquinas"]
