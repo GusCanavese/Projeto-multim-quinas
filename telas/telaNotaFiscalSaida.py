@@ -62,12 +62,26 @@ def telaNotaFiscalSaida(self, valor):
 
     def decideEmitente(self, valor):
         if valor == "Nutrigel":
-            print("entrou aqui")
-            self.variavelNumeroDaNota.set("000001")
-            self.variavelSerieDaNota.set("1")
             self.variavelRazaoSocialEmitente.set("NUTRIGEL DISTRIBUIDORA EIRELI")
-            self.variavelCNPJRazaoSocialEmitente.set("00.995.044/0001-07")
+            self.variavelCNPJRazaoSocialEmitente.set("009950440001-07")
             self.variavelInscEstadualEmitente.set(0)
+
+
+        if valor == "multimaquinas":
+
+
+        if valor == "polimaquinas":
+
+
+
+
+
+        # colocar endereço e certificado digital de cada uma
+
+
+
+
+
 
     opcoesSituacao = ["Normal", "Extemporâneo"]
     opcoesFinalidade = ["Normal", "complementar", "Ajuste"]
@@ -117,9 +131,9 @@ def telaNotaFiscalSaida(self, valor):
     self.variavelEntradaOuSaida.set("Saída") if valor else self.variavelEntradaOuSaida.set("Entrada")
 
 
-    criarLabelEntry(self.frameTelaNotaSaida, "Número da NF", 0.1, 0.05, 0.07, self.variavelNumeroDaNota)
-    criarLabelEntry(self.frameTelaNotaSaida, "Série", 0.2, 0.05, 0.07, self.variavelSerieDaNota)
-    criarLabelEntry(self.frameTelaNotaSaida, "Chave da NF", 0.3, 0.05, 0.3, self.variavelChaveDaNota)
+    # criarLabelEntry(self.frameTelaNotaSaida, "Número da NF", 0.1, 0.05, 0.07, self.variavelNumeroDaNota)
+    # criarLabelEntry(self.frameTelaNotaSaida, "Série", 0.2, 0.05, 0.07, self.variavelSerieDaNota)
+    # criarLabelEntry(self.frameTelaNotaSaida, "Chave da NF", 0.3, 0.05, 0.3, self.variavelChaveDaNota)
 
     ctk.CTkLabel(self.frameTelaNotaSaida, text="Destinatário----------").place(relx=0.1, rely=0.15)
     criarLabelEntry(self.frameTelaNotaSaida, "Razão social", 0.1, 0.20, 0.3, self.variavelRazaoSocialRemetente)

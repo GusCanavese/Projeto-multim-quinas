@@ -21,3 +21,5 @@ def telaFiscal(self):
 
         gerarOrcamento = criaBotao(frame, "Gerar Sped fiscal", 0.33, 0.24, 0.24, lambda:None)
         gerarOrcamento.configure(height=50, image=None, compound="left")
+
+        criaBotao(frame, "◀️ Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
