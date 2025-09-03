@@ -56,21 +56,43 @@ def telaNotaFiscalSaida(self, valor):
             case "2949": variavelCFOPNota.set("Compra de mercadoria importada para comercialização/indústria (outro estado)")
             case "2915": variavelCFOPNota.set("Aquisição de bem para imobilizado importado (outro estado)")
             case "2916": variavelCFOPNota.set("Aquisição de material para uso/consumo importado (outro estado)")
+            case "5402": variavelCFOPNota.set("Venda de mercadoria recebida de terceiros sujeita ao reg")
             case _: variavelCFOPNota.set("")
         return variavelCFOPNota.get()
 
+    # self.variavelInscEstadualEmitente = ctk.StringVar()
+    # self.variavelCNPJRazaoSocialEmitente = ctk.StringVar()
+    # self.variavelRazaoSocialEmitente = ctk.StringVar()
 
     def decideEmitente(self, valor):
         if valor == "Nutrigel":
             self.variavelRazaoSocialEmitente.set("NUTRIGEL DISTRIBUIDORA EIRELI")
-            self.variavelCNPJRazaoSocialEmitente.set("009950440001-07")
+            self.variavelInscEstadualEmitente.set("6259569630086")
+            self.variavelCNPJRazaoSocialEmitente.set("00995044000107")  # 14 dígitos, sem máscara
+
+            # Endereço do emitente
+            self.variavelNumeroEnd          = "126"
+            self.variavelLogradouroEnd      = "R DOUTOR OSCAR DA CUNHA"
+            self.variavelBairroEnd          = "FABRICAS"
+            self.variavelComplementoEnd     = "LETRA B"
+            self.variavelMunicipioEnd       = "SAO JOAO DEL REI"
+            self.variavelUFEnd              = "MG"
+            self.variavelCEPEnd             = "36301194"    # só dígitos
+            self.variavelCodigoMunicipioEnd = "3162500"     # IBGE com 7 dígitos
+            self.variavelTelefoneEnd        = "3233716171"  # só dígitos (DDD+telefone)
+
+
+
+        if valor == "Multimáquinas":
+            self.variavelRazaoSocialEmitente.set("POLIMAQUINAS")
+            self.variavelCNPJRazaoSocialEmitente.set("23889618000150")
             self.variavelInscEstadualEmitente.set(0)
 
 
-        if valor == "multimaquinas":
-
-
-        if valor == "polimaquinas":
+        if valor == "Polimáquinas":
+            self.variavelRazaoSocialEmitente.set("NUTRIGEL DISTRIBUIDORA EIRELI")
+            self.variavelCNPJRazaoSocialEmitente.set("009950440001-07")
+            self.variavelInscEstadualEmitente.set(0)
 
 
 
@@ -131,13 +153,10 @@ def telaNotaFiscalSaida(self, valor):
     self.variavelEntradaOuSaida.set("Saída") if valor else self.variavelEntradaOuSaida.set("Entrada")
 
 
-    # criarLabelEntry(self.frameTelaNotaSaida, "Número da NF", 0.1, 0.05, 0.07, self.variavelNumeroDaNota)
-    # criarLabelEntry(self.frameTelaNotaSaida, "Série", 0.2, 0.05, 0.07, self.variavelSerieDaNota)
-    # criarLabelEntry(self.frameTelaNotaSaida, "Chave da NF", 0.3, 0.05, 0.3, self.variavelChaveDaNota)
-
-    ctk.CTkLabel(self.frameTelaNotaSaida, text="Destinatário----------").place(relx=0.1, rely=0.15)
-    criarLabelEntry(self.frameTelaNotaSaida, "Razão social", 0.1, 0.20, 0.3, self.variavelRazaoSocialRemetente)
-    criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.20, 0.15, self.variavelCNPJRazaoSocialRemetente)
+    ctk.CTkLabel(self.frameTelaNotaSaida, text="Destinatário----------").place(relx=0.1, rely=0.05)
+    criarLabelEntry(self.frameTelaNotaSaida, "Razão social", 0.1, 0.10, 0.3, self.variavelRazaoSocialRemetente)
+    criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.10, 0.15, self.variavelCNPJRazaoSocialRemetente)
+    criarLabelEntry(self.frameTelaNotaSaida, "Inscrição Estadual", 0.1, 0.20, 0.15, self.variavelInscricaoEstadualRemetente)
 
     ctk.CTkLabel(self.frameTelaNotaSaida, text="Emitente----------").place(relx=0.1, rely=0.3)
     opcoes=["nenhum", "Multimaquinas", "Nutrigel", "Polimáquinas"]

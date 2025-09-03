@@ -226,19 +226,26 @@ def criaComandoACBr(self, nome_arquivo):
                "9").strip()  # 9 = operação não presencial (outros)
 
     # ---------------- Emitente ----------------
-    xNomeEmit    = V("variavelRazaoSocialEmitente")
-    cnpjEmit     = _so_digitos(V("variavelCNPJRazaoSocialEmitente"))
-    ieEmit       = V("variavelInscEstadualEmitente") or "ISENTO"
+    # xNomeEmit    = V("variavelRazaoSocialEmitente")
+    # cnpjEmit     = _so_digitos(V("variavelCNPJRazaoSocialEmitente"))
+    # ieEmit       = V("variavelInscEstadualEmitente") or "ISENTO"
 
-    emit_xLgr    = V("emit_xLgr")
-    emit_nro     = V("emit_nro")
-    emit_xCpl    = V("emit_xCpl")
-    emit_xBairro = V("emit_xBairro")
-    emit_cMun    = _so_digitos(V("emit_cMun"))
-    emit_xMun    = V("emit_xMun")
-    emit_UF      = V("emit_UF")
-    emit_CEP     = _so_digitos(V("emit_CEP"))
-    emit_fone    = _so_digitos(V("emit_fone"))
+
+    xNomeEmit  = self.variavelRazaoSocialEmitente.get()
+    cnpjEmit   = self.variavelCNPJRazaoSocialEmitente.get()
+    ieEmit     = self.variavelInscEstadualEmitente.get()
+
+    emit_fone    = self.variavelTelefoneEnd
+    emit_CEP     = self.variavelCEPEnd
+    emit_UF      = self.variavelUFEnd
+    emit_xMun    = self.variavelMunicipioEnd
+    emit_cMun    = self.variavelCodigoMunicipioEnd
+    emit_xCpl    = self.variavelComplementoEnd
+    emit_xLgr    = self.variavelLogradouroEnd
+    emit_nro     = self.variavelNumeroEnd
+    emit_xBairro = self.variavelBairroEnd
+
+
 
     # ---------------- Destinatário ----------------
     xNomeDest    = V("variavelRazaoSocialRemetente")
