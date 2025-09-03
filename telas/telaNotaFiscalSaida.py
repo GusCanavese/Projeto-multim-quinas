@@ -7,9 +7,77 @@ import datetime
 from telas.telaProdutoNotaSaida import telaProdutosNotaSaida
 from funcoesTerceiras import filtrar, verificaSeQuerFiltrarPorPeriodo
 from componentes import criaFrameJanela, criaBotao, criarLabelComboBox, criarLabelEntry, criarLabelLateralComboBox, criarLabelLateralEntry
+from consultas.select import Buscas 
+
 
 
 def telaNotaFiscalSaida(self, valor):
+    self.frameTelaNotaSaida = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
+    usuarioLogado =" self.logado"
+    usuarioLogado = usuarioLogado.capitalize()
+
+
+    def buscaCliente(event=None): 
+        nomeDoCliente = self.Rs.get()
+        dadosCliente = Buscas.buscaClientesFiscal(nomeDoCliente)
+
+
+        if hasattr(self, 'resultadoLabels'):
+            for label in self.resultadoLabels: 
+                label.destroy()
+        self.resultadoLabels = []
+            
+        yNovo = 0.21  
+        for i, row in enumerate(dadosCliente):
+            if i >= 5:
+                break
+            label = ctk.CTkButton(self.frameTelaNotaSaida,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cpf=row[1], cnpj=row[2], cep=row[4], endereco=row[5], referencia=row[6], num=row[7], bairro=row[8], rua=row[9]: selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, num, bairro, rua))
+            label.place(relx=0.05, rely=yNovo, relwidth=0.27)
+            self.resultadoLabels.append(label)  
+            yNovo += 0.0399
+
+
+    def selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, numero, bairro, rua):
+
+        # enderecoCliente = f"{rua} - {numero} - {bairro} - {endereco}"
+        # self.nomeDoClienteBuscado.delete(0, "end")
+        # self.nomeDoClienteBuscado.insert(0, nome)
+        # if cnpj:
+        #     variavelCtkEntry.set(cnpj)
+        # elif cpf:
+        #     variavelCtkEntry.set(cpf)
+        # else:
+        #     variavelCtkEntry.set("sem valores")
+        
+        # self.entradaCEP.delete(0, "end")
+        # self.entradaEnderecoNoPedido.delete(0, "end")
+        # self.entradaNumero.delete(0, "end")
+        # self.entradaReferenciaEnderecoEntrega.delete(0, "end")
+        # if referencia == None:
+        #     referencia = ""
+
+
+        # variavelCep.set(cep)
+        # variavelEndereco.set(enderecoCliente)
+        # variavelReferencia.set(referencia)
+        # variavelNumero.set(numero)
+        # for label in self.resultadoLabels: 
+        #     label.destroy()
+        pass
+
+
+
+    def on_stop_typing(event=None):
+        print("Parou de digitar")
+        buscaCliente()
+
+    def on_key_release(event):
+        if self.typing_job is not None:
+            self.after_cancel(self.typing_job)
+        self.typing_job = self.after(300, on_stop_typing)
+
+
+
 
     def acessar(dados, *caminho, default=""):
         for chave in caminho:
@@ -21,9 +89,7 @@ def telaNotaFiscalSaida(self, valor):
             return dados["#text"]
         return dados if isinstance(dados, str) else default
 
-    self.frameTelaNotaSaida = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
-    usuarioLogado =" self.logado"
-    usuarioLogado = usuarioLogado.capitalize()
+
 
     def buscaNatureza(cfop):
         variavelCFOPNota = ctk.StringVar()
@@ -95,18 +161,6 @@ def telaNotaFiscalSaida(self, valor):
             self.variavelInscEstadualEmitente.set(0)
 
 
-
-
-
-        # colocar endereço e certificado digital de cada uma
-
-
-
-
-
-
-    opcoesSituacao = ["Normal", "Extemporâneo"]
-    opcoesFinalidade = ["Normal", "complementar", "Ajuste"]
     opcoesPagamento = ["À vista", "À prazo", "Outros"]
     opcoesTransporte = [
         "Contratação do Frete por conta do Remetente (CIF)",
@@ -154,9 +208,13 @@ def telaNotaFiscalSaida(self, valor):
 
 
     ctk.CTkLabel(self.frameTelaNotaSaida, text="Destinatário----------").place(relx=0.1, rely=0.05)
-    criarLabelEntry(self.frameTelaNotaSaida, "Razão social", 0.1, 0.10, 0.3, self.variavelRazaoSocialRemetente)
-    criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.10, 0.15, self.variavelCNPJRazaoSocialRemetente)
-    criarLabelEntry(self.frameTelaNotaSaida, "Inscrição Estadual", 0.1, 0.20, 0.15, self.variavelInscricaoEstadualRemetente)
+    self.Rs = criarLabelEntry(self.frameTelaNotaSaida, "Razão social", 0.1, 0.10, 0.3, self.variavelRazaoSocialRemetente)
+    cnpj = criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.10, 0.15, self.variavelCNPJRazaoSocialRemetente)
+    self.Rs.bind("<KeyRelease>", on_key_release)
+    self.Rs.bind("<Button-1>", buscaCliente)
+
+
+    criarLabelEntry(self.frameTelaNotaSaida, "Inscrição Estadual", 0.1, 0.20, 0.15, None)
 
     ctk.CTkLabel(self.frameTelaNotaSaida, text="Emitente----------").place(relx=0.1, rely=0.3)
     opcoes=["nenhum", "Multimaquinas", "Nutrigel", "Polimáquinas"]
