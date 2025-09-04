@@ -427,6 +427,7 @@ def telaProdutosNotaSaida(self, cfop):
 
         criaBotaoPequeno(frame, "PIS/COFINS", 0.7, 0.95, 0.1, lambda:PisCofins(frame))
         criaBotaoPequeno(frame, "Salvar e Sair", 0.1, 0.95, 0.1, lambda:salvar_dados_e_sair())
+        criaBotaoPequeno(frame, "Calcular", 0.1, 0.95, 0.1, lambda:calculaValores())
         ctk.CTkButton(frame, text="X", width=10, height=10, corner_radius=0,command=destroyModal).place(relx=0.989, rely=0.018, anchor="center")
 
 
@@ -495,7 +496,8 @@ def telaProdutosNotaSaida(self, cfop):
             self.vr_cofins_st.set(dados_salvos.get("vr_cofins_st",""))
 
 
-
+        def calculaValores():
+            
 
 
         def salvar_dados_e_sair():

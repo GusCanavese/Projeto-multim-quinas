@@ -4,6 +4,7 @@
 # - Numeração Produto/ICMS/PIS/COFINS casada por item (001, 002, 003...)
 # - dhEmi único
 # - indIntermed conforme indPres (NT 2020.006): indIntermed=0/1 e bloco [infIntermed] quando houver marketplace
+# - NOVO: nNF auto-incremental por CNPJ+Série quando não informado (evita duplicidade 539)
 
 import os
 import pathlib
@@ -125,17 +126,52 @@ def _preencher_enderecos_faltantes_arquivo(self, ini_path):
         pass
 # --- fim helper injetado ---
 
-# Diretórios padrão do ACBr Monitor (ajuste se necessário)
-ACBR_CMD_DIR = "NotaFiscal/EnviarComando"
-ACBR_RSP_DIR = "NotaFiscal/ReceberComando"
 
-# ------------------------ UTIL ------------------------
+# ------------------------ NOVO: Sequência nNF por CNPJ+Série ------------------------
+SEQ_BASE_DIR = os.path.join("NotaFiscal", "Sequencia")
 
 def _so_digitos(s):
     try:
         return re.sub(r'\D+', '', str(s or ""))
     except Exception:
         return ""
+
+def _seq_path(cnpj_sem_mascara, serie_int):
+    os.makedirs(SEQ_BASE_DIR, exist_ok=True)
+    cnpj_txt = (cnpj_sem_mascara or "00000000000000").zfill(14)
+    serie_txt = str(serie_int).zfill(3)
+    return os.path.join(SEQ_BASE_DIR, f"NUM_{cnpj_txt}_{serie_txt}.seq")
+
+def _proximo_numero_nfe(cnpj_sem_mascara, serie_int):
+    """
+    Retorna o próximo nNF (1..999999999) persistido em arquivo local por CNPJ+Série.
+    Só é usado quando o número não foi informado manualmente nas telas.
+    """
+    path = _seq_path(cnpj_sem_mascara, serie_int)
+    atual = 0
+    try:
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                txt = f.read().strip()
+                if txt.isdigit():
+                    atual = int(txt)
+    except Exception:
+        atual = 0
+    proximo = atual + 1
+    if proximo > 999_999_999:
+        proximo = 1  # reseta caso estoure o limite de 9 dígitos
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(str(proximo))
+    except Exception:
+        pass
+    return proximo
+# ------------------------ FIM Sequência ------------------------
+
+
+# Diretórios padrão do ACBr Monitor (ajuste se necessário)
+ACBR_CMD_DIR = "NotaFiscal/EnviarComando"
+ACBR_RSP_DIR = "NotaFiscal/ReceberComando"
 
 # ------------------------ ACBr I/O ------------------------
 
@@ -195,11 +231,23 @@ def criaComandoACBr(self, nome_arquivo):
     # ---------------- Cabeçalho / Identificacao ----------------
     natop     = V("variavelNatureza", "VENDA DE MERCADORIA") or "VENDA DE MERCADORIA"
     raw_serie = V("variavelSerieDaNota", "") or V("serie", "") or "1"
-    raw_nnf   = V("variavelNumeroDaNota", "") or V("nNF", "") or "1"
-    try:    serie_int = int(raw_serie)
-    except: serie_int = 1
-    try:    nnf_int   = int(raw_nnf)
-    except: nnf_int   = 1
+    try:
+        serie_int = int(raw_serie)
+    except:
+        serie_int = 1
+
+    # CNPJ do emitente (para sequenciar nNF quando não informado)
+    cnpj_emit_for_seq = _so_digitos(V("variavelCNPJRazaoSocialEmitente", ""))
+
+    # nNF informado? Se sim, respeita. Se não, usa sequência local por CNPJ+Série
+    raw_nnf = V("variavelNumeroDaNota", "") or V("nNF", "")
+    if str(raw_nnf).strip().isdigit():
+        try:
+            nnf_int = int(raw_nnf)
+        except:
+            nnf_int = _proximo_numero_nfe(cnpj_emit_for_seq, serie_int)
+    else:
+        nnf_int = _proximo_numero_nfe(cnpj_emit_for_seq, serie_int)
 
     # Data/Hora
     data_ptbr = V("variavelDataDocumento", "")
@@ -226,11 +274,6 @@ def criaComandoACBr(self, nome_arquivo):
                "9").strip()  # 9 = operação não presencial (outros)
 
     # ---------------- Emitente ----------------
-    # xNomeEmit    = V("variavelRazaoSocialEmitente")
-    # cnpjEmit     = _so_digitos(V("variavelCNPJRazaoSocialEmitente"))
-    # ieEmit       = V("variavelInscEstadualEmitente") or "ISENTO"
-
-
     xNomeEmit  = self.variavelRazaoSocialEmitente.get()
     cnpjEmit   = self.variavelCNPJRazaoSocialEmitente.get()
     ieEmit     = self.variavelInscEstadualEmitente.get()
@@ -248,19 +291,6 @@ def criaComandoACBr(self, nome_arquivo):
 
 
     # ---------------- Destinatário ----------------
-    # xNomeDest    = V("variavelRazaoSocialRemetente")
-    # cnpjDest     = _so_digitos(V("variavelCNPJRazaoSocialRemetente"))
-    # ieDest       = V("variavelInscEstadualRemetente") or "ISENTO"
-    # dest_xLgr    = V("dest_xLgr")
-    # dest_nro     = V("dest_nro")
-    # dest_xBairro = V("dest_xBairro")
-    # dest_cMun    = _so_digitos(V("dest_cMun"))
-    # dest_xMun    = V("dest_xMun")
-    # dest_UF      = V("dest_UF")
-    # dest_CEP     = _so_digitos(V("dest_CEP"))
-    # dest_fone    = _so_digitos(V("dest_fone"))
-
-
     xNomeDest = self.nomeDestinatario
     cnpjDest  = self.documentoDestinatario
     ieDest    = self.inscricaoEstadualDestinatario.get()
