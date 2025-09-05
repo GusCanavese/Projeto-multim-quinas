@@ -2,24 +2,24 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
-from funcoesTerceiras.buscarProdutos import buscarProdutos
-from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criarLabelEntry, criarLabelComboBox, criaBotao, criaLabel
+from funcoesTerceiras.buscarProdutosFiscal import buscarProdutosFiscal
+from componentes import criaFrameJanela, criaFrameJanela, criarLabelEntry, criarLabelComboBox, criaBotao, criaLabel
 
  
-def telaEstoque(self):
+def telaEstoqueFiscal(self):
     frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     opcoes = ["Todos", "Multimáquinas", "Nutrigel", "Polimáquinas"]
 
 
     # Filtros - lado esquerdo
     buscar = criarLabelEntry(frame,"Filtrar", 0.05, 0.04, 0.22, None)
-    filtrarPorVendedor = criarLabelComboBox(frame, "Filtrar por vendedor(a)", 0.315, 0.04, 0.22, opcoes)
+    filtrarPorVendedor = criarLabelComboBox(frame, "Escolher estoque", 0.315, 0.04, 0.22, opcoes)
 
 
 
-    criaBotao(frame, "Buscar", 0.84, 0.08, 0.1, lambda:buscarProdutos(self, frame, buscar.get(), filtrarPorVendedor.get(), 1))
+    criaBotao(frame, "Buscar", 0.84, 0.08, 0.1, lambda:buscarProdutosFiscal(self, frame, buscar.get(), filtrarPorVendedor.get(), 1))
     criaLabel(frame, "Fiscal", 0.60, 0.08, 0.1, "#1F8107")
-    buscar.bind("<Return>", lambda event: buscarProdutos(self, frame, buscar.get(), filtrarPorVendedor.get(), 1))
+    buscar.bind("<Return>", lambda event: buscarProdutosFiscal(self, frame, buscar.get(), filtrarPorVendedor.get(), 1))
     criaBotao(frame, "◀️ Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
 
 

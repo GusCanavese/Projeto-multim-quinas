@@ -17,5 +17,19 @@ def confirmarExclusaoDoProduto(self, frame, descricao,):
         deleta.deletarProduto(descricao)
         frame.destroy()
         messagebox.showinfo('Sucesso', "Você excluiu esse produto")
+
+
+def confirmarExclusaoDoProdutoFiscal(self, frame, descricao,):
+    print(descricao)
+
+    resposta = messagebox.askquestion(
+        "Confirmação",
+        "Você está excluindo esse produto, deseja continuar?",
+        icon='question'
+    )
+    if resposta == "yes":
+        deleta.deletarProdutoFiscal(descricao)
+        frame.destroy()
+        messagebox.showinfo('Sucesso', "Você excluiu esse produto")
         
         

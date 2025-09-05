@@ -13,3 +13,8 @@ class deleta:
         queryDeletaPedido = "DELETE FROM produtos WHERE nome_do_produto LIKE %s;"
         db.cursor.execute(queryDeletaPedido, (descricao,))
         db.conn.commit()
+
+    def deletarProdutoFiscal(descricao):
+        queryDeletaPedido = "DELETE FROM produtos_fiscal WHERE nome_do_produto LIKE %s;"
+        db.cursor.execute(queryDeletaPedido, (descricao,))
+        db.conn.commit()

@@ -8,7 +8,7 @@ from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaLabelD
 
 
 
-def telaVerProduto(self, p):
+def telaVerProduto(self, p, fiscal):
     frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
 
@@ -31,12 +31,18 @@ def telaVerProduto(self, p):
     criaLabelDescritivo(frame, "Marca",               0.05, 0.43, 0.15, self.cor, ctk.StringVar(value=p[9]))
     
 
-
-    criaBotao(frame, 'salvar alterações', 0.61, 0.43, 0.15, lambda:confirmarAlteracoesNoProduto.confirmarAlteracoesNoProduto(self, frame, p[11], self.quantidade.get(), self.precoVenda.get(), self.precoCusto.get()))
-    print(p[0])
-    botaoExclui = criaBotao(frame, 'Excluir produto', 0.79, 0.43, 0.15, lambda:confirmarExclusaoDoProduto.confirmarExclusaoDoProduto(self, frame, p[11]))
-    botaoExclui.configure(fg_color=self.corNegado)
-    criaBotao(frame, 'Voltar', 0.15, 0.95, 0.20, lambda:frame.destroy())
+    if fiscal:
+        criaBotao(frame, 'salvar alterações', 0.61, 0.43, 0.15, lambda:confirmarAlteracoesNoProduto.confirmarAlteracoesNoProduto(self, frame, p[11], self.quantidade.get(), self.precoVenda.get(), self.precoCusto.get()))
+        print(p[0])
+        botaoExclui = criaBotao(frame, 'Excluir produto', 0.79, 0.43, 0.15, lambda:confirmarExclusaoDoProduto.confirmarExclusaoDoProdutoFiscal(self, frame, p[11]))
+        botaoExclui.configure(fg_color=self.corNegado)
+        criaBotao(frame, 'Voltar', 0.15, 0.95, 0.20, lambda:frame.destroy())
+    else:
+        criaBotao(frame, 'salvar alterações', 0.61, 0.43, 0.15, lambda:confirmarAlteracoesNoProduto.confirmarAlteracoesNoProduto(self, frame, p[11], self.quantidade.get(), self.precoVenda.get(), self.precoCusto.get()))
+        print(p[0])
+        botaoExclui = criaBotao(frame, 'Excluir produto', 0.79, 0.43, 0.15, lambda:confirmarExclusaoDoProduto.confirmarExclusaoDoProduto(self, frame, p[11]))
+        botaoExclui.configure(fg_color=self.corNegado)
+        criaBotao(frame, 'Voltar', 0.15, 0.95, 0.20, lambda:frame.destroy())
     
 
 

@@ -17,6 +17,12 @@ class Atualiza:
         db.cursor.execute(queryAtualizaPedido, (quantidade, preco, custo, id))
         db.conn.commit()
 
+    def atualizaProdutoFiscal(quantidade, preco, custo, id):
+        dataHoje = date.today()
+        queryAtualizaPedido = "UPDATE produtos_fiscal SET quantidade = %s, valor_de_venda = %s, valor_de_custo = %s  WHERE id LIKE %s LIMIT 1"
+        db.cursor.execute(queryAtualizaPedido, (quantidade, preco, custo, id))
+        db.conn.commit()
+
     def removeUnidadesDeProdutos(desc):
         for i in desc:
             partes = i.rsplit(' ', 1)

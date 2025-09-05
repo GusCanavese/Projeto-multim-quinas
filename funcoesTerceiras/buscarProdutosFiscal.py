@@ -4,10 +4,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from consultas.select import Buscas 
 from telas.telaVerProduto import telaVerProduto
-from componentes import criaFrameJanela,  criaLabel, criaBotao
+from componentes import criaLabel, criaBotao
  
-def buscarProdutos(self, frame, nome, cnpj, pagina=1):
-    produtos = Buscas.buscaEstoqueProdutos(nome, cnpj)
+def buscarProdutosFiscal(self, frame, nome, cnpj, pagina=1):
+    produtos = Buscas.buscaEstoqueProdutosFiscal(nome, cnpj)
 
     # Remove dados anteriores da tabela
     if hasattr(self, "dadosTelaVerProdutos"):
@@ -23,8 +23,15 @@ def buscarProdutos(self, frame, nome, cnpj, pagina=1):
     y = 0.18
     for rowProduto, produto in enumerate(pedidosPagina, start=1):
         corDeFundo = "#1C60A0" 
-        dadosProduto = [produto[11], produto[0], produto[2], produto[3], produto[12]]
-        dadosextras = [produto[0], produto[11], produto[2], produto[3], produto[4], produto[5], produto[6], produto[7], produto[8], produto[12], produto[13], produto[14]]
+
+
+        dadosProduto = [produto[0], produto[10], produto[1], produto[6], produto[13]]
+
+
+
+                        #nome      codiInterno  codBarras   codGrade      NCM         CST_A     valorVenda    custo    qtdEstoque     CFOP     estoque_MIN  estoque_MAX   CEST         cnpj
+        dadosextras = [produto[0], produto[1], produto[2], produto[3], produto[4], produto[5], produto[6], produto[7], produto[8], produto[9], produto[10], produto[11], produto[12], produto[13]]
+
 
 
 
@@ -48,7 +55,7 @@ def buscarProdutos(self, frame, nome, cnpj, pagina=1):
             self.dadosTelaVerProdutos.append(label)
 
 
-        btn = criaBotao(frame, "Ver", 0.95, y, 0.05, lambda p=dadosextras: telaVerProduto(self, p, 0))
+        btn = criaBotao(frame, "Ver", 0.95, y, 0.05, lambda p=dadosextras: telaVerProduto(self, p, 1))
         self.dadosTelaVerProdutos.append(btn) 
 
         y += 0.045
@@ -65,9 +72,9 @@ def buscarProdutos(self, frame, nome, cnpj, pagina=1):
         }
 
         if pagina > 1:
-            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.85, 0.2, lambda p=params: buscarProdutos(self, frame, p['nome'], p['cnpj'], p['pagina']-1))
+            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.85, 0.2, lambda p=params: buscarProdutosFiscal(self, frame, p['nome'], p['cnpj'], p['pagina']-1))
             self.dadosTelaVerProdutos.append(btnAnterior)
 
         if fimProdutos < len(produtos):
-            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.85, 0.2, lambda p=params: buscarProdutos(self, frame, p['nome'], p['cnpj'], p['pagina']+1))
+            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.85, 0.2, lambda p=params: buscarProdutosFiscal(self, frame, p['nome'], p['cnpj'], p['pagina']+1))
             self.dadosTelaVerProdutos.append(btnProxima)
