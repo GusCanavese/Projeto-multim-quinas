@@ -427,7 +427,7 @@ def telaProdutosNotaSaida(self, cfop):
 
         criaBotaoPequeno(frame, "PIS/COFINS", 0.7, 0.95, 0.1, lambda:PisCofins(frame))
         criaBotaoPequeno(frame, "Salvar e Sair", 0.1, 0.95, 0.1, lambda:salvar_dados_e_sair())
-        criaBotaoPequeno(frame, "Calcular", 0.1, 0.95, 0.1, lambda:calculaValores())
+        criaBotaoPequeno(frame, "Calcular", 0.4, 0.95, 0.1, lambda:calculaValores())
         ctk.CTkButton(frame, text="X", width=10, height=10, corner_radius=0,command=destroyModal).place(relx=0.989, rely=0.018, anchor="center")
 
 
@@ -497,7 +497,147 @@ def telaProdutosNotaSaida(self, cfop):
 
 
         def calculaValores():
-            
+            # VO (valor da operação) pegando do subtotal da linha; se vazio, calcula do básico
+            try:
+                vo = float(linha["subtotal"].get().replace(",", "."))
+            except:
+                try:
+                    preco = float((linha["preco"].get() or "0").replace(",", "."))
+                except:
+                    preco = 0.0
+                try:
+                    qtd = float(linha["quantidade"].get() or "0")
+                except:
+                    qtd = 0.0
+                try:
+                    acresc = float((linha["acrescimo"].get() or "0").replace(",", "."))
+                except:
+                    acresc = 0.0
+                try:
+                    desc_real = float((linha["desc_real"].get() or "0").replace(",", "."))
+                except:
+                    desc_real = 0.0
+                try:
+                    desc_perc = float((linha["desc_porcentagem"].get() or "0").replace(",", "."))
+                except:
+                    desc_perc = 0.0
+                vo = preco * qtd - desc_real - (preco * qtd * (desc_perc / 100.0)) + acresc
+                if vo < 0:
+                    vo = 0.0
+
+            # -----------------------
+            # ICMS PRÓPRIO (CST 00)
+            # -----------------------
+            mod_icms = self.mod_bc_icms.get()
+            try:
+                red_icms = float((self.red_bc_icms.get() or "0").replace(",", "."))
+            except:
+                red_icms = 0.0
+            try:
+                aliq_icms = float((self.aliq_icms.get() or "0").replace(",", "."))
+            except:
+                aliq_icms = 0.0
+
+            # Valor da Operação (simples): vBC = VO * (1 - Red/100)
+            if mod_icms == "Valor da Operação" or mod_icms == "":
+                vbc_icms = vo * (1.0 - (red_icms / 100.0))
+            else:
+                # Mantém simples: usa mesma forma como aproximação
+                vbc_icms = vo * (1.0 - (red_icms / 100.0))
+
+            vicms = vbc_icms * (aliq_icms / 100.0)
+
+            self.bc_icms.set(f"{vbc_icms:.2f}")
+            self.vr_icms.set(f"{vicms:.2f}")
+
+            # -----------------------
+            # ICMS ST (se houver)
+            # -----------------------
+            mod_st = self.mod_bc_icms_st.get()
+            try:
+                red_st = float((self.red_bc_icms_st.get() or "0").replace(",", "."))
+            except:
+                red_st = 0.0
+            try:
+                mva = float((self.mva_icms_st.get() or "0").replace(",", "."))
+            except:
+                mva = 0.0
+            try:
+                aliq_st = float((self.aliq_icms_st.get() or "0").replace(",", "."))
+            except:
+                aliq_st = 0.0
+
+            # Base ST conforme modalidade
+            vbc_st = 0.0
+            if mod_st == "Margem Valor Agregado (%)":
+                vbc_pre = vo * (1.0 - (red_st / 100.0))
+                vbc_st = vbc_pre * (1.0 + (mva / 100.0))
+            elif mod_st in ("Pauta (Valor)", "Preço Tabelado Máx. (Valor)"):
+                # Campo "Valor BC ICMS" (override/pauta)
+                try:
+                    vbc_st = float((self.vr_bc_ICMS.get() or "0").replace(",", "."))
+                except:
+                    vbc_st = 0.0
+            elif mod_st == "Valor da Operação":
+                vbc_st = vo * (1.0 - (red_st / 100.0))
+            else:
+                vbc_st = 0.0
+
+            self.bc_icms_st.set(f"{vbc_st:.2f}" if vbc_st > 0 else "")
+
+            # vICMSST = (vBCST * AlqST) - vICMS
+            vicmsst_bruto = vbc_st * (aliq_st / 100.0)
+            vicmsst = max(vicmsst_bruto - vicms, 0.0)
+
+            if vbc_st > 0:
+                self.vr_icms_st.set(f"{vicmsst:.2f}")
+                self.vr_bc_icms_st_ret.set(f"{vbc_st:.2f}")
+                self.vr_icms_st_ret.set(f"{vicmsst:.2f}")
+                self.vr_icms_subst.set(f"{vicmsst:.2f}")
+            else:
+                self.vr_icms_st.set("")
+                self.vr_bc_icms_st_ret.set("")
+                self.vr_icms_st_ret.set("")
+                self.vr_icms_subst.set("")
+
+            # -----------------------
+            # FCP / FCP-ST (se aplicável)
+            # -----------------------
+            # FCP: vFCP = BC_FCP * pFCP; se BC_FCP vazio, usa vBCST
+            try:
+                p_fcp = float((self.aliq_fcp_porc.get() or "0").replace(",", "."))
+            except:
+                p_fcp = 0.0
+            try:
+                bc_fcp = float((self.bc_FCP.get() or "0").replace(",", "."))
+            except:
+                bc_fcp = 0.0
+            if bc_fcp == 0.0:
+                bc_fcp = vbc_st
+            vfcp = bc_fcp * (p_fcp / 100.0)
+
+            self.bc_FCP.set(f"{bc_fcp:.2f}" if bc_fcp > 0 else "")
+            self.vr_FCP.set(f"{vfcp:.2f}" if vfcp > 0 else "")
+
+            # FCP-ST: vFCPST = BC_FCP_ST * pFCP_ST; se base vazia, usa vBCST
+            try:
+                p_fcp_st = float((self.aliq_fcp_st.get() or "0").replace(",", "."))
+            except:
+                p_fcp_st = 0.0
+            try:
+                bc_fcp_st = float((self.bc_fcp_st.get() or "0").replace(",", "."))
+            except:
+                bc_fcp_st = 0.0
+            if bc_fcp_st == 0.0:
+                bc_fcp_st = vbc_st
+            vfcp_st = bc_fcp_st * (p_fcp_st / 100.0)
+
+            self.bc_fcp_st.set(f"{bc_fcp_st:.2f}" if bc_fcp_st > 0 else "")
+            self.vr_fcp_st.set(f"{vfcp_st:.2f}" if vfcp_st > 0 else "")
+
+        calculaValores()
+        
+
 
 
         def salvar_dados_e_sair():

@@ -117,6 +117,7 @@ def criarLabelLateralEntry(frame, texto, relx, rely, width, variavel):
         "Alíq. FCP ST Ret.(%)",
         "Vr. FCP ST Ret.",
         "Vr. FCP Efetivo"
+        "Valor BC ICMS"
     ):
         fonte = ("TkDefaultFont", 11)
     else:

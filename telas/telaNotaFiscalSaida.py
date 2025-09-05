@@ -107,10 +107,7 @@ def telaNotaFiscalSaida(self, valor):
         print("Parou de digitar")
         buscaCliente()
 
-    def on_key_release(event):
-        if self.typing_job is not None:
-            self.after_cancel(self.typing_job)
-        self.typing_job = self.after(300, on_stop_typing)
+
 
 
 
@@ -162,9 +159,6 @@ def telaNotaFiscalSaida(self, valor):
             case _: variavelCFOPNota.set("")
         return variavelCFOPNota.get()
 
-    # self.variavelInscEstadualEmitente = ctk.StringVar()
-    # self.variavelCNPJRazaoSocialEmitente = ctk.StringVar()
-    # self.variavelRazaoSocialEmitente = ctk.StringVar()
 
     def decideEmitente(self, valor):
         if valor == "Nutrigel":
@@ -179,10 +173,9 @@ def telaNotaFiscalSaida(self, valor):
             self.variavelComplementoEnd     = "LETRA B"
             self.variavelMunicipioEnd       = "SAO JOAO DEL REI"
             self.variavelUFEnd              = "MG"
-            self.variavelCEPEnd             = "36301194"    # só dígitos
-            self.variavelCodigoMunicipioEnd = "3162500"     # IBGE com 7 dígitos
-            self.variavelTelefoneEnd        = "3233716171"  # só dígitos (DDD+telefone)
-
+            self.variavelCEPEnd             = "36301194"    
+            self.variavelCodigoMunicipioEnd = "3162500"      
+            self.variavelTelefoneEnd        = "3233716171"
 
 
         if valor == "Multimáquinas":
@@ -247,7 +240,7 @@ def telaNotaFiscalSaida(self, valor):
     ctk.CTkLabel(self.frameTelaNotaSaida, text="Destinatário----------").place(relx=0.1, rely=0.05)
     self.Rs = criarLabelEntry(self.frameTelaNotaSaida, "Razão social", 0.1, 0.10, 0.3, self.variavelRazaoSocialRemetente)
     cnpj = criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.10, 0.15, self.variavelCNPJRazaoSocialRemetente)
-    self.Rs.bind("<KeyRelease>", on_key_release)
+    self.Rs.bind("<KeyRelease>", buscaCliente)
     self.Rs.bind("<Button-1>", buscaCliente)
 
 

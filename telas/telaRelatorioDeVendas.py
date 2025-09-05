@@ -22,7 +22,7 @@ def telaRelatorioDeVendas(self):
     self.selecionarPeriodo.bind("<Button-1>", command=lambda event: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodo(self,frame, self.selecionarPeriodo.get(), event))
     
 
-    # Botões
+    # Botões 
     
     
     criaBotao(frame, "Buscar", 0.84, 0.08, 0.1, lambda:filtrar.filtrarPedidos( self, frameVendas, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(), self.datePickerInicio.get() if hasattr(self, "datePickerInicio") else None, self.datePickerFim.get() if hasattr(self, "datePickerFim") else None, self.selecionarPeriodo.get()))
