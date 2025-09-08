@@ -13,7 +13,6 @@ import time
 import random
 from datetime import datetime
 
-
 # --- helper injetado: preenche campos faltantes de endereço nos blocos [Emitente] e [Destinatario]
 def _V_get(self, attr, default=""):
     val = getattr(self, attr, default)
@@ -346,8 +345,19 @@ def criaComandoACBr(self, nome_arquivo):
     vCOFINS  = V("totalCOFINS", "0.00") or "0.00"
     vProdTot = V("valorTotalProdutos", "") or V("valorSubtotal", "")  # pode vir vazio
 
-    itens    = list(getattr(self, "valoresDosItens", []) or [])
-    dadosTrib = list(getattr(self, "dadosProduto", []) or [])  # opcional
+    itens_base = list(getattr(self, "valoresDosItens", []) or [])
+
+    dp = getattr(self, "dadosProdutos", None)  # pode ser dict (chaves -> item) ou list
+    if isinstance(dp, dict):
+        trib_list = list(dp.values())
+    elif isinstance(dp, list):
+        trib_list = dp
+    else:
+        trib_list = list(getattr(self, "dadosProduto", []) or [])  # fallback antigo
+
+    # se não houver itens_base, monta "raso" só para casar posições
+    if not itens_base and trib_list:
+        itens_base = [{} for _ in trib_list]
 
     # Modalidade de frete
     modFrete = _so_digitos(V("variavelModalidadeFrete", "")) or "9"  # 9 = sem frete
@@ -422,10 +432,17 @@ def criaComandoACBr(self, nome_arquivo):
         else:
             f.write("IE=ISENTO\r\n")
         # CRT se existir nas telas; se não, 1 (Simples) por padrão
-        crt = str(getattr(self, "crt", "") or "").strip()
+
+
+        # CRT (1=SN, 2=Excesso SN, 3=Regime Normal)
+        crt = (V("CRT_emitente", "") or
+               V("variavelCRTEmitente", "") or
+               V("variavelCRT", "") or
+               V("crt", "")).strip()
         if crt not in {"1", "2", "3"}:
-            crt = "1"
+            crt = "3"  # se não vier da tela, regime normal por segurança
         f.write(f"CRT={crt}\r\n")
+
         if emit_xLgr:    f.write(f"xLgr={emit_xLgr}\r\n")
         if emit_nro:     f.write(f"nro={emit_nro}\r\n")
         if emit_xCpl:    f.write(f"xCpl={emit_xCpl}\r\n")
@@ -462,15 +479,14 @@ def criaComandoACBr(self, nome_arquivo):
         f.write("\r\n")
 
         # ---------------- [Produtos] + tributos por item ----------------
-        for idx, base in enumerate(itens, start=1):
+        tot_vBC = tot_vICMS = tot_vBCST = tot_vST = 0.0
+        tot_vProd = 0.0
+        for idx, base in enumerate(itens_base, start=1):
             prod = dict(base)
-            # mescla tributação paralela se houver
-            if idx-1 < len(dadosTrib):
+            print(prod)
+            if idx-1 < len(trib_list):
                 try:
-                    trib = dict(dadosTrib[idx-1])
-                    for k,v in trib.items():
-                        if v not in (None, "", "None"):
-                            prod[k] = v
+                    prod.update({k: v for k, v in dict(trib_list[idx-1]).items() if v not in (None, "", "None")})
                 except Exception:
                     pass
 
@@ -479,68 +495,149 @@ def criaComandoACBr(self, nome_arquivo):
             NCM    = prod.get("ncm",        prod.get("NCM",      "00000000"))
             CFOP   = prod.get("cfop",       prod.get("CFOP",     V("variavelCFOP", "5102") or "5102"))
             uCom   = prod.get("unidade",    prod.get("uCom",     "UN"))
-            qCom   = prod.get("quantidade", prod.get("qCom",     "1"))
-            vUnCom = prod.get("valor_unitario", prod.get("vUnCom",  "0.01"))
-            vProd  = prod.get("valor_total",    prod.get("vProd",   vUnCom))
+                        # --- NORMALIZAÇÃO qCom / vUnCom / vProd (evita Rejeição 629) ---
+            _raw_q = str(prod.get("quantidade") or prod.get("qCom") or "").replace(",", ".").strip()
+            _raw_u = str(prod.get("preco") or prod.get("valor_unitario") or prod.get("vUnCom") or "0.01").replace(",", ".").strip()
+            _raw_t = str(prod.get("subtotal") or prod.get("valor_total") or prod.get("vProd") or _raw_u).replace(",", ".").strip()
+
+            def _to_float(s, default):
+                try:
+                    return float(s)
+                except Exception:
+                    return float(default)
+
+            q = _to_float(_raw_q, 0 if _raw_q != "" else 0)
+            u = _to_float(_raw_u, 0.01)
+            t = _to_float(_raw_t, u)
+
+            # Se quantidade vier vazia/zero, calcula a partir do total e unitário; se não der, assume 1
+            if q <= 0:
+                if u > 0 and t > 0:
+                    q = t / u
+                else:
+                    q = 1.0
+
+            # Garante consistência exata: q * u (2 casas) = t
+            if q > 0 and t > 0:
+                u = t / q
+
+            # Formatação nos padrões da NF-e
+            qCom   = f"{q:.4f}"
+            vUnCom = f"{u:.10f}"
+            vProd  = f"{t:.2f}"
+            try:
+                tot_vProd += float(vProd.replace(",", "."))
+            except:
+                pass
 
             f.write(f"[Produto{idx:03d}]\r\n")
-            f.write(f"cProd={cProd}\r\n")
-            f.write(f"xProd={xProd}\r\n")
-            f.write(f"NCM={NCM}\r\n")
-            f.write(f"CFOP={CFOP}\r\n")
-            f.write(f"uCom={uCom}\r\n")
-            f.write(f"qCom={qCom}\r\n")
-            f.write(f"vUnCom={vUnCom}\r\n")
-            f.write(f"vProd={vProd}\r\n")
-            f.write("indTot=1\r\n\r\n")
+            f.write(f"cProd={cProd}\r\nxProd={xProd}\r\nNCM={NCM}\r\nCFOP={CFOP}\r\n")
+            f.write(f"uCom={uCom}\r\nqCom={qCom}\r\nvUnCom={vUnCom}\r\nvProd={vProd}\r\nindTot=1\r\n\r\n")
+            # --- FIM NORMALIZAÇÃO ---
 
-            # ---- ICMS
+            # ===== ICMS por item =====
             orig  = prod.get("orig",  prod.get("origem", "0"))
             csosn = prod.get("csosn") or prod.get("CSOSN")
             cst   = prod.get("cst")   or prod.get("CST")
 
+            # mapeia chaves usadas na tela de totais
+            vBC   = prod.get("vBC") or prod.get("bc_icms") or prod.get("vBC_ICMS") or "0.00"
+            pICMS = prod.get("pICMS") or prod.get("aliq_icms") or "0.00"
+            vICMS = prod.get("vICMS") or prod.get("vr_icms") or prod.get("valor_icms") or "0.00"
+
+            vBCST   = prod.get("vBCST") or prod.get("bc_icms_st") or prod.get("vr_bc_icms_st_ret") or ""
+            vICMSST = prod.get("vICMSST") or prod.get("vr_icms_st") or prod.get("vr_icms_subst") or prod.get("vr_icms_st_ret") or ""
+
+            f.write(f"[ICMS{idx:03d}]\r\n")
+
+
+
+            # ---- ICMS (decide por item)
+
+            orig      = prod.get("orig",  prod.get("origem", "0"))
+            csosn_txt = (prod.get("csosn") or prod.get("CSOSN") or "").strip()
+            cst_txt   = (prod.get("cst")   or prod.get("CST")   or "").strip()
+            vBC       = prod.get("vBC")       or prod.get("bc_icms")        or prod.get("vBC_ICMS") or "0.00"
+            pICMS     = prod.get("pICMS")     or prod.get("aliq_icms")      or "0.00"
+            vICMS     = prod.get("vICMS")     or prod.get("vr_icms")        or prod.get("valor_icms") or "0.00"
+            vBCST     = prod.get("vBCST")     or prod.get("bc_icms_st")     or prod.get("vr_bc_icms_st_ret") or ""
+            vICMSST   = prod.get("vICMSST")   or prod.get("vr_icms_st")     or prod.get("vr_icms_subst")     or prod.get("vr_icms_st_ret") or ""
+            
             f.write(f"[ICMS{idx:03d}]\r\n")
             f.write(f"orig={orig}\r\n")
-            # Corrigido: respeita CRT do Emitente
-            if crt in ("1", "2"):  # Simples Nacional
-                csosn_val = csosn or str(getattr(self, "csosn_padrao", "") or "102")
-                f.write(f"CSOSN={csosn_val}\r\n\r\n")
-            else:  # Regime Normal
-                vBC   = prod.get("vBC",   prod.get("bc_icms", "0.00"))
-                pICMS = prod.get("pICMS", prod.get("aliq_icms", "0.00"))
-                vICMS = prod.get("vICMS", prod.get("valor_icms", "0.00"))
-                f.write(f"CST={cst or '00'}\r\n")
-                f.write(f"vBC={vBC}\r\n")
-                f.write(f"pICMS={pICMS}\r\n")
-                f.write(f"vICMS={vICMS}\r\n\r\n")
 
-            # ---- PIS
+            if csosn_txt:
+                # Se veio CSOSN no item, escreve CSOSN e não força CST nem valores de ICMS padrão
+                f.write(f"CSOSN={csosn_txt}\r\n\r\n")
+            elif cst_txt:
+                # Se veio CST no item, escreve CST + base/alíquota/valor
+                f.write(f"CST={cst_txt}\r\n")
+                f.write(f"vBC={vBC}\r\npICMS={pICMS}\r\nvICMS={vICMS}\r\n")
+                if vBCST:   f.write(f"vBCST={vBCST}\r\n")
+                if vICMSST: f.write(f"vICMSST={vICMSST}\r\n")
+                f.write("\r\n")
+            else:
+                # Se nada veio do item, decide pelo CRT do emitente (mantido como estava)
+                if crt in ("1", "2"):   # Simples
+                    f.write(f"CSOSN={(getattr(self, 'csosn_padrao', '') or '102')}\r\n\r\n")
+                else:                    # Regime Normal
+                    f.write("CST=00\r\n")
+                    f.write(f"vBC={vBC}\r\npICMS={pICMS}\r\nvICMS={vICMS}\r\n")
+                    if vBCST:   f.write(f"vBCST={vBCST}\r\n")
+                    if vICMSST: f.write(f"vICMSST={vICMSST}\r\n")
+                    f.write("\r\n")
+                
+                def _fnum(x):
+                    try:
+                        return float(str(x).replace(",", "."))
+                    except:
+                        return 0.0
+
+                tot_vBC   += _fnum(vBC)
+                tot_vICMS += _fnum(vICMS)
+                tot_vBCST += _fnum(vBCST)
+                tot_vST   += _fnum(vICMSST)
+
+
+            # ===== PIS por item =====
             f.write(f"[PIS{idx:03d}]\r\n")
             f.write(f"CST={(prod.get('cst_pis') or prod.get('CST_PIS') or '99')}\r\n")
             f.write(f"vBC={(prod.get('bc_pis') or prod.get('vBC_PIS') or '0.00')}\r\n")
             f.write(f"pPIS={(prod.get('aliq_pis') or prod.get('pPIS') or '0.00')}\r\n")
             f.write(f"vPIS={(prod.get('valor_pis') or prod.get('vPIS') or '0.00')}\r\n\r\n")
 
-            # ---- COFINS
+            # ===== COFINS por item =====
             f.write(f"[COFINS{idx:03d}]\r\n")
             f.write(f"CST={(prod.get('cst_cofins') or prod.get('CST_COFINS') or '99')}\r\n")
             f.write(f"vBC={(prod.get('bc_cofins') or prod.get('vBC_COFINS') or '0.00')}\r\n")
             f.write(f"pCOFINS={(prod.get('aliq_cofins') or prod.get('pCOFINS') or '0.00')}\r\n")
             f.write(f"vCOFINS={(prod.get('valor_cofins') or prod.get('vCOFINS') or '0.00')}\r\n\r\n")
 
+
+
+        
         # ---------------- [Total] ----------------
         f.write("[Total]\r\n")
-        if vProdTot:
-            f.write(f"vProd={vProdTot}\r\n")
+        # usa a soma dos itens (garante consistência com o detalhamento)
+        f.write(f"vBC={tot_vBC:.2f}\r\n")
+        f.write(f"vBCST={tot_vBCST:.2f}\r\n")
+        f.write(f"vST={tot_vST:.2f}\r\n")
+
+        # mantém seus demais campos
+        f.write(f"vProd={tot_vProd:.2f}\r\n")
         f.write(f"vNF={vNF}\r\n")
         f.write(f"vFrete={vFrete}\r\n")
         f.write(f"vSeg={vSeg}\r\n")
         f.write(f"vDesc={vDesc}\r\n")
         f.write(f"vOutro={vOutro}\r\n")
-        f.write(f"vICMS={vICMS}\r\n")
+
+        # ICMS total também pela soma dos itens (evita divergência)
+        f.write(f"vICMS={tot_vICMS:.2f}\r\n")
+
         f.write(f"vIPI={vIPI}\r\n")
         f.write(f"vPIS={vPIS}\r\n")
         f.write(f"vCOFINS={vCOFINS}\r\n\r\n")
+
 
         # ---------------- [Transportador] ----------------
         f.write("[Transportador]\r\n")
@@ -555,6 +652,20 @@ def criaComandoACBr(self, nome_arquivo):
         f.write('"\r\n,1,1,1, ,1)')
 
 def criarNFE(self):
+
+
+
+    itens = getattr(self, "dadosProdutos", {}) or {}
+    print("\n================ TRIBUTAÇÃO POR ITEM ================\n")
+    for nome_prod, campos in itens.items():
+        print(f"[ITEM] {nome_prod}")
+        for k, v in dict(campos).items():
+            print(f"  {k}: {v}")
+        print("-" * 52)
+    if not itens:
+        print("(nenhum item salvo em self.dadosProdutos)")
+    print("\n=====================================================\n")
+
     """
     Cria NotaFiscal/EnviarComando/enviar.txt (CriarEnviarNFe),
     garante normalizações essenciais e aguarda o retorno do ACBr.

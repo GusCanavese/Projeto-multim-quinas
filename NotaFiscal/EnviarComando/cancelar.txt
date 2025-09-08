@@ -1,0 +1,1 @@
+NFe.CancelarNFe("31250900995044000107550010000000011834442342","Cancelamento por duplicidade em homologacao.","00995044000107")

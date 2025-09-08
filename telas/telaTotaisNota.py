@@ -11,6 +11,9 @@ from componentes import criaFrameJanela, criarLabelLateralEntry, criaBotao
 def telaTotaisNotaSaida(self):
     self.frameTelaTotais = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
+    # DEBUG: listar tudo que foi salvo na tributação por produto
+
+
     # Variáveis individuais
     def nova_var():
         v = ctk.StringVar()
@@ -46,6 +49,96 @@ def telaTotaisNotaSaida(self):
     self.valorRetidoIRRF            = nova_var()
     self.bcPrevidencia              = nova_var()
     self.valorPrevidencia           = nova_var()
+
+
+
+       # ============================
+    # SOMA DOS TRIBUTOS POR ITEM
+    # (preenche os totais da tela)
+    # ============================
+    try:
+        itens = getattr(self, "dadosProdutos", {}) or {}
+
+        # acumuladores locais (apenas nesta função)
+        tot_bc_icms = 0.0
+        tot_v_icms = 0.0
+        tot_bc_icms_st = 0.0
+        tot_v_icms_st = 0.0
+        tot_pis = 0.0
+        tot_pis_st = 0.0
+        tot_cofins = 0.0
+        tot_cofins_st = 0.0
+        tot_ipi = 0.0
+
+        for it in itens.values():
+            # ---- BC ICMS
+            v = (it.get("bc_icms") or it.get("vBC_ICMS") or it.get("vBC") or "").strip()
+            if v:
+                try: tot_bc_icms += float(v.replace(",", "."))
+                except: pass
+
+            # ---- ICMS
+            v = (it.get("vr_icms") or it.get("vICMS") or it.get("valor_icms") or "").strip()
+            if v:
+                try: tot_v_icms += float(v.replace(",", "."))
+                except: pass
+
+            # ---- BC ICMS ST
+            v = (it.get("bc_icms_st") or it.get("vBCST") or it.get("vr_bc_icms_st_ret") or "").strip()
+            if v:
+                try: tot_bc_icms_st += float(v.replace(",", "."))
+                except: pass
+
+            # ---- ICMS ST
+            v = (it.get("vr_icms_st") or it.get("vr_icms_subst") or it.get("vICMSST") or it.get("vr_icms_st_ret") or "").strip()
+            if v:
+                try: tot_v_icms_st += float(v.replace(",", "."))
+                except: pass
+
+            # ---- PIS
+            v = (it.get("vr_pis") or it.get("vPIS") or it.get("valor_pis") or "").strip()
+            if v:
+                try: tot_pis += float(v.replace(",", "."))
+                except: pass
+
+            # ---- PIS ST
+            v = (it.get("vr_pis_st") or it.get("vPISST") or "").strip()
+            if v:
+                try: tot_pis_st += float(v.replace(",", "."))
+                except: pass
+
+            # ---- COFINS
+            v = (it.get("vr_cofins") or it.get("vCOFINS") or it.get("valor_cofins") or "").strip()
+            if v:
+                try: tot_cofins += float(v.replace(",", "."))
+                except: pass
+
+            # ---- COFINS ST
+            v = (it.get("vr_cofins_st") or it.get("vCOFINSST") or "").strip()
+            if v:
+                try: tot_cofins_st += float(v.replace(",", "."))
+                except: pass
+
+            # ---- IPI (se houver no item)
+            v = (it.get("vr_ipi") or it.get("vIPI") or it.get("valor_ipi") or "").strip()
+            if v:
+                try: tot_ipi += float(v.replace(",", "."))
+                except: pass
+
+        # >>> AQUI EU ATRIBUO AS SOMAS AOS CAMPOS DA TELA <<<
+        self.totalBCICMS.set(f"{tot_bc_icms:.2f}")
+        self.valorICMS.set(f"{tot_v_icms:.2f}")
+        self.totalBCICMSST.set(f"{tot_bc_icms_st:.2f}")
+        self.totalICMSST.set(f"{tot_v_icms_st:.2f}")
+        self.totalPIS.set(f"{tot_pis:.2f}")
+        self.totalPISST.set(f"{tot_pis_st:.2f}")
+        self.totalCOFINS.set(f"{tot_cofins:.2f}")
+        self.totalCOFINSST.set(f"{tot_cofins_st:.2f}")
+        self.totalIPI.set(f"{tot_ipi:.2f}")
+
+    except Exception as e:
+        # não quebra a tela; só loga
+        print("Aviso (soma de tributos):", e)
 
     # Primeira coluna
     criarLabelLateralEntry(self.frameTelaTotais, "Total frete",     0.12, 0.05, 0.11, self.totalFrete)
