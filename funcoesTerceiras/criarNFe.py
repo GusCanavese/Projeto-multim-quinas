@@ -345,6 +345,20 @@ def criaComandoACBr(self, nome_arquivo):
     vCOFINS  = V("totalCOFINS", "0.00") or "0.00"
     vProdTot = V("valorTotalProdutos", "") or V("valorSubtotal", "")  # pode vir vazio
 
+    # depois de vICMS, vProdTot...
+    try:
+        _icms_tot_user = float(str(vICMS).replace(",", "."))
+    except:
+        _icms_tot_user = 0.0
+    try:
+        _vprod_tot_user = float(str(vProdTot or "0").replace(",", "."))
+    except:
+        _vprod_tot_user = 0.0
+
+    # Alíquota "global" (se o usuário informou total de ICMS e total de produtos)
+    _aliq_icms_global = (_icms_tot_user / _vprod_tot_user * 100.0) if (_icms_tot_user > 0 and _vprod_tot_user > 0) else 0.0
+
+
     itens_base = list(getattr(self, "valoresDosItens", []) or [])
 
     dp = getattr(self, "dadosProdutos", None)  # pode ser dict (chaves -> item) ou list
@@ -548,7 +562,7 @@ def criaComandoACBr(self, nome_arquivo):
             vBCST   = prod.get("vBCST") or prod.get("bc_icms_st") or prod.get("vr_bc_icms_st_ret") or ""
             vICMSST = prod.get("vICMSST") or prod.get("vr_icms_st") or prod.get("vr_icms_subst") or prod.get("vr_icms_st_ret") or ""
 
-            f.write(f"[ICMS{idx:03d}]\r\n")
+            # f.write(f"[ICMS{idx:03d}]\r\n")
 
 
 
@@ -570,33 +584,66 @@ def criaComandoACBr(self, nome_arquivo):
                 # Se veio CSOSN no item, escreve CSOSN e não força CST nem valores de ICMS padrão
                 f.write(f"CSOSN={csosn_txt}\r\n\r\n")
             elif cst_txt:
-                # Se veio CST no item, escreve CST + base/alíquota/valor
+                _num = lambda x: float(str(x).replace(",", ".").strip() or "0")
+                bc_num    = _num(vBC)
+                aliq_num  = _num(pICMS)
+                vicms_num = _num(vICMS)
+                vprod_num = _num(vProd)
+
+                if cst_txt == "00":
+                    # Base do ICMS do item = vProd (se não informada)
+                    if bc_num <= 0:
+                        bc_num = vprod_num
+                        vBC = f"{bc_num:.2f}"
+
+                    # Se tudo veio zerado, use a alíquota global (se existir) para fechar com o total
+                    if aliq_num <= 0 and vicms_num <= 0 and _aliq_icms_global > 0:
+                        aliq_num  = _aliq_icms_global
+                        pICMS     = f"{aliq_num:.4f}"
+                        vicms_num = bc_num * aliq_num / 100.0
+                        vICMS     = f"{vicms_num:.2f}"
+
+                    # Casos parciais
+                    if aliq_num > 0 and vicms_num <= 0:
+                        vicms_num = bc_num * aliq_num / 100.0
+                        vICMS = f"{vicms_num:.2f}"
+                    if vicms_num > 0 and aliq_num <= 0 and bc_num > 0:
+                        aliq_num = (vicms_num / bc_num) * 100.0
+                        pICMS = f"{aliq_num:.4f}"
+
                 f.write(f"CST={cst_txt}\r\n")
+                f.write("modBC=3\r\n")  # <<< troque 0 por 3 (valor da operação)
                 f.write(f"vBC={vBC}\r\npICMS={pICMS}\r\nvICMS={vICMS}\r\n")
                 if vBCST:   f.write(f"vBCST={vBCST}\r\n")
                 if vICMSST: f.write(f"vICMSST={vICMSST}\r\n")
                 f.write("\r\n")
+
+            
             else:
-                # Se nada veio do item, decide pelo CRT do emitente (mantido como estava)
                 if crt in ("1", "2"):   # Simples
                     f.write(f"CSOSN={(getattr(self, 'csosn_padrao', '') or '102')}\r\n\r\n")
                 else:                    # Regime Normal
+                    _num = lambda x: float(str(x).replace(",", ".").strip() or "0")
+                    if _num(vBC) <= 0:
+                        vBC = vProd   # usa o vProd já calculado acima como base do item
+
                     f.write("CST=00\r\n")
+                    f.write("modBC=3\r\n")  # <<< aqui também 3
                     f.write(f"vBC={vBC}\r\npICMS={pICMS}\r\nvICMS={vICMS}\r\n")
                     if vBCST:   f.write(f"vBCST={vBCST}\r\n")
                     if vICMSST: f.write(f"vICMSST={vICMSST}\r\n")
                     f.write("\r\n")
                 
-                def _fnum(x):
-                    try:
-                        return float(str(x).replace(",", "."))
-                    except:
-                        return 0.0
+            def _fnum(x):
+                try:
+                    return float(str(x).replace(",", "."))
+                except:
+                    return 0.0
 
-                tot_vBC   += _fnum(vBC)
-                tot_vICMS += _fnum(vICMS)
-                tot_vBCST += _fnum(vBCST)
-                tot_vST   += _fnum(vICMSST)
+            tot_vBC   += _fnum(vBC)
+            tot_vICMS += _fnum(vICMS)
+            tot_vBCST += _fnum(vBCST)
+            tot_vST   += _fnum(vICMSST)
 
 
             # ===== PIS por item =====
@@ -615,7 +662,27 @@ def criaComandoACBr(self, nome_arquivo):
 
 
 
-        
+        try: frete = float(str(vFrete).replace(",", ".")) 
+        except: frete = 0.0
+        try: seg = float(str(vSeg).replace(",", ".")) 
+        except: seg = 0.0
+        try: outro = float(str(vOutro).replace(",", ".")) 
+        except: outro = 0.0
+        try: ipi = float(str(vIPI).replace(",", ".")) 
+        except: ipi = 0.0
+        try: desc = float(str(vDesc).replace(",", ".")) 
+        except: desc = 0.0
+        # ST total já está em tot_vST; se for 0, não impacta
+        vNF_calc = (tot_vProd - desc) + frete + seg + outro + ipi + tot_vST
+        vNF_calc = float(f"{vNF_calc:.2f}")  # 2 casas
+
+        # Se vNF vier vazio/zero ou diferente do calculado, força o correto
+        try:
+            vNF_num = float(str(vNF).replace(",", "."))
+        except:
+            vNF_num = 0.0
+        if vNF_num <= 0.0 or abs(vNF_num - vNF_calc) > 0.01:
+            vNF = f"{vNF_calc:.2f}"
         # ---------------- [Total] ----------------
         f.write("[Total]\r\n")
         # usa a soma dos itens (garante consistência com o detalhamento)
