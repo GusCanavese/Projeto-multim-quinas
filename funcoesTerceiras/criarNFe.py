@@ -555,7 +555,21 @@ def criaComandoACBr(self, nome_arquivo):
             cst   = prod.get("cst")   or prod.get("CST")
 
             # mapeia chaves usadas na tela de totais
-            vBC   = prod.get("vBC") or prod.get("bc_icms") or prod.get("vBC_ICMS") or "0.00"
+            # --- injeta tributação salva por CHAVE do produto (não perder bc_icms) ---
+            chave = prod.get('cProd') or prod.get('xProd')
+            if isinstance(getattr(self, 'dadosProdutos', None), dict) and chave in self.dadosProdutos:
+                try:
+                    prod.update({k: v for k, v in dict(self.dadosProdutos[chave]).items() if v not in (None, '', 'None')})
+                except Exception:
+                    prod.update(self.dadosProdutos[chave])
+            # --- fim injeção por chave ---
+            vBC = prod.get('vBC')
+            if vBC is None and 'bc_icms' in prod:
+                vBC = prod['bc_icms']
+            if vBC is None and 'vBC_ICMS' in prod:
+                vBC = prod['vBC_ICMS']
+            if vBC is None:
+                vBC = '0.00'
             pICMS = prod.get("pICMS") or prod.get("aliq_icms") or "0.00"
             vICMS = prod.get("vICMS") or prod.get("vr_icms") or prod.get("valor_icms") or "0.00"
 
@@ -571,7 +585,8 @@ def criaComandoACBr(self, nome_arquivo):
             orig      = prod.get("orig",  prod.get("origem", "0"))
             csosn_txt = (prod.get("csosn") or prod.get("CSOSN") or "").strip()
             cst_txt   = (prod.get("cst")   or prod.get("CST")   or "").strip()
-            vBC       = prod.get("vBC")       or prod.get("bc_icms")        or prod.get("vBC_ICMS") or "0.00"
+            vBC       = prod['bc_icms'] or prod['vBC_ICMS'] or prod.get("vBC")
+            print(vBC)
             pICMS     = prod.get("pICMS")     or prod.get("aliq_icms")      or "0.00"
             vICMS     = prod.get("vICMS")     or prod.get("vr_icms")        or prod.get("valor_icms") or "0.00"
             vBCST     = prod.get("vBCST")     or prod.get("bc_icms_st")     or prod.get("vr_bc_icms_st_ret") or ""
@@ -580,7 +595,7 @@ def criaComandoACBr(self, nome_arquivo):
             f.write(f"[ICMS{idx:03d}]\r\n")
             f.write(f"orig={orig}\r\n")
 
-            if csosn_txt:
+            if False:
                 # Se veio CSOSN no item, escreve CSOSN e não força CST nem valores de ICMS padrão
                 f.write(f"CSOSN={csosn_txt}\r\n\r\n")
             elif cst_txt:
@@ -591,9 +606,11 @@ def criaComandoACBr(self, nome_arquivo):
                 vprod_num = _num(vProd)
 
                 if cst_txt == "00":
+                    print(f"cst_txt ta zerado", cst_txt)
                     # Base do ICMS do item = vProd (se não informada)
                     if bc_num <= 0:
                         bc_num = vprod_num
+                        print(bc_num)
                         vBC = f"{bc_num:.2f}"
 
                     # Se tudo veio zerado, use a alíquota global (se existir) para fechar com o total
@@ -613,7 +630,14 @@ def criaComandoACBr(self, nome_arquivo):
 
                 f.write(f"CST={cst_txt}\r\n")
                 f.write("modBC=3\r\n")  # <<< troque 0 por 3 (valor da operação)
-                f.write(f"vBC={vBC}\r\npICMS={pICMS}\r\nvICMS={vICMS}\r\n")
+                _bc = str(vBC).strip().replace(',', '.')
+                print(_bc)
+                if not _bc:
+                    _bc = bc_num
+                f.write(f"vBC={_bc}\r\n")
+                
+                f.write(f"pICMS={pICMS}\r\n")
+                f.write(f"vICMS={vICMS}\r\n")
                 if vBCST:   f.write(f"vBCST={vBCST}\r\n")
                 if vICMSST: f.write(f"vICMSST={vICMSST}\r\n")
                 f.write("\r\n")
@@ -629,10 +653,15 @@ def criaComandoACBr(self, nome_arquivo):
 
                     f.write("CST=00\r\n")
                     f.write("modBC=3\r\n")  # <<< aqui também 3
-                    f.write(f"vBC={vBC}\r\npICMS={pICMS}\r\nvICMS={vICMS}\r\n")
-                    if vBCST:   f.write(f"vBCST={vBCST}\r\n")
-                    if vICMSST: f.write(f"vICMSST={vICMSST}\r\n")
-                    f.write("\r\n")
+                _bc = str(vBC).strip().replace(',', '.')
+                if not _bc:
+                    _bc = '0.00'
+                f.write(f"vBC={_bc}\r\n")
+                f.write(f"pICMS={pICMS}\r\n")
+                f.write(f"vICMS={vICMS}\r\n")
+                if vBCST:   f.write(f"vBCST={vBCST}\r\n")
+                if vICMSST: f.write(f"vICMSST={vICMSST}\r\n")
+                f.write("\r\n")
                 
             def _fnum(x):
                 try:

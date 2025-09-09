@@ -432,6 +432,7 @@ def telaProdutosNotaSaida(self, cfop):
 
 
         if hasattr(self, "dadosProdutos") and produto.get() in self.dadosProdutos:
+            print(self.dadosProdutos)
 
             dados_salvos = self.dadosProdutos[produto.get()]
 
@@ -548,6 +549,7 @@ def telaProdutosNotaSaida(self, cfop):
             vicms = vbc_icms * (aliq_icms / 100.0)
 
             self.bc_icms.set(f"{vbc_icms:.2f}")
+            print(vbc_icms)
             self.vr_icms.set(f"{vicms:.2f}")
 
             # -----------------------
@@ -644,6 +646,10 @@ def telaProdutosNotaSaida(self, cfop):
             if not hasattr(self, "dadosProdutos"):
                 self.dadosProdutos = {}
 
+
+
+
+######## ==================== DADOS TA AQUIIIII ======================== ########
             self.dadosProdutos[produto.get()] = {
                 "codigo": self.codigoEntry.get(),
                 "ncm": self.NCMEntry.get(),
@@ -706,6 +712,7 @@ def telaProdutosNotaSaida(self, cfop):
                 "vr_cofins_st": self.vr_cofins_st.get()
 
             }
+            print(self.dadosProdutos)
 
             destroyModal()
 
@@ -836,9 +843,7 @@ def telaProdutosNotaSaida(self, cfop):
                     entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'cfop':
-                    print(campo)
                     entrada.configure(textvariable=variavelCfop)
-                    print(entrada)
 
                 if campo == 'subtotal':
                     entrada.bind("<KeyRelease>", lambda event: atualizarTotalGeral())
@@ -876,9 +881,7 @@ def telaProdutosNotaSaida(self, cfop):
             self.botaoRemoverItem.place_forget()
 
         self.yNovo = self.posicaoy + 0.02
-        print("destruiu")
         self.entradaProduto = ""
-        print("destruiu")
 
         atualizarTotalGeral()
     
