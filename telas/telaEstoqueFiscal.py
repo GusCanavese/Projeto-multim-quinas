@@ -16,7 +16,8 @@ def telaEstoqueFiscal(self):
     filtrarPorVendedor = criarLabelComboBox(frame, "Escolher estoque", 0.315, 0.04, 0.22, opcoes)
 
 
-
+    buscarProdutosFiscal(self, frame, buscar.get(), filtrarPorVendedor.get(), 1)
+    
     criaBotao(frame, "Buscar", 0.84, 0.08, 0.1, lambda:buscarProdutosFiscal(self, frame, buscar.get(), filtrarPorVendedor.get(), 1))
     criaLabel(frame, "Fiscal", 0.60, 0.08, 0.1, "#1F8107")
     buscar.bind("<Return>", lambda event: buscarProdutosFiscal(self, frame, buscar.get(), filtrarPorVendedor.get(), 1))

@@ -6,6 +6,7 @@ import customtkinter as ctk
 from datetime import datetime
 from telas.telaFaturamentoEntradaNota import telaGerarFaturamentoEntradaNota
 from componentes import criaFrameJanela, criarLabelLateralEntry, criaBotao
+from decimal import Decimal, ROUND_HALF_UP
 
 
 def telaTotaisNotaSaida(self):
@@ -60,69 +61,75 @@ def telaTotaisNotaSaida(self):
         itens = getattr(self, "dadosProdutos", {}) or {}
 
         # acumuladores locais (apenas nesta função)
-        tot_bc_icms = 0.0
-        tot_v_icms = 0.0
-        tot_bc_icms_st = 0.0
-        tot_v_icms_st = 0.0
-        tot_pis = 0.0
-        tot_pis_st = 0.0
-        tot_cofins = 0.0
-        tot_cofins_st = 0.0
-        tot_ipi = 0.0
+        tot_bc_icms = Decimal("0.00")
+        tot_v_icms = Decimal("0.00")
+        tot_bc_icms_st = Decimal("0.00")
+        tot_v_icms_st = Decimal("0.00")
+        tot_pis = Decimal("0.00")
+        tot_pis_st = Decimal("0.00")
+        tot_cofins = Decimal("0.00")
+        tot_cofins_st = Decimal("0.00")
+        def D(x):
+            try:
+                return Decimal(str(x).replace(",", ".")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            except:
+                return Decimal("0.00")
+
+        tot_ipi = Decimal("0.00")
 
         for it in itens.values():
             # ---- BC ICMS
             v = (it.get("bc_icms") or it.get("vBC_ICMS") or it.get("vBC") or "").strip()
             if v:
-                try: tot_bc_icms += float(v.replace(",", "."))
+                try: tot_bc_icms += D(v)
                 except: pass
 
             # ---- ICMS
             v = (it.get("vr_icms") or it.get("vICMS") or it.get("valor_icms") or "").strip()
             if v:
-                try: tot_v_icms += float(v.replace(",", "."))
+                try: tot_v_icms += D(v)
                 except: pass
 
             # ---- BC ICMS ST
             v = (it.get("bc_icms_st") or it.get("vBCST") or it.get("vr_bc_icms_st_ret") or "").strip()
             if v:
-                try: tot_bc_icms_st += float(v.replace(",", "."))
+                try: tot_bc_icms_st += D(v)
                 except: pass
 
             # ---- ICMS ST
             v = (it.get("vr_icms_st") or it.get("vr_icms_subst") or it.get("vICMSST") or it.get("vr_icms_st_ret") or "").strip()
             if v:
-                try: tot_v_icms_st += float(v.replace(",", "."))
+                try: tot_v_icms_st += D(v)
                 except: pass
 
             # ---- PIS
             v = (it.get("vr_pis") or it.get("vPIS") or it.get("valor_pis") or "").strip()
             if v:
-                try: tot_pis += float(v.replace(",", "."))
+                try: tot_pis += D(v)
                 except: pass
 
             # ---- PIS ST
             v = (it.get("vr_pis_st") or it.get("vPISST") or "").strip()
             if v:
-                try: tot_pis_st += float(v.replace(",", "."))
+                try: tot_pis_st += D(v)
                 except: pass
 
             # ---- COFINS
             v = (it.get("vr_cofins") or it.get("vCOFINS") or it.get("valor_cofins") or "").strip()
             if v:
-                try: tot_cofins += float(v.replace(",", "."))
+                try: tot_cofins += D(v)
                 except: pass
 
             # ---- COFINS ST
             v = (it.get("vr_cofins_st") or it.get("vCOFINSST") or "").strip()
             if v:
-                try: tot_cofins_st += float(v.replace(",", "."))
+                try: tot_cofins_st += D(v)
                 except: pass
 
             # ---- IPI (se houver no item)
             v = (it.get("vr_ipi") or it.get("vIPI") or it.get("valor_ipi") or "").strip()
             if v:
-                try: tot_ipi += float(v.replace(",", "."))
+                try: tot_ipi += D(v)
                 except: pass
 
         # >>> AQUI EU ATRIBUO AS SOMAS AOS CAMPOS DA TELA <<<

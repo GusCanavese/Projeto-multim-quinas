@@ -12,6 +12,7 @@ import re
 import time
 import random
 from datetime import datetime
+from decimal import Decimal, ROUND_HALF_UP
 
 # --- helper injetado: preenche campos faltantes de endereço nos blocos [Emitente] e [Destinatario]
 def _V_get(self, attr, default=""):
@@ -238,15 +239,13 @@ def criaComandoACBr(self, nome_arquivo):
     # CNPJ do emitente (para sequenciar nNF quando não informado)
     cnpj_emit_for_seq = _so_digitos(V("variavelCNPJRazaoSocialEmitente", ""))
 
-    # nNF informado? Se sim, respeita. Se não, usa sequência local por CNPJ+Série
+    # nNF: homologação sempre usa sequência local por CNPJ+Série (evita 539)
     raw_nnf = V("variavelNumeroDaNota", "") or V("nNF", "")
-    if str(raw_nnf).strip().isdigit():
-        try:
-            nnf_int = int(raw_nnf)
-        except:
-            nnf_int = _proximo_numero_nfe(cnpj_emit_for_seq, serie_int)
+    if _so_digitos(raw_nnf):
+        nnf_int = int(_so_digitos(raw_nnf))
     else:
         nnf_int = _proximo_numero_nfe(cnpj_emit_for_seq, serie_int)
+
 
     # Data/Hora
     data_ptbr = V("variavelDataDocumento", "")
@@ -493,8 +492,10 @@ def criaComandoACBr(self, nome_arquivo):
         f.write("\r\n")
 
         # ---------------- [Produtos] + tributos por item ----------------
-        tot_vBC = tot_vICMS = tot_vBCST = tot_vST = 0.0
-        tot_vProd = 0.0
+        tot_vBC = Decimal("0.00"); tot_vICMS = Decimal("0.00"); tot_vBCST = Decimal("0.00"); tot_vST = Decimal("0.00")
+        tot_vProd = Decimal("0.00")
+        tot_vPIS = Decimal("0.00"); tot_vCOFINS = Decimal("0.00")
+
         for idx, base in enumerate(itens_base, start=1):
             prod = dict(base)
             print(prod)
@@ -540,7 +541,7 @@ def criaComandoACBr(self, nome_arquivo):
             vUnCom = f"{u:.10f}"
             vProd  = f"{t:.2f}"
             try:
-                tot_vProd += float(vProd.replace(",", "."))
+                tot_vProd += Decimal(str(vProd).replace(",", ".")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
             except:
                 pass
 
@@ -606,7 +607,8 @@ def criaComandoACBr(self, nome_arquivo):
                 vprod_num = _num(vProd)
 
                 if cst_txt == "00":
-                    print(f"cst_txt ta zerado", cst_txt)
+                    vBCST = ""
+                    vICMSST = ""
                     # Base do ICMS do item = vProd (se não informada)
                     if bc_num <= 0:
                         bc_num = vprod_num
@@ -631,7 +633,6 @@ def criaComandoACBr(self, nome_arquivo):
                 f.write(f"CST={cst_txt}\r\n")
                 f.write("modBC=3\r\n")  # <<< troque 0 por 3 (valor da operação)
                 _bc = str(vBC).strip().replace(',', '.')
-                print(_bc)
                 if not _bc:
                     _bc = bc_num
                 f.write(f"vBC={_bc}\r\n")
@@ -644,6 +645,8 @@ def criaComandoACBr(self, nome_arquivo):
 
             
             else:
+                vBCST = ""
+                vICMSST = ""
                 if crt in ("1", "2"):   # Simples
                     f.write(f"CSOSN={(getattr(self, 'csosn_padrao', '') or '102')}\r\n\r\n")
                 else:                    # Regime Normal
@@ -665,9 +668,10 @@ def criaComandoACBr(self, nome_arquivo):
                 
             def _fnum(x):
                 try:
-                    return float(str(x).replace(",", "."))
+                    d = Decimal(str(x).replace(",", "."))
+                    return d.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
                 except:
-                    return 0.0
+                    return Decimal("0.00")
 
             tot_vBC   += _fnum(vBC)
             tot_vICMS += _fnum(vICMS)
@@ -676,42 +680,89 @@ def criaComandoACBr(self, nome_arquivo):
 
 
             # ===== PIS por item =====
+            pis_cst = (prod.get('cst_pis') or prod.get('CST_PIS') or '99')
+            pis_vbc = (prod.get('bc_pis')  or prod.get('vBC_PIS') or '0.00')
+            pis_ppc = (prod.get('aliq_pis') or prod.get('pPIS') or '0.00')
+            pis_vvl = (prod.get('vr_pis') or prod.get('valor_pis') or prod.get('vPIS'))
+
+            if not pis_vvl:  # calcula vPIS = vBC * pPIS/100
+                try:
+                    pis_vvl = f"{(float(str(pis_vbc).replace(',','.')) * float(str(pis_ppc).replace(',','.'))/100):.2f}"
+                except:
+                    pis_vvl = "0.00"
+
             f.write(f"[PIS{idx:03d}]\r\n")
-            f.write(f"CST={(prod.get('cst_pis') or prod.get('CST_PIS') or '99')}\r\n")
-            f.write(f"vBC={(prod.get('bc_pis') or prod.get('vBC_PIS') or '0.00')}\r\n")
-            f.write(f"pPIS={(prod.get('aliq_pis') or prod.get('pPIS') or '0.00')}\r\n")
-            f.write(f"vPIS={(prod.get('valor_pis') or prod.get('vPIS') or '0.00')}\r\n\r\n")
+            f.write(f"CST={pis_cst}\r\n")
+            f.write(f"vBC={pis_vbc}\r\n")
+            f.write(f"pPIS={pis_ppc}\r\n")
+            f.write(f"vPIS={pis_vvl}\r\n\r\n")
+
+            # +++ NOVO: acumula total PIS
+            tot_vPIS += _fnum(pis_vvl)
+
 
             # ===== COFINS por item =====
+            cof_cst = (prod.get('cst_cofins') or prod.get('CST_COFINS') or '99')
+            cof_vbc = (prod.get('bc_cofins')  or prod.get('vBC_COFINS') or '0.00')
+            cof_ppc = (prod.get('aliq_cofins') or prod.get('pCOFINS') or '0.00')
+            cof_vvl = (prod.get('vr_cofins') or prod.get('valor_cofins') or prod.get('vCOFINS'))
+
+            if not cof_vvl:  # calcula vCOFINS = vBC * pCOFINS/100
+                try:
+                    cof_vvl = f"{(float(str(cof_vbc).replace(',','.')) * float(str(cof_ppc).replace(',','.'))/100):.2f}"
+                except:
+                    cof_vvl = "0.00"
+
             f.write(f"[COFINS{idx:03d}]\r\n")
-            f.write(f"CST={(prod.get('cst_cofins') or prod.get('CST_COFINS') or '99')}\r\n")
-            f.write(f"vBC={(prod.get('bc_cofins') or prod.get('vBC_COFINS') or '0.00')}\r\n")
-            f.write(f"pCOFINS={(prod.get('aliq_cofins') or prod.get('pCOFINS') or '0.00')}\r\n")
-            f.write(f"vCOFINS={(prod.get('valor_cofins') or prod.get('vCOFINS') or '0.00')}\r\n\r\n")
+            f.write(f"CST={cof_cst}\r\n")
+            f.write(f"vBC={cof_vbc}\r\n")
+            f.write(f"pCOFINS={cof_ppc}\r\n")
+            f.write(f"vCOFINS={cof_vvl}\r\n\r\n")
 
+            # +++ NOVO: acumula total COFINS
+            tot_vCOFINS += _fnum(cof_vvl)
 
-
-        try: frete = float(str(vFrete).replace(",", ".")) 
-        except: frete = 0.0
-        try: seg = float(str(vSeg).replace(",", ".")) 
-        except: seg = 0.0
-        try: outro = float(str(vOutro).replace(",", ".")) 
-        except: outro = 0.0
-        try: ipi = float(str(vIPI).replace(",", ".")) 
-        except: ipi = 0.0
-        try: desc = float(str(vDesc).replace(",", ".")) 
-        except: desc = 0.0
+        try: frete = _fnum(vFrete)
+        except: frete = Decimal("0.00")
+        try: seg = _fnum(vSeg)
+        except: seg = Decimal("0.00")
+        try: outro = _fnum(vOutro)
+        except: outro = Decimal("0.00")
+        try: ipi = _fnum(vIPI)
+        except: ipi = Decimal("0.00")
+        try: desc = _fnum(vDesc)
+        except: desc = Decimal("0.00")
         # ST total já está em tot_vST; se for 0, não impacta
         vNF_calc = (tot_vProd - desc) + frete + seg + outro + ipi + tot_vST
-        vNF_calc = float(f"{vNF_calc:.2f}")  # 2 casas
+        vNF_calc = vNF_calc.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
         # Se vNF vier vazio/zero ou diferente do calculado, força o correto
         try:
-            vNF_num = float(str(vNF).replace(",", "."))
+            vNF_num = _fnum(vNF)
         except:
-            vNF_num = 0.0
-        if vNF_num <= 0.0 or abs(vNF_num - vNF_calc) > 0.01:
+            vNF_num = Decimal("0.00")
+        if (vNF_num <= Decimal("0.00")) or (abs(vNF_num - vNF_calc) > Decimal("0.01")):
             vNF = f"{vNF_calc:.2f}"
+
+        # Fallback: se vPIS/vCOFINS vier vazio ou zero, soma pelos itens
+        def _soma(lista, chave):
+            from decimal import Decimal
+            tot = Decimal("0.00")
+            for p in (lista or []):
+                v = p.get(chave) or p.get(chave.upper()) or "0"
+                try:
+                    tot += Decimal(str(v).replace(",", "."))
+                except:
+                    pass
+            return f"{tot:.2f}"
+
+        if not str(vPIS).strip() or str(vPIS).strip() in {"0", "0.0", "0.00"}:
+            vPIS = f"{tot_vPIS:.2f}"
+
+        if not str(vCOFINS).strip() or str(vCOFINS).strip() in {"0", "0.0", "0.00"}:
+            vCOFINS = f"{tot_vCOFINS:.2f}"
+
+
         # ---------------- [Total] ----------------
         f.write("[Total]\r\n")
         # usa a soma dos itens (garante consistência com o detalhamento)

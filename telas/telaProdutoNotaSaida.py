@@ -8,7 +8,7 @@ import requests
 from PIL import Image
 import datetime
 from telas.telaTotaisNota import telaTotaisNotaSaida
-from componentes import criaFrameJanela, criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel, criaEntry, criaSimouNaoLateral, criaTextAreaModal, criarLabelEntry, criarLabelComboBox, criarLabelLateralComboBox, criarLabelLateralEntry, criaSimouNao
+from componentes import criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel, criaEntry, criaSimouNaoLateral, criaTextAreaModal, criarLabelEntry, criarLabelComboBox, criarLabelLateralComboBox, criarLabelLateralEntry
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
@@ -197,6 +197,8 @@ def telaProdutosNotaSaida(self, cfop):
                 self.framePisCofins.lift()  
             else:
                 self.framePisCofins = criaFrameJanela(frameTelaNotaProduto, 0.5, 0.5, 0.8, 0.9, self.corModal)
+                criaBotaoPequeno(self.framePisCofins, "Calcular", 0.4, 0.95, 0.1, lambda:calculaValores())
+
 
                 opcoes=[    "01 - Operação Tributável (base de cálculo = valor da operação alíquota normal (cumulativo/não cumulativo))",
                             "02 - Operação Tributável (base de cálculo = valor da operação (alíquota diferenciada))",
@@ -497,6 +499,8 @@ def telaProdutosNotaSaida(self, cfop):
             self.vr_cofins_st.set(dados_salvos.get("vr_cofins_st",""))
 
 
+
+
         def calculaValores():
             # VO (valor da operação) pegando do subtotal da linha; se vazio, calcula do básico
             try:
@@ -636,6 +640,35 @@ def telaProdutosNotaSaida(self, cfop):
 
             self.bc_fcp_st.set(f"{bc_fcp_st:.2f}" if bc_fcp_st > 0 else "")
             self.vr_fcp_st.set(f"{vfcp_st:.2f}" if vfcp_st > 0 else "")
+
+            # --- PIS (base = VO, igual à lógica "Valor da Operação") ---
+            try:
+                aliq_pis = float((self.aliq_pis.get() or "0").replace(",", "."))
+            except:
+                aliq_pis = 0.0
+            try:
+                vbc_pis = float((self.bc_pis.get() or "0").replace(",", "."))
+            except:
+                vbc_pis = 0.0
+            if vbc_pis == 0.0:
+                vbc_pis = vo  # mesma base do BC ICMS quando "Valor da Operação"
+            self.bc_pis.set(f"{vbc_pis:.2f}")
+            self.vr_pis.set(f"{(vbc_pis * aliq_pis / 100.0):.2f}")
+
+            # --- COFINS (base = VO, igual à lógica "Valor da Operação") ---
+            try:
+                aliq_cofins = float((self.aliq_cofins.get() or "0").replace(",", "."))
+            except:
+                aliq_cofins = 0.0
+            try:
+                vbc_cofins = float((self.bc_cofins.get() or "0").replace(",", "."))
+            except:
+                vbc_cofins = 0.0
+            if vbc_cofins == 0.0:
+                vbc_cofins = vo  # mesma base do BC ICMS quando "Valor da Operação"
+            self.bc_cofins.set(f"{vbc_cofins:.2f}")
+            self.vr_cofins.set(f"{(vbc_cofins * aliq_cofins / 100.0):.2f}")
+
 
         calculaValores()
         
