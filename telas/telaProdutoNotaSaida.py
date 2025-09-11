@@ -12,7 +12,7 @@ from componentes import criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel,
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
-def telaProdutosNotaSaida(self, cfop):
+def telaProdutosNotaSaida(self, cnpj, cfop):
 
     self.row=1
     self.posicaoy = 0.2
@@ -47,27 +47,6 @@ def telaProdutosNotaSaida(self, cfop):
     def passe(self):
         pass
 
-    def formatar_moeda(event):
-        entrada = event.widget  # widget que disparou o evento
-        texto = entrada.get()
-
-        texto_numerico = ''.join(filter(str.isdigit, texto))
-
-        if not texto_numerico:
-            texto_numerico = "0"
-
-        while len(texto_numerico) < 3:
-            texto_numerico = "0" + texto_numerico
-
-        reais = texto_numerico[:-2]
-        centavos = texto_numerico[-2:]
-
-        valor = f"{int(reais)},{centavos}"
-
-        # Evita piscar o cursor para o final
-        entrada.delete(0, "end")
-        entrada.insert(0, valor)
-
     def buscaProduto(nomeDoProduto, entradaProduto, yNovo):
         if hasattr(self, "resultadoLabelsProduto"):
             for label in self.resultadoLabelsProduto:
@@ -75,10 +54,10 @@ def telaProdutosNotaSaida(self, cfop):
 
         self.resultadoLabelsProduto = []
 
-        for i, row in enumerate(Buscas.buscaProduto(nomeDoProduto)):
+        for i, row in enumerate(Buscas.buscaEstoqueProdutosFiscal(nomeDoProduto, cnpj)):
             if i >= 5:
-                break
-            label = criaBotao(frameParaItensNoFrame,row[0],0.195,yNovo+0.02 + i * 0.02,0.26,lambda nome=row[0], valor=row[1], quantidade=row[2], ent=entradaProduto:selecionaProduto(nome, valor, quantidade, ent))
+                break     
+            label = criaBotao(frameParaItensNoFrame,row[0],0.195,yNovo+0.02 + i * 0.02,0.26,lambda nome=row[0], valor=row[6].replace(',', '.'), quantidade=row[8].replace(',', '.'), ent=entradaProduto:selecionaProduto(nome, valor, quantidade, ent))
             label.configure(fg_color=self.cor, corner_radius=0, font=("TkDefaultFont", 14))
             self.resultadoLabelsProduto.append(label)
 
@@ -91,7 +70,7 @@ def telaProdutosNotaSaida(self, cfop):
             if linha["produto"] == entradaProduto:
                 linha["preco"].delete(0, "end")
                 linha["preco"].insert(0, valor)
-                linha["preco"].configure(state="disabled")
+                # linha["preco"].configure(state="disabled")
 
 
                 linha["quantidade"].delete(0, "end")
@@ -112,6 +91,7 @@ def telaProdutosNotaSaida(self, cfop):
 
                 linha["subtotal"].delete(0, "end")
                 linha["subtotal"].insert(0, valor)
+
                 linha["subtotal_original"] = float(valor)
 
                 break
@@ -750,48 +730,45 @@ def telaProdutosNotaSaida(self, cfop):
             destroyModal()
 
 
-
     def atualizarTotalGeral():
         total = 0.0
 
         for linha in self.linhas:
-            entry_descPorc = linha["desc_porcentagem"]
-            entry_descReal = linha["desc_real"]
-            entry_subtotal = linha["subtotal"]
-            entry_quantida = linha["quantidade"]
-            entry_acrescim = linha["acrescimo"]
-            
-            
-            descReal = float(entry_descReal.get().replace(",", ".") or 0)
-            descPorc = float(entry_descPorc.get().replace(",", ".") or 0)
+            entry_preco       = linha["preco"]
+            entry_descPorc    = linha["desc_porcentagem"]
+            entry_descReal    = linha["desc_real"]
+            entry_subtotal    = linha["subtotal"]
+            entry_quantida    = linha["quantidade"]
+            entry_acrescim    = linha["acrescimo"]
+
+            descReal = float((entry_descReal.get() or "0").replace(",", "."))
+            descPorc = float((entry_descPorc.get() or "0").replace(",", ".")) / 100.0
             quantida = float(entry_quantida.get() or 0)
-            acrescim = float(entry_acrescim.get().replace(",", ".") or 0)
-            descPorc = descPorc/100
+            acrescim = float((entry_acrescim.get() or "0").replace(",", "."))
 
-            valorSubtotal = linha.get("subtotal_original", float(entry_subtotal.get().replace(",", ".") or 0))
+            # Base unitária
+            precoAtual = float((entry_preco.get() or "0").replace(",", "."))
+            valorUnit = (
+                precoAtual if precoAtual > 0
+                else linha.get("subtotal_original", float((entry_subtotal.get() or "0").replace(",", ".")))
+            )
 
-            descReal = float(entry_descReal.get().replace(",", ".") or 0)
+            # 1) Calcula total bruto da linha (preço x quantidade) + acréscimo
+            baseSemDesc = (valorUnit * quantida if quantida > 0 else valorUnit) + acrescim
+            novo_subtotal = baseSemDesc
 
-            novo_subtotal = valorSubtotal - descReal if descReal > 0 else valorSubtotal
+            # 2) Se houver DESCONTO EM R$, aplica UMA VEZ no total da linha
+            if descReal > 0:
+                entry_descPorc.delete(0, "end"); entry_descPorc.insert(0, "0")
+                novo_subtotal = max(baseSemDesc - descReal, 0.0)
 
-            if descReal:
-                entry_descPorc.delete(0, "end")
-                entry_descPorc.insert(0, "0")
-                novo_subtotal = valorSubtotal - descReal if descReal > 0 else valorSubtotal
+            # 3) Se houver DESCONTO EM %, aplica sobre o total da linha
+            elif descPorc > 0:
+                entry_descReal.delete(0, "end"); entry_descReal.insert(0, "0")
+                novo_subtotal = max(baseSemDesc * (1.0 - descPorc), 0.0)
 
-            if descPorc:
-                entry_descReal.delete(0, "end")
-                entry_descReal.insert(0, "0")
-                desconto = valorSubtotal *descPorc if descPorc > 0 and descPorc < 100 else valorSubtotal
-                novo_subtotal = valorSubtotal - desconto
-
-
-            if quantida >0:
-                novo_subtotal = novo_subtotal*quantida+acrescim
-                
             entry_subtotal.delete(0, "end")
             entry_subtotal.insert(0, f"{novo_subtotal:.2f}")
-
             total += novo_subtotal
 
     for i, coluna in enumerate(listaLabels):
@@ -880,6 +857,9 @@ def telaProdutosNotaSaida(self, cfop):
 
                 if campo == 'subtotal':
                     entrada.bind("<KeyRelease>", lambda event: atualizarTotalGeral())
+
+                if campo == "preco":
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
 
 
                 

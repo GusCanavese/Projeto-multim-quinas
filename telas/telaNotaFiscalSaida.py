@@ -155,8 +155,11 @@ def telaNotaFiscalSaida(self, valor):
             case "2949": variavelCFOPNota.set("Compra de mercadoria importada para comercialização/indústria (outro estado)")
             case "2915": variavelCFOPNota.set("Aquisição de bem para imobilizado importado (outro estado)")
             case "2916": variavelCFOPNota.set("Aquisição de material para uso/consumo importado (outro estado)")
-            case "5402": variavelCFOPNota.set("Venda de mercadoria recebida de terceiros sujeita ao reg")
-            case _: variavelCFOPNota.set("")
+            case "5405": variavelCFOPNota.set("Venda de mercadoria recebida de terceiros sujeita ao reg")
+            case "5102": variavelCFOPNota.set("Venda de mercadoria adquirida ou recebida de terceiros")
+            case "1411": variavelCFOPNota.set("Devolução de venda de mercadoria recebida de terceiros em operação com mercadoria sujeita a substituição tributária")
+            case "1202": variavelCFOPNota.set("Devolução de venda de mercadoria adquirida ou recebida de terceiros")
+            case "1926": variavelCFOPNota.set("Lançamento efetuado a título de reclassificação de mercadoria decorrente de formação de kit ou de sua desagregação")
         return variavelCFOPNota.get()
 
 
@@ -275,5 +278,5 @@ def telaNotaFiscalSaida(self, valor):
     formasPag = criarLabelComboBox(self.frameTelaNotaSaida, "Forma de pagamento", 0.4, 0.64, 0.2, opcoesPagamento)
     formasPag.set(self.formaDePagamento.get())
 
-    criaBotao(self.frameTelaNotaSaida, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutosNotaSaida(self, cfop.get())).place(anchor="nw")
+    criaBotao(self.frameTelaNotaSaida, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutosNotaSaida(self, emt.get(), cfop.get())).place(anchor="nw")
     criaBotao(self.frameTelaNotaSaida, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaNotaSaida.destroy()).place(anchor="nw")
