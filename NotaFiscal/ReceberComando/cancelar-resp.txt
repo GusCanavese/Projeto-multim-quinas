@@ -1,0 +1,5 @@
+ERRO: DadosPFX, ArquivoPFX, URLPFX ou NumeroSerie não especificados !
+ERRO: DadosPFX, ArquivoPFX, URLPFX ou NumeroSerie não especificados !
+ERRO: DadosPFX, ArquivoPFX, URLPFX ou NumeroSerie não especificados !
+ERRO: DadosPFX, ArquivoPFX, URLPFX ou NumeroSerie não especificados !
+ERRO: Tempo de Uso Expirou!
