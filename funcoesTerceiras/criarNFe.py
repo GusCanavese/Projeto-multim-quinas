@@ -392,7 +392,45 @@ def criaComandoACBr(self, nome_arquivo):
         V("variavelIdMarketplace", "")
     ).strip()
 
-    # ---------------- Escrever arquivo ----------------
+
+
+
+
+
+
+
+
+
+    ini_path     = r"C:\ACBrMonitorPLUS\ACBrMonitor.ini"
+    pfx_absoluto = r"C:\Users\gus\Desktop\Projeto-multim-quinas\arquivos\certificado.pfx"
+    pfx_senha    = 'nutri@00995'  # a senha correta
+
+    with open(ini_path, "r", encoding="utf-8", errors="ignore") as f:
+        txt = f.read()
+
+    novo_cert = (
+        "[Certificado]\r\n"
+        "SSLLib=1\r\n"
+        "CryptLib=1\r\n"
+        "HttpLib=3\r\n"
+        "XmlSignLib=4\r\n"
+        "SSLType=0\r\n"
+        f"ArquivoPFX={pfx_absoluto}\r\n"
+        "URLPFX=\r\n"          # vazio
+        "NumeroSerie=\r\n"     # vazio
+        f'Senha="{pfx_senha}"\r\n'  # <-- entre aspas para não truncar
+    )
+
+    # substitui toda a seção de uma vez (lambda evita problemas com \U nos paths)
+    txt = re.sub(r'(?s)\[Certificado\]\s*.*?(?=\r?\n\[|$)', lambda m: novo_cert, txt)
+
+    with open(ini_path, "w", encoding="utf-8", newline="\r\n") as f_ini:
+        f_ini.write(txt)
+        f_ini.flush()
+        os.fsync(f_ini.fileno())
+
+
+    # --- agora SIM: grava o arquivo de comando (nome_arquivo) ---
     with open(nome_arquivo, "w", encoding="utf-8", newline="\r\n") as f:
         f.write('NFe.CriarEnviarNFe(\r\n"\r\n')
 
@@ -404,7 +442,7 @@ def criaComandoACBr(self, nome_arquivo):
         f.write("mod=55\r\n")
         f.write(f"serie={serie_int}\r\n")
         f.write(f"nNF={nnf_int}\r\n")
-        f.write(f"dhEmi={data_ptbr} {hora}\r\n")  # única ocorrência
+        f.write(f"dhEmi={data_ptbr} {hora}\r\n")
         f.write(f"tpNF={tpnf}\r\n")
         f.write(f"idDest={idDest}\r\n")
         f.write("tpAmb=2\r\n")
