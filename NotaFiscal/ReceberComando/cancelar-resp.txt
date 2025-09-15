@@ -1,0 +1,9 @@
+ERRO: Erro ao ler informações do Certificado.
+Provavelmente a senha está errada
+Error: 587686001 - error:23076071:PKCS12 routines:PKCS12_parse:mac verify failure
+ERRO: Erro ao ler informações do Certificado.
+Provavelmente a senha está errada
+Error: 587686001 - error:23076071:PKCS12 routines:PKCS12_parse:mac verify failure
+ERRO: Erro ao ler informações do Certificado.
+Provavelmente a senha está errada
+Error: 587686001 - error:23076071:PKCS12 routines:PKCS12_parse:mac verify failure
