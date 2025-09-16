@@ -167,7 +167,7 @@ def telaNotaFiscalSaida(self, valor):
         if valor == "Nutrigel":
             self.variavelRazaoSocialEmitente.set("NUTRIGEL DISTRIBUIDORA EIRELI")
             self.variavelInscEstadualEmitente.set("6259569630086")
-            self.variavelCNPJRazaoSocialEmitente.set("00995044000107")  # 14 dígitos, sem máscara
+            self.variavelCNPJRazaoSocialEmitente.set("00995044000107")
 
             # Endereço do emitente
             self.variavelNumeroEnd          = "126"
@@ -176,21 +176,50 @@ def telaNotaFiscalSaida(self, valor):
             self.variavelComplementoEnd     = "LETRA B"
             self.variavelMunicipioEnd       = "SAO JOAO DEL REI"
             self.variavelUFEnd              = "MG"
-            self.variavelCEPEnd             = "36301194"    
-            self.variavelCodigoMunicipioEnd = "3162500"      
+            self.variavelCEPEnd             = "36301194"
+            self.variavelCodigoMunicipioEnd = "3162500"
             self.variavelTelefoneEnd        = "3233716171"
 
+            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoNutrigel.pfx"
+            self.senhaCertificado   = "nutri@00995"
 
         if valor == "Multimáquinas":
-            self.variavelRazaoSocialEmitente.set("POLIMAQUINAS")
-            self.variavelCNPJRazaoSocialEmitente.set("23889618000150")
-            self.variavelInscEstadualEmitente.set(0)
+            self.variavelRazaoSocialEmitente.set("MULTIMAQUINAS REFRIGERACAO E MAQUINAS DEL REI LTDA")
+            self.variavelCNPJRazaoSocialEmitente.set("05704180000106")  # 14 dígitos, sem máscara
+            self.variavelInscEstadualEmitente.set("6252430230046")
 
+            # Endereço
+            self.variavelNumeroEnd          = "97"
+            self.variavelLogradouroEnd      = "R DOUTOR OSCAR DA CUNHA"
+            self.variavelBairroEnd          = "FABRICAS"
+            self.variavelComplementoEnd     = ""
+            self.variavelMunicipioEnd       = "SAO JOAO DEL REI"
+            self.variavelUFEnd              = "MG"
+            self.variavelCEPEnd             = "36301194"
+            self.variavelCodigoMunicipioEnd = "3162500"
+            self.variavelTelefoneEnd        = "3233713382"
+
+            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoMultimaquinas.pfx"
+            self.senhaCertificado   = "multi2025"
 
         if valor == "Polimáquinas":
-            self.variavelRazaoSocialEmitente.set("NUTRIGEL DISTRIBUIDORA EIRELI")
-            self.variavelCNPJRazaoSocialEmitente.set("009950440001-07")
-            self.variavelInscEstadualEmitente.set(0)
+            self.variavelRazaoSocialEmitente.set("ANA F COELHO RESENDE")
+            self.variavelCNPJRazaoSocialEmitente.set("23889618000150")
+            self.variavelInscEstadualEmitente.set("84549874")  # cartão CNPJ não traz IE
+
+            # Endereço (Vila Velha/ES)
+            self.variavelNumeroEnd          = "30"
+            self.variavelLogradouroEnd      = "R ANA MEROTTO STEFANON"
+            self.variavelBairroEnd          = "COBILANDIA"
+            self.variavelComplementoEnd     = "SALA 03"
+            self.variavelMunicipioEnd       = "VILA VELHA"
+            self.variavelUFEnd              = "ES"
+            self.variavelCEPEnd             = "29111630"      # 29.111-630 -> apenas dígitos
+            self.variavelCodigoMunicipioEnd = "3205200"       # IBGE de Vila Velha/ES
+            self.variavelTelefoneEnd        = "3233713382" 
+
+            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoPolimaquinas.pfx"
+            self.senhaCertificado   = "23889"
 
 
     opcoesPagamento = ["À vista", "À prazo", "Outros"]
@@ -250,7 +279,7 @@ def telaNotaFiscalSaida(self, valor):
     criarLabelEntry(self.frameTelaNotaSaida, "Inscrição Estadual", 0.1, 0.20, 0.15, self.inscricaoEstadualDestinatario)
 
     ctk.CTkLabel(self.frameTelaNotaSaida, text="Emitente----------").place(relx=0.1, rely=0.3)
-    opcoes=["nenhum", "Multimaquinas", "Nutrigel", "Polimáquinas"]
+    opcoes=["nenhum", "Multimáquinas", "Nutrigel", "Polimáquinas"]
     emt = criarLabelComboBox(self.frameTelaNotaSaida, "Razão social", 0.1, 0.35, 0.3, opcoes)
     emt.configure(command= lambda valor: decideEmitente(self, emt.get()))
     criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.35, 0.15, self.variavelCNPJRazaoSocialEmitente)

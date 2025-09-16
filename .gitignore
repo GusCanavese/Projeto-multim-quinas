@@ -10,3 +10,14 @@ Orcamento.pdf
 comIPI.xml
 semIPI.xml
 
+certificados/certificadoMultimaquinas.pfx
+certificados/certificadoNutrigel.pfx
+certificados/certificadoPolimaquinas.pfx
+NotaFiscal/ReceberComando/.tmp
+NotaFiscal/ReceberComando/cert-resp.txt
+NotaFiscal/ReceberComando/enviar-resp.txt
+NotaFiscal/Sequencia/NUM_00000000000000_001.seq
+NotaFiscal/Sequencia/NUM_00995044000107_001.seq
+NotaFiscal/Sequencia/NUM_05704180000106_001.seq
+NotaFiscal/Sequencia/NUM_23889618000150_001.seq
+NotaFiscal/Sequencia/NUM_00995044000107_001.seq

@@ -210,12 +210,6 @@ def aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5):
 # ------------------------ COMANDO ------------------------
 
 def criaComandoACBr(self, nome_arquivo):
-    """
-    Gera um ÚNICO arquivo de comando contendo:
-        NFe.CriarEnviarNFe("...INI...", 1, 1, 1, , 1)
-    usando SOMENTE as variáveis já preenchidas no fluxo das telas.
-    """
-
     os.makedirs(os.path.dirname(nome_arquivo), exist_ok=True)
 
     # atalho para pegar StringVar/valores das telas
@@ -402,36 +396,12 @@ def criaComandoACBr(self, nome_arquivo):
 
 
     ini_path     = r"C:\ACBrMonitorPLUS\ACBrMonitor.ini"
-    pfx_absoluto = r"C:\Users\gus\Desktop\Projeto-multim-quinas\arquivos\certificado.pfx"
-    pfx_senha    = 'nutri@00995'  # a senha correta
-
-    with open(ini_path, "r", encoding="utf-8", errors="ignore") as f:
-        txt = f.read()
-
-    novo_cert = (
-        "[Certificado]\r\n"
-        "SSLLib=1\r\n"
-        "CryptLib=1\r\n"
-        "HttpLib=3\r\n"
-        "XmlSignLib=4\r\n"
-        "SSLType=0\r\n"
-        f"ArquivoPFX={pfx_absoluto}\r\n"
-        "URLPFX=\r\n"          # vazio
-        "NumeroSerie=\r\n"     # vazio
-        f'Senha="{pfx_senha}"\r\n'  # <-- entre aspas para não truncar
-    )
-
-    # substitui toda a seção de uma vez (lambda evita problemas com \U nos paths)
-    txt = re.sub(r'(?s)\[Certificado\]\s*.*?(?=\r?\n\[|$)', lambda m: novo_cert, txt)
-
-    with open(ini_path, "w", encoding="utf-8", newline="\r\n") as f_ini:
-        f_ini.write(txt)
-        f_ini.flush()
-        os.fsync(f_ini.fileno())
+    pfx_absoluto = self.caminhoCertificado
+    pfx_senha    = self.senhaCertificado
 
 
-    # --- agora SIM: grava o arquivo de comando (nome_arquivo) ---
-    with open(nome_arquivo, "w", encoding="utf-8", newline="\r\n") as f:
+    with open(nome_arquivo, "w", encoding="utf-8", newline="") as f:
+        # 2) Criar e enviar a NFe (BLOCO ÚNICO)
         f.write('NFe.CriarEnviarNFe(\r\n"\r\n')
 
         # [infNFe] / [Identificacao]
@@ -453,7 +423,6 @@ def criaComandoACBr(self, nome_arquivo):
         f.write(f"indPres={indPres}\r\n")
         f.write("procEmi=0\r\n")
         f.write("verProc=Sistema Python\r\n")
-
         # >>> NOVO: indicativo do intermediador conforme indPres
         if indPres in {"2", "3", "4", "9"}:
             if len(marketplace_cnpj) == 14:
@@ -837,27 +806,26 @@ def criaComandoACBr(self, nome_arquivo):
         f.write('"\r\n,1,1,1, ,1)')
 
 def criarNFE(self):
-
-
-
-    itens = getattr(self, "dadosProdutos", {}) or {}
-    print("\n================ TRIBUTAÇÃO POR ITEM ================\n")
-    for nome_prod, campos in itens.items():
-        print(f"[ITEM] {nome_prod}")
-        for k, v in dict(campos).items():
-            print(f"  {k}: {v}")
-        print("-" * 52)
-    if not itens:
-        print("(nenhum item salvo em self.dadosProdutos)")
-    print("\n=====================================================\n")
-
-    """
-    Cria NotaFiscal/EnviarComando/enviar.txt (CriarEnviarNFe),
-    garante normalizações essenciais e aguarda o retorno do ACBr.
-    """
     os.makedirs(ACBR_CMD_DIR, exist_ok=True)
     os.makedirs(ACBR_RSP_DIR, exist_ok=True)
 
+    # 1) SET CERTIFICADO (COMANDO ISOLADO)
+    cert_cmd  = os.path.join(ACBR_CMD_DIR, "cert.txt")
+    cert_resp = os.path.join(ACBR_RSP_DIR, "cert-resp.txt")
+    try:
+        if os.path.exists(cert_resp):
+            os.remove(cert_resp)
+    except Exception:
+        pass
+
+    with open(cert_cmd, "w", encoding="utf-8", newline="") as f:
+        f.write(f'NFe.SetCertificado("{self.caminhoCertificado}","{self.senhaCertificado}")\r\n')
+
+    r1 = aguarda_acbr_resposta(cert_resp, timeout=60, interval=0.2)
+    if not r1.get("ok"):
+        return r1  # se falhou o certificado, para aqui
+
+    # 2) CRIAR/ENVIAR NFe (COMANDO COMPLETO)
     cmd_path  = os.path.join(ACBR_CMD_DIR, "enviar.txt")
     resp_path = os.path.join(ACBR_RSP_DIR, "enviar-resp.txt")
     try:
@@ -866,15 +834,12 @@ def criarNFE(self):
     except Exception:
         pass
 
-    criaComandoACBr(self, cmd_path)
-    # >>> PATCH: preenche campos faltantes de endereço
+    criaComandoACBr(self, cmd_path)  # agora escreve só o CriarEnviarNFe(...)
     _preencher_enderecos_faltantes_arquivo(self, cmd_path)
-    # <<< PATCH
-    # pequeno delay para o Monitor consumir
-    time.sleep(0.5)
 
     resultado = aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5)
     return resultado
+
 
 # compatibilidade (se alguma parte do seu app ainda chamar gerarNFe)
 gerarNFe = criarNFE
