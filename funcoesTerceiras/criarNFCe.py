@@ -327,6 +327,7 @@ def criaComandoACBr(self, nome_arquivo):
     _IBGE2MUN = {
         "3162500": "SAO JOAO DEL REI",
         "3106200": "BELO HORIZONTE",
+        "3168804": "TIRADENTES",
     }
     # Emitente
     if not emit_xMun:
@@ -342,6 +343,12 @@ def criaComandoACBr(self, nome_arquivo):
             dest_cMun = emit_cMun
             dest_xMun = _IBGE2MUN.get(dest_cMun, emit_xMun)
     dest_xMun = re.sub(r"[^ -ÿ]", "", (dest_xMun or "").upper()).strip()
+    # Ajuste coerente: se só veio xMun (ex.: TIRADENTES) e não veio cMun,
+    # derive o código IBGE a partir do nome para evitar inconsistência 999
+    _MUN2IBGE = {v: k for k, v in _IBGE2MUN.items()}
+    if not dest_cMun and dest_xMun:
+        dest_cMun = _MUN2IBGE.get(dest_xMun, dest_cMun)
+
 
     # ---------------- Totais / Pagamento ----------------
     vNF      = V("valorLiquido", "0.00") or "0.00"
@@ -844,7 +851,11 @@ def criaComandoACBr(self, nome_arquivo):
             vCOFINS = f"{tot_vCOFINS:.2f}"
 
 
-        # ---------------- [Total] ----------------
+        
+        # coerência de ST: se não houve ST nos itens, zere vBCST
+        if tot_vST == Decimal("0.00"):
+            tot_vBCST = Decimal("0.00")
+# ---------------- [Total] ----------------
         f.write("[Total]\r\n")
         f.write(f"vBC={tot_vBC:.2f}\r\n")
         f.write(f"vBCST={tot_vBCST:.2f}\r\n")
@@ -872,7 +883,7 @@ def criaComandoACBr(self, nome_arquivo):
 
 
         # Encerramento do comando
-        f.write('"\r\n,1,1,1, ,1)')
+        f.write('",1,1,1,1)')
 
 def criarNFE(self):
     os.makedirs(ACBR_CMD_DIR, exist_ok=True)
