@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from tkinter import messagebox
 from componentes import criaFrameJanela, criaBotao, criaTextArea
-from funcoesTerceiras import criarNFe
+from funcoesTerceiras import criarNFe, criarNFCe
 
 
 def telaObservacoesNotaSaida(self):
@@ -63,5 +63,10 @@ def telaObservacoesNotaSaida(self):
     self.variavelObservacoes.set(0)
 
     criaBotao(self.frameTelaObservacoes, "salvar", 0.25, 0.94, 0.15, lambda: criarNFe.gerarNFe(self)).place(anchor="nw")
+    criaBotao(self.frameTelaObservacoes, "Gerar nfc-e", 0.40, 0.94, 0.15, lambda: criarNFCe.gerarNFe(self)).place(anchor="nw")
+
     # criaBotao(self.frameTelaObservacoes, "consultar", 0.55, 0.94, 0.15, lambda: criarNFe.consultar_ultimo_recibo(self)).place(anchor="nw")
     criaBotao(self.frameTelaObservacoes, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaObservacoes.destroy()).place(anchor="nw")
+
+
+# COLOCAR O CAMINHO CORRETO DOS CERTIFICADOS

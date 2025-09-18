@@ -180,7 +180,7 @@ def telaNotaFiscalSaida(self, valor):
             self.variavelCodigoMunicipioEnd = "3162500"
             self.variavelTelefoneEnd        = "3233716171"
 
-            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoNutrigel.pfx"
+            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\multimaquinas\certificados\certificadoNutrigel.pfx"
             self.senhaCertificado   = "nutri@00995"
 
         if valor == "Multimáquinas":
@@ -199,7 +199,7 @@ def telaNotaFiscalSaida(self, valor):
             self.variavelCodigoMunicipioEnd = "3162500"
             self.variavelTelefoneEnd        = "3233713382"
 
-            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoMultimaquinas.pfx"
+            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\multimaquinas\certificados\certificadoMultimaquinas.pfx"
             self.senhaCertificado   = "multi2025"
 
         if valor == "Polimáquinas":
@@ -214,13 +214,12 @@ def telaNotaFiscalSaida(self, valor):
             self.variavelComplementoEnd     = "SALA 03"
             self.variavelMunicipioEnd       = "VILA VELHA"
             self.variavelUFEnd              = "ES"
-            self.variavelCEPEnd             = "29111630"      # 29.111-630 -> apenas dígitos
-            self.variavelCodigoMunicipioEnd = "3205200"       # IBGE de Vila Velha/ES
+            self.variavelCEPEnd             = "29111630"
+            self.variavelCodigoMunicipioEnd = "3205200"
             self.variavelTelefoneEnd        = "3233713382" 
 
-            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoPolimaquinas.pfx"
+            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\multimaquinas\certificados\certificadoMultimaquinas.pfx"
             self.senhaCertificado   = "23889"
-
 
     opcoesPagamento = ["À vista", "À prazo", "Outros"]
     opcoesTransporte = [

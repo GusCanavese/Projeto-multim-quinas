@@ -49,7 +49,6 @@ def confirmarSalvamentoDoFaturamento(self, quantidade, valor, formaPag, data, pe
 
 
 def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data, repeticao):
-    print("aoooopa")
 
     confirmado = "Não"
     if 1:

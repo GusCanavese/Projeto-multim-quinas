@@ -103,5 +103,5 @@ def telaObservacoes(self, dadosNota):
             self.frameEscolherNotaFiscal.destroy()
         except Exception as e:
             print(f"Erro ao inserir nota fiscal: {e}")
-    criaBotao(self.frameTelaObservacoes, "salvar", 0.25, 0.94, 0.15, lambda: insereRetorna()).place(anchor="nw")
+    criaBotao(self.frameTelaObservacoes, "Gerar nf-e", 0.25, 0.94, 0.15, lambda: insereRetorna()).place(anchor="nw")
     criaBotao(self.frameTelaObservacoes, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaObservacoes.destroy()).place(anchor="nw")
