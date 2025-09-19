@@ -27,6 +27,7 @@ import telas.telagerarFaturamento
 import telas.telaContasAPagarEAReceber
 import telas.telaNotaFiscalSaida
 import telas.telaProdutoNotaSaida
+import telas.telaSpedFiscal
 # import random
 
 # ctk.set_appearance_mode("system")  
@@ -83,7 +84,8 @@ class App(ctk.CTk):
         self.corModal = "#404040"
 
 
-        telas.telaLogin.telaLogin(self)
+        # telas.telaLogin.telaLogin(self)
+        telas.telaSpedFiscal.telaSpeedFiscal(self)
         # telas.telaEstoque.telaEstoque(self)
         # telas.telaProdutoNotaSaida.telaProdutosNotaSaida(self, 1)
         # telas.telaNotaFiscalSaida.telaNotaFiscalSaida(self, 0)

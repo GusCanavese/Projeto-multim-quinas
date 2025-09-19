@@ -451,6 +451,119 @@ def criaComandoACBr(self, nome_arquivo):
             f.write("\r\n")
         # <<< NOVO
 
+
+        #  [Transp] - modalidade de frete
+        try:
+            _modfrete = ""
+            # tenta nas variáveis que você já usa na tela nova, sem mudar a sua lógica
+            for _cand in ("variavelModalidadeFrete", "variavelModalidade", "modFrete", "modalidadeFrete"):
+                try:
+                    _v = V(_cand)  # se sua função V existir, usa; se não existir, cai no except
+                except Exception:
+                    try:
+                        _v = globals().get(_cand) or locals().get(_cand)
+                    except Exception:
+                        _v = None
+                if _v not in (None, "", "None"):
+                    _modfrete = str(_v).strip()
+                    break
+            if not _modfrete:
+                _modfrete = "0"  # padrão NFe: 0=por conta do emitente
+            f.write("[Transp]\r\n")
+            f.write(f"modFrete={_modfrete}\r\n\r\n")
+        except Exception:
+            # não interrompe o fluxo caso algo não exista
+            pass
+
+        # [Transportador] - identificação (opcional, só grava se houver algum valor)
+        try:
+            _cnpjcpf = ""
+            for _cand in ("variavelCNPJTransportador","cnpjTransportador","cpfCnpjTransportador",
+                        "documentoTransportador","transportadora_cnpj","CNPJTransportador"):
+                try:
+                    _v = V(_cand)
+                except Exception:
+                    _v = globals().get(_cand) or locals().get(_cand)
+                if _v not in (None,"","None"):
+                    _cnpjcpf = str(_v).strip()
+                    break
+
+            _xnome = ""
+            for _cand in ("variavelTransportador","nomeTransportador","transportador","transportadora_nome"):
+                try:
+                    _v = V(_cand)
+                except Exception:
+                    _v = globals().get(_cand) or locals().get(_cand)
+                if _v not in (None,"","None"):
+                    _xnome = str(_v).strip()
+                    break
+
+            if _cnpjcpf or _xnome:
+                f.write("[Transportador]\r\n")
+                if _cnpjcpf: f.write(f"CNPJCPF={_cnpjcpf}\r\n")
+                if _xnome:   f.write(f"xNome={_xnome}\r\n")
+                f.write("\r\n")
+        except Exception:
+            pass
+
+        # [RetTransp] - retenção ICMS de transporte (opcional)
+        try:
+            def _norm_dec(_val):
+                # mantém o estilo do seu projeto: trocar vírgula por ponto só se vier string
+                if _val is None or _val == "None" or _val == "":
+                    return ""
+                _s = str(_val).strip()
+                return _s.replace(",", ".")
+
+            _vServ   = ""
+            _vBCRet  = ""
+            _pICMSRet= ""
+            _vICMSRet= ""
+            _CFOP    = ""
+            _cMunFG  = ""
+
+            # valores
+            for _name, _store in (
+                (("variavelValorServicoTransp","variavelValorServicoTransporte","vServTransp","vServ"), "_vServ"),
+                (("variavelBCRetencaoICMS","vBCRetTransp","vBCRet"), "_vBCRet"),
+                (("variavelAliquotaRetICMS","pICMSRetTransp","pICMSRet"), "_pICMSRet"),
+                (("variavelValorICMSRetido","vICMSRetTransp","vICMSRet"), "_vICMSRet"),
+                (("variavelCFOPTransporte","variavelCFOPTransp","cfopTransp","CFOPTransp","CFOP"), "_CFOP"),
+                (("variavelMunicipioGerador","cMunFGTransp","municipioGeradorCod","cMunFG"), "_cMunFG"),
+            ):
+                _val = None
+                for _cand in _name:
+                    try:
+                        _v = V(_cand)
+                    except Exception:
+                        _v = globals().get(_cand) or locals().get(_cand)
+                    if _v not in (None,"","None"):
+                        _val = _v
+                        break
+                if _store == "_vServ":    _vServ    = _norm_dec(_val)
+                if _store == "_vBCRet":   _vBCRet   = _norm_dec(_val)
+                if _store == "_pICMSRet": _pICMSRet = _norm_dec(_val)
+                if _store == "_vICMSRet": _vICMSRet = _norm_dec(_val)
+                if _store == "_CFOP":     _CFOP     = str(_val).strip() if _val not in (None,"","None") else ""
+                if _store == "_cMunFG":   _cMunFG   = str(_val).strip() if _val not in (None,"","None") else ""
+
+            if any(( _vServ, _vBCRet, _pICMSRet, _vICMSRet, _CFOP, _cMunFG )):
+                f.write("[RetTransp]\r\n")
+                if _vServ:     f.write(f"vServ={_vServ}\r\n")
+                if _vBCRet:    f.write(f"vBCRet={_vBCRet}\r\n")
+                if _pICMSRet:  f.write(f"pICMSRet={_pICMSRet}\r\n")
+                if _vICMSRet:  f.write(f"vICMSRet={_vICMSRet}\r\n")
+                if _CFOP:      f.write(f"CFOP={_CFOP}\r\n")
+                if _cMunFG:    f.write(f"cMunFG={_cMunFG}\r\n")
+                f.write("\r\n")
+        except Exception:
+            pass
+
+        # <<<<< END_TRANSPORTE_PATCH (NFe) >>>>>
+
+
+
+
         # [Emitente]
         f.write("[Emitente]\r\n")
         cnpj_ok = cnpjEmit if len(cnpjEmit) == 14 else ""
