@@ -78,6 +78,11 @@ def criarLabelComboBox(frame, texto, relx, rely, width, lista):
     entry.place(relx=relx, rely=rely + 0.04, relwidth=width, anchor="w")
     return entry
 
+
+def checkbox(frame, texto, relx, rely, comando):
+    checkbox = ctk.CTkCheckBox(master = frame, text=texto, variable=None, onvalue="on", offvalue="off", command=lambda:comando)
+    checkbox.place(relx=relx, rely=rely)
+
 def criaComboBox(frame, relx, rely, width, lista, comando):
     entry = ctk.CTkComboBox(frame, values=lista, corner_radius=0, command=comando)
     entry.bind("<Key>", lambda e: "break")

@@ -84,8 +84,8 @@ class App(ctk.CTk):
         self.corModal = "#404040"
 
 
-        # telas.telaLogin.telaLogin(self)
-        telas.telaSpedFiscal.telaSpeedFiscal(self)
+        telas.telaLogin.telaLogin(self)
+        # telas.telaSpedFiscal.telaSpeedFiscal(self)
         # telas.telaEstoque.telaEstoque(self)
         # telas.telaProdutoNotaSaida.telaProdutosNotaSaida(self, 1)
         # telas.telaNotaFiscalSaida.telaNotaFiscalSaida(self, 0)
