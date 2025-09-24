@@ -180,7 +180,7 @@ def telaNotaFiscalSaida(self, valor):
             self.variavelCodigoMunicipioEnd = "3162500"
             self.variavelTelefoneEnd        = "3233716171"
 
-            self.caminhoCertificado = r"C:\Users\gus\Desktop\Projeto-multim-quinas\NotaFiscal\certificados\certificadoNutrigel.pfx"
+            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoNutrigel.pfx"
             self.senhaCertificado   = "nutri@00995"
 
         if valor == "Multimáquinas":
@@ -199,7 +199,7 @@ def telaNotaFiscalSaida(self, valor):
             self.variavelCodigoMunicipioEnd = "3162500"
             self.variavelTelefoneEnd        = "3233713382"
 
-            self.caminhoCertificado = r"C:\Users\gus\Desktop\Projeto-multim-quinas\NotaFiscal\certificados\certificadoMultimaquinas.pfx"
+            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoMultimaquinas.pfx"
             self.senhaCertificado   = "multi2025"
 
         if valor == "Polimáquinas":
@@ -218,7 +218,7 @@ def telaNotaFiscalSaida(self, valor):
             self.variavelCodigoMunicipioEnd = "3205200"
             self.variavelTelefoneEnd        = "3233713382" 
 
-            self.caminhoCertificado = r"C:\Users\gus\Desktop\Projeto-multim-quinas\NotaFiscal\certificados\certificadoPolimaquinas.pfx"
+            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoPolimaquinas.pfx"
             self.senhaCertificado   = "23889"
 
     opcoesPagamento = ["À vista", "À prazo", "Outros"]

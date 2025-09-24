@@ -6,6 +6,7 @@
 # - indIntermed conforme indPres (NT 2020.006): indIntermed=0/1 e bloco [infIntermed] quando houver marketplace
 # - NOVO: nNF auto-incremental por CNPJ+Série quando não informado (evita duplicidade 539)
 
+import sys
 import os
 import pathlib
 import re
@@ -13,6 +14,7 @@ import time
 import random
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
+from consultas.insert import inserir_nota_fiscal
 
 # --- helper injetado: preenche campos faltantes de endereço nos blocos [Emitente] e [Destinatario]
 def _V_get(self, attr, default=""):
@@ -166,6 +168,83 @@ def _proximo_numero_nfe(cnpj_sem_mascara, serie_int):
     except Exception:
         pass
     return proximo
+
+def _max_nnf_logs(cnpj_sem_mascara, serie_int, logs_dir=r"C:\ACBrMonitorPLUS\Logs"):
+    try:
+        import os, glob, re
+        import xml.etree.ElementTree as ET
+        max_n = 0
+        for pat in ("*-nfe.xml", "*-procNFe.xml"):
+            for path in glob.glob(os.path.join(logs_dir, pat)):
+                try:
+                    tree = ET.parse(path)
+                    root = tree.getroot()
+                    ns = {"n": root.tag.split("}")[0].strip("{")}
+                    inf = root.find(".//n:infNFe", ns)
+                    if inf is None:
+                        continue
+                    ide = inf.find("n:ide", ns)
+                    if ide is None:
+                        continue
+                    cnpj_el = root.find(".//n:emit/n:CNPJ", ns)
+                    if cnpj_el is None:
+                        continue
+                    cnpj_xml = _so_digitos(cnpj_el.text)
+                    if cnpj_xml != cnpj_sem_mascara:
+                        continue
+                    serie_xml = ide.find("n:serie", ns)
+                    nnf_xml   = ide.find("n:nNF",  ns)
+                    if serie_xml is None or nnf_xml is None:
+                        continue
+                    if int(serie_xml.text) != int(serie_int):
+                        continue
+                    n = int(re.sub(r"\D+", "", nnf_xml.text or "0"))
+                    if n > max_n:
+                        max_n = n
+                except Exception:
+                    continue
+        return max_n
+    except Exception:
+        return 0
+
+def _grava_seq(cnpj_sem_mascara, serie_int, valor):
+    path = _seq_path(cnpj_sem_mascara, serie_int)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(str(int(valor)))
+    except Exception:
+        pass
+
+def _proximo_nnf_unico(self, cnpj_sem_mascara, serie_int):
+    # 1) maior nNF AUTORIZADO no banco
+    mx = 0
+    try:
+        from db import cursor as _dbcursor
+        _dbcursor.execute(
+            "SELECT COALESCE(MAX(numero),0) "
+            "FROM notas_fiscais "
+            "WHERE emitente_cnpjcpf=%s AND modelo=55 AND serie=%s AND COALESCE(cancelada,0)=0 "
+            "AND (UPPER(COALESCE(status,''))='AUTORIZADA' OR COALESCE(cStat,0) IN (100,150))",
+            (cnpj_sem_mascara, int(serie_int))
+        )
+        row = _dbcursor.fetchone()
+        mx = int(row[0] or 0)
+    except Exception:
+        mx = 0
+
+    # 2) sequência local (.seq)
+    seq_val = _proximo_numero_nfe(cnpj_sem_mascara, serie_int)
+
+    # 3) maior nNF já usado nos XMLs do ACBr (Logs)
+    log_max = _max_nnf_logs(cnpj_sem_mascara, serie_int)
+
+    # 4) escolhe o maior candidato + garante persistência da sequência
+    val = max(seq_val, mx + 1, log_max + 1)
+    if val != seq_val:
+        _grava_seq(cnpj_sem_mascara, serie_int, val)
+    return val
+
 # ------------------------ FIM Sequência ------------------------
 
 
@@ -234,12 +313,22 @@ def criaComandoACBr(self, nome_arquivo):
     cnpj_emit_for_seq = _so_digitos(V("variavelCNPJRazaoSocialEmitente", ""))
 
     # nNF: homologação sempre usa sequência local por CNPJ+Série (evita 539)
-    raw_nnf = V("variavelNumeroDaNota", "") or V("nNF", "")
-    if _so_digitos(raw_nnf):
-        nnf_int = int(_so_digitos(raw_nnf))
-    else:
-        nnf_int = _proximo_numero_nfe(cnpj_emit_for_seq, serie_int)
+# homologação: força nNF único por CNPJ+Série (consulta banco + .seq)
+    nnf_int = _proximo_nnf_unico(self, cnpj_emit_for_seq, serie_int)
 
+
+    
+
+
+    # garantir número/série visíveis para insert.py
+    if hasattr(self, "variavelNumeroDaNota") and hasattr(self.variavelNumeroDaNota, "set"):
+        self.variavelNumeroDaNota.set(str(nnf_int))
+    else:
+        self.variavelNumeroDaNota = str(nnf_int)
+    if hasattr(self, "variavelSerieDaNota") and hasattr(self.variavelSerieDaNota, "set"):
+        self.variavelSerieDaNota.set(str(serie_int))
+    else:
+        self.variavelSerieDaNota = str(serie_int)
 
     # Data/Hora
     data_ptbr = V("variavelDataDocumento", "")
@@ -257,6 +346,7 @@ def criaComandoACBr(self, nome_arquivo):
         data_ptbr = datetime.now().strftime("%d/%m/%Y")
     hora = V("variavelHoraEntradaSaida", "") or datetime.now().strftime("%H:%M:%S")
 
+    data_iso = datetime.strptime(data_ptbr, "%d/%m/%Y").strftime("%Y-%m-%d")
     ent_saida = (V("variavelEntradaOuSaida", "Saída") or "Saída").lower()
     tpnf      = 0 if "entra" in ent_saida else 1  # 0=Entrada, 1=Saída
 
@@ -283,8 +373,8 @@ def criaComandoACBr(self, nome_arquivo):
 
 
     # ---------------- Destinatário ----------------
-    xNomeDest = self.nomeDestinatario
-    cnpjDest  = self.documentoDestinatario
+    xNomeDest = V("nomeDestinatario", "")
+    cnpjDest  = V("documentoDestinatario", "")
     ieDest    = self.inscricaoEstadualDestinatario.get()
     dest_xLgr = self.ruaDestinatario
     dest_nro  = self.numeroDestinatario
@@ -566,7 +656,7 @@ def criaComandoACBr(self, nome_arquivo):
 
         # [Emitente]
         f.write("[Emitente]\r\n")
-        cnpj_ok = cnpjEmit if len(cnpjEmit) == 14 else ""
+        cnpj_ok = _so_digitos(cnpjEmit)
         f.write(f"CNPJ={cnpj_ok}\r\n")
         f.write(f"xNome={xNomeEmit}\r\n")
         ie_num = _so_digitos(ieEmit)
@@ -941,6 +1031,28 @@ def criaComandoACBr(self, nome_arquivo):
         f.write(f"vIPI={vIPI}\r\n")
         f.write(f"vPIS={vPIS}\r\n")
         f.write(f"vCOFINS={vCOFINS}\r\n\r\n")
+        # campos que o insert.py lê
+        self.variavelValorTotalNota = str(vNF)
+        self.variavelValorProdutos  = f"{tot_vProd:.2f}"
+        self.variavelValorDesconto  = str(vDesc)
+        self.variavelValorFrete     = str(vFrete)
+        self.variavelValorSeguro    = str(vSeg)
+        self.variavelOutros         = str(vOutro)
+        self.variavelBaseICMS       = f"{tot_vBC:.2f}"
+        self.variavelValorICMS      = f"{tot_vICMS:.2f}"
+        self.variavelBaseICMSST     = f"{tot_vBCST:.2f}"
+        self.variavelValorICMSST    = f"{tot_vST:.2f}"
+        self.variavelValorIPI       = str(vIPI)
+        self.variavelValorPIS       = str(vPIS)
+        self.variavelValorCOFINS    = str(vCOFINS)
+        
+        # destinatário para insert.py
+        self.variavelNomeRazaoDestinatario = xNomeDest
+        self.variavelCNPJDestinatario      = cnpjDest
+
+        self.variavelDataEmissao    = f"{data_iso} {hora}"
+        self.variavelDataSaida      = f"{data_iso} {hora}"
+
 
 
         # ---------------- [Transportador] ----------------
@@ -988,6 +1100,11 @@ def criarNFE(self):
     _preencher_enderecos_faltantes_arquivo(self, cmd_path)
 
     resultado = aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5)
+
+        
+    status = "AUTORIZADA" if str(resultado.get("cStat")) in ("100", "150") else "GERADA"
+    xml_path = resultado.get("xml") or ""
+    inserir_nota_fiscal(self, tipo="NFe", xml_path=xml_path, status=status)
     return resultado
 
 

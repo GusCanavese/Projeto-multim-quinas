@@ -79,8 +79,8 @@ def criarLabelComboBox(frame, texto, relx, rely, width, lista):
     return entry
 
 
-def checkbox(frame, texto, relx, rely, comando):
-    checkbox = ctk.CTkCheckBox(master = frame, text=texto, variable=None, onvalue="on", offvalue="off", command=lambda:comando)
+def checkbox(frame, texto, relx, rely, variavel, comando):
+    checkbox = ctk.CTkCheckBox(master = frame, text=texto, variable=variavel, onvalue="on", offvalue="off", command=lambda:comando)
     checkbox.place(relx=relx, rely=rely)
 
 def criaComboBox(frame, relx, rely, width, lista, comando):

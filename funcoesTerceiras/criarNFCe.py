@@ -919,6 +919,18 @@ def criarNFE(self):
     _preencher_enderecos_faltantes_arquivo(self, cmd_path)
 
     resultado = aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5)
+    try:
+        try:
+            from consultas.insert import inserir_nota_fiscal
+        except Exception:
+            import sys
+            sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+            from consultas.insert import inserir_nota_fiscal
+
+        status = "AUTORIZADA" if str(resultado.get("cStat")) in ("100", "150") else "GERADA"
+        inserir_nota_fiscal(self, tipo="NFCe", xml_path=resultado.get("xml"), status=status)
+    except Exception as e:
+        print("Falha ao salvar NFCe no banco:", e)
     return resultado
 
 

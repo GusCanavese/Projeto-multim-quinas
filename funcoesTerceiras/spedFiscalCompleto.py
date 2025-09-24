@@ -1,494 +1,465 @@
-"""
-sped_fiscal_completo.py
-------------------------------------
-Gera arquivo SPED Fiscal (EFD ICMS/IPI) cobrindo TODOS os blocos padrão
-(0, C, D, E, G, H, K, 1 e 9), com dados reais quando disponíveis no mesmo *data model*
-do seu `criarNFe.py` e "sem movimento" (IND_MOV=1) quando não houver dados.
+# funcoesTerceiras/spedFiscalCompleto.py
+import os, re, glob, json, datetime
+from collections import Counter, defaultdict
+from pathlib import Path
+from xml.etree import ElementTree as ET
 
-Versão de leiaute (padrão): 3.1.8 (vigente em 2025). Pode ser alterada pelo parâmetro `versao_layout`.
-
-Como usar rapidamente
----------------------
-from sped_fiscal_completo import gerar_sped_fiscal_completo
-
-# self = seu objeto de emissão que já usa criarNFe.py
-caminho = gerar_sped_fiscal_completo(self,
-                                     caminho_txt="sped_fiscal_COMPLETO.txt",
-                                     dt_ini="20250801", dt_fin="20250831")
-
-Observações importantes
------------------------
-- Este módulo produz um arquivo tecnicamente completo, com todos os blocos e fechamentos.
-- Onde não houver dados na sua aplicação (ex.: serviços, inventário, CIAP, K200), o bloco é aberto
-  com sem-movimento (IND_MOV=1). Você pode alimentar dados opcionais para cada bloco (ver docstrings).
-- Para a apuração do ICMS (Bloco E), aceita um parâmetro `apuracao_icms` para informar débitos/créditos
-  reais. Se você não passar, será feita uma apuração **simplificada** a partir dos C190 (somatório dos
-  débitos ICMS de saída) e créditos = 0 (o que pode não refletir sua realidade). Ajuste conforme seu caso.
-"""
-
-from datetime import datetime
-import calendar
-import os
-import re
-from collections import defaultdict, Counter
+try:
+    import db  # opcional: deve expor 'cursor'
+except Exception:
+    db = None
 
 
-# ------------------- helpers -------------------
-def _sd(x):
-    return re.sub(r"\D", "", str(x or ""))
+def gerar_sped_fiscal_completo(
+    self,
+    caminho_txt,
+    dt_ini,
+    dt_fin,
+    pasta_logs=None,
+    usar_fallback_xml=True,
+    blocos_ativos=("0", "C", "9"),
+    incluir_0005=False,
+    incluir_0100=False,
+):
+    """
+    EFD ICMS/IPI parametrizável, com ordem de blocos canônica e Bloco 9 sem duplicidade.
+    Ordem: 0, B, C, D, E, G, H, K, 1, 9 (o 9 sempre por último).
+    - Blocos extras (B, D, E, G, H, K, 1) saem "sem movimento" quando incluídos.
+    - C190 com 11 campos + COD_OBS vazio (|| no final), alíquota e valores com vírgula.
+    """
 
-def _get_strvar(obj, attr, default=""):
-    try:
-        v = getattr(obj, attr)
-        if hasattr(v, "get"):
-            return (v.get() or "").strip()
-        return (str(v) or "").strip()
-    except Exception:
-        return str(default)
+    # ---------------- helpers ----------------
+    def _somente_dig(s): 
+        return re.sub(r"\D+", "", str(s or ""))
 
-def _get_num(obj, attr, default=0.0):
-    try:
-        v = getattr(obj, attr)
-        if hasattr(v, "get"):
-            v = v.get()
-        v = str(v).replace(",", ".")
-        return float(v or 0.0)
-    except Exception:
-        return float(default)
+    def _parse_dt(s):
+        return datetime.date(int(s[0:4]), int(s[4:6]), int(s[6:8]))
 
-def _dt_yyyymmdd(dt):
-    s = (dt or "").strip()
-    if re.fullmatch(r"\d{8}", s):  # YYYYMMDD
-        return s
-    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", s):
-        return s.replace("-", "")
-    if re.fullmatch(r"\d{2}/\d{2}/\d{4}", s):
-        d, m, y = s.split("/")
-        return f"{y}{m}{d}"
-    return datetime.now().strftime("%Y%m%d")
+    def _get(attr, default=""):
+        v = getattr(self, attr, default)
+        try:
+            if hasattr(v, "get"):
+                return str(v.get())
+        except Exception:
+            pass
+        return str(v)
 
-def _reg(*campos):
-    return "|" + "|".join("" if c is None else str(c) for c in campos) + "|\r\n"
+    def _safe(el, tag, ns=None, default=""):
+        if el is None:
+            return default
+        if ns and ":" not in tag:
+            tag = f"n:{tag}"
+        node = el.find(tag, ns) if ns else el.find(tag)
+        if node is not None and node.text and node.text.strip():
+            return node.text.strip()
+        return default
 
-# contador por registro, para Bloco 9 (9900)
-class RegCount:
-    def __init__(self):
-        self.c = Counter()
-    def add(self, codigo):
-        self.c[codigo] += 1
-    def items(self):
-        return self.c.items()
+    def _num(x):
+        try:
+            return float(str(x).replace(",", "."))
+        except Exception:
+            return 0.0
 
-# ------------------- mapeamentos do seu criarNFe.py -------------------
+    def _fmt(v):
+        try:
+            return f"{float(v):.2f}".replace(".", ",")
+        except Exception:
+            return "0,00"
 
-def _get_emit_dest(self):
+    def _norm_cst(cst):
+        s = _somente_dig(cst)
+        if len(s) == 0: return "000"
+        if len(s) == 1: return "00"+s
+        if len(s) == 2: return "0"+s
+        return s[:3]
+
+    def _s(v):  # sanear textos para campos com pipe
+        return ("" if v is None else str(v)).replace("|","/").strip()
+
+    def ativo(letra: str) -> bool:
+        return letra in set(x.upper() for x in blocos_ativos)
+
+    # ---------------- período / xmls ----------------
+    d_i, d_f = _parse_dt(dt_ini), _parse_dt(dt_fin)
+    if not pasta_logs:
+        pasta_logs = getattr(self, "caminhoLogsAcbr", r"C:\ACBrMonitorPLUS\Logs")
+    pasta_logs = os.path.abspath(pasta_logs)
+    xmls = []
+    if usar_fallback_xml:
+        pats = ["*-procNFe.xml", "*-procNFCe.xml", "*-nfe.xml", "*-nfce.xml"]
+        for p in pats:
+            xmls += glob.glob(os.path.join(pasta_logs, p))
+        xmls = sorted(set(xmls))
+
+    # ---------------- emitente (0000) ----------------
     emit = {
-        "CNPJ": _sd(_get_strvar(self, "variavelCNPJRazaoSocialEmitente")) or "00995044000107",
-        "xNome": _get_strvar(self, "variavelRazaoSocialEmitente") or "EMITENTE DEMO",
-        "IE": (_get_strvar(self, "inscricaoEstadualEmitente") or "ISENTO").upper(),
-        "UF": _get_strvar(self, "ufEmitente", "MG"),
-        "xMun": _get_strvar(self, "munEmitente", "SAO JOAO DEL REI"),
-        "CEP": _get_strvar(self, "cepEmitente", "36301194"),
-        "ender": {
-            "xLgr": _get_strvar(self, "logradouroEmitente", "RUA DEMO"),
-            "nro": _get_strvar(self, "numeroEmitente", "0"),
-            "xBairro": _get_strvar(self, "bairroEmitente", "CENTRO"),
-            "cMun": _get_strvar(self, "cMunEmitente", "3162500"),
-            "fone": _get_strvar(self, "foneEmitente", ""),
-        },
-        "IM": _get_strvar(self, "inscricaoMunicipalEmitente", ""),
-        "EMAIL": _get_strvar(self, "emailEmitente", ""),
+        "COD_VER": "019",
+        "FINALIDADE": 0,
+        "NOME": _get("variavelRazaoSocialEmitente", "") or _get("razaoSocialEmitente", "EMITENTE"),
+        "CNPJ": _somente_dig(_get("variavelCNPJRazaoSocialEmitente", "") or _get("cnpjEmitente", "")),
+        "UF": (_get("variavelUFEnd", "") or _get("estadoEmitente", "MG")).strip().upper() or "MG",
+        "IE": _somente_dig(_get("variavelInscEstadualEmitente", "") or _get("ieEmitente", "")) or "ISENTO",
+        "COD_MUN": _somente_dig(_get("variavelCodigoMunicipioEnd", "") or _get("codigoIBGEEmitente", "") or _get("codMunEmitente", "")),
+        "IM": _get("imEmitente", ""),
+        "SUFRAMA": "",
+        "IND_ATIV": "1",
+        "PERFIL": {"Perfil A":"A","Perfil B":"B","Perfil C":"C"}.get(_get("perfilSped","Perfil A"),"A"),
     }
-    if emit["IE"] != "ISENTO":
-        emit["IE"] = _sd(emit["IE"]) or "ISENTO"
+    cbf = getattr(self, "cbFinalidade", None)
+    if cbf and hasattr(cbf, "get") and "sub" in cbf.get().lower():
+        emit["FINALIDADE"] = 1
+    cbp = getattr(self, "cbPerfil", None)
+    if cbp and hasattr(cbp, "get"):
+        emit["PERFIL"] = {"Perfil A":"A","Perfil B":"B","Perfil C":"C"}.get(cbp.get(), emit["PERFIL"])
 
-    dest = {
-        "CNPJCPF": _sd(_get_strvar(self, "variavelCNPJRazaoSocialRemetente")),
-        "xNome": _get_strvar(self, "variavelRazaoSocialRemetente"),
-        "UF": _get_strvar(self, "ufDestinatario", emit["UF"]),
-        "xMun": _get_strvar(self, "munDestinatario", emit["xMun"]),
-        "IE": _get_strvar(self, "ieDestinatario", ""),
-    }
-    if dest["IE"] and dest["IE"].upper() != "ISENTO":
-        dest["IE"] = _sd(dest["IE"])
-    return emit, dest
+    # fallbacks via DB
+    if (len(emit["CNPJ"])!=14 or not emit["UF"] or not emit["COD_MUN"] or emit["IE"]=="ISENTO") and db and getattr(db, "cursor", None):
+        try:
+            cur = db.cursor
+            cur.execute("""
+                SELECT emitente_cnpjcpf, emitente_nome, emitente_ie, emitente_cod_mun, emitente_uf
+                FROM notas_fiscais
+                WHERE COALESCE(cancelada,0)=0
+                ORDER BY dhEmi DESC LIMIT 1
+            """)
+            r = cur.fetchone()
+            if r:
+                cnpj_db = _somente_dig(r[0] or "")
+                if len(emit["CNPJ"])!=14 and len(cnpj_db)==14: emit["CNPJ"]=cnpj_db
+                if not emit["NOME"] and r[1]: emit["NOME"]=str(r[1])
+                ie_db = _somente_dig(r[2] or "")
+                if emit["IE"]=="ISENTO" and ie_db: emit["IE"]=ie_db
+                cm_db = _somente_dig(r[3] or "")
+                if not emit["COD_MUN"] and cm_db: emit["COD_MUN"]=cm_db
+                uf_db = (r[4] or "").strip().upper()
+                if not emit["UF"] and uf_db: emit["UF"]=uf_db
+        except Exception:
+            pass
 
-def _coleta_unidades_produtos(itens):
-    unids = set()
-    prods = {}
-    for it in itens:
-        u = (it.get("unidade") or "UN").upper()
-        unids.add(u)
-        cProd = it.get("codigo") or "1"
-        prods[cProd] = {
-            "cProd": cProd,
-            "xProd": it.get("descricao") or "ITEM",
-            "NCM": it.get("ncm") or "00000000",
-            "uCom": u,
-        }
-    return sorted(unids), prods
+    # fallback via primeiro XML
+    if usar_fallback_xml and (len(emit["CNPJ"])!=14 or not emit["UF"] or not emit["COD_MUN"] or emit["IE"]=="ISENTO"):
+        for xp in xmls:
+            try:
+                root = ET.parse(xp).getroot()
+                ns = {"n": root.tag.split("}")[0].strip("{")}
+                inf = root.find(".//n:infNFe", ns)
+                if inf is None: continue
+                e = inf.find("n:emit", ns); end = e.find("n:enderEmit", ns) if e is not None else None
+                if e is not None:
+                    cnpj_xml = _somente_dig(_safe(e, "CNPJ", ns))
+                    if len(emit["CNPJ"])!=14 and len(cnpj_xml)==14: emit["CNPJ"]=cnpj_xml
+                    ie_xml = _somente_dig(_safe(e, "IE", ns))
+                    if emit["IE"]=="ISENTO" and ie_xml: emit["IE"]=ie_xml
+                    nome_xml = _safe(e, "xNome", ns)
+                    if emit["NOME"]=="EMITENTE" and nome_xml: emit["NOME"]=nome_xml
+                if end is not None:
+                    cod_mun_xml = _somente_dig(_safe(end, "cMun", ns))
+                    if not emit["COD_MUN"] and cod_mun_xml: emit["COD_MUN"]=cod_mun_xml
+                    uf_xml = (_safe(end, "UF", ns) or "").strip().upper()
+                    if not emit["UF"] and uf_xml: emit["UF"]=uf_xml
+                break
+            except Exception:
+                continue
 
-def _agrega_c190(itens, regime="SN"):
-    acc = defaultdict(lambda: {"vBC": 0.0, "vICMS": 0.0, "vIPI": 0.0, "vProd": 0.0})
-    for it in itens:
-        cfop = (it.get("cfop") or "5102")
-        cst = (it.get("cst") or it.get("cst_icms") or "").strip()
-        csosn = (it.get("csosn") or "").strip()
-        key_cst = csosn if regime == "SN" and csosn else (cst or "00")
-        vbc = float(str(it.get("vBC") or it.get("bc_icms") or 0).replace(",", ".") or 0)
-        vicms = float(str(it.get("vICMS") or it.get("valor_icms") or 0).replace(",", ".") or 0)
-        vipi = float(str(it.get("valor_ipi") or 0).replace(",", ".") or 0)
-        vprod = float(str(it.get("valor_total") or it.get("valor_unitario") or 0).replace(",", ".") or 0)
-        key = (cfop, key_cst)
-        acc[key]["vBC"] += vbc
-        acc[key]["vICMS"] += vicms
-        acc[key]["vIPI"] += vipi
-        acc[key]["vProd"] += vprod
-    return acc
+    # garantias mínimas (validador indicará se inválido)
+    if len(emit["CNPJ"])!=14: emit["CNPJ"]="00000000000000"
+    if not emit["COD_MUN"]: emit["COD_MUN"]="0000000"
 
-# ------------------- blocos -------------------
+    # ---------------- Coleta de Notas ----------------
+    notas = []
+    partes = {}
 
-def _bloco_0(self, linhas, rc: RegCount, dt_ini, dt_fin, versao_layout="3.1.8"):
-    emit, dest = _get_emit_dest(self)
-    COD_VER = "018" if versao_layout == "3.1.8" else "019"
-    COD_FIN = "0"
-    NOME = emit["xNome"]; CNPJ = emit["CNPJ"]; UF = emit["UF"]; IE = emit["IE"]
-    COD_MUN = emit["ender"]["cMun"]; IM = emit["IM"]; SUFRAMA=""
-    IND_PERFIL = "A"; IND_ATIV = "0"
+    # Banco (prioridade)
+    try:
+        if db and getattr(db, "cursor", None):
+            cur = db.cursor
+            di = datetime.datetime(d_i.year, d_i.month, d_i.day, 0,0,0)
+            df = datetime.datetime(d_f.year, d_f.month, d_f.day, 23,59,59)
+            cur.execute("""
+                SELECT modelo, serie, numero, chave, tpNF, dhEmi,
+                       valor_total, valor_desconto, valor_produtos, valor_frete, valor_seguro, valor_outras_despesas,
+                       valor_bc_icms, valor_icms, valor_bc_icms_st, valor_icms_st, valor_ipi, valor_pis, valor_cofins, itens_json,
+                       destinatario_cnpj, destinatario_nome
+                  FROM notas_fiscais
+                 WHERE dhEmi BETWEEN %s AND %s AND COALESCE(cancelada,0)=0
+            """, (di, df))
+            rows = cur.fetchall()
+            cols = [d[0] for d in cur.description]
+            for r in rows:
+                rec = dict(zip(cols, r))
+                d_emis = rec.get("dhEmi")
+                if isinstance(d_emis, str):
+                    try: d_emis = datetime.datetime.fromisoformat(d_emis)
+                    except Exception: d_emis = di
+                if isinstance(d_emis, datetime.date) and not isinstance(d_emis, datetime.datetime):
+                    d_emis = datetime.datetime(d_emis.year, d_emis.month, d_emis.day)
 
-    def add(*campos):
-        linhas.append(_reg(*campos)); rc.add(campos[0])
+                mod = str(rec.get("modelo") or "55")
+                serie = int(rec.get("serie") or 0)
+                nnf = int(rec.get("numero") or 0)
+                chv = str(rec.get("chave") or "")
+                tpNF = str(rec.get("tpNF") or "1")
 
-    add("0000", COD_VER, COD_FIN, dt_ini, dt_fin, NOME, CNPJ, UF, IE, COD_MUN, IM, SUFRAMA, IND_PERFIL, IND_ATIV)
-    add("0001", "0")
-    # 0005
-    FANTASIA = NOME; CEP = _get_strvar(self, "cepEmitente", "")
-    END = emit["ender"]["xLgr"]; NUM = emit["ender"]["nro"]; COMPL = ""; BAIRRO = emit["ender"]["xBairro"]
-    FONE = emit["ender"]["fone"]; FAX = ""; EMAIL = emit["EMAIL"]
-    add("0005", FANTASIA, CEP, END, NUM, COMPL, BAIRRO, FONE, FAX, EMAIL)
+                vNF = float(rec.get("valor_total") or 0.0)
+                vDesc = float(rec.get("valor_desconto") or 0.0)
+                vProd = float(rec.get("valor_produtos") or 0.0)
+                vFrete = float(rec.get("valor_frete") or 0.0)
+                vSeg = float(rec.get("valor_seguro") or 0.0)
+                vOutros = float(rec.get("valor_outras_despesas") or 0.0)
 
-    # 0100 (contabilista) - opcional; preenche vazio por padrão
-    CRC = _get_strvar(self, "crcContador", "")
-    NOME_CON = _get_strvar(self, "nomeContador", "")
-    CPF_CON = _sd(_get_strvar(self, "cpfContador", ""))
-    CRC_UF = _get_strvar(self, "ufCRC", "")
-    FONE_CON = _get_strvar(self, "foneContador", "")
-    EMAIL_CON = _get_strvar(self, "emailContador", "")
-    COD_MUN_CON = _get_strvar(self, "cMunContador", "")
-    if NOME_CON or CPF_CON or CRC:
-        add("0100", NOME_CON, CPF_CON, CRC, CRC_UF, FONE_CON, EMAIL_CON, COD_MUN_CON)
+                vBC = float(rec.get("valor_bc_icms") or 0.0)
+                vICMS = float(rec.get("valor_icms") or 0.0)
+                vBCST = float(rec.get("valor_bc_icms_st") or 0.0)
+                vICMSST = float(rec.get("valor_icms_st") or 0.0)
+                vIPI = float(rec.get("valor_ipi") or 0.0)
+                vPIS = float(rec.get("valor_pis") or 0.0)
+                vCOFINS = float(rec.get("valor_cofins") or 0.0)
 
-    # 0150 participantes (emitente/dest)
-    add("0150", "EMIT", NOME, "", CNPJ, "", IE, UF, "", emit["xMun"])
-    if dest.get("CNPJCPF") or dest.get("xNome"):
-        add("0150", "DEST", dest.get("xNome") or "DESTINATARIO", "", dest.get("CNPJCPF"), "", dest.get("IE"), dest.get("UF"), "", dest.get("xMun"))
+                cod_part = _somente_dig(rec.get("destinatario_cnpj") or "") or f"CF-{nnf}"
+                nome_dest = (rec.get("destinatario_nome") or "CONSUMIDOR FINAL").strip() or "CONSUMIDOR FINAL"
+                partes.setdefault(cod_part, {
+                    "NOME": nome_dest[:100], "CNPJ": _somente_dig(rec.get("destinatario_cnpj") or ""),
+                    "CPF": "", "COD_PAIS": "1058", "IE": "", "COD_MUN": "", "SUFRAMA": "",
+                    "END": "", "NUM": "", "COMPL": "", "BAIRRO": "",
+                })
 
-    # 0190 unidades e 0200 produtos
-    itens = list(getattr(self, "valoresDosItens", []) or [])
-    unids, produtos = _coleta_unidades_produtos(itens)
-    for u in unids:
-        add("0190", u, u)
-    for cProd, prod in produtos.items():
-        add("0200", cProd, prod["xProd"], "", prod["NCM"], "", "", "", prod["uCom"], "", "", "")
-        # 0205 (alteração item) omitido, a menos que você forneça self.prod_alteracoes
+                items = []
+                raw = rec.get("itens_json")
+                if raw:
+                    try:
+                        if isinstance(raw, (bytes, bytearray)): raw = raw.decode("utf-8", "ignore")
+                        data = json.loads(raw)
+                        items = data.get("itens", []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
+                    except Exception:
+                        items = []
 
-    # 0400/0450/0460 (cadastros auxiliares) — preencher se você tiver essas tabelas
-    # por padrão, omitimos para não "sujar" o arquivo com códigos fictícios
+                c100 = {
+                    "IND_OPER": "1" if tpNF=="1" else "0",
+                    "IND_EMIT": "0",
+                    "COD_PART": cod_part,
+                    "COD_MOD": mod,
+                    "COD_SIT": "00",
+                    "SER": serie, "NUM_DOC": nnf, "CHV_NFE": chv,
+                    "DT_DOC": d_emis.strftime("%d%m%Y"), "DT_E_S": d_emis.strftime("%d%m%Y"),
+                    "VL_DOC": vNF, "IND_PGTO": "0", "VL_DESC": vDesc, "VL_ABAT_NT": 0.0,
+                    "VL_MERC": vProd, "IND_FRT": "0", "VL_FRT": vFrete, "VL_SEG": vSeg, "VL_OUT_DA": vOutros,
+                    "VL_BC_ICMS": vBC, "VL_ICMS": vICMS, "VL_BC_ICMS_ST": vBCST, "VL_ICMS_ST": vICMSST,
+                    "VL_IPI": vIPI, "VL_PIS": vPIS, "VL_COFINS": vCOFINS, "VL_PIS_ST": 0.0, "VL_COFINS_ST": 0.0,
+                    "C190": defaultdict(lambda: {"VL_OPR":0.0,"VL_BC_ICMS":0.0,"VL_ICMS":0.0,"VL_BC_ICMS_ST":0.0,"VL_ICMS_ST":0.0,"VL_RED_BC":0.0,"VL_IPI":0.0}),
+                }
+                for it in items:
+                    cfop = str(it.get("CFOP") or it.get("cfop") or "5102")
+                    cst  = _norm_cst(it.get("CST") or it.get("CSOSN") or it.get("cst") or it.get("csosn") or "00")
+                    aliq = _num(it.get("pICMS") or it.get("aliqICMS") or it.get("pIcms") or 0)
+                    v_item = _num(it.get("vProd") or it.get("valor_produto") or it.get("valor") or 0)
+                    vbc_i  = _num(it.get("vBC") or it.get("bc_icms") or 0)
+                    vicms_i= _num(it.get("vICMS") or it.get("icms") or 0)
+                    k = (cst, cfop, round(aliq,2))
+                    ag = c100["C190"][k]
+                    ag["VL_OPR"] += v_item; ag["VL_BC_ICMS"] += vbc_i; ag["VL_ICMS"] += vicms_i
+                    ag["VL_BC_ICMS_ST"] += _num(it.get("vBCST") or 0)
+                    ag["VL_ICMS_ST"] += _num(it.get("vICMSST") or 0)
+                    ag["VL_IPI"] += _num(it.get("vIPI") or 0)
 
-def _bloco_C(self, linhas, rc: RegCount, dt_ini, dt_fin):
-    def add(*campos):
-        linhas.append(_reg(*campos)); rc.add(campos[0])
+                notas.append(c100)
+    except Exception:
+        pass
 
-    itens = list(getattr(self, "valoresDosItens", []) or [])
-    tem_docs = bool(itens)
-    add("C001", "0" if tem_docs else "1")
-    if not tem_docs:
-        return
+    # Fallback via XML (se nada no banco)
+    if usar_fallback_xml and not notas:
+        for xp in xmls:
+            try:
+                root = ET.parse(xp).getroot()
+                ns = {"n": root.tag.split("}")[0].strip("{")}
+                inf = root.find(".//n:infNFe", ns)
+                if inf is None: continue
+                ide = inf.find("n:ide", ns); tot = inf.find("n:total/n:ICMSTot", ns)
+                d_doc = _safe(ide, "dEmi", ns); dhEmi = _safe(ide, "dhEmi", ns)
+                if d_doc: d_emis = datetime.date.fromisoformat(d_doc)
+                else: d_emis = datetime.date.fromisoformat((dhEmi or "0000-01-01")[:10])
+                if not (d_i <= d_emis <= d_f): continue
 
-    # capa NF-e C100
-    regime = "SN" if str(_get_strvar(self, "crt", "1")) in ("1","2") else "NR"
-    ind_oper = "1" if _get_strvar(self, "variavelEntradaOuSaida", "1") == "1" else "0"
-    ind_emit = "1"
-    cod_part = "DEST" if ind_oper == "1" else "EMIT"
-    mod = "55"
-    nnf = _get_strvar(self, "variavelNumeroDaNota", "1")
-    serie = _get_strvar(self, "variavelSerieDaNota", "1")
-    chave = _get_strvar(self, "variavelChaveDaNota", "")
+                mod = _safe(ide, "mod", ns) or "55"
+                serie = int(_safe(ide, "serie", ns) or "1")
+                nnf = int(_safe(ide, "nNF", ns) or "0")
+                tpNF = _safe(ide, "tpNF", ns) or "1"
+                chv = (inf.attrib.get("Id","") or "").replace("NFe","")
 
-    data_emissao = _get_strvar(self, "data_emissao", "")
-    if "/" in data_emissao:
-        d, m, y = data_emissao.split("/")[:3]
-        dt_e = f"{y}{m}{d}"
-    else:
-        dt_e = dt_ini
+                dest = inf.find("n:dest", ns)
+                d_nome = _safe(dest, "xNome", ns) or "CONSUMIDOR FINAL"
+                d_cnpj = _somente_dig(_safe(dest, "CNPJ", ns))
+                d_cpf  = _somente_dig(_safe(dest, "CPF", ns))
+                cod_part = (d_cnpj or d_cpf) or f"CF-{nnf}"
+                partes.setdefault(cod_part, {"NOME": d_nome[:100], "CNPJ": d_cnpj, "CPF": d_cpf,
+                                             "COD_PAIS":"1058", "IE":"", "COD_MUN":"", "SUFRAMA":"",
+                                             "END":"", "NUM":"", "COMPL":"", "BAIRRO":""})
 
-    vl_doc = _get_num(self, "valorLiquido", 0.0)
-    vl_desc = _get_num(self, "totalDesconto", 0.0)
-    vl_frt = _get_num(self, "totalFrete", 0.0)
-    vl_seg = _get_num(self, "totalSeguro", 0.0)
-    vl_out_da = _get_num(self, "outrasDespesas", 0.0)
-    vl_bc_icms = _get_num(self, "vBC", 0.0)
-    vl_icms    = _get_num(self, "valorICMS", 0.0)
-    vl_ipi     = _get_num(self, "totalIPI", 0.0)
+                def g(x): return _num(_safe(tot, x, ns) or "0")
+                vNF, vDesc, vProd = g("vNF"), g("vDesc"), g("vProd")
+                vBC, vICMS = g("vBC"), g("vICMS")
+                vBCST, vICMSST = g("vBCST"), g("vICMSST")
+                vIPI, vPIS, vCOFINS = g("vIPI"), g("vPIS"), g("vCOFINS")
+                vFrete, vSeg, vOutros = g("vFrete"), g("vSeg"), g("vOutro")
 
-    add("C100", ind_oper, ind_emit, cod_part, "00", mod, serie, nnf, dt_e, dt_e,
-        "1", "1", "1", f"{vl_doc:.2f}", f"{vl_desc:.2f}", "0.00", f"{vl_frt:.2f}",
-        f"{vl_seg:.2f}", f"{vl_out_da:.2f}", f"{vl_bc_icms:.2f}", f"{vl_icms:.2f}",
-        "0.00", f"{vl_ipi:.2f}", "0.00", "", "", "", chave)
+                c100 = {
+                    "IND_OPER": "1" if tpNF=="1" else "0",
+                    "IND_EMIT": "0", "COD_PART": cod_part, "COD_MOD": mod, "COD_SIT": "00",
+                    "SER": serie, "NUM_DOC": nnf, "CHV_NFE": chv,
+                    "DT_DOC": d_emis.strftime("%d%m%Y"), "DT_E_S": d_emis.strftime("%d%m%Y"),
+                    "VL_DOC": vNF, "IND_PGTO": "0", "VL_DESC": vDesc, "VL_ABAT_NT": 0.0,
+                    "VL_MERC": vProd, "IND_FRT": "0", "VL_FRT": vFrete, "VL_SEG": vSeg, "VL_OUT_DA": vOutros,
+                    "VL_BC_ICMS": vBC, "VL_ICMS": vICMS, "VL_BC_ICMS_ST": vBCST, "VL_ICMS_ST": vICMSST,
+                    "VL_IPI": vIPI, "VL_PIS": vPIS, "VL_COFINS": vCOFINS, "VL_PIS_ST": 0.0, "VL_COFINS_ST": 0.0,
+                    "C190": defaultdict(lambda: {"VL_OPR":0.0,"VL_BC_ICMS":0.0,"VL_ICMS":0.0,"VL_BC_ICMS_ST":0.0,"VL_ICMS_ST":0.0,"VL_RED_BC":0.0,"VL_IPI":0.0}),
+                }
 
-    # C170 itens
-    for idx, it in enumerate(itens, start=1):
-        q = float(str(it.get("quantidade", "0")).replace(",", ".") or 0)
-        v_un = float(str(it.get("valor_unitario", "0")).replace(",", ".") or 0)
-        v_prod = float(str(it.get("valor_total", v_un)).replace(",", ".") or 0)
-        cfop = it.get("cfop") or "5102"
-        cst = (it.get("cst") or it.get("cst_icms") or it.get("csosn") or "00")
-        x_prod = it.get("descricao") or "ITEM"
-        u = (it.get("unidade") or "UN").upper()
-        aliq_icms = float(str(it.get("aliq_icms", "0")).replace(",", ".") or 0)
-        vbc = float(str(it.get("vBC") or it.get("bc_icms") or 0).replace(",", ".") or 0)
-        vicms = float(str(it.get("vICMS") or it.get("valor_icms") or 0).replace(",", ".") or 0)
-        vipi = float(str(it.get("valor_ipi") or 0).replace(",", ".") or 0)
-        add("C170", idx, x_prod, u, f"{q:.4f}", f"{v_un:.6f}", f"{v_prod:.2f}", cst, cfop, "", "",
-            f"{vbc:.2f}", f"{aliq_icms:.2f}", f"{vicms:.2f}", "0.00", "0.00", "0.00", "0.00", "0.00",
-            "0.00", "0.00", "0.00", f"{vipi:.2f}")
+                for det in inf.findall("n:det", ns):
+                    prod = det.find("n:prod", ns); icms = det.find("n:imposto/n:ICMS", ns)
+                    cfop = _safe(prod, "CFOP", ns) or "5102"
+                    n = list(icms)[0] if (icms is not None and len(icms)) else None
+                    cst = _safe(n, "CST", ns) or _safe(n, "CSOSN", ns)
+                    aliq = _num(_safe(n, "pICMS", ns) or "0")
+                    v_item = _num(_safe(prod, "vProd", ns) or "0")
+                    vbc_i  = _num(_safe(n, "vBC", ns) or "0")
+                    vicms_i= _num(_safe(n, "vICMS", ns) or "0")
+                    k = (_norm_cst(cst) if cst else "000", cfop, round(aliq,2))
+                    ag = c100["C190"][k]
+                    ag["VL_OPR"] += v_item; ag["VL_BC_ICMS"] += vbc_i; ag["VL_ICMS"] += vicms_i
+                notas.append(c100)
+            except Exception:
+                continue
 
-    # C190 agregação por CFOP/tributação
-    agreg = _agrega_c190(itens, regime=regime)
-    for (cfop, cst_ou_csosn), tot in sorted(agreg.items()):
-        add("C190", cst_ou_csosn, cfop, "0.00", f"{tot['vBC']:.2f}", f"{tot['vICMS']:.2f}",
-            "0.00", "0.00", f"{tot['vIPI']:.2f}", f"{tot['vProd']:.2f}")
-
-def _bloco_D(self, linhas, rc: RegCount, docs_servicos=None):
-    def add(*campos):
-        linhas.append(_reg(*campos)); rc.add(campos[0])
-
-    tem_docs = bool(docs_servicos)
-    add("D001", "0" if tem_docs else "1")
-    if not tem_docs:
-        return
-    # Exemplos (D100/D190) poderiam ser gerados se você fornecer docs_servicos (lista de dicts)
-    # Aqui mantemos apenas a abertura quando houver dados.
-
-def _bloco_E(self, linhas, rc: RegCount, dt_ini, dt_fin, apuracao_icms=None):
-    def add(*campos):
-        linhas.append(_reg(*campos)); rc.add(campos[0])
-
-    # Abre bloco E com movimento se houver NF-e (C100) ou se apuração for passada
-    tem_c = any(ln.startswith("|C100|") for ln in linhas)
-    add("E001", "0" if (tem_c or apuracao_icms) else "1")
-    if not (tem_c or apuracao_icms):
-        return
-
-    add("E100", dt_ini, dt_fin)
-
-    # Apuração simplificada ou informada
-    if apuracao_icms is None:
-        # pega débitos ICMS de C190
-        total_debitos = 0.0
-        for ln in linhas:
-            # |C190|CST|CFOP|ALIQ|vBC|vICMS|...
-            if ln.startswith("|C190|"):
-                split = ln.strip().split("|")
-                vICMS = float(split[6].replace(",", ".") if split[6] else 0.0)
-                total_debitos += vICMS
-        apuracao_icms = {
-            "VL_TOT_DEBITOS": total_debitos,
-            "VL_TOT_CREDITOS": 0.0,
-            "VL_AJ_DEBITOS": 0.0,
-            "VL_AJ_CREDITOS": 0.0,
-            "VL_ESTORNOS_DEBITOS": 0.0,
-            "VL_ESTORNOS_CREDITOS": 0.0,
-            "VL_SLD_CREDOR_ANT": 0.0,
-            "VL_OUT_DEB": 0.0,
-            "VL_OUT_CRED": 0.0,
-        }
-
-    # Campos mínimos E110 (simplificado)
-    deb = float(apuracao_icms.get("VL_TOT_DEBITOS", 0))
-    cre = float(apuracao_icms.get("VL_TOT_CREDITOS", 0))
-    ajd = float(apuracao_icms.get("VL_AJ_DEBITOS", 0))
-    ajc = float(apuracao_icms.get("VL_AJ_CREDITOS", 0))
-    estd = float(apuracao_icms.get("VL_ESTORNOS_DEBITOS", 0))
-    estc = float(apuracao_icms.get("VL_ESTORNOS_CREDITOS", 0))
-    sld_ant = float(apuracao_icms.get("VL_SLD_CREDOR_ANT", 0))
-    odeb = float(apuracao_icms.get("VL_OUT_DEB", 0))
-    ocred = float(apuracao_icms.get("VL_OUT_CRED", 0))
-
-    vl_sld_apurado = (deb + ajd + odeb - estd) - (cre + ajc + ocred - estc) - sld_ant
-    vl_sld_transp = abs(vl_sld_apurado) if vl_sld_apurado < 0 else 0.0
-    vl_icms_recolher = vl_sld_apurado if vl_sld_apurado > 0 else 0.0
-
-    add("E110",
-        f"{deb:.2f}", f"{ajd:.2f}", f"{estd:.2f}", f"{cre:.2f}", f"{ajc:.2f}", f"{estc:.2f}",
-        f"{sld_ant:.2f}", f"{odeb:.2f}", f"{ocred:.2f}",
-        f"{vl_sld_apurado:.2f}", f"{vl_sld_transp:.2f}", f"{vl_icms_recolher:.2f}", "0.00")
-
-    if vl_icms_recolher > 0:
-        # E116: obrigações do ICMS a recolher (vencimento básico = dia 15 do mês seguinte)
-        y, m, d = int(dt_fin[:4]), int(dt_fin[4:6]), int(dt_fin[6:8])
-        # aproxima o vencimento: dia 15 próximo mês
-        if m == 12:
-            venc = f"{y+1}01{15:02d}"
-        else:
-            venc = f"{y}{m+1:02d}{15:02d}"
-        # COD_OR = "000" (código genérico – ajuste conforme sua UF)
-        add("E116", "000", f"{vl_icms_recolher:.2f}", venc, "", "", "", "", "", "")
-
-def _bloco_G(self, linhas, rc: RegCount, ciap=None):
-    def add(*campos):
-        linhas.append(_reg(*campos)); rc.add(campos[0])
-    add("G001", "0" if ciap else "1")
-    # Preencher G110/G125 se você fornecer lançamentos de CIAP em `ciap`
-
-def _bloco_H(self, linhas, rc: RegCount, inventario=None, dt_inv=None):
-    def add(*campos):
-        linhas.append(_reg(*campos)); rc.add(campos[0])
-
-    tem_inv = bool(inventario)
-    add("H001", "0" if tem_inv else "1")
-    if not tem_inv:
-        return
-    dt_inv = _dt_yyyymmdd(dt_inv or datetime.now().strftime("%Y-%m-%d"))
-    vl_inv = 0.0
-    add("H005", dt_inv, "0", "0.00")  # motivo 0=Inventário no final do período; VL_INV ajustado abaixo
-    # H010 itens inventariados
-    for it in inventario:
-        cProd = it.get("codigo") or "1"
-        xProd = it.get("descricao") or "ITEM"
-        u = (it.get("unidade") or "UN").upper()
-        qtd = float(str(it.get("quantidade") or 0).replace(",", ".") or 0)
-        vUnit = float(str(it.get("valor_unitario") or 0).replace(",", ".") or 0)
-        vlItem = float(str(it.get("valor_total") or (qtd*vUnit)).replace(",", ".") or 0)
-        vl_inv += vlItem
-        add("H010", cProd, xProd, u, f"{qtd:.4f}", f"{vUnit:.6f}", f"{vlItem:.2f}", "", "", "", "")
-    # Ajusta o VL_INV no H005: regrava linha com valor
-    for i, ln in enumerate(linhas):
-        if ln.startswith("|H005|"):
-            campos = ln.strip().split("|")
-            campos[4] = f"{vl_inv:.2f}"
-            linhas[i] = "|".join(campos) + "|\r\n"
-            break
-
-def _bloco_K(self, linhas, rc: RegCount, k200_estoque=None, periodo=None):
-    def add(*campos):
-        linhas.append(_reg(*campos)); rc.add(campos[0])
-
-    tem_k = bool(k200_estoque)
-    add("K001", "0" if tem_k else "1")
-    if not tem_k:
-        return
-    # K100 período de apuração
-    if periodo and isinstance(periodo, (tuple, list)) and len(periodo) == 2:
-        add("K100", _dt_yyyymmdd(periodo[0]), _dt_yyyymmdd(periodo[1]))
-    # K200 estoque escriturado por produto
-    for it in k200_estoque:
-        cProd = it.get("codigo") or "1"
-        dtEst = _dt_yyyymmdd(it.get("data") or datetime.now().strftime("%Y-%m-%d"))
-        qtd = float(str(it.get("quantidade") or 0).replace(",", ".") or 0)
-        indEst = it.get("ind_est", "0")  # 0=posse do informante
-        add("K200", dtEst, cProd, f"{qtd:.4f}", indEst)
-
-def _bloco_1(self, linhas, rc: RegCount):
-    def add(*campos):
-        linhas.append(_reg(*campos)); rc.add(campos[0])
-
-    # Abre com movimento se houver qualquer dado complementar; por padrão "sem"
-    add("1001", "1")
-    # 1010 - obrigatoriedades (flags S/N); usamos 'N' por padrão
-    add("1010", "N","N","N","N","N","N","N","N","N","N","N","N")
-
-def _bloco_9(linhas, rc: RegCount):
-    def add(*campos):
-        linhas.append(_reg(*campos)); rc.add(campos[0])
-    add("9001", "0")
-
-    # 9900 para cada registro que já contabilizamos
-    total_9900 = 0
-    for cod, qtd in sorted(rc.items()):
-        add("9900", cod, qtd)
-        total_9900 += 1
-    # os próprios somatórios
-    add("9900", "9900", total_9900 + 3)
-    add("9900", "9990", 1)
-    add("9900", "9999", 1)
-
-    # 9990 - encerramento do bloco 9: QTD_LIN_9
-    qtd_lin_bloco9 = 1 + (total_9900 + 3) + 1
-    add("9990", qtd_lin_bloco9)
-
-    # 9999 - encerramento do arquivo: QTD_LIN total
-    total = len(linhas) + 1
-    add("9999", total)
-
-# ------------------- orquestrador -------------------
-
-
-
-
-
-def gerar_sped_fiscal_completo(self,
-                               caminho_txt="sped_fiscal_COMPLETO.txt",
-                               dt_ini=None, dt_fin=None,
-                               versao_layout="3.1.8",
-                               docs_servicos=None,
-                               apuracao_icms=None,
-                               inventario=None, dt_inventario=None,
-                               k200_estoque=None, k_periodo=None,
-                               ciap=None):
-    """
-    Gera o SPED Fiscal completo.
-
-    Parâmetros-chave:
-      - dt_ini / dt_fin: strings "YYYYMMDD" (ou "YYYY-MM-DD"/"dd/MM/yyyy")
-      - versao_layout: "3.1.8" (2025) ou "3.1.9" (vigente em 2026)
-      - docs_servicos: lista[dict] para Bloco D (se não informado -> sem movimento)
-      - apuracao_icms: dict para E110/E116 com chaves VL_TOT_DEBITOS, VL_TOT_CREDITOS, etc.
-      - inventario: lista[dict] com itens do inventário para H010 (se não informado -> sem movimento)
-      - dt_inventario: data do inventário (H005)
-      - k200_estoque: lista[dict] com {codigo, quantidade, data?, ind_est?} (se não -> sem movimento)
-      - k_periodo: (dt_ini, dt_fin) para K100, opcional
-      - ciap: lista/dados do CIAP (G110/G125), se omitido -> sem movimento
-
-    Retorna: caminho absoluto do TXT gerado.
-    """
-
-    hoje = datetime.now()
-    if not dt_ini or not dt_fin:
-        dt_ini = hoje.replace(day=1).strftime("%Y%m01")
-        last_day = calendar.monthrange(hoje.year, hoje.month)[1]
-        dt_fin = hoje.replace(day=last_day).strftime("%Y%m%d")
-    dt_ini = _dt_yyyymmdd(dt_ini); dt_fin = _dt_yyyymmdd(dt_fin)
-
+    # ---------------- linhas ----------------
     linhas = []
-    rc = RegCount()
+    regs = []
+    def add(line, reg=None):
+        linhas.append(line)
+        if reg: regs.append(reg)
 
-    _bloco_0(self, linhas, rc, dt_ini, dt_fin, versao_layout=versao_layout)
-    _bloco_C(self, linhas, rc, dt_ini, dt_fin)
-    _bloco_D(self, linhas, rc, docs_servicos=docs_servicos)
-    _bloco_E(self, linhas, rc, dt_ini, dt_fin, apuracao_icms=apuracao_icms)
-    _bloco_G(self, linhas, rc, ciap=ciap)
-    _bloco_H(self, linhas, rc, inventario=inventario, dt_inv=dt_inventario)
-    _bloco_K(self, linhas, rc, k200_estoque=k200_estoque, periodo=k_periodo)
-    _bloco_1(self, linhas, rc)
-    _bloco_9(linhas, rc)
+    # ===== Bloco 0 =====
+    if ativo("0"):
+        b0 = len(linhas)
+        add(f"|0000|{emit['COD_VER']}|{emit['FINALIDADE']}|{d_i.strftime('%d%m%Y')}|{d_f.strftime('%d%m%Y')}|{emit['NOME']}|{emit['CNPJ']}||{emit['UF']}|{emit['IE']}|{emit['COD_MUN']}|{emit['IM']}|{emit['SUFRAMA']}|{emit['PERFIL']}|{emit['IND_ATIV']}|", "0000")
+        add("|0001|0|", "0001")
 
-    with open(caminho_txt, "w", encoding="utf-8", newline="") as f:
-        f.writelines(linhas)
+        if incluir_0005:
+            fantasia = _get("variavelFantasiaRazaoSocialEmitente", "") or _get("variavelFantasiaEmitente", "") or emit["NOME"]
+            cep      = _somente_dig(_get("variavelCEPEnd", ""))[:8] or "00000000"
+            end      = _get("variavelLogradouroEnd", "") or _get("variavelEnderecoRazaoSocialEmitente", "") or "NAO INFORMADO"
+            num      = _get("variavelNumeroEnd", "")
+            compl    = _get("variavelComplementoEnd", "")
+            bairro   = _get("variavelBairroEnd", "") or "NAO INFORMADO"
+            fone     = _somente_dig(_get("variavelTelefoneEnd", ""))[:11]
+            fax      = _somente_dig(_get("variavelFaxEnd", ""))[:11]
+            email    = _get("variavelEmailEmitente", "") or _get("emailEmitente", "")
+            add(f"|0005|{_s(fantasia)}|{_s(cep)}|{_s(end)}|{_s(num)}|{_s(compl)}|{_s(bairro)}|{_s(fone)}|{_s(fax)}|{_s(email)}|", "0005")
 
-    return os.path.abspath(caminho_txt)
+        if incluir_0100:
+            nome_cont = _get("variavelNomeContador", "") or _get("nomeContador", "") or "RESPONSAVEL CONTABIL"
+            cpf_cont  = _somente_dig(_get("variavelCPFContador", "") or _get("cpfContador", ""))[:11] or "00000000000"
+            crc_cont  = _get("variavelCRCContador", "") or _get("crcContador", "") or "0000000"
+            cnpj_escr = _somente_dig(_get("variavelCNPJEscritorio", "") or _get("cnpjEscritorio", ""))
+            cep_cont  = _somente_dig(_get("variavelCEPContador", "") or _get("cepContador", ""))[:8]
+            end_cont  = _get("variavelEnderecoContador", "") or _get("enderecoContador", "")
+            num_cont  = _get("variavelNumeroContador", "") or _get("numeroContador", "")
+            compl_cont= _get("variavelComplementoContador", "") or _get("complementoContador", "")
+            bairro_cont=_get("variavelBairroContador", "") or _get("bairroContador", "")
+            fone_cont = _somente_dig(_get("variavelTelefoneContador", "") or _get("telefoneContador", ""))[:11]
+            fax_cont  = _somente_dig(_get("variavelFaxContador", "") or _get("faxContador", ""))[:11]
+            email_cont= _get("variavelEmailContador", "") or _get("emailContador", "") or "contato@exemplo.com"
+            cod_mun_cont = _somente_dig(_get("variavelCodigoMunicipioContador", "") or _get("codMunContador", "") or emit["COD_MUN"])
+            add(f"|0100|{_s(nome_cont)}|{_s(cpf_cont)}|{_s(crc_cont)}|{_s(cnpj_escr)}|{_s(cep_cont)}|{_s(end_cont)}|{_s(num_cont)}|{_s(compl_cont)}|{_s(bairro_cont)}|{_s(fone_cont)}|{_s(fax_cont)}|{_s(email_cont)}|{_s(cod_mun_cont)}|", "0100")
 
+        # 0150 (somente participantes usados)
+        for cod, p in sorted(partes.items()):
+            add("|0150|{COD_PART}|{NOME}|{COD_PAIS}|{CNPJ}|{CPF}|{IE}|{COD_MUN}|{SUFRAMA}|{END}|{NUM}|{COMPL}|{BAIRRO}|".format(
+                COD_PART=str(cod)[:60],
+                NOME=_s(p.get("NOME") or "PARTICIPANTE")[:100],
+                COD_PAIS=p.get("COD_PAIS","1058"),
+                CNPJ=_somente_dig(p.get("CNPJ","")),
+                CPF=_somente_dig(p.get("CPF","")),
+                IE=_somente_dig(p.get("IE","")),
+                COD_MUN=_somente_dig(p.get("COD_MUN","")),
+                SUFRAMA=_s(p.get("SUFRAMA","")),
+                END=_s(p.get("END",""))[:60],
+                NUM=_s(p.get("NUM",""))[:10],
+                COMPL=_s(p.get("COMPL",""))[:60],
+                BAIRRO=_s(p.get("BAIRRO",""))[:60],
+            ), "0150")
+        qtd_0 = (len(linhas) - b0) + 1
+        add(f"|0990|{qtd_0}|", "0990")
 
+    # ===== Bloco B (sem movimento) =====
+    if ativo("B"):
+        ini = len(linhas)
+        add("|B001|1|", "B001")
+        add(f"|B990|{(len(linhas)-ini)+1}|", "B990")
 
+    # ===== Bloco C =====
+    if ativo("C"):
+        bc = len(linhas)
+        if notas:
+            add("|C001|0|", "C001")
+            for n in notas:
+                add("|C100|{IND_OPER}|{IND_EMIT}|{COD_PART}|{COD_MOD}|{COD_SIT}|{SER}|{NUM_DOC}|{CHV_NFE}|{DT_DOC}|{DT_E_S}|{VL_DOC}|{IND_PGTO}|{VL_DESC}|{VL_ABAT_NT}|{VL_MERC}|{IND_FRT}|{VL_FRT}|{VL_SEG}|{VL_OUT_DA}|{VL_BC_ICMS}|{VL_ICMS}|{VL_BC_ICMS_ST}|{VL_ICMS_ST}|{VL_IPI}|{VL_PIS}|{VL_COFINS}|{VL_PIS_ST}|{VL_COFINS_ST}|".format(
+                    IND_OPER=n["IND_OPER"], IND_EMIT=n["IND_EMIT"], COD_PART=str(n["COD_PART"])[:60],
+                    COD_MOD=n["COD_MOD"], COD_SIT=n["COD_SIT"], SER=n["SER"], NUM_DOC=n["NUM_DOC"],
+                    CHV_NFE=n["CHV_NFE"], DT_DOC=n["DT_DOC"], DT_E_S=n["DT_E_S"],
+                    VL_DOC=_fmt(n["VL_DOC"]), IND_PGTO=n["IND_PGTO"], VL_DESC=_fmt(n["VL_DESC"]),
+                    VL_ABAT_NT=_fmt(n["VL_ABAT_NT"]), VL_MERC=_fmt(n["VL_MERC"]), IND_FRT=n["IND_FRT"],
+                    VL_FRT=_fmt(n["VL_FRT"]), VL_SEG=_fmt(n["VL_SEG"]), VL_OUT_DA=_fmt(n["VL_OUT_DA"]),
+                    VL_BC_ICMS=_fmt(n["VL_BC_ICMS"]), VL_ICMS=_fmt(n["VL_ICMS"]),
+                    VL_BC_ICMS_ST=_fmt(n["VL_BC_ICMS_ST"]), VL_ICMS_ST=_fmt(n["VL_ICMS_ST"]),
+                    VL_IPI=_fmt(n["VL_IPI"]), VL_PIS=_fmt(n["VL_PIS"]), VL_COFINS=_fmt(n["VL_COFINS"]),
+                    VL_PIS_ST=_fmt(n["VL_PIS_ST"]), VL_COFINS_ST=_fmt(n["VL_COFINS_ST"]),
+                ), "C100")
+                for (cst, cfop, aliq), v in sorted(n["C190"].items()):
+                    add(f"|C190|{cst}|{cfop}|{_fmt(aliq)}|{_fmt(v['VL_OPR'])}|{_fmt(v['VL_BC_ICMS'])}|{_fmt(v['VL_ICMS'])}|{_fmt(v['VL_BC_ICMS_ST'])}|{_fmt(v['VL_ICMS_ST'])}|{_fmt(v['VL_RED_BC'])}|{_fmt(v['VL_IPI'])}||", "C190")
+            qtd_c = (len(linhas) - bc) + 1
+            add(f"|C990|{qtd_c}|", "C990")
+        else:
+            add("|C001|1|", "C001")
+            add("|C990|2|", "C990")
 
+    # ===== Blocos D/E/G/H/K sem movimento =====
+    for letra in ("D","E","G","H","K"):
+        if ativo(letra):
+            ini = len(linhas)
+            add(f"|{letra}001|1|", f"{letra}001")
+            add(f"|{letra}990|{(len(linhas)-ini)+1}|", f"{letra}990")
 
+    # ===== Bloco 1 sem movimento =====
+    if ativo("1"):
+        ini = len(linhas)
+        add("|1001|1|", "1001")
+        add(f"|1990|{(len(linhas)-ini)+1}|", "1990")
 
+    # ===== Bloco 9 (sempre por último) =====
+    # Calcular contagem antes de inserir 9001 para não duplicar 9900|9001|1|
+    cont = Counter(regs)  # somente registros até aqui (sem 9001/9900/9990/9999)
+    add("|9001|0|", "9001")
 
+    for r in sorted(cont.keys()):
+        add(f"|9900|{r}|{cont[r]}|", "9900")
 
+    # 9900 para 9001, 9990 e 9999 (apenas 1 ocorrência cada)
+    add("|9900|9001|1|", "9900")
+    add("|9900|9990|1|", "9900")
+    add("|9900|9999|1|", "9900")
 
+    # 9900 do próprio 9900 com TOTAL de linhas 9900 emitidas (inclui esta linha)
+    total_9900 = len(cont) + 3 + 1
+    add(f"|9900|9900|{total_9900}|", "9900")
 
+    # 9990: total de linhas do bloco 9 = 9001(1) + 9900(total_9900) + 9990(1) + 9999(1)
+    add(f"|9990|{1 + total_9900 + 1 + 1}|", "9990")
 
+    # 9999: total de linhas do arquivo (+1 do próprio 9999)
+    add(f"|9999|{len(linhas)+1}|", "9999")
 
-
-
-
+    # gravação
+    out = Path(caminho_txt)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("w", encoding="latin-1") as f:
+        f.write("\r\n".join(linhas) + "\r\n")
+    return str(out)
