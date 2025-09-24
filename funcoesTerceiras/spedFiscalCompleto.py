@@ -461,5 +461,6 @@ def gerar_sped_fiscal_completo(
     out = Path(caminho_txt)
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", encoding="latin-1") as f:
-        f.write("\r\n".join(linhas) + "\r\n")
+        linhas_sem_espaco = [l.replace(" ", "") for l in linhas]
+        f.write("\r\n".join(linhas_sem_espaco) + "\r\n")
     return str(out)
