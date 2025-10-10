@@ -8,7 +8,7 @@ from funcoesTerceiras import calculaParcelasFaturamento
 from telas.telaObservacoesNotaSaida import telaObservacoesNotaSaida
 from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvamentoDoFaturamentoNota
 from componentes import criaFrameJanela, criaBotao
-
+ 
 def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota):
     valorDaNota = ctk.StringVar()
     valorDaNota.set(valorNota)

@@ -56,31 +56,30 @@ def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data
         valorTotal = valor[0].get()
         formaPagamento = formaPag[0].get()
         dataFaturamento = data.get()
-
-        dataBase = datetime.strptime(dataFaturamento, "%d/%m/%Y")
+        try:
+            dataBase = datetime.strptime(dataFaturamento, "%d/%m/%Y")
         
-        valorParcela = round(float(valorTotal) / float(qtdParcelas), 2)
-        for i in range(int(qtdParcelas)):
-            if repeticao == "Mensal":
-                dataParcela = dataBase + relativedelta(months=i)
-            elif repeticao == "Bimestral":
-                dataParcela = dataBase + relativedelta(months=2 * i)
-            elif repeticao == "Semestral":
-                dataParcela = dataBase + relativedelta(months=6 * i)
-            elif repeticao == "Anual":
-                dataParcela = dataBase + relativedelta(years=i)
+            valorParcela = round(float(valorTotal) / float(qtdParcelas), 2)
+            for i in range(int(qtdParcelas)):
+                if repeticao == "Mensal":
+                    dataParcela = dataBase + relativedelta(months=i)
+                elif repeticao == "Bimestral":
+                    dataParcela = dataBase + relativedelta(months=2 * i)
+                elif repeticao == "Semestral":
+                    dataParcela = dataBase + relativedelta(months=6 * i)
+                elif repeticao == "Anual":
+                    dataParcela = dataBase + relativedelta(years=i)
 
-            dataFormatada = dataParcela.strftime("%Y-%m-%d")
- 
-            # Insere.registraFaturamentoNoBanco(confirmado, dataFormatada, valorParcela, formaPagamento, 1)
-            self.faturamento = ({
-                "confirmado": confirmado,
-                "dataFormatada": dataFormatada,
-                "valorParcela": valorParcela,
-                "formaPagamento": formaPagamento,
-            })
-
-
+                dataFormatada = dataParcela.strftime("%Y-%m-%d")
+    
+                # Insere.registraFaturamentoNoBanco(confirmado, dataFormatada, valorParcela, formaPagamento, 1)
+                self.faturamento = ({
+                    "confirmado": confirmado,
+                    "dataFormatada": dataFormatada,
+                    "valorParcela": valorParcela,
+                    "formaPagamento": formaPagamento,
+                })
+        except:
+            pass
     else:            
-
         pass

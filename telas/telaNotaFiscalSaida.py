@@ -6,8 +6,9 @@ import customtkinter as ctk
 import datetime
 from telas.telaProdutoNotaSaida import telaProdutosNotaSaida
 from funcoesTerceiras import filtrar, verificaSeQuerFiltrarPorPeriodo
-from componentes import criaFrameJanela, criaBotao, criarLabelComboBox, criarLabelEntry, criarLabelLateralComboBox, criarLabelLateralEntry
+from componentes import checkbox, criaFrameJanela, criaBotao, criarLabelComboBox, criarLabelEntry, criarLabelLateralComboBox, criarLabelLateralEntry
 from consultas.select import Buscas 
+from telas.telaNotaReferenciada import telaNotaReferenciada
 
 
 
@@ -15,6 +16,14 @@ def telaNotaFiscalSaida(self, valor):
     self.frameTelaNotaSaida = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     usuarioLogado =" self.logado"
     usuarioLogado = usuarioLogado.capitalize()
+
+
+
+    def decideATela(valor):
+        if valor == "Devolução" or valor == "Complementar":
+            self.botaoTela = criaBotao(self.frameTelaNotaSaida, "Próximo - Tela notas Ref.", 0.25, 0.94, 0.15, lambda: telaNotaReferenciada(self, emt.get(), cfop.get())).place(anchor="nw")
+        else:
+            self.botaoTela = criaBotao(self.frameTelaNotaSaida, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutosNotaSaida(self, emt.get(), cfop.get())).place(anchor="nw")
 
 
     def buscaCliente(event=None): 
@@ -102,25 +111,6 @@ def telaNotaFiscalSaida(self, valor):
         # pass
 
 
-
-    def on_stop_typing(event=None):
-        print("Parou de digitar")
-        buscaCliente()
-
-
-
-
-
-
-    def acessar(dados, *caminho, default=""):
-        for chave in caminho:
-            if isinstance(dados, dict) and chave in dados:
-                dados = dados[chave]
-            else:
-                return default
-        if isinstance(dados, dict) and "#text" in dados:
-            return dados["#text"]
-        return dados if isinstance(dados, str) else default
 
 
 
@@ -230,7 +220,8 @@ def telaNotaFiscalSaida(self, valor):
         "Transporte Próprio por conta do Destinatário",
         "Sem Ocorrência de Transporte"
     ]
-
+    
+    self.movimentacaoProdutos = ctk.BooleanVar()
     self.inscricaoEstadualDestinatario = ctk.StringVar()
     self.variavelNumeroDaNota = ctk.StringVar()
     self.variavelSerieDaNota = ctk.StringVar()
@@ -254,7 +245,7 @@ def telaNotaFiscalSaida(self, valor):
     self.formaDePagamento = ctk.StringVar()
     self.variavelModalidadeFrete = ctk.StringVar()
     self.variavelValorTotal = ctk.StringVar()
-    self.opcoesFinalidade = ["Normal", "Complementar", "Ajuste"]
+    self.opcoesFinalidade = ["Normal", "Complementar", "Ajuste", "Devolução", "Normal - consumidor final"]
     self.opcoesSituacao = ["Ativa", "Cancelada", "Inutilizada"]
     
     self.variavelVendedor.set(usuarioLogado)
@@ -292,7 +283,8 @@ def telaNotaFiscalSaida(self, valor):
     criarLabelLateralEntry(self.frameTelaNotaSaida, "Data confirmação", 0.75, 0.34, 0.1, self.variavelDataConfirmacao)
     criarLabelLateralEntry(self.frameTelaNotaSaida, "Vendedor", 0.75, 0.39, 0.1, self.variavelVendedor)
     criarLabelLateralEntry(self.frameTelaNotaSaida, "Tipo da nota", 0.75, 0.44, 0.1, self.variavelEntradaOuSaida)
-    criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data finalidade", 0.75, 0.49, 0.1, self.opcoesFinalidade)
+    finalidade = criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data finalidade", 0.75, 0.49, 0.1, self.opcoesFinalidade)
+    finalidade.configure(command=lambda valor: decideATela(valor))
     criarLabelLateralComboBox(self.frameTelaNotaSaida, "Data situação", 0.75, 0.54, 0.1, self.opcoesSituacao)
 
 
@@ -308,3 +300,4 @@ def telaNotaFiscalSaida(self, valor):
 
     criaBotao(self.frameTelaNotaSaida, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutosNotaSaida(self, emt.get(), cfop.get())).place(anchor="nw")
     criaBotao(self.frameTelaNotaSaida, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaNotaSaida.destroy()).place(anchor="nw")
+    checkBox = checkbox(self.frameTelaNotaSaida, "Movimentação dos produtos", 0.7, 0.60, None, lambda: self.movimentacaoProdutos.set(checkBox.get()))

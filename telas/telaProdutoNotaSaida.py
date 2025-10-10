@@ -133,6 +133,7 @@ def telaProdutosNotaSaida(self, cnpj, cfop):
         self.vr_bc_ICMS = ctk.StringVar()
         self.vr_icms_st_dest = ctk.StringVar()
         self.bc_icms_st_dest = ctk.StringVar()
+        self.aliq_pis = ctk.StringVar()
         self.aliq_icms_cfop = ctk.StringVar()
         self.bc_FCP = ctk.StringVar()
         self.aliq_fcp_porc = ctk.StringVar()
@@ -159,7 +160,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop):
         self.VRDespAduaneira = ctk.StringVar()
         self.aliquEntry =ctk.StringVar()
         self.credICMSEntry =ctk.StringVar()
-        self.aliq_pis = ctk.StringVar()
         self.bc_pis = ctk.StringVar()
         self.vr_pis = ctk.StringVar()
         self.aliq_pis_st = ctk.StringVar()
@@ -219,7 +219,11 @@ def telaProdutosNotaSaida(self, cnpj, cfop):
                 PIS.place(relx=0.02, rely=0.03, relheight=0.015)
                 criarLabelComboBox(self.framePisCofins, "CST", 0.05, 0.07, 0.9, opcoes)
 
-                criarLabelEntry(self.framePisCofins, "Alíq. PIS (%)", 0.3, 0.18, 0.15, self.aliq_pis)
+
+                self.aliq_pis.set("0.65%")
+                aliqpis = criarLabelEntry(self.framePisCofins, "Alíq. PIS (%)", 0.3, 0.18, 0.15, self.aliq_pis)
+                aliqpis.configure(state="disabled")
+
                 criarLabelEntry(self.framePisCofins, "BC PIS", 0.5, 0.18, 0.15, self.bc_pis)
                 criarLabelEntry(self.framePisCofins, "Vr. PIS", 0.7, 0.18, 0.15, self.vr_pis)
                 criaSimouNaoLateral(self.framePisCofins, "Modalidade PIS", "Percentual", "Valor/Qtd", 0.05, 0.15, passe)
@@ -233,14 +237,17 @@ def telaProdutosNotaSaida(self, cnpj, cfop):
                 COFINS = ctk.CTkLabel(self.framePisCofins,  text="COFINS-----------------------------------------------------------------------------", font=("TkDefaultFont", 11))
                 COFINS.place(relx=0.02, rely=0.54, relheight=0.015)
 
-                criarLabelEntry(self.framePisCofins, "Alíq. COFINS (%)", 0.3, 0.60, 0.15, self.aliq_cofins)
+                self.aliq_cofins.set("3%")
+                aliqcofi = criarLabelEntry(self.framePisCofins, "Alíq. COFINS (%)", 0.3, 0.60, 0.15, self.aliq_cofins)
+                aliqcofi.configure(state="disabled")
+
                 criarLabelEntry(self.framePisCofins, "BC COFINS", 0.5, 0.60, 0.15, self.bc_cofins)
                 criarLabelEntry(self.framePisCofins, "Vr. COFINS", 0.7, 0.60, 0.15, self.vr_cofins)
                 criaSimouNaoLateral(self.framePisCofins, "Modalidade COFINS", "Percentual", "Valor/Qtd", 0.05, 0.58, passe)
 
-                aliqCOF = criarLabelEntry(self.framePisCofins, "Alíq. COFINS ST (%)", 0.3, 0.77, 0.15, self.aliq_cofins_st)
-                bcCOF = criarLabelEntry(self.framePisCofins, "BC COFINS ST", 0.5, 0.77, 0.15, self.bc_cofins_st)
-                pisCOF = criarLabelEntry(self.framePisCofins, "Vr. COFINS ST", 0.7, 0.77, 0.15, self.vr_cofins_st)
+                criarLabelEntry(self.framePisCofins, "Alíq. COFINS ST (%)", 0.3, 0.77, 0.15, self.aliq_cofins_st)
+                criarLabelEntry(self.framePisCofins, "BC COFINS ST", 0.5, 0.77, 0.15, self.bc_cofins_st)
+                criarLabelEntry(self.framePisCofins, "Vr. COFINS ST", 0.7, 0.77, 0.15, self.vr_cofins_st)
                 criaSimouNaoLateral(self.framePisCofins, "Modalidade COFINS ST", "Percentual", "Valor/Qtd", 0.05, 0.76, passe)
 
 
@@ -426,27 +433,27 @@ def telaProdutosNotaSaida(self, cnpj, cfop):
             self.beneficioEntry.set(dados_salvos.get("beneficio", ""))
             self.aliquEntry.set(dados_salvos.get("aliqICMS", ""))
             self.credICMSEntry.set(dados_salvos.get("credICMS", ""))
-            self.bc_icms.set(dados_salvos.get("bc_icms", ""))
             self.aliq_icms.set(dados_salvos.get("aliq_icms", ""))
             self.vr_icms.set(dados_salvos.get("vr_icms", ""))
             self.csosn.set(dados_salvos.get("csosn", ""))
             self.cst_a.set(dados_salvos.get("cst_a", ""))
             self.cst_b.set(dados_salvos.get("cst_b", ""))
-            self.mod_bc_icms.set(dados_salvos.get("mod_bc_icms", ""))
             self.red_bc_icms.set(dados_salvos.get("red_bc_icms", ""))
             self.mod_bc_icms_st.set(dados_salvos.get("mod_bc_icms_st", ""))
-            self.vr_bc_icms.insert(0, dados_salvos.get("vr_bc_icms", ""))
+            self.mod_bc_icms.set(dados_salvos.get("mod_bc_icms", ""))
             self.mva_icms_st.set(dados_salvos.get("mva_icms_st", ""))
-            self.bc_icms_st.set(dados_salvos.get("bc_icms_st", ""))
             self.red_bc_icms_st.set(dados_salvos.get("red_bc_icms_st", ""))
-            self.vr_icms_st.set(dados_salvos.get("vr_icms_st", ""))
+            self.vr_bc_icms.insert(0, dados_salvos.get("vr_bc_icms", ""))
             self.vr_bc_icms_st_ret.set(dados_salvos.get("vr_bc_icms_st_ret", ""))
+            self.vr_icms_st.set(dados_salvos.get("vr_icms_st", ""))
             self.vr_icms_st_ret.set(dados_salvos.get("vr_icms_st_ret", ""))
+            self.vr_icms_st_dest.set(dados_salvos.get("vr_icms_st_dest", ""))
             self.aliq_icms_cfop.set(dados_salvos.get("aliq_icms_cfop", ""))
+            self.bc_icms.set(dados_salvos.get("bc_icms", 0.00))
+            self.bc_icms_st.set(dados_salvos.get("bc_icms_st", ""))
             self.bc_icms_st_dest.set(dados_salvos.get("bc_icms_st_dest", ""))
             self.vr_icms_subst.set(dados_salvos.get("vr_icms_subst", ""))
             self.aliq_icms_st.set(dados_salvos.get("aliq_icms_st", ""))
-            self.vr_icms_st_dest.set(dados_salvos.get("vr_icms_st_dest", ""))
             self.bc_FCP.set(dados_salvos.get("bc_FCP", ""))
             self.aliq_fcp_porc.set(dados_salvos.get("aliq_fcp_porc", ""))
             self.vr_FCP.set(dados_salvos.get("vr_FCP", ""))
@@ -480,9 +487,7 @@ def telaProdutosNotaSaida(self, cnpj, cfop):
 
 
 
-
         def calculaValores():
-            # VO (valor da operação) pegando do subtotal da linha; se vazio, calcula do básico
             try:
                 vo = float(linha["subtotal"].get().replace(",", "."))
             except:
@@ -523,18 +528,11 @@ def telaProdutosNotaSaida(self, cnpj, cfop):
             except:
                 aliq_icms = 0.0
 
-            # Valor da Operação (simples): vBC = VO * (1 - Red/100)
-            if mod_icms == "Valor da Operação" or mod_icms == "":
-                vbc_icms = vo * (1.0 - (red_icms / 100.0))
-            else:
-                # Mantém simples: usa mesma forma como aproximação
-                vbc_icms = vo * (1.0 - (red_icms / 100.0))
-
+            vbc_icms = vo * (1.0 - (red_icms / 100.0))
             vicms = vbc_icms * (aliq_icms / 100.0)
 
-            self.bc_icms.set(f"{vbc_icms:.2f}")
-            print(vbc_icms)
-            self.vr_icms.set(f"{vicms:.2f}")
+            valorICMS = float(self.bc_icms.get())*(aliq_icms / 100.0)
+            self.vr_icms.set(f"{valorICMS:.2f}")
 
             # -----------------------
             # ICMS ST (se houver)
@@ -571,9 +569,10 @@ def telaProdutosNotaSaida(self, cnpj, cfop):
 
             self.bc_icms_st.set(f"{vbc_st:.2f}" if vbc_st > 0 else "")
 
-            # vICMSST = (vBCST * AlqST) - vICMS
             vicmsst_bruto = vbc_st * (aliq_st / 100.0)
-            vicmsst = max(vicmsst_bruto - vicms, 0.0)
+            vicmsst = vicmsst_bruto - vicms
+            if vicmsst < 0:
+                vicmsst = 0.0
 
             if vbc_st > 0:
                 self.vr_icms_st.set(f"{vicmsst:.2f}")
@@ -618,39 +617,29 @@ def telaProdutosNotaSaida(self, cnpj, cfop):
                 bc_fcp_st = vbc_st
             vfcp_st = bc_fcp_st * (p_fcp_st / 100.0)
 
+
+
+
             self.bc_fcp_st.set(f"{bc_fcp_st:.2f}" if bc_fcp_st > 0 else "")
             self.vr_fcp_st.set(f"{vfcp_st:.2f}" if vfcp_st > 0 else "")
 
-            # --- PIS (base = VO, igual à lógica "Valor da Operação") ---
-            try:
-                aliq_pis = float((self.aliq_pis.get() or "0").replace(",", "."))
-            except:
-                aliq_pis = 0.0
-            try:
-                vbc_pis = float((self.bc_pis.get() or "0").replace(",", "."))
-            except:
-                vbc_pis = 0.0
-            if vbc_pis == 0.0:
-                vbc_pis = vo  # mesma base do BC ICMS quando "Valor da Operação"
-            self.bc_pis.set(f"{vbc_pis:.2f}")
-            self.vr_pis.set(f"{(vbc_pis * aliq_pis / 100.0):.2f}")
+            # --- PIS 
+            aliq_pis = 0.00065
+            valorBCPis = float(self.bc_icms.get()) - valorICMS
+            self.bc_pis.set(f"{valorBCPis:.2f}")
+            self.vr_pis.set(valorBCPis * aliq_pis)
 
-            # --- COFINS (base = VO, igual à lógica "Valor da Operação") ---
-            try:
-                aliq_cofins = float((self.aliq_cofins.get() or "0").replace(",", "."))
-            except:
-                aliq_cofins = 0.0
-            try:
-                vbc_cofins = float((self.bc_cofins.get() or "0").replace(",", "."))
-            except:
-                vbc_cofins = 0.0
-            if vbc_cofins == 0.0:
-                vbc_cofins = vo  # mesma base do BC ICMS quando "Valor da Operação"
-            self.bc_cofins.set(f"{vbc_cofins:.2f}")
-            self.vr_cofins.set(f"{(vbc_cofins * aliq_cofins / 100.0):.2f}")
+            # --- COFINS (mesma lógica do PIS) ---
+            aliq_cofins = 0.03
+            valorBCCofins = float(self.bc_icms.get()) - valorICMS
+            self.bc_cofins.set(f"{valorBCCofins:.2f}")
+            self.vr_cofins.set(valorBCCofins * aliq_cofins)
 
 
-        calculaValores()
+
+
+
+        # calculaValores()
         
 
 
