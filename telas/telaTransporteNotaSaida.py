@@ -9,6 +9,8 @@ from telas.telaObservacoes import telaObservacoes
 from telas.telaTotaisNota import telaTotaisNotaSaida
 
 
+
+
 def acessar(dados, *caminho, default=""):
     for chave in caminho:
         if isinstance(dados, dict) and chave in dados:
@@ -21,6 +23,16 @@ def acessar(dados, *caminho, default=""):
 
 
 def telaTransporteNotaSaida(self):
+    
+    opcoesPagamento = ["À vista", "À prazo", "Outros"]
+    opcoesTransporte = [
+        "Contratação do Frete por conta do Remetente (CIF)",
+        "Contratação do Frete por conta do Destinatário (FOB)",
+        "Contratação do Frete por conta de Terceiros",
+        "Transporte Próprio por conta do Remetente",
+        "Transporte Próprio por conta do Destinatário",
+        "Sem Ocorrência de Transporte"
+    ]
     self.frametelaTransporte = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     # opções
@@ -35,29 +47,29 @@ def telaTransporteNotaSaida(self):
     variavelModelo = ctk.StringVar()
     variavelTributacao = ctk.StringVar()
 
-    criarLabelEntry(self.frametelaTransporte, "Modalidade do frete", 0.05, 0.1, 0.25, variavelModalidade)
+    criarLabelComboBox(self.frametelaTransporte, "Modalidade do frete", 0.05, 0.1, 0.25, opcoesTransporte)
     criarLabelEntry(self.frametelaTransporte, "Transportador", 0.35, 0.1, 0.3, variavelTransportador)
     criarLabelEntry(self.frametelaTransporte, "CPF/CNPJ", 0.7, 0.1, 0.1, variavelCNPJTransportador)
 
-    criarLabelEntry(self.frametelaTransporte, "Número", 0.05, 0.2, 0.05, ctk.StringVar())
+    criarLabelEntry(self.frametelaTransporte, "Número", 0.05, 0.2, 0.05, None)
     criarLabelComboBox(self.frametelaTransporte, "Série", 0.12, 0.2, 0.05, opcoesSerie)
-    criarLabelEntry(self.frametelaTransporte, "SubSérie", 0.19, 0.2, 0.05, ctk.StringVar())
+    criarLabelEntry(self.frametelaTransporte, "SubSérie", 0.19, 0.2, 0.05, None)
     modelo = criarLabelComboBox(self.frametelaTransporte, "Modelo", 0.26, 0.2, 0.05, opcoesModelo)
     modelo.set(variavelModelo.get())
     tribut = criarLabelComboBox(self.frametelaTransporte, "Tributação", 0.33, 0.2, 0.05, opcoesTributacao)
     tribut.set(variavelTributacao.get())
-    criarLabelEntry(self.frametelaTransporte, "Chave CT-e ", 0.40, 0.2, 0.15, ctk.StringVar())
-    criarLabelEntry(self.frametelaTransporte, "Data Emissão", 0.57, 0.2, 0.10, ctk.StringVar())
-    criarLabelEntry(self.frametelaTransporte, "Data Prestação", 0.69, 0.2, 0.10, ctk.StringVar())
-    criarLabelEntry(self.frametelaTransporte, "Desconto", 0.81, 0.2, 0.05, ctk.StringVar())
-    criarLabelEntry(self.frametelaTransporte, "Total da Nota ", 0.88, 0.2, 0.05, ctk.StringVar())
+    criarLabelEntry(self.frametelaTransporte, "Chave CT-e ", 0.40, 0.2, 0.15, None)
+    criarLabelEntry(self.frametelaTransporte, "Data Emissão", 0.57, 0.2, 0.10, None)
+    criarLabelEntry(self.frametelaTransporte, "Data Prestação", 0.69, 0.2, 0.10, None)
+    criarLabelEntry(self.frametelaTransporte, "Desconto", 0.81, 0.2, 0.05, None)
+    criarLabelEntry(self.frametelaTransporte, "Total da Nota ", 0.88, 0.2, 0.05, None)
 
-    criarLabelLateralEntry(self.frametelaTransporte, "CFOP", 0.10, 0.4, 0.08, ctk.StringVar())
-    criarLabelLateralEntry(self.frametelaTransporte, "BC Retenção ICMS", 0.40, 0.4, 0.15, ctk.StringVar())
-    criarLabelLateralEntry(self.frametelaTransporte, "Valor ICMS Retido", 0.70, 0.4, 0.15, ctk.StringVar())
-    criarLabelLateralEntry(self.frametelaTransporte, "Valor do Serviço", 0.10, 0.5, 0.15, ctk.StringVar())
-    criarLabelLateralEntry(self.frametelaTransporte, "Aliquota Ret. ICMS", 0.40, 0.5, 0.15, ctk.StringVar())
-    criarLabelLateralEntry(self.frametelaTransporte, "Município Gerador", 0.70, 0.5, 0.15, ctk.StringVar())
+    criarLabelLateralEntry(self.frametelaTransporte, "CFOP", 0.10, 0.4, 0.08, None)
+    criarLabelLateralEntry(self.frametelaTransporte, "BC Retenção ICMS", 0.40, 0.4, 0.15, None)
+    criarLabelLateralEntry(self.frametelaTransporte, "Valor ICMS Retido", 0.70, 0.4, 0.15, None)
+    criarLabelLateralEntry(self.frametelaTransporte, "Valor do Serviço", 0.10, 0.5, 0.15, None)
+    criarLabelLateralEntry(self.frametelaTransporte, "Aliquota Ret. ICMS", 0.40, 0.5, 0.15, None)
+    criarLabelLateralEntry(self.frametelaTransporte, "Município Gerador", 0.70, 0.5, 0.15, None)
 
 
     criaBotao(self.frametelaTransporte, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: telaTotaisNotaSaida(self)).place(anchor="nw")

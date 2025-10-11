@@ -211,15 +211,6 @@ def telaNotaFiscalSaida(self, valor):
             self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoPolimaquinas.pfx"
             self.senhaCertificado   = "23889"
 
-    opcoesPagamento = ["À vista", "À prazo", "Outros"]
-    opcoesTransporte = [
-        "Contratação do Frete por conta do Remetente (CIF)",
-        "Contratação do Frete por conta do Destinatário (FOB)",
-        "Contratação do Frete por conta de Terceiros",
-        "Transporte Próprio por conta do Remetente",
-        "Transporte Próprio por conta do Destinatário",
-        "Sem Ocorrência de Transporte"
-    ]
     
     self.movimentacaoProdutos = ctk.BooleanVar()
     self.inscricaoEstadualDestinatario = ctk.StringVar()
@@ -293,10 +284,7 @@ def telaNotaFiscalSaida(self, valor):
     cfop.bind("<KeyRelease>", lambda event: self.variavelNatureza.set(buscaNatureza(self.variavelCFOP.get())))
     criarLabelEntry(self.frameTelaNotaSaida, "Natureza da Operação", 0.2, 0.49, 0.4, self.variavelNatureza)
 
-    ctk.CTkLabel(self.frameTelaNotaSaida, text="Transporte----------").place(relx=0.1, rely=0.59)
-    self.modalidadeDoFrete = criarLabelComboBox(self.frameTelaNotaSaida, "Modalidade do frete", 0.1, 0.64, 0.27, opcoesTransporte)
-    formasPag = criarLabelComboBox(self.frameTelaNotaSaida, "Forma de pagamento", 0.4, 0.64, 0.2, opcoesPagamento)
-    formasPag.set(self.formaDePagamento.get())
+
 
     criaBotao(self.frameTelaNotaSaida, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutosNotaSaida(self, emt.get(), cfop.get())).place(anchor="nw")
     criaBotao(self.frameTelaNotaSaida, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaNotaSaida.destroy()).place(anchor="nw")
