@@ -1,2 +1,9 @@
-dar funcionalidade para o checkbox na tela inicial da nota fiscal que gera movimentação no estoque
-criar a tela de notas relacionadas
+opção pra devolução e opção pra referenciar nota fiscal igual
+checkbox para movimentação de produtos do estoque✅
+colocar quantidade antes do preço na tela de produtos
+contas para o pis e cofins:       valor cofins  = aliq PIS(%) * base de calculo pis(valor do icms com a aliq do icms) mesma coisa pro pis✅
+tela transporte "faltando modalidade de frete e campos de dados✅
+quando tem trransportadora cadastrada, só digitar o cnpk e ja é importado o trransportadora
+gerar faturaento não é mais obrigatório✅
+na hora de gerarNFCe ta indo pro sped fiscal
+nota fiscal de entrada parte do produto importado ta dando erro e faturamento também
