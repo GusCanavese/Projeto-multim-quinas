@@ -4,7 +4,7 @@ from componentes import criaFrameJanela, criaBotao, criaTextArea
 from funcoesTerceiras import criarNFe, criarNFCe
 
 
-def telaObservacoesNotaSaida(self):
+def telaObservacoesNotaSaida(self, cons):
     self.frameTelaObservacoes = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     self.variavelObsFisco = ctk.StringVar()
@@ -61,9 +61,12 @@ def telaObservacoesNotaSaida(self):
 
     self.variavelObservacoes = ctk.StringVar()
     self.variavelObservacoes.set(0)
+    
+    if cons:
+        criaBotao(self.frameTelaObservacoes, "Salvar e gerar nfc-e", 0.40, 0.94, 0.15, lambda: criarNFCe.gerarNFe(self)).place(anchor="nw")
+    else:
+        criaBotao(self.frameTelaObservacoes, "Salvar e gerar nf-e", 0.25, 0.94, 0.15, lambda: criarNFe.gerarNFe(self)).place(anchor="nw")
 
-    criaBotao(self.frameTelaObservacoes, "salvar", 0.25, 0.94, 0.15, lambda: criarNFe.gerarNFe(self)).place(anchor="nw")
-    criaBotao(self.frameTelaObservacoes, "Gerar nfc-e", 0.40, 0.94, 0.15, lambda: criarNFCe.gerarNFe(self)).place(anchor="nw")
 
     # criaBotao(self.frameTelaObservacoes, "consultar", 0.55, 0.94, 0.15, lambda: criarNFe.consultar_ultimo_recibo(self)).place(anchor="nw")
     criaBotao(self.frameTelaObservacoes, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaObservacoes.destroy()).place(anchor="nw")

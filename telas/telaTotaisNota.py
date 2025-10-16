@@ -9,7 +9,7 @@ from componentes import criaFrameJanela, criarLabelLateralEntry, criaBotao
 from decimal import Decimal, ROUND_HALF_UP
 
 
-def telaTotaisNotaSaida(self):
+def telaTotaisNotaSaida(self, cons):
     self.frameTelaTotais = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     # DEBUG: listar tudo que foi salvo na tributação por produto
@@ -186,5 +186,5 @@ def telaTotaisNotaSaida(self):
     criarLabelLateralEntry(self.frameTelaTotais, "BC da Previdência Social", 0.48, 0.55, 0.11, self.bcPrevidencia)
     criarLabelLateralEntry(self.frameTelaTotais, "VR Previdência Social",    0.48, 0.60, 0.11, self.valorPrevidencia)
 
-    criaBotao(self.frameTelaTotais, "Próximo - Tela de faturamento", 0.25, 0.94, 0.15, lambda: telaGerarFaturamentoEntradaNota(self, None, 0)).place(anchor="nw")
+    criaBotao(self.frameTelaTotais, "Próximo - Tela de faturamento", 0.25, 0.94, 0.15, lambda: telaGerarFaturamentoEntradaNota(self, None, 0, cons)).place(anchor="nw")
     criaBotao(self.frameTelaTotais, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaTotais.destroy()).place(anchor="nw")

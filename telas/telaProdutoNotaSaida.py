@@ -12,7 +12,7 @@ from componentes import criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel,
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
-def telaProdutosNotaSaida(self, cnpj, cfop):
+def telaProdutosNotaSaida(self, cnpj, cfop, cons):
 
     self.row=1
     self.posicaoy = 0.2
@@ -487,6 +487,17 @@ def telaProdutosNotaSaida(self, cnpj, cfop):
 
 
 
+
+        def calculaValoresPisCofins():
+            # --- PIS 
+            aliq_pis = 0.00065
+            self.vr_pis.set(float(self.bc_icms.get()) * aliq_pis)
+
+            # --- COFINS (mesma lógica do PIS) ---
+            aliq_cofins = 0.03
+            self.vr_cofins.set(float(self.bc_icms.get()) * aliq_cofins)
+
+
         def calculaValores():
             try:
                 vo = float(linha["subtotal"].get().replace(",", "."))
@@ -616,9 +627,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop):
             if bc_fcp_st == 0.0:
                 bc_fcp_st = vbc_st
             vfcp_st = bc_fcp_st * (p_fcp_st / 100.0)
-
-
-
 
             self.bc_fcp_st.set(f"{bc_fcp_st:.2f}" if bc_fcp_st > 0 else "")
             self.vr_fcp_st.set(f"{vfcp_st:.2f}" if vfcp_st > 0 else "")
@@ -916,7 +924,7 @@ def telaProdutosNotaSaida(self, cnpj, cfop):
             self.valoresDosItens.append(item)
 
 
-    criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self))).place(anchor="nw")
+    criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, cons))).place(anchor="nw")
     criaBotao(frameTelaNotaProduto, "Voltar", 0.05, 0.94, 0.15, lambda: frameTelaNotaProduto.destroy()).place(anchor="nw")
 
     aplicar_maiusculo_em_todos_entries(self)

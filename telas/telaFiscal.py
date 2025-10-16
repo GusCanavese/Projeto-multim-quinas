@@ -12,7 +12,7 @@ from telas.telaSpedFiscal import telaSpeedFiscal
 def telaFiscal(self):
         frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
-        relatorioDeVendas = criaBotao(frame, "Emitir nota de saída", 0.66, 0.24, 0.24, lambda:telaNotaFiscalSaida(self, 1))
+        relatorioDeVendas = criaBotao(frame, "Emitir nota de saída", 0.66, 0.24, 0.24, lambda:telaNotaFiscalSaida(self, 1, 0))
         relatorioDeVendas.configure(height=50, image=None, compound="left")
 
         estoque = criaBotao(frame, "Estoque", 0.66, 0.35, 0.24, lambda:telaEstoqueFiscal(self))
@@ -24,7 +24,7 @@ def telaFiscal(self):
         gerarOrcamento = criaBotao(frame, "Gerar Sped fiscal", 0.33, 0.35, 0.24, lambda:telaSpeedFiscal(self))
         gerarOrcamento.configure(height=50, image=None, compound="left")
 
-        gerarOrcamento = criaBotao(frame, "Gerar NFC-e", 0.33, 0.46, 0.24, lambda:telaSpeedFiscal(self))
+        gerarOrcamento = criaBotao(frame, "Gerar NFC-e", 0.33, 0.46, 0.24, lambda:telaNotaFiscalSaida(self, 0, 1))
         gerarOrcamento.configure(height=50, image=None, compound="left")
 
         criaBotao(frame, "◀️ Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())

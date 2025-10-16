@@ -9,7 +9,7 @@ from telas.telaObservacoesNotaSaida import telaObservacoesNotaSaida
 from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvamentoDoFaturamentoNota
 from componentes import criaFrameJanela, criaBotao
  
-def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota):
+def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, cons):
     valorDaNota = ctk.StringVar()
     valorDaNota.set(valorNota)
     self.variavelRepeticao = 0
@@ -175,7 +175,7 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota):
 
     def salvarEFechar(self):
         confirmarSalvamentoDoFaturamentoNota(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, self.variavelRepeticao)
-        telaObservacoesNotaSaida(self)
+        telaObservacoesNotaSaida(self, cons)
 
     criaBotao(self.frameTelaGerarFaturamento, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaGerarFaturamento.destroy()).place(anchor="nw")
     criaBotao(self.frameTelaGerarFaturamento, "Próximo - Observações", 0.25, 0.94, 0.15, lambda: salvarEFechar(self)).place(anchor="nw")

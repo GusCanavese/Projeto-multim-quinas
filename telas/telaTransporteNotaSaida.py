@@ -1,10 +1,11 @@
 import sys
 import os
+from tkinter import messagebox
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from datetime import date
 from funcoesTerceiras import calculaParcelasFaturamento
-from componentes import criaFrameJanela, criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criaBotao
+from componentes import criaBotaoPequeno, criaEntry, criaFrameJanela, criaLabel, criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criaBotao
 from telas.telaObservacoes import telaObservacoes
 from telas.telaTotaisNota import telaTotaisNotaSaida
 
@@ -22,8 +23,9 @@ def acessar(dados, *caminho, default=""):
     return dados if isinstance(dados, str) else default
 
 
-def telaTransporteNotaSaida(self):
+def telaTransporteNotaSaida(self, cons):
     
+    listaLabels = ["Quantidade", "Espécie",	"Marca", "Numeração", "Peso Bruto",	"Peso Líquido"]
     opcoesPagamento = ["À vista", "À prazo", "Outros"]
     opcoesTransporte = [
         "Contratação do Frete por conta do Remetente (CIF)",
@@ -33,6 +35,9 @@ def telaTransporteNotaSaida(self):
         "Transporte Próprio por conta do Destinatário",
         "Sem Ocorrência de Transporte"
     ]
+
+
+    
     self.frametelaTransporte = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     # opções
@@ -72,5 +77,86 @@ def telaTransporteNotaSaida(self):
     criarLabelLateralEntry(self.frametelaTransporte, "Município Gerador", 0.70, 0.5, 0.15, None)
 
 
-    criaBotao(self.frametelaTransporte, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: telaTotaisNotaSaida(self)).place(anchor="nw")
+
+
+
+
+    self.posicaoy = 0.6
+    self.posicaox = 0.05
+    self.posicaoyBotaoTransp = 0.65
+    self.posicaoyBotaoRemoverTransp = 0.691
+    self.contadorDeLinhas = 0
+    self.yNovo = 0.24
+    self.entradaProduto = 0
+    self.valorSubtotal = 0
+    self.linhasTransporte = []
+
+
+    self.botaoRemoverItem = ctk.CTkButton(self.frametelaTransporte, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: removerItem(self))
+    self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotao-0.04)
+
+
+
+    for i, coluna in enumerate(listaLabels):
+        criaLabel(self.frametelaTransporte, coluna, self.posicaox, self.posicaoy, 0.145, self.cor)
+        self.posicaox +=0.1453
+    self.posicaox = 0.05
+    self.botaoAdicionarItemTransp = criaBotaoPequeno(self.frametelaTransporte, "Adicionar item", 0.7, self.posicaoyBotaoTransp, 0.07, lambda: (adicionarItem(self)))
+
+    def adicionarItem(self):
+
+        self.posicaoy += 0.04
+        self.posicaoyBotaoTransp += 0.04
+        self.posicaoyBotaoRemoverTransp += 0.04
+
+        self.botaoAdicionarItemTransp.place(relx=0.875, rely=self.posicaoyBotaoTransp)
+        self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotaoRemoverTransp)
+        linha_widgets = {}
+        
+
+        for i, coluna in enumerate(listaLabels):
+
+            entrada = criaEntry(self.frametelaTransporte, self.posicaox, self.posicaoy, 0.145, None)
+            campo = ["Quantidade", "Espécie", "Marca", "Numeração", "Peso Bruto", "Peso Líquido"][i - 2]
+            linha_widgets[campo] = entrada
+
+            self.posicaox += 0.1453
+
+
+        self.posicaox = 0.05
+        self.linhasTransporte.append(linha_widgets)
+        self.yNovo = self.posicaoy + 0.02
+
+    def removerItem(self):
+        if len(self.linhasTransporte) > 1:
+            ultima_linha = self.linhasTransporte.pop()
+
+            for widget in ultima_linha.values():
+                if hasattr(widget, "destroy"):
+                    widget.destroy()
+
+            self.contadorDeLinhas -= 9
+            self.posicaoy -= 0.02
+            self.posicaoyBotaoTransp -= 0.02
+            self.posicaoyBotaoRemoverTransp -= 0.02
+
+            self.botaoAdicionarItem.place(relx=0.883, rely=self.posicaoyBotao)
+            self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotaoRemoverTransp)
+
+        if len(self.linhasTransporte) == 1:
+            self.botaoRemoverItem.place_forget()
+
+        self.yNovo = self.posicaoy + 0.02
+        self.entradaProduto = ""
+
+    
+
+
+
+    adicionarItem(self)
+
+
+
+
+    criaBotao(self.frametelaTransporte, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: telaTotaisNotaSaida(self, cons)).place(anchor="nw")
     criaBotao(self.frametelaTransporte, "Voltar", 0.05, 0.94, 0.15, lambda: self.frametelaTransporte.destroy()).place(anchor="nw")

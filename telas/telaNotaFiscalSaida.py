@@ -12,7 +12,7 @@ from telas.telaNotaReferenciada import telaNotaReferenciada
 
 
 
-def telaNotaFiscalSaida(self, valor):
+def telaNotaFiscalSaida(self, valor, cons):
     self.frameTelaNotaSaida = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     usuarioLogado =" self.logado"
     usuarioLogado = usuarioLogado.capitalize()
@@ -286,6 +286,6 @@ def telaNotaFiscalSaida(self, valor):
 
 
 
-    criaBotao(self.frameTelaNotaSaida, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutosNotaSaida(self, emt.get(), cfop.get())).place(anchor="nw")
+    criaBotao(self.frameTelaNotaSaida, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutosNotaSaida(self, emt.get(), cfop.get(), cons)).place(anchor="nw")
     criaBotao(self.frameTelaNotaSaida, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaNotaSaida.destroy()).place(anchor="nw")
     checkBox = checkbox(self.frameTelaNotaSaida, "Movimentação dos produtos", 0.7, 0.60, None, lambda: self.movimentacaoProdutos.set(checkBox.get()))
