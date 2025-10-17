@@ -359,6 +359,7 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
 
 
         self.mod_bc_icms = criarLabelLateralComboBox(frame, "Mod. BC ICMS",     0.11, 0.37+posGera, 0.09, opcoes_MOD_ICMS)
+        self.bc_icms.set(linha["subtotal"].get())
         criarLabelLateralEntry(frame, "BC ICMS",             0.11, 0.41+posGera, 0.09, self.bc_icms)
         criarLabelLateralEntry(frame, "Red. BC ICMS (%)",    0.11, 0.45+posGera, 0.09, self.red_bc_icms)
         criarLabelLateralEntry(frame, "Aliq. ICMS (%)",      0.11, 0.49+posGera, 0.09, self.aliq_icms)

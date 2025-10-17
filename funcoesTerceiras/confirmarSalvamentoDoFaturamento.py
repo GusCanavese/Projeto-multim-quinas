@@ -55,7 +55,10 @@ def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data
         qtdParcelas = quantidade[0].get()
         valorTotal = valor[0].get()
         formaPagamento = formaPag[0].get()
-        dataFaturamento = data.get()
+        try:
+            dataFaturamento = data.get()
+        except:
+            dataFaturamento = data
         try:
             dataBase = datetime.strptime(dataFaturamento, "%d/%m/%Y")
         

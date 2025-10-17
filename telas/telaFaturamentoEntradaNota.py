@@ -10,8 +10,7 @@ from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvament
 from componentes import criaFrameJanela, criaBotao
  
 def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, cons):
-    valorDaNota = ctk.StringVar()
-    valorDaNota.set(valorNota)
+
     self.variavelRepeticao = 0
     self.row = 1
     self.frameTelaGerarFaturamento = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
@@ -32,13 +31,7 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, cons):
     self.descontoTotalVindoDoPedido = ctk.StringVar()
     self.acrescimoTotalVindoDoPedido = ctk.StringVar()
 
-    self.botaoAdicionarParcela = ctk.CTkButton(
-        self.frameTelaGerarFaturamento, 
-        text="Adicionar Parcela", 
-        width=20, 
-        corner_radius=0, 
-        command=lambda: verificaParcelasPreenchidas(self)
-    )
+    self.botaoAdicionarParcela = ctk.CTkButton(self.frameTelaGerarFaturamento, text="Adicionar Parcela", width=20, corner_radius=0, command=lambda: verificaParcelasPreenchidas(self))
 
     # Campos de totais
     labelEntradasTotais = ctk.CTkLabel(self.frameValorTotais, text="Total")
@@ -68,7 +61,7 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, cons):
 
     labelValorDaNota = ctk.CTkLabel(self.frameValorTotais, text="Valor da nota")
     labelValorDaNota.place(relx=0.1, rely=0.60)
-    self.ValorDaNota = ctk.CTkEntry(self.frameValorTotais, textvariable=valorDaNota)
+    self.ValorDaNota = ctk.CTkEntry(self.frameValorTotais, textvariable=valorNota)
     self.ValorDaNota.place(relx=0.1, rely=0.70, relwidth=0.3)
 
     self.listaComboboxes = []
@@ -103,7 +96,10 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, cons):
 
     def adicionaParcela(self):
         self.valorDoPedidoVariavel = ctk.StringVar()
-        self.valorDoPedidoVariavel.set(valorDaNota.get())
+        if valorNota:
+            self.valorDoPedidoVariavel.set(valorNota.get())
+        else:
+            self.valorDoPedidoVariavel.set(0)
 
         self.y += 0.038
         self.botaoAdicionarParcela.place(relx=0.2, rely=self.y)
@@ -174,7 +170,11 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, cons):
         colunas.place(relx=posicaox, rely=posicaoy, relwidth=largura_label-0.001)
 
     def salvarEFechar(self):
-        confirmarSalvamentoDoFaturamentoNota(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, self.variavelRepeticao)
+        try:
+            confirmarSalvamentoDoFaturamentoNota(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, self.variavelRepeticao)
+        except:
+            confirmarSalvamentoDoFaturamentoNota(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, "99/99/9999", self.variavelRepeticao)
+
         telaObservacoesNotaSaida(self, cons)
 
     criaBotao(self.frameTelaGerarFaturamento, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaGerarFaturamento.destroy()).place(anchor="nw")

@@ -251,7 +251,6 @@ def criaComandoACBr(self, nome_arquivo):
     # Data/Hora
     data_ptbr = V("variavelDataDocumento", "")
     if not data_ptbr:
-        # tenta QDate (ex.: self.data_emissao)
         try:
             d = getattr(self, "data_emissao")
             if hasattr(d, "date"):

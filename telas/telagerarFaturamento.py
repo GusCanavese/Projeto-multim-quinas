@@ -194,7 +194,6 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
             forma_pagamento = self.listaComboboxes[i].get()
             quantidade = self.listaEntradaQuantidade[i].get()
             valor = self.listaEntradaValor[i].get()
-            print(self.data.get())
         self.frameTelaGerarFaturamento.destroy()
     criaBotao(self.frameTelaGerarFaturamento, "Salvar e fechar", 0.4, 0.918, 0.15, lambda: salvarEFechar(self))
 

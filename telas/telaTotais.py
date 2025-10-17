@@ -95,6 +95,6 @@ def telaTotais(self, dadosNota, IPI):
     criarLabelLateralEntry(self.frameTelaTotais, "BC da Previdência Social", 0.48, 0.55, 0.11, none)
     criarLabelLateralEntry(self.frameTelaTotais, "VR Previdência Social",    0.48, 0.60, 0.11, none)
 
-    criaBotao(self.frameTelaTotais, "Próximo - Tela de faturamento", 0.25, 0.94, 0.15, lambda: telaGerarFaturamentoEntradaNota(self, dadosNota, variavelValorLiquido)).place(anchor="nw")
+    criaBotao(self.frameTelaTotais, "Próximo - Tela de faturamento", 0.25, 0.94, 0.15, lambda: telaGerarFaturamentoEntradaNota(self, dadosNota, variavelValorLiquido, 0)).place(anchor="nw")
     criaBotao(self.frameTelaTotais, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaTotais.destroy()).place(anchor="nw")
 
