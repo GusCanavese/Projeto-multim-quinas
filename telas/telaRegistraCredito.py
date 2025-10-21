@@ -217,5 +217,5 @@ def telaRegistroCredito(self, dadosNota):
     formasPag = criarLabelComboBox(self.frameTelaRegistraCredito, "Forma de pagamento", 0.4, 0.64, 0.2, opcoesPagamento)
     formasPag.set(formaDePagamento.get())
 
-    criaBotao(self.frameTelaRegistraCredito, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutos(self, dadosNota, cfop)).place(anchor="nw")
+    criaBotao(self.frameTelaRegistraCredito, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutos(self, dadosNota, 1, cfop)).place(anchor="nw")
     criaBotao(self.frameTelaRegistraCredito, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaRegistraCredito.destroy()).place(anchor="nw")
