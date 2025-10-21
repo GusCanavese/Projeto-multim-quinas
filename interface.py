@@ -28,6 +28,7 @@ import telas.telaContasAPagarEAReceber
 import telas.telaNotaFiscalSaida
 import telas.telaProdutoNotaSaida
 import telas.telaSpedFiscal
+import telas.telaTransporteNotaSaida
 # import random
 
 # ctk.set_appearance_mode("system")  

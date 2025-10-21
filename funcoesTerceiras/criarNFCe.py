@@ -430,8 +430,8 @@ def criaComandoACBr(self, nome_arquivo):
         f.write(f"serie={serie_int}\r\n")
         f.write(f"nNF={nnf_int}\r\n")
         f.write(f"dhEmi={data_ptbr} {hora}\r\n")
-        f.write(f"tpNF={tpnf}\r\n")
-        f.write("idDest=1\r\n")
+        f.write(f"tpNF={1}\r\n")
+        f.write(f"idDest={idDest}\r\n")
         f.write("tpAmb=2\r\n")
         f.write("tpImp=4\r\n")
         f.write("tpEmis=1\r\n")
@@ -533,6 +533,7 @@ def criaComandoACBr(self, nome_arquivo):
 
             # >>> AJUSTE CFOP PARA BATER COM idDest / tpNF (EVITA 773/733)
             _cfop = _so_digitos(str(CFOP)) or "5102"
+            tpnf = 1
             if idDest == 3:
                 # Exterior -> 7xxx (saída) ou 3xxx (entrada)
                 if tpnf == 1 and _cfop[0] != "7":
@@ -607,7 +608,7 @@ def criaComandoACBr(self, nome_arquivo):
                 pass
 
             f.write(f"[Produto{idx:03d}]\r\n")
-            f.write(f"cProd={cProd}\r\nxProd={xProd}\r\nNCM={NCM}\r\nCFOP={CFOP}\r\n")
+            f.write(f"cProd={cProd}\r\nxProd={xProd}\r\nNCM={NCM}\r\nCFOP={5102}\r\n")
             f.write(f"uCom={uCom}\r\nqCom={qCom}\r\nvUnCom={vUnCom}\r\nvProd={vProd}\r\nindTot=1\r\n\r\n")
             # --- FIM NORMALIZAÇÃO ---
 

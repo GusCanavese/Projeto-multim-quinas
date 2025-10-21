@@ -170,7 +170,7 @@ def telaNotaFiscalSaida(self, valor, cons):
             self.variavelCodigoMunicipioEnd = "3162500"
             self.variavelTelefoneEnd        = "3233716171"
 
-            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoNutrigel.pfx"
+            self.caminhoCertificado = r"C:\Users\gus\Desktop\Projeto-multim-quinas\certificados\certificadoNutrigel.pfx"
             self.senhaCertificado   = "nutri@00995"
 
         if valor == "Multimáquinas":

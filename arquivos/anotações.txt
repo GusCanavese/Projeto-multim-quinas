@@ -1,9 +1,47 @@
-opção pra devolução e opção pra referenciar nota fiscal igual
-checkbox para movimentação de produtos do estoque✅
-colocar quantidade antes do preço na tela de produtos
-contas para o pis e cofins:       valor cofins  = aliq PIS(%) * base de calculo pis(valor do icms com a aliq do icms) mesma coisa pro pis✅
-tela transporte "faltando modalidade de frete e campos de dados✅
-quando tem trransportadora cadastrada, só digitar o cnpk e ja é importado o trransportadora
-gerar faturaento não é mais obrigatório✅
-na hora de gerarNFCe ta indo pro sped fiscal
-nota fiscal de entrada parte do produto importado ta dando erro e faturamento também
+Relatório pra nota fiscal
+Tabela de notas fiscais com filtro 
+
+Começa digitando pelo CNPJ
+cadastrar novo caso não existe (cliente e fornecedor)
+
+Notas referenciadas
+Verificar dados do produto tag 
+Tirar FCP da tela de tributação 
+Valor de venda = valor final do produto***                          ✅
+BC IMS = valor de venda                                             ✅
+Redução base icms (%) influência no valor da base de cálculo BC IMS ✅
+VLR ICMS = Alíquota (%) * BC IMS                                    ✅
+Dar funcionalidade redução BC icms                                  ✅
+BC PIS = base produto - VLR ICMS                                    ✅
+Tirar cofins pis ST                                                 ✅
+Pesquisar transportador via CNPJ 
+Tirar segunda linha nota transporte saída                           ✅
+arrumar posição botao remover item da tela transporte nota de saida ✅
+
+Colocar dinheiro na forma de pagamento
+Faturamento puxar valor 
+
+Número do pedido vinculado a nota na tela de gerar
+
+Salvar ficar em rascunho, colocar mais uma camada de confirmação pra realmente salvar 
+
+Inutilizar nota
+CCR carta de correção
+Gerar XML
+Imprimir (save to PDF)
+Clonar nota
+
+———————————————————————
+NFC-E
+
+Não é obrigatório razão social cliente pra gerar 
+Mudar as mesmas coisas de Tributação do NC-E
+Tirar tela de transporte. 
+
+———————————————————————
+
+Adicionar opção de entrar sem XML
+Município gerador no transporte, puxar dados do município 
+
+———————————————————————
+SPED FISCAL

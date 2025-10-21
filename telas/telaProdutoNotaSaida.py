@@ -164,7 +164,7 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
         self.vr_pis = ctk.StringVar()
         self.aliq_pis_st = ctk.StringVar()
         self.bc_pis_st = ctk.StringVar()
-        self.vr_pis_st = ctk.StringVar()
+
         self.aliq_cofins = ctk.StringVar()
         self.bc_cofins = ctk.StringVar()
         self.vr_cofins = ctk.StringVar()
@@ -228,10 +228,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
                 criarLabelEntry(self.framePisCofins, "Vr. PIS", 0.7, 0.18, 0.15, self.vr_pis)
                 criaSimouNaoLateral(self.framePisCofins, "Modalidade PIS", "Percentual", "Valor/Qtd", 0.05, 0.15, passe)
 
-                criarLabelEntry(self.framePisCofins, "Alíq. PIS ST (%)", 0.3, 0.35, 0.15, self.aliq_pis_st)
-                criarLabelEntry(self.framePisCofins, "BC PIS ST", 0.5, 0.35, 0.15, self.bc_pis_st)
-                criarLabelEntry(self.framePisCofins, "Vr. PIS ST", 0.7, 0.35, 0.15, self.vr_pis_st)
-                criaSimouNaoLateral(self.framePisCofins, "Modalidade PIS ST", "Percentual", "Valor/Qtd", 0.05, 0.33, passe)
                 
 
                 COFINS = ctk.CTkLabel(self.framePisCofins,  text="COFINS-----------------------------------------------------------------------------", font=("TkDefaultFont", 11))
@@ -244,13 +240,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
                 criarLabelEntry(self.framePisCofins, "BC COFINS", 0.5, 0.60, 0.15, self.bc_cofins)
                 criarLabelEntry(self.framePisCofins, "Vr. COFINS", 0.7, 0.60, 0.15, self.vr_cofins)
                 criaSimouNaoLateral(self.framePisCofins, "Modalidade COFINS", "Percentual", "Valor/Qtd", 0.05, 0.58, passe)
-
-                criarLabelEntry(self.framePisCofins, "Alíq. COFINS ST (%)", 0.3, 0.77, 0.15, self.aliq_cofins_st)
-                criarLabelEntry(self.framePisCofins, "BC COFINS ST", 0.5, 0.77, 0.15, self.bc_cofins_st)
-                criarLabelEntry(self.framePisCofins, "Vr. COFINS ST", 0.7, 0.77, 0.15, self.vr_cofins_st)
-                criaSimouNaoLateral(self.framePisCofins, "Modalidade COFINS ST", "Percentual", "Valor/Qtd", 0.05, 0.76, passe)
-
-
 
 
 
@@ -478,25 +467,13 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
             self.vr_pis.set(dados_salvos.get("vr_pis",""))
             self.aliq_pis_st.set(dados_salvos.get("aliq_pis_st",""))
             self.bc_pis_st.set(dados_salvos.get("bc_pis_st",""))
-            self.vr_pis_st.set(dados_salvos.get("vr_pis_st",""))
             self.aliq_cofins.set(dados_salvos.get("aliq_cofins",""))
             self.bc_cofins.set(dados_salvos.get("bc_cofins",""))
             self.vr_cofins.set(dados_salvos.get("vr_cofins",""))
-            self.aliq_cofins_st.set(dados_salvos.get("aliq_cofins_st",""))
-            self.bc_cofins_st.set(dados_salvos.get("bc_cofins_st",""))
-            self.vr_cofins_st.set(dados_salvos.get("vr_cofins_st",""))
 
 
 
 
-        def calculaValoresPisCofins():
-            # --- PIS 
-            aliq_pis = 0.00065
-            self.vr_pis.set(float(self.bc_icms.get()) * aliq_pis)
-
-            # --- COFINS (mesma lógica do PIS) ---
-            aliq_cofins = 0.03
-            self.vr_cofins.set(float(self.bc_icms.get()) * aliq_cofins)
 
 
         def calculaValores():
@@ -542,6 +519,10 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
 
             vbc_icms = vo * (1.0 - (red_icms / 100.0))
             vicms = vbc_icms * (aliq_icms / 100.0)
+
+            auxiliarBCPIS = float(self.bc_icms.get())
+            auxiliar = float(self.bc_icms.get())*float(self.red_bc_icms.get())/100
+            self.bc_icms.set(float(self.bc_icms.get())-auxiliar)          
 
             valorICMS = float(self.bc_icms.get())*(aliq_icms / 100.0)
             self.vr_icms.set(f"{valorICMS:.2f}")
@@ -634,15 +615,17 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
 
             # --- PIS 
             aliq_pis = 0.00065
-            valorBCPis = float(self.bc_icms.get()) - valorICMS
+            valorBCPis = auxiliarBCPIS - valorICMS
             self.bc_pis.set(f"{valorBCPis:.2f}")
-            self.vr_pis.set(valorBCPis * aliq_pis)
+            vr_pis = (valorBCPis * aliq_pis * 10)
+            self.vr_pis.set(f"{vr_pis:.2f}")
 
             # --- COFINS (mesma lógica do PIS) ---
             aliq_cofins = 0.03
-            valorBCCofins = float(self.bc_icms.get()) - valorICMS
+            valorBCCofins = auxiliarBCPIS - valorICMS
             self.bc_cofins.set(f"{valorBCCofins:.2f}")
-            self.vr_cofins.set(valorBCCofins * aliq_cofins)
+            vr_cofins = (valorBCCofins * aliq_cofins)
+            self.vr_cofins.set(f"{vr_cofins:.2f}")
 
 
 
@@ -714,13 +697,10 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
                 "vr_pis": self.vr_pis.get(),
                 "aliq_pis_st": self.aliq_pis_st.get(),
                 "bc_pis_st": self.bc_pis_st.get(),
-                "vr_pis_st": self.vr_pis_st.get(),
                 "aliq_cofins": self.aliq_cofins.get(),
                 "bc_cofins": self.bc_cofins.get(),
                 "vr_cofins": self.vr_cofins.get(),
                 "aliq_cofins_st": self.aliq_cofins_st.get(),
-                "bc_cofins_st": self.bc_cofins_st.get(),
-                "vr_cofins_st": self.vr_cofins_st.get()
 
             }
             print(self.dadosProdutos)
