@@ -6,7 +6,7 @@ cadastrar novo caso não existe (cliente e fornecedor)
 
 Notas referenciadas
 Verificar dados do produto tag 
-Tirar FCP da tela de tributação 
+Tirar FCP da tela de tributação                                     ✅ 
 Valor de venda = valor final do produto***                          ✅
 BC IMS = valor de venda                                             ✅
 Redução base icms (%) influência no valor da base de cálculo BC IMS ✅

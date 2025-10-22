@@ -135,18 +135,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
         self.bc_icms_st_dest = ctk.StringVar()
         self.aliq_pis = ctk.StringVar()
         self.aliq_icms_cfop = ctk.StringVar()
-        self.bc_FCP = ctk.StringVar()
-        self.aliq_fcp_porc = ctk.StringVar()
-        self.vr_FCP = ctk.StringVar()
-        self.aliq_fcp_dif = ctk.StringVar()
-        self.bc_fcp_st = ctk.StringVar()
-        self.aliq_fcp_st = ctk.StringVar()
-        self.vr_fcp_st = ctk.StringVar()
-        self.vr_fcp_dif = ctk.StringVar()
-        self.bc_fcp_st_ret = ctk.StringVar()
-        self.aliq_fcp_st_ret = ctk.StringVar()
-        self.vr_fcp_st_ret = ctk.StringVar()
-        self.vr_fcp_efet = ctk.StringVar()
         self.codigoEntry = ctk.StringVar()
         self.NCMEntry = ctk.StringVar()
         self.CSETEntry = ctk.StringVar()
@@ -377,24 +365,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
         criarLabelLateralEntry(frame, "Aliq. ICMS ST (%)",   0.80, 0.41+posGera, 0.09, self.aliq_icms_st)
         criarLabelLateralEntry(frame, "Vr. ICMS ST Dest.",   0.80, 0.45+posGera, 0.09, self.vr_icms_st_dest)
 
-        destinatario = ctk.CTkLabel(frame,  text="FCP-----------------------------------------------------------------------------", font=("TkDefaultFont", 11))
-        destinatario.place(relx=0.02, rely=0.52, relheight=0.01)
-
-        criarLabelLateralEntry(frame, "BC FCP",               0.11, 0.585+posGera, 0.09, self.bc_FCP)
-        criarLabelLateralEntry(frame, "Alíq. FCP (%)",        0.11, 0.625+posGera, 0.09, self.aliq_fcp_porc)
-        criarLabelLateralEntry(frame, "Vr. FCP",              0.11, 0.665+posGera, 0.09, self.vr_FCP)
-        criarLabelLateralEntry(frame, "Aliq. FCP Dif.(%)",    0.34, 0.585+posGera, 0.09, self.aliq_fcp_dif)
-        criarLabelLateralEntry(frame, "BC FCP ST",            0.34, 0.625+posGera, 0.09, self.bc_fcp_st)
-        criarLabelLateralEntry(frame, "Alíq. FCP ST (%)",     0.34, 0.665+posGera, 0.09, self.aliq_fcp_st)
-        criarLabelLateralEntry(frame, "Vr. FCP ST",           0.57, 0.585+posGera, 0.09, self.vr_fcp_st)
-        criarLabelLateralEntry(frame, "Vr. FCP Dif.",         0.57, 0.625+posGera, 0.09, self.vr_fcp_dif)
-        criarLabelLateralEntry(frame, "BC FCP ST Ret.",       0.57, 0.665+posGera, 0.09, self.bc_fcp_st_ret)
-        criarLabelLateralEntry(frame, "Alíq. FCP ST Ret.(%)", 0.80, 0.585+posGera, 0.09, self.aliq_fcp_st_ret)
-        criarLabelLateralEntry(frame, "Vr. FCP ST Ret.",      0.80, 0.625+posGera, 0.09, self.vr_fcp_st_ret)
-        criarLabelLateralEntry(frame, "Vr. FCP Efetivo",      0.80, 0.665+posGera, 0.09, self.vr_fcp_efet)
-
-
-
         criarLabelEntry(frame, "Alíq. IOF (%)",              0.05, 0.70+posGera, 0.25, self.aliqIOFEntry)
         criarLabelEntry(frame, "Alíq. II (%)",               0.31, 0.70+posGera, 0.15, self.aliqIIEntry)
         criarLabelEntry(frame, "BC II ",                     0.47, 0.70+posGera, 0.10, self.BCIIEntry)
@@ -444,18 +414,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
             self.bc_icms_st_dest.set(dados_salvos.get("bc_icms_st_dest", ""))
             self.vr_icms_subst.set(dados_salvos.get("vr_icms_subst", ""))
             self.aliq_icms_st.set(dados_salvos.get("aliq_icms_st", ""))
-            self.bc_FCP.set(dados_salvos.get("bc_FCP", ""))
-            self.aliq_fcp_porc.set(dados_salvos.get("aliq_fcp_porc", ""))
-            self.vr_FCP.set(dados_salvos.get("vr_FCP", ""))
-            self.aliq_fcp_dif.set(dados_salvos.get("aliq_fcp_dif", ""))
-            self.bc_fcp_st.set(dados_salvos.get("bc_fcp_st", ""))
-            self.aliq_fcp_st.set(dados_salvos.get("aliq_fcp_st", ""))
-            self.vr_fcp_st.set(dados_salvos.get("vr_fcp_st", ""))
-            self.vr_fcp_dif.set(dados_salvos.get("vr_fcp_dif", ""))
-            self.bc_fcp_st_ret.set(dados_salvos.get("bc_fcp_st_ret", ""))
-            self.aliq_fcp_st_ret.set(dados_salvos.get("aliq_fcp_st_ret", ""))
-            self.vr_fcp_st_ret.set(dados_salvos.get("vr_fcp_st_ret", ""))
-            self.vr_fcp_efet.set(dados_salvos.get("vr_fcp_efet", ""))
             self.aliqIOFEntry.set(dados_salvos.get("aliq_iof", ""))
             self.aliqIIEntry.set(dados_salvos.get("aliq_ii", ""))
             self.BCIIEntry.set(dados_salvos.get("bc_ii", ""))
@@ -578,41 +536,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
                 self.vr_icms_st_ret.set("")
                 self.vr_icms_subst.set("")
 
-            # -----------------------
-            # FCP / FCP-ST (se aplicável)
-            # -----------------------
-            # FCP: vFCP = BC_FCP * pFCP; se BC_FCP vazio, usa vBCST
-            try:
-                p_fcp = float((self.aliq_fcp_porc.get() or "0").replace(",", "."))
-            except:
-                p_fcp = 0.0
-            try:
-                bc_fcp = float((self.bc_FCP.get() or "0").replace(",", "."))
-            except:
-                bc_fcp = 0.0
-            if bc_fcp == 0.0:
-                bc_fcp = vbc_st
-            vfcp = bc_fcp * (p_fcp / 100.0)
-
-            self.bc_FCP.set(f"{bc_fcp:.2f}" if bc_fcp > 0 else "")
-            self.vr_FCP.set(f"{vfcp:.2f}" if vfcp > 0 else "")
-
-            # FCP-ST: vFCPST = BC_FCP_ST * pFCP_ST; se base vazia, usa vBCST
-            try:
-                p_fcp_st = float((self.aliq_fcp_st.get() or "0").replace(",", "."))
-            except:
-                p_fcp_st = 0.0
-            try:
-                bc_fcp_st = float((self.bc_fcp_st.get() or "0").replace(",", "."))
-            except:
-                bc_fcp_st = 0.0
-            if bc_fcp_st == 0.0:
-                bc_fcp_st = vbc_st
-            vfcp_st = bc_fcp_st * (p_fcp_st / 100.0)
-
-            self.bc_fcp_st.set(f"{bc_fcp_st:.2f}" if bc_fcp_st > 0 else "")
-            self.vr_fcp_st.set(f"{vfcp_st:.2f}" if vfcp_st > 0 else "")
-
             # --- PIS 
             aliq_pis = 0.00065
             valorBCPis = auxiliarBCPIS - valorICMS
@@ -674,18 +597,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
                 "vr_icms_subst": self.vr_icms_subst.get(),
                 "aliq_icms_st": self.aliq_icms_st.get(),
                 "vr_icms_st_dest": self.vr_icms_st_dest.get(),
-                "bc_FCP": self.bc_FCP.get(),
-                "aliq_fcp_porc": self.aliq_fcp_porc.get(),
-                "vr_FCP": self.vr_FCP.get(),
-                "aliq_fcp_dif": self.aliq_fcp_dif.get(),
-                "bc_fcp_st": self.bc_fcp_st.get(),
-                "aliq_fcp_st": self.aliq_fcp_st.get(),
-                "vr_fcp_st": self.vr_fcp_st.get(),
-                "vr_fcp_dif": self.vr_fcp_dif.get(),
-                "bc_fcp_st_ret": self.bc_fcp_st_ret.get(),
-                "aliq_fcp_st_ret": self.aliq_fcp_st_ret.get(),
-                "vr_fcp_st_ret": self.vr_fcp_st_ret.get(),
-                "vr_fcp_efet": self.vr_fcp_efet.get(),
                 "aliq_iof": self.aliqIOFEntry.get(),
                 "aliq_ii": self.aliqIIEntry.get(),
                 "bc_ii": self.BCIIEntry.get(),
