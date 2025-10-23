@@ -5,7 +5,7 @@ Começa digitando pelo CNPJ
 cadastrar novo caso não existe (cliente e fornecedor)
 
 Notas referenciadas
-Verificar dados do produto tag 
+Verificar dados do produto tag                                      ✅(a importação dos produtos pelo tag veio com tudo ok)
 Tirar FCP da tela de tributação                                     ✅ 
 Valor de venda = valor final do produto***                          ✅
 BC IMS = valor de venda                                             ✅
@@ -20,8 +20,8 @@ arrumar posição botao remover item da tela transporte nota de saida ✅
 
 Colocar dinheiro na forma de pagamento
 Faturamento puxar valor 
-
-Número do pedido vinculado a nota na tela de gerar
+arrumar tela de produtos no fluxo de importar nota 
+Número do pedido vinculado a nota na tela de gerar                  ✅
 
 Salvar ficar em rascunho, colocar mais uma camada de confirmação pra realmente salvar 
 

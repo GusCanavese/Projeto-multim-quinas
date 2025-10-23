@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from datetime import datetime
 from telas.telaProdutos import telaProdutos
-from componentes import ( criaFrameJanela, criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox, criaBotao)
+from componentes import criaFrameJanela, criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox, criaBotao
 from telas.telaTransporte import telaTransporte
 
 
@@ -129,11 +129,11 @@ def telaRegistroCredito(self, dadosNota):
             return datetime.strptime(data_str, "%Y-%m-%d").strftime("%d/%m/%Y")
         except:
             return ""
-    dataCriacao = formatar_data(acessar(dadosNota, "NFe", "infNFe", "ide", "dhEmi"))
-    dataEntrada = formatar_data(acessar(dadosNota, "NFe", "infNFe", "ide", "dhSaiEnt"))
-    dataDocumento = formatar_data(acessar(dadosNota, "NFe", "infNFe", "ide", "dhEmi"))
+    dataCriacao      = formatar_data(acessar(dadosNota, "NFe", "infNFe", "ide", "dhEmi"))
+    dataEntrada      = formatar_data(acessar(dadosNota, "NFe", "infNFe", "ide", "dhSaiEnt"))
+    dataDocumento    = formatar_data(acessar(dadosNota, "NFe", "infNFe", "ide", "dhEmi"))
     horaEntradaSaida = acessar(dadosNota, "NFe", "infNFe", "ide", "dhSaiEnt").split("T")[-1][:5] if "T" in acessar(dadosNota, "NFe", "infNFe", "ide", "dhSaiEnt") else ""
-    codigoPagamento = acessar(dadosNota, "NFe", "infNFe", "pag", "detPag", "tPag")
+    codigoPagamento  = acessar(dadosNota, "NFe", "infNFe", "pag", "detPag", "tPag")
     variavelNumeroDaNota.set(acessar(dadosNota, "NFe", "infNFe", "ide", "nNF"))
     variavelSerieDaNota.set(acessar(dadosNota, "NFe", "infNFe", "ide", "serie"))
     variavelChaveDaNota.set(tirarPrefixoDaNota)
@@ -151,11 +151,8 @@ def telaRegistroCredito(self, dadosNota):
     variavelDataEntrada.set(dataEntrada)
     variavelDataCriacao.set(dataCriacao)
     variavelHoraEntradaSaida.set(horaEntradaSaida)
-    # variavelStatus.set(acessar(dadosNota, "NFe", "infNFe", "ide", "tpNF"))
     variavelStatus.set("Em Digitação")
     variavelDataConfirmacao.set(dataEntrada)
-    # variavelCFOP.set(acessar(dadosNota, "NFe", "infNFe", "det", "prod", "CFOP"))
-    # variavelNatureza.set(acessar(dadosNota, "NFe", "infNFe", "ide", "natOp"))
     
 
     # Combos
@@ -169,9 +166,9 @@ def telaRegistroCredito(self, dadosNota):
         case _:
             formaDePagamento.set("Outros")
 
-    opcoesSituacao = ["Normal", "Extemporâneo"]
+    opcoesSituacao   = ["Normal", "Extemporâneo"]
     opcoesFinalidade = ["Normal", "complementar", "Ajuste"]
-    opcoesPagamento = ["À vista", "À prazo", "Outros"]
+    opcoesPagamento  = ["À vista", "À prazo", "Outros"]
     opcoesTransporte = [
         "Contratação do Frete por conta do Remetente (CIF)",
         "Contratação do Frete por conta do Destinatário (FOB)",
@@ -217,5 +214,5 @@ def telaRegistroCredito(self, dadosNota):
     formasPag = criarLabelComboBox(self.frameTelaRegistraCredito, "Forma de pagamento", 0.4, 0.64, 0.2, opcoesPagamento)
     formasPag.set(formaDePagamento.get())
 
-    criaBotao(self.frameTelaRegistraCredito, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutos(self, dadosNota, 1, cfop)).place(anchor="nw")
+    criaBotao(self.frameTelaRegistraCredito, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutos(self, dadosNota, 0, cfop)).place(anchor="nw")
     criaBotao(self.frameTelaRegistraCredito, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaRegistraCredito.destroy()).place(anchor="nw")

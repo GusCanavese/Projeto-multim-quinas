@@ -23,7 +23,7 @@ def acessar(dados, *caminho, default=""):
     return dados if isinstance(dados, str) else default
 
 
-def telaTransporteNotaSaida(self, cons):
+def telaTransporteNotaSaida(self, EhNotaDoConsumidor):
     
     listaLabels = ["Quantidade", "Espécie",	"Marca", "Numeração", "Peso Bruto",	"Peso Líquido"]
     opcoesTransporte = [
@@ -122,5 +122,5 @@ def telaTransporteNotaSaida(self, cons):
 
 
 
-    criaBotao(self.frametelaTransporte, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: telaTotaisNotaSaida(self, cons)).place(anchor="nw")
+    criaBotao(self.frametelaTransporte, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: telaTotaisNotaSaida(self, EhNotaDoConsumidor)).place(anchor="nw")
     criaBotao(self.frametelaTransporte, "Voltar", 0.05, 0.94, 0.15, lambda: self.frametelaTransporte.destroy()).place(anchor="nw")
