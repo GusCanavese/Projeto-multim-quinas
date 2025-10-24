@@ -6,6 +6,7 @@ from datetime import date
 import customtkinter as ctk
 import sys
 import os
+from datetime import date
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
@@ -254,7 +255,6 @@ def modal(self, teste):
     entradasLista = []
     variaveis = []
 
-
     for i in enumerate(labels):
         variavel = ctk.StringVar()
         variaveis.append(variavel)
@@ -283,6 +283,58 @@ def modal(self, teste):
             campo.place(relx=posicaoxb, rely=0.15)
             entradasLista.append(campo)
             posicaoxb += 0.15
+
+    forma = self.combobox.get()  # usa o combobox que disparou o modal
+
+    if forma == "Dinheiro":
+        # Ajuste valores padrão para pagamento à vista
+        try:
+            # Qtd parcelas = 1
+            entradasLista[1].set("1")
+            entradasLista[1].configure(state="disabled")
+        except Exception:
+            pass
+
+        try:
+            # Repetição não se aplica
+            # qualquer valor; ficará desabilitado
+            self.campoRepeticao.set("Mensal")
+            self.campoRepeticao.configure(state="disabled")
+        except Exception:
+            pass
+
+        try:
+            # Intervalo = 0 (desabilita)
+            entradasLista[3].delete(0, "end")
+            entradasLista[3].insert(0, "0")
+            entradasLista[3].configure(state="disabled")
+        except Exception:
+            pass
+
+        try:
+            entradasLista[4].delete(0, "end")
+            entradasLista[4].insert(0, date.today().strftime("%d/%m/%Y"))
+            entradasLista[4].configure(state="disabled")
+        except Exception:
+            pass
+    else:
+        # Qualquer outra forma: garante que tudo esteja habilitado
+        try:
+            entradasLista[1].configure(state="normal")
+        except Exception:
+            pass
+        try:
+            self.campoRepeticao.configure(state="normal")
+        except Exception:
+            pass
+        try:
+            entradasLista[3].configure(state="normal")
+        except Exception:
+            pass
+        try:
+            entradasLista[4].configure(state="normal")
+        except Exception:
+            pass
 
     self.opcoesLabelModal = ["Item", "Documento", "Valor", "Vencimento"]
     self.posicaoXLabelModal = 0.2
