@@ -12,8 +12,8 @@ from componentes import criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel,
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
-def telaProdutosNotaSaida(self, cnpj, cfop, cons):
-
+def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
+    print("entrou na certa")
     self.row=1
     self.posicaoy = 0.2
     self.posicaox = 0.024
@@ -660,6 +660,9 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
             entry_subtotal.insert(0, f"{novo_subtotal:.2f}")
             total += novo_subtotal
 
+        self.valorSubtotal = total
+        print(self.valorSubtotal)
+
     for i, coluna in enumerate(listaLabels):
         if i == 0:
             criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.040, self.cor)
@@ -816,7 +819,7 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
             self.valoresDosItens.append(item)
 
 
-    criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, cons))).place(anchor="nw")
+    criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, EhNotaDoConsumidor))).place(anchor="nw")
     criaBotao(frameTelaNotaProduto, "Voltar", 0.05, 0.94, 0.15, lambda: frameTelaNotaProduto.destroy()).place(anchor="nw")
 
     aplicar_maiusculo_em_todos_entries(self)

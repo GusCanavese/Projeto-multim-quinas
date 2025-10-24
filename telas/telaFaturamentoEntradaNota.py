@@ -18,16 +18,15 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, EhNotaDoConsumid
     self.frameValorTotais = ctk.CTkFrame(self.frameTelaGerarFaturamento, fg_color=self.cor)
 
     valores = ["Forma de pagamento", "Quantidade parcelas", "Valor"]
-    opcoesPagamento = ["", "Bndes", "Boleto", "Carnê", "Crédito a vista", "Crédito parcelado", "Débito", "Cheque", "Depósito"]
+    opcoesPagamento = ["", "Dinheiro", "Bndes", "Boleto", "Carnê", "Crédito a vista", "Crédito parcelado", "Débito", "Cheque", "Depósito"]
 
     largura_label = 0.2
     posicaoy = 0.1
     self.y = 0.138
     self.teste = 0.038
     self.yParcelas = 0.138
-    self.totais = 0
     self.totaisFormasDePagamento = ctk.StringVar()
-    self.totaisFormasDePagamento.set(self.totais)
+    self.totaisFormasDePagamento.set(self.valorSubtotal)
 
     self.descontoTotalVindoDoPedido = ctk.StringVar()
     self.acrescimoTotalVindoDoPedido = ctk.StringVar()
@@ -114,7 +113,7 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, EhNotaDoConsumid
         self.entradaQuantidade.place(relx=0.4, rely=self.yParcelas, relwidth=0.2)
         self.listaEntradaQuantidade.append(self.entradaQuantidade)
 
-        self.entradaValor = ctk.CTkEntry(self.frameTelaGerarFaturamento, textvariable=self.valorDoPedidoVariavel, width=100, corner_radius=0)
+        self.entradaValor = ctk.CTkEntry(self.frameTelaGerarFaturamento, textvariable=self.totaisFormasDePagamento, width=100, corner_radius=0)
         self.entradaValor.place(relx=0.6, rely=self.yParcelas, relwidth=0.2)
         self.entradaValor.bind("<KeyRelease>", lambda event: calcularTotal())
         self.listaEntradaValor.append(self.entradaValor)
