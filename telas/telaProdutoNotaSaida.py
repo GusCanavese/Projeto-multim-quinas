@@ -22,7 +22,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
     self.contadorDeLinhas = 0
     self.yNovo = 0.24
     self.entradaProduto = 0
-    self.valorSubtotal = 0
     self.linhas = []
 
 
@@ -660,8 +659,8 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
             entry_subtotal.insert(0, f"{novo_subtotal:.2f}")
             total += novo_subtotal
 
-        self.valorSubtotal = total
-        print(self.valorSubtotal)
+        self.valorSubtotalFaturamento = total
+        print(self.valorSubtotalFaturamento)
 
     for i, coluna in enumerate(listaLabels):
         if i == 0:

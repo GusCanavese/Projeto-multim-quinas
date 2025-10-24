@@ -3,7 +3,7 @@ Tabela de notas fiscais com filtro
 Começa digitando pelo CNPJ                                             (Gustavo)
 cadastrar novo caso não existe (cliente e fornecedor)                  (Gustavo)
 Notas referenciadas
-Verificar dados do produto tag                                      ✅(a importação dos produtos pelo tag veio com tudo ok)
+Verificar dados do produto tag                                      ✅
 Tirar FCP da tela de tributação                                     ✅ 
 Valor de venda = valor final do produto***                          ✅
 BC IMS = valor de venda                                             ✅
@@ -16,7 +16,7 @@ Pesquisar transportador via CNPJ
 Tirar segunda linha nota transporte saída                           ✅
 arrumar posição botao remover item da tela transporte nota de saida ✅
 Colocar dinheiro na forma de pagamento                              ✅
-Faturamento puxar valor                                                 (Gabriel)
+Faturamento puxar valor                                             ✅
 arrumar tela de produtos no fluxo de importar nota                      
 Número do pedido vinculado a nota na tela de gerar                  ✅
 

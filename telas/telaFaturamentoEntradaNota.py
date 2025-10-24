@@ -26,7 +26,8 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, EhNotaDoConsumid
     self.teste = 0.038
     self.yParcelas = 0.138
     self.totaisFormasDePagamento = ctk.StringVar()
-    self.totaisFormasDePagamento.set(self.valorSubtotal)
+    self.totaisFormasDePagamento.set(self.valorSubtotalFaturamento)
+    print(self.valorSubtotalFaturamento)
 
     self.descontoTotalVindoDoPedido = ctk.StringVar()
     self.acrescimoTotalVindoDoPedido = ctk.StringVar()
@@ -114,6 +115,7 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, EhNotaDoConsumid
         self.listaEntradaQuantidade.append(self.entradaQuantidade)
 
         self.entradaValor = ctk.CTkEntry(self.frameTelaGerarFaturamento, textvariable=self.totaisFormasDePagamento, width=100, corner_radius=0)
+        print(self.totaisFormasDePagamento)
         self.entradaValor.place(relx=0.6, rely=self.yParcelas, relwidth=0.2)
         self.entradaValor.bind("<KeyRelease>", lambda event: calcularTotal())
         self.listaEntradaValor.append(self.entradaValor)
