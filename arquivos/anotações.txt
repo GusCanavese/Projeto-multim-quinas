@@ -1,3 +1,5 @@
+NOTA DE SAÍDA:
+
 Relatório pra nota fiscal
 Tabela de notas fiscais com filtro 
 
@@ -5,7 +7,7 @@ Começa digitando pelo CNPJ
 cadastrar novo caso não existe (cliente e fornecedor)
 
 Notas referenciadas
-Verificar dados do produto tag 
+Verificar dados do produto tag                                      ⏳ (Gus)
 Tirar FCP da tela de tributação                                     ✅ 
 Valor de venda = valor final do produto***                          ✅
 BC IMS = valor de venda                                             ✅
@@ -18,10 +20,10 @@ Pesquisar transportador via CNPJ
 Tirar segunda linha nota transporte saída                           ✅
 arrumar posição botao remover item da tela transporte nota de saida ✅
 
-Colocar dinheiro na forma de pagamento
-Faturamento puxar valor 
+Colocar dinheiro na forma de pagamento                              ⏳
+Faturamento puxar valor                                             ⏳
 
-Número do pedido vinculado a nota na tela de gerar
+Número do pedido vinculado a nota na tela de gerar                  ⏳ (Gus)
 
 Salvar ficar em rascunho, colocar mais uma camada de confirmação pra realmente salvar 
 
@@ -32,16 +34,17 @@ Imprimir (save to PDF)
 Clonar nota
 
 ———————————————————————
-NFC-E
+NFC-E:
 
 Não é obrigatório razão social cliente pra gerar 
 Mudar as mesmas coisas de Tributação do NC-E
 Tirar tela de transporte. 
 
 ———————————————————————
+Nota de Entrada:
 
 Adicionar opção de entrar sem XML
 Município gerador no transporte, puxar dados do município 
 
 ———————————————————————
-SPED FISCAL
+SPED FISCAL: 
