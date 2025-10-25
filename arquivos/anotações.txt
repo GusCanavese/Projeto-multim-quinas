@@ -1,4 +1,4 @@
-NOTA DE SAÍDA:
+teste pull request
 
 Relatório pra nota fiscal
 Tabela de notas fiscais com filtro 
@@ -30,17 +30,16 @@ Imprimir (save to PDF)
 Clonar nota
 
 ———————————————————————
-NFC-E:
+NFC-E
 
 Não é obrigatório razão social cliente pra gerar 
 Mudar as mesmas coisas de Tributação do NC-E
 Tirar tela de transporte. 
 
 ———————————————————————
-Nota de Entrada:
 
 Adicionar opção de entrar sem XML
 Município gerador no transporte, puxar dados do município 
 
 ———————————————————————
-SPED FISCAL: 
+SPED FISCAL
