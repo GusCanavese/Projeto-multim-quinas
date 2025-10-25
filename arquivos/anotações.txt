@@ -2,12 +2,10 @@ NOTA DE SAÍDA:
 
 Relatório pra nota fiscal
 Tabela de notas fiscais com filtro 
-
-Começa digitando pelo CNPJ
-cadastrar novo caso não existe (cliente e fornecedor)
-
+Começa digitando pelo CNPJ                                             (Gustavo)
+cadastrar novo caso não existe (cliente e fornecedor)                  (Gustavo)
 Notas referenciadas
-Verificar dados do produto tag                                      ⏳ (Gus)
+Verificar dados do produto tag                                      ✅
 Tirar FCP da tela de tributação                                     ✅ 
 Valor de venda = valor final do produto***                          ✅
 BC IMS = valor de venda                                             ✅
@@ -19,14 +17,12 @@ Tirar cofins pis ST                                                 ✅
 Pesquisar transportador via CNPJ 
 Tirar segunda linha nota transporte saída                           ✅
 arrumar posição botao remover item da tela transporte nota de saida ✅
-
-Colocar dinheiro na forma de pagamento                              ⏳
-Faturamento puxar valor                                             ⏳
-
-Número do pedido vinculado a nota na tela de gerar                  ⏳ (Gus)
+Colocar dinheiro na forma de pagamento                              ✅
+Faturamento puxar valor                                             ✅
+arrumar tela de produtos no fluxo de importar nota                     (Gabriel) completa com os valores dos produtos que são puxados pela nota. A tela de produtos, a função "lerNotaFiscal" e a "EscolherNotaFiscal", ce pod ejogar no gpt e pedir pra ele enviar esses dados para os respectivos campos da tela de produtos.  outro detalhe, pra mais preciso, pede o chat pra nao criar funções extras, e alterar no código somente o que você pediu
+Número do pedido vinculado a nota na tela de gerar                  ✅
 
 Salvar ficar em rascunho, colocar mais uma camada de confirmação pra realmente salvar 
-
 Inutilizar nota
 CCR carta de correção
 Gerar XML

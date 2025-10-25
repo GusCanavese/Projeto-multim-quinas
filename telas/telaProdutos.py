@@ -15,7 +15,8 @@ from componentes import criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel,
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
-def telaProdutos(self, cnpj, cfop, cons, dadosNota=None):
+def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
+    print(EhNotaDoConsumidor)
     """
     Tela de Produtos da Nota de Saída.
     Se `dadosNota` (NF-e de entrada) for fornecido, os itens serão
@@ -56,7 +57,7 @@ def telaProdutos(self, cnpj, cfop, cons, dadosNota=None):
 
         self.resultadoLabelsProduto = []
 
-        for i, row in enumerate(Buscas.buscaEstoqueProdutosFiscal(nomeDoProduto, cnpj)):
+        for i, row in enumerate(Buscas.buscaEstoqueProdutosFiscal(nomeDoProduto)):
             if i >= 5:
                 break     
             label = criaBotao(frameParaItensNoFrame,row[0],0.195,yNovo+0.02 + i * 0.02,0.26,lambda nome=row[0], valor=row[6].replace(',', '.'), quantidade=row[8].replace(',', '.'), ent=entradaProduto:selecionaProduto(nome, valor, quantidade, ent))
@@ -944,7 +945,7 @@ def telaProdutos(self, cnpj, cfop, cons, dadosNota=None):
         # Atualiza totais após o preenchimento
         atualizarTotalGeral()
 
-    criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, cons))).place(anchor="nw")
+    criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, EhNotaDoConsumidor))).place(anchor="nw")
     criaBotao(frameTelaNotaProduto, "Voltar", 0.05, 0.94, 0.15, lambda: frameTelaNotaProduto.destroy()).place(anchor="nw")
 
     aplicar_maiusculo_em_todos_entries(self)

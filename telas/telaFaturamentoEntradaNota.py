@@ -28,9 +28,9 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, cons):
     self.y = 0.138
     self.teste = 0.038
     self.yParcelas = 0.138
-    self.totais = 0
     self.totaisFormasDePagamento = ctk.StringVar()
-    self.totaisFormasDePagamento.set(self.totais)
+    self.totaisFormasDePagamento.set(self.valorSubtotalFaturamento)
+    print(self.valorSubtotalFaturamento)
 
     self.descontoTotalVindoDoPedido = ctk.StringVar()
     self.acrescimoTotalVindoDoPedido = ctk.StringVar()
@@ -203,7 +203,7 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, cons):
             confirmarSalvamentoDoFaturamentoNota(
                 self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, "99/99/9999", self.variavelRepeticao)
 
-        telaObservacoesNotaSaida(self, cons)
+        telaObservacoesNotaSaida(self, EhNotaDoConsumidor)
 
     criaBotao(self.frameTelaGerarFaturamento, "Voltar", 0.05, 0.94, 0.15,
               lambda: self.frameTelaGerarFaturamento.destroy()).place(anchor="nw")
