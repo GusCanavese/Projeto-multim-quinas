@@ -26,8 +26,10 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, EhNotaDoConsumid
     self.teste = 0.038
     self.yParcelas = 0.138
     self.totaisFormasDePagamento = ctk.StringVar()
-    self.totaisFormasDePagamento.set(self.valorSubtotalFaturamento)
-    print(self.valorSubtotalFaturamento)
+    try:
+        self.totaisFormasDePagamento.set(self.valorSubtotalFaturamento)
+    except:
+        self.totaisFormasDePagamento.set(0)
 
     self.descontoTotalVindoDoPedido = ctk.StringVar()
     self.acrescimoTotalVindoDoPedido = ctk.StringVar()
