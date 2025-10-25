@@ -660,7 +660,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
             total += novo_subtotal
 
         self.valorSubtotalFaturamento = total
-        print(self.valorSubtotalFaturamento)
 
     for i, coluna in enumerate(listaLabels):
         if i == 0:

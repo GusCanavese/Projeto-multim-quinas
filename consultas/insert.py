@@ -44,9 +44,15 @@ class Insere:
 
 
 
-    def insereClienteNoBanco(nome, cpf, cnpj, IE, RG, CEP, rua, numero, bairro, cidade, estado, referencia, telefone):
-        queryInserirCliente = "INSERT INTO clientes(nome, cpf, cnpj, IE, RG, CEP, rua, numero, bairro, cidade, estado, referencia, telefone) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-        db.cursor.execute(queryInserirCliente, (nome, cpf, cnpj, IE, RG, CEP, rua, numero, bairro, cidade, estado, referencia, telefone, ))
+    def insereClienteNoBanco(nome, cpf, cnpj, IE, RG, CEP, rua, numero, bairro, cidade, estado, referencia, telefone, fiscal):
+        if fiscal:
+            print("entrou, eh fiscal")
+            queryInserirCliente = "INSERT INTO clientes_fiscal(nome_razao_social, CPF_CNPJ, inscricao_estadual, CEP, Logradouro, Numero, Bairro, Cidade, Estado) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+            db.cursor.execute(queryInserirCliente, (nome, cpf, IE, CEP, rua, numero, bairro, cidade, estado, ))
+        else:
+            print("entrou, não fiscal")
+            queryInserirCliente = "INSERT INTO clientes(nome, cpf, cnpj, IE, RG, CEP, rua, numero, bairro, cidade, estado, referencia, telefone) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+            db.cursor.execute(queryInserirCliente, (nome, cpf, cnpj, IE, RG, CEP, rua, numero, bairro, cidade, estado, referencia, telefone, ))
         db.conn.commit()
         messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
 
