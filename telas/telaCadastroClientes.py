@@ -5,13 +5,13 @@ import customtkinter as ctk
 from tkinter import messagebox
 import requests
 from funcoesTerceiras.registraClienteNoBanco import registraClienteNoBanco
-from componentes import criaFrameJanela, criaFrameJanela, criarLabelEntry, criaBotao
+from componentes import criaFrameJanela, criaFrameJanela, criarLabelEntry, criaBotao, criarLabelComboBox
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
-def telaCadastroClientes(self):
-    frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
+def telaCadastroClientes(self, ehClienteFiscal):
+    frame  = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     bairro = ctk.StringVar()
-    rua = ctk.StringVar()
+    rua    = ctk.StringVar()
     cidade = ctk.StringVar()
     estado = ctk.StringVar()
 
@@ -36,7 +36,7 @@ def telaCadastroClientes(self):
     self.cidadeCliente = criarLabelEntry(frame, "Cidade *", 0.50, 0.35, 0.24, cidade)
     self.estadoCliente = criarLabelEntry(frame, "Estado *", 0.75, 0.35, 0.10, estado)
 
-    self.referencia    = criarLabelEntry(frame, "Referência ", 0.45+0.05, 0.45, 0.35, None)
+    self.referencia    = criarLabelEntry(frame, "Referência ", 0.50, 0.45, 0.35, None)
 
     self.CEPcliente.bind("<Return>", lambda event: buscaCep(self.CEPcliente.get(), self.numeroCliente.get()))
     self.CEPcliente.bind("<Tab>", lambda event: buscaCep(self.CEPcliente.get(), self.numeroCliente.get()) if self.CEPcliente.get().strip() else None)
@@ -62,5 +62,5 @@ def telaCadastroClientes(self):
     # ================ Botões =====================#
 
     criaBotao(frame, "◀️ Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
-    criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraClienteNoBanco(self, frame))
+    criaBotao(frame, "Cadastrar", 0.66, 0.80, 0.20, lambda:registraClienteNoBanco(self, frame, ehClienteFiscal))
     aplicar_maiusculo_em_todos_entries(self)

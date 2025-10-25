@@ -43,7 +43,7 @@ def telaCadastros(self):
 
     elif self.cargo == (('Financeiro',),) or self.cargo == (('Gerente',),):
         
-        clientes = criaBotao(frame, "Clientes", 0.66, 0.24, 0.24, lambda:telaCadastroClientes(self))
+        clientes = criaBotao(frame, "Clientes", 0.66, 0.24, 0.24, lambda:telaCadastroClientes(self, False))
         clientes.configure(height=50, image=fotoCliente, compound="left")
 
         produtos = criaBotao(frame, "Produtos", 0.33, 0.24, 0.24, lambda:telaCadastroProdutos(self))

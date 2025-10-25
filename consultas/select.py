@@ -240,9 +240,35 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
     
-    def buscaClientesFiscal(valor):
-        queryBuscaClientes = """SELECT nome_razao_social, CPF_CNPJ, inscricao_estadual, Logradouro, Numero, CEP, Bairro, Cidade, Estado
-        FROM clientes_fiscal"""
-        db.cursor.execute(queryBuscaClientes)
-        resultado = db.cursor.fetchall()
-        return resultado
+    def buscaClientesFiscal(nome, cnpj):
+        if cnpj:
+            cnpj = cnpj.strip()
+            cnpj_limpo = cnpj.replace('.', '').replace('/', '').replace('-', '')
+
+            queryBuscaClientes = """SELECT nome_razao_social, CPF_CNPJ, inscricao_estadual, Logradouro, Numero, CEP, Bairro, Cidade, Estado
+            FROM clientes_fiscal 
+                WHERE 
+                    REPLACE(REPLACE(REPLACE(CPF_CNPJ, '.', ''), '/', ''), '-', '') LIKE %s"""
+
+            db.cursor.execute(queryBuscaClientes, (f"{cnpj_limpo}%",))
+            resultado = db.cursor.fetchall()
+            return resultado
+        
+        elif nome:
+            queryBuscaClientes = """SELECT nome_razao_social, CPF_CNPJ, inscricao_estadual, Logradouro, Numero, CEP, Bairro, Cidade, Estado
+            FROM clientes_fiscal 
+                WHERE 
+                    nome_razao_social LIKE %s"""
+
+            db.cursor.execute(queryBuscaClientes, (f"{nome}%",))
+            resultado = db.cursor.fetchall()
+            return resultado
+        else:
+            queryBuscaClientes = """SELECT nome_razao_social, CPF_CNPJ, inscricao_estadual, Logradouro, Numero, CEP, Bairro, Cidade, Estado
+            FROM clientes_fiscal 
+                WHERE 
+                    nome_razao_social OR CPF_CNPJ LIKE "%%" """
+
+            db.cursor.execute(queryBuscaClientes)
+            resultado = db.cursor.fetchall()
+            return resultado
