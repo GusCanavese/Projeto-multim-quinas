@@ -5,7 +5,6 @@ import db
 
 
 class Buscas:
-    
     def buscaProduto(nomeDoProduto):
         queryBuscaProduto = "SELECT nome_do_produto, valor_de_venda, quantidade FROM produtos WHERE nome_do_produto LIKE %s"
         db.cursor.execute(queryBuscaProduto, (f"%{nomeDoProduto}%",))
@@ -182,7 +181,6 @@ class Buscas:
 
         return resultado
     
-
     def buscaEstoqueProdutosFiscal(valor, cnpj):
         if cnpj == "Todos":
             queryBuscaProdutosEstoque = """SELECT ﻿descricao_do_produto, cadigo_interno, codigo_de_barras, codigo_grade, codigo_NCM, CST_A, valor_venda, custo, quantidade_em_estoque, CFOP, estoque_MIN, estoque_MAX, CEST, cnpj FROM produtos_fiscal
@@ -229,8 +227,6 @@ class Buscas:
 
         return resultado
 
-
-
     def buscaFuncionarios(valor):
         queryBuscaFuncionarios = """SELECT nome, cargo FROM funcionarios 
         WHERE 
@@ -268,6 +264,41 @@ class Buscas:
             FROM clientes_fiscal 
                 WHERE 
                     nome_razao_social OR CPF_CNPJ LIKE "%%" """
+
+            db.cursor.execute(queryBuscaClientes)
+            resultado = db.cursor.fetchall()
+            return resultado
+        
+
+
+    def buscaTransportador(nome, cnpj):
+        if cnpj:
+            cnpj = cnpj.strip()
+            cnpj_limpo = cnpj.replace('.', '').replace('/', '').replace('-', '')
+
+            queryBuscaClientes = """SELECT nome_real, cpf_cnpj
+            FROM transportadoras 
+                WHERE 
+                    REPLACE(REPLACE(REPLACE(cpf_cnpj, '.', ''), '/', ''), '-', '') LIKE %s"""
+
+            db.cursor.execute(queryBuscaClientes, (f"{cnpj_limpo}%",))
+            resultado = db.cursor.fetchall()
+            return resultado
+        
+        elif nome:
+            queryBuscaClientes = """SELECT nome_real, cpf_cnpj
+            FROM transportadoras 
+                WHERE 
+                    nome_real LIKE %s"""
+
+            db.cursor.execute(queryBuscaClientes, (f"{nome}%",))
+            resultado = db.cursor.fetchall()
+            return resultado
+        else:
+            queryBuscaClientes = """SELECT nome_real, cpf_cnpj
+            FROM transportadoras 
+                WHERE 
+                    nome_real OR cpf_cnpj LIKE "%%" """
 
             db.cursor.execute(queryBuscaClientes)
             resultado = db.cursor.fetchall()
