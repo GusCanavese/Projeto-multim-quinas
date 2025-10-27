@@ -243,20 +243,7 @@ def inserir_nota_fiscal(self, tipo, xml_path=None, status=None):
             transportadora_cnpjcpf, transportadora_nome,
             xml_path, itens_json
         ) VALUES (
-            %s, %s, %s, %s, %s, %s,
-            %s, %s, %s,
-            %s, %s,
-            %s, %s,
-            %s, %s,
-            %s, %s, %s,
-            %s, %s, %s,
-            %s, %s, %s,
-            %s, %s,
-            %s, %s, %s, %s,
-            %s, %s,
-            %s, %s
-        )
-        """,
+            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
         (
             tipo_str, status_str, int(modelo_int), int(serie_int), int(numero_int), chave_nfe,
             cUF, int(tpAmb), int(tpNF),

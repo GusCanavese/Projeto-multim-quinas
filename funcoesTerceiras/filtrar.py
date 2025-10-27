@@ -122,16 +122,6 @@ def filtrarContas(self, frame, valor, pagina=1):
         dadosContas = [conta[0], conta[2], conta[1], conta[3], conta[4]]
         dataOriginal = dadosContas[2]
         dataOriginal = str(dataOriginal)
-        
-        # except:
-        #     dataOriginal = dadosContas[2]
-        #     dataOriginal = str(dataOriginal)
-        #     try:
-        #         dataFormatada = datetime.strptime(dataOriginal, "%Y-%m-%d").strftime("%d/%m/%Y")
-        #     except:
-        #         dataFormatada = datetime.strptime(dataOriginal, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y")
-        #     dadosContas[2] = dataFormatada
-
         x = 0.03
 
 
@@ -187,10 +177,6 @@ def filtrarContas(self, frame, valor, pagina=1):
 
 
 
-
-
-
-
 def filtrarFuncionarios(self, frame, valor, pagina=1):
     
     funcionarios = Buscas.buscaFuncionarios(valor)
@@ -217,6 +203,46 @@ def filtrarFuncionarios(self, frame, valor, pagina=1):
             label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
             self.dadosTelaFiltrarFunc.append(label)
             x+=0.175
+
+
+        btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=dadosContas: telaVer(self, p))
+        self.dadosTelaFiltrarFunc.append(btn)
+
+        y += 0.059
+
+
+
+def filtrarNotasFiscais(self, frame, valor, pagina=1):
+    notas = Buscas.buscaNotasFiscais(valor)
+
+    if hasattr(self, "dadosTelaFiltrarFunc"):
+        for item in self.dadosTelaFiltrarFunc:
+            item.destroy()
+    self.dadosTelaFiltrarFunc = []
+
+    iniciofunc = (pagina - 1) * 10
+    fimfunc = pagina * 10
+    contasPagina = notas[iniciofunc:fimfunc]
+    
+    y = 0.1
+
+    for row, notas in enumerate(contasPagina, start=1):
+        corDeFundo = "#1C60A0"
+        dadosContas = [notas[0], notas[1], notas[2]]
+
+        x = 0.03
+
+        for colNum, valor in enumerate(dadosContas):
+            if colNum == 0:
+                corDeFundo = "#1C60A0"
+                label = criaLabel(frame, valor, x, y, 0.07, corDeFundo)
+                self.dadosTelaFiltrarFunc.append(label)
+                x+=0.075
+            elif colNum == 1:
+                corDeFundo = "#1C60A0"
+                label = criaLabel(frame, valor, x, y, 0.05, corDeFundo)
+                self.dadosTelaFiltrarFunc.append(label)
+                x+=0.055
 
 
         btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=dadosContas: telaVer(self, p))

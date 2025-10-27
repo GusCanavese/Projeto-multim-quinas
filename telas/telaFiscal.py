@@ -6,6 +6,7 @@ from telas.telaNotaFiscalSaida import telaNotaFiscalSaida
 from funcoesTerceiras.escolherNotaFiscal import escolherNotaFiscal
 from telas.telaEstoqueFiscal import telaEstoqueFiscal
 from telas.telaSpedFiscal import telaSpeedFiscal
+from telas.telaRelatorioDeNotasFiscais import telaRelatorioDeNotasFiscais
 
 
 
@@ -26,5 +27,8 @@ def telaFiscal(self):
 
         gerarOrcamento = criaBotao(frame, "Gerar NFC-e", 0.33, 0.46, 0.24, lambda:telaNotaFiscalSaida(self, 0, 1))
         gerarOrcamento.configure(height=50, image=None, compound="left")
+
+        verTodasAsNotas = criaBotao(frame, "Ver todas as notas", 0.66, 0.46, 0.24, lambda:telaRelatorioDeNotasFiscais(self))
+        verTodasAsNotas.configure(height=50, image=None, compound="left")
 
         criaBotao(frame, "◀️ Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
