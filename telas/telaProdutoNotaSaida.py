@@ -7,6 +7,7 @@ from tkinter import messagebox
 import requests
 from PIL import Image
 import datetime
+from telas.telaTotaisNotaSaida import telaTotaisNotaSaida
 from telas.telaTransporteNotaSaida import telaTransporteNotaSaida
 from componentes import criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel, criaEntry, criaSimouNaoLateral, criaTextAreaModal, criarLabelEntry, criarLabelComboBox, criarLabelLateralComboBox, criarLabelLateralEntry
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
@@ -816,10 +817,12 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
             }
             self.valoresDosItens.append(item)
 
-
-    criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, EhNotaDoConsumidor))).place(anchor="nw")
+    #nota do consumidor não precisa de tela de transporte
+    if EhNotaDoConsumidor:
+            criaBotao(frameTelaNotaProduto, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTotaisNotaSaida(self, EhNotaDoConsumidor))).place(anchor="nw")
+    else:
+        criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, EhNotaDoConsumidor))).place(anchor="nw")
     criaBotao(frameTelaNotaProduto, "Voltar", 0.05, 0.94, 0.15, lambda: frameTelaNotaProduto.destroy()).place(anchor="nw")
-
     aplicar_maiusculo_em_todos_entries(self)
 
     

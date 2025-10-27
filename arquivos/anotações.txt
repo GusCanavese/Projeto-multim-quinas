@@ -1,8 +1,5 @@
-Relatório pra nota fiscal                                           🟡(Gustavo)
-Tabela de notas fiscais com filtro                                  🟡(Gustavo)
 Começa digitando pelo CNPJ                                          ✅
-cadastrar novo caso não existe (cliente e fornecedor)               ✅
-Notas referenciadas
+cadastrar novo caso não existe (cliente e fornecedor)               ✅ ? onde era o fornecedor você quis dizer transportador?
 Verificar dados do produto tag                                      ✅
 Tirar FCP da tela de tributação                                     ✅ 
 Valor de venda = valor final do produto***                          ✅
@@ -17,8 +14,22 @@ Tirar segunda linha nota transporte saída                           ✅
 arrumar posição botao remover item da tela transporte nota de saida ✅
 Colocar dinheiro na forma de pagamento                              ✅
 Faturamento puxar valor                                             ✅
-arrumar tela de produtos no fluxo de importar nota                     (Gabriel) completa com os valores dos produtos que são puxados pela nota. A tela de produtos, a função "lerNotaFiscal" e a "EscolherNotaFiscal", ce pod ejogar no gpt e pedir pra ele enviar esses dados para os respectivos campos da tela de produtos.  outro detalhe, pra mais preciso, pede o chat pra nao criar funções extras, e alterar no código somente o que você pediu
 Número do pedido vinculado a nota na tela de gerar                  ✅
+Notas referenciadas
+arrumar tela de produtos no fluxo de importar nota                     (Gabriel) completa com os valores dos produtos que são puxados pela nota. A tela de produtos, a função "lerNotaFiscal" e a "EscolherNotaFiscal", ce pod ejogar no gpt e pedir pra ele enviar esses dados para os respectivos campos da tela de produtos.  outro detalhe, pra mais preciso, pede o chat pra nao criar funções extras, e alterar no código somente o que você pediu
+Relatório pra nota fiscal                                           🟡(Gustavo)
+Tabela de notas fiscais com filtro                                  🟡(Gustavo)
+
+
+
+
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=
+|  ESSAS ALTERAÇÕES SÓ SÃO POSSÍVEIS                           |
+|  DEPOIS QUE A NOTA FISCAL ESTIVER SENDO                      |
+|  GERADA CORRETAMENTE E ESTIVERMOS CONSEGUINDO                |
+|  ACESSAR ELA. OU SEJA, DEPOIS DO RELATÓRIO TER SIDO CRIADO   |
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=
+
 
 Salvar ficar em rascunho, colocar mais uma camada de confirmação pra realmente salvar 
 Inutilizar nota
@@ -29,10 +40,9 @@ Clonar nota
 
 ———————————————————————
 NFC-E
-
-Não é obrigatório razão social cliente pra gerar 
-Mudar as mesmas coisas de Tributação do NC-E
-Tirar tela de transporte. 
+ 
+Mudar as mesmas coisas de Tributação do NC-E                        ✅
+Tirar tela de transporte.                                           ✅
 
 ———————————————————————
 

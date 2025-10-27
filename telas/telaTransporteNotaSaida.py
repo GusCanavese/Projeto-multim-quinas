@@ -5,7 +5,7 @@ import customtkinter as ctk
 from consultas.select import Buscas
 from componentes import criaBotaoPequeno, criaEntry, criaFrameJanela, criaLabel, criarLabelEntry, criarLabelComboBox, criaBotao
 from telas.telaCadastroTransportadoras import telaCadastroTransportadoras 
-from telas.telaTotaisNota import telaTotaisNotaSaida
+from telas.telaTotaisNotaSaida import telaTotaisNotaSaida
 
 def telaTransporteNotaSaida(self, EhNotaDoConsumidor):
     self.frametelaTransporte = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
