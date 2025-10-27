@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
-from telas import telaRegistraCredito, telaVerDebito
+from telas import telaNotaFiscalEntrada, telaVerDebito
 from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criarLabelEntry, criaBotao
 
 def telaVercontasApagar(self, d):
