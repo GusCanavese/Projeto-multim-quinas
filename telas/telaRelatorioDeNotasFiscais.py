@@ -22,22 +22,22 @@ def telaRelatorioDeNotasFiscais(self):
 
 
     # Cabeçalhos da tabela
-    colunas = ["Status", "Operação", "Número", "Série", "Destinatário", "cfop", "Data de emissão", "Valor total"]
+    colunas = ["Status", "Tipo", "Op", "Destinatário", "Série", "Valor total", "cfop", "Data de emissão", "Numero"]
     x = 0.03
     y = 0.05
 
     for i, coluna in enumerate(colunas):
-        if i == 0 or i == 1:
-            criaLabel(frameVendas, coluna, x, y, 0.05, self.cor)
+        if i == 0:
+            criaLabel(frameVendas, coluna, x, y, 0.07, self.cor)
+            x += 0.075
+        elif i == 1 or i == 2 or i == 4:
+            criaLabel(frameVendas, coluna, x, y, 0.05, self.cor) 
             x += 0.055
-        # elif i == 1:
-        #     criaLabel(frameVendas, coluna, x, y, 0.15, self.cor) 
-        #     x += 0.155
-        elif i == 2:
-            criaLabel(frameVendas, coluna, x, y, 0.15, self.cor)
-            x += 0.155
+        elif i == 3:
+            criaLabel(frameVendas, coluna, x, y, 0.2, self.cor)
+            x += 0.205
         else:
-            criaLabel(frameVendas, coluna, x, y, 0.17, self.cor)
-            x += 0.175
+            criaLabel(frameVendas, coluna, x, y, 0.10, self.cor)
+            x += 0.105
 
 

@@ -45,8 +45,51 @@ class App(ctk.CTk):
         self.alturaTela = 900
         self.larguraTela = 1280
         self.geometry(f"{self.larguraTela}x{self.alturaTela}")
-        self.telas()
 
+        # ===== INÍCIO: abrir no segundo monitor (lado direito) e maximizar (Windows) =====
+        if sys.platform == "win32":
+            try:
+                import ctypes
+                from ctypes import WINFUNCTYPE, c_int, c_double, POINTER, c_long
+
+                class RECT(ctypes.Structure):
+                    _fields_ = [("left", c_long), ("top", c_long),
+                                ("right", c_long), ("bottom", c_long)]
+
+                monitors = []
+
+                # callback EnumDisplayMonitors
+                MonitorEnumProc = WINFUNCTYPE(c_int, c_int, c_int, POINTER(RECT), c_double)
+
+                def _cb(hMonitor, hdcMonitor, lprcMonitor, lParam):
+                    r = lprcMonitor.contents
+                    # (left, top, width, height)
+                    monitors.append((r.left, r.top, r.right - r.left, r.bottom - r.top))
+                    return 1
+
+                ctypes.windll.user32.EnumDisplayMonitors(
+                    0, 0, MonitorEnumProc(_cb), 0
+                )
+
+                if len(monitors) >= 2:
+                    # pega o monitor mais à direita (maior 'left')
+                    rightmost = max(monitors, key=lambda m: m[0])
+                    x, y = rightmost[0], rightmost[1]
+                    # posiciona a janela no topo do monitor da direita
+                    self.geometry(f"+{x}+{y}")
+            except Exception:
+                # se algo falhar, apenas segue e maximiza no principal
+                pass
+
+        # garante posicionamento aplicado antes de maximizar
+        self.update_idletasks()
+        try:
+            self.state("zoomed")  # maximiza (Windows)
+        except Exception:
+            pass
+        # ===== FIM: abrir no segundo monitor (lado direito) e maximizar (Windows) =====
+
+        self.telas()
         self.report_callback_exception = self.exibir_erro_global
 
     def gerar_erro(self):

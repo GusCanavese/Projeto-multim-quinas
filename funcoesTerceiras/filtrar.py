@@ -85,10 +85,6 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
             self.dadosTelaVerPedidos.append(btnProxima)
 
 
-
-
-
-
 def filtrarContas(self, frame, valor, pagina=1):
     self.valorAtualFiltroContas = valor
     if hasattr(self, "datePickerInicio") and hasattr(self, "datePickerFim"):
@@ -162,11 +158,6 @@ def filtrarContas(self, frame, valor, pagina=1):
     
     if len(contas) > 10:
 
-        
-        params = {
-            'pagina': pagina,
-            'valor': valor,
-        }
         if pagina > 1:
             btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.75, 0.2,lambda: filtrarContas(self, frame, self.valorAtualFiltroContas, pagina - 1))
             self.dadosTelaFiltrarContas.append(btnAnterior)
@@ -174,7 +165,6 @@ def filtrarContas(self, frame, valor, pagina=1):
         if fimContas < len(contas):
             btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.75, 0.2,lambda: filtrarContas(self, frame, self.valorAtualFiltroContas, pagina + 1))
             self.dadosTelaFiltrarContas.append(btnProxima)
-
 
 
 def filtrarFuncionarios(self, frame, valor, pagina=1):
@@ -211,7 +201,6 @@ def filtrarFuncionarios(self, frame, valor, pagina=1):
         y += 0.059
 
 
-
 def filtrarNotasFiscais(self, frame, valor, pagina=1):
     notas = Buscas.buscaNotasFiscais(valor)
 
@@ -223,12 +212,17 @@ def filtrarNotasFiscais(self, frame, valor, pagina=1):
     iniciofunc = (pagina - 1) * 10
     fimfunc = pagina * 10
     contasPagina = notas[iniciofunc:fimfunc]
-    
+
+    totalNotas = len(notas)
+    mostrarPaginacao = totalNotas > 10
+    temProxima = fimfunc < totalNotas
+    filtro_valor = valor
+
     y = 0.1
 
     for row, notas in enumerate(contasPagina, start=1):
         corDeFundo = "#1C60A0"
-        dadosContas = [notas[0], notas[1], notas[2]]
+        dadosContas = [notas[0], notas[1], notas[2], notas[3], notas[4], notas[5], notas[6], notas[7], notas[8]]
 
         x = 0.03
 
@@ -237,15 +231,44 @@ def filtrarNotasFiscais(self, frame, valor, pagina=1):
                 corDeFundo = "#1C60A0"
                 label = criaLabel(frame, valor, x, y, 0.07, corDeFundo)
                 self.dadosTelaFiltrarFunc.append(label)
-                x+=0.075
-            elif colNum == 1:
+                x += 0.075
+            elif colNum == 1 or colNum == 2:
                 corDeFundo = "#1C60A0"
                 label = criaLabel(frame, valor, x, y, 0.05, corDeFundo)
                 self.dadosTelaFiltrarFunc.append(label)
-                x+=0.055
-
+                x += 0.055
+            elif colNum == 3:
+                corDeFundo = "#1C60A0"
+                label = criaLabel(frame, valor, x, y, 0.2, corDeFundo)
+                self.dadosTelaFiltrarFunc.append(label)
+                x += 0.205
+            elif colNum == 4:
+                corDeFundo = "#1C60A0"
+                label = criaLabel(frame, valor, x, y, 0.05, corDeFundo)
+                self.dadosTelaFiltrarFunc.append(label)
+                x += 0.055
+            else:
+                corDeFundo = "#1C60A0"
+                label = criaLabel(frame, valor, x, y, 0.1, corDeFundo)
+                self.dadosTelaFiltrarFunc.append(label)
+                x += 0.105
 
         btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=dadosContas: telaVer(self, p))
         self.dadosTelaFiltrarFunc.append(btn)
 
         y += 0.059
+
+    if mostrarPaginacao:
+        if pagina > 1:
+            btnAnterior = criaBotao(
+                frame, "← Anterior", 0.33, 0.9, 0.2,
+                lambda v=filtro_valor: filtrarNotasFiscais(self, frame, v, pagina - 1)
+            )
+            self.dadosTelaFiltrarFunc.append(btnAnterior)
+
+        if temProxima:
+            btnProxima = criaBotao(
+                frame, "Próximo →", 0.66, 0.9, 0.2,
+                lambda v=filtro_valor: filtrarNotasFiscais(self, frame, v, pagina + 1)
+            )
+            self.dadosTelaFiltrarFunc.append(btnProxima)
