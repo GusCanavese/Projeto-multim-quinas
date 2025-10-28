@@ -59,6 +59,7 @@ def telaTotaisNotaSaida(self, EhNotaDoConsumidor):
     # ============================
     try:
         itens = getattr(self, "dadosProdutos", {}) or {}
+        print(itens)
 
         # acumuladores locais (apenas nesta função)
         tot_bc_icms = Decimal("0.00")

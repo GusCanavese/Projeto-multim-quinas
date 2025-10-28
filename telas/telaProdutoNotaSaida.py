@@ -57,7 +57,7 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
         for i, row in enumerate(Buscas.buscaEstoqueProdutosFiscal(nomeDoProduto, cnpj)):
             if i >= 5:
                 break     
-            label = criaBotao(frameParaItensNoFrame,row[0],0.195,yNovo+0.02 + i * 0.02,0.26,lambda nome=row[0], valor=row[6].replace(',', '.'), quantidade=row[8].replace(',', '.'), ent=entradaProduto:selecionaProduto(nome, valor, quantidade, ent))
+            label = criaBotao(frameParaItensNoFrame, row[0], 0.195, yNovo+0.02 + i * 0.02, 0.26, lambda nome=row[0], valor=row[6].replace(',', '.'), quantidade=row[8].replace(',', '.'), ncm=row[4], cst=row[5], cest=row[12], ent=entradaProduto: selecionaProduto(nome, valor, quantidade, ncm, cst, cest, ent))    
             label.configure(fg_color=self.cor, corner_radius=0, font=("TkDefaultFont", 14))
             self.resultadoLabelsProduto.append(label)
 

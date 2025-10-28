@@ -374,7 +374,7 @@ def criaComandoACBr(self, nome_arquivo):
     # ---------------- Destinatário ----------------
     xNomeDest = V("nomeDestinatario", "")
     cnpjDest  = V("documentoDestinatario", "")
-    ieDest    = self.inscricaoEstadualDestinatario.get()
+    ieDest    = self.inscricaoEstadualDestinatario.get() 
     dest_xLgr = self.ruaDestinatario
     dest_nro  = self.numeroDestinatario
     dest_xBairro = self.bairroDestinatario
