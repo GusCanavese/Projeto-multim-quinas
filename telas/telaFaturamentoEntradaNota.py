@@ -207,15 +207,8 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, EhNotaDoConsumid
 
         telaObservacoesNotaSaida(self, EhNotaDoConsumidor)
 
-<<<<<<< HEAD
-    criaBotao(self.frameTelaGerarFaturamento, "Voltar", 0.05, 0.94, 0.15,
-              lambda: self.frameTelaGerarFaturamento.destroy()).place(anchor="nw")
-    criaBotao(self.frameTelaGerarFaturamento, "Próximo - Observações",
-              0.25, 0.94, 0.15, lambda: salvarEFechar(self)).place(anchor="nw")
-=======
     criaBotao(self.frameTelaGerarFaturamento, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaGerarFaturamento.destroy()).place(anchor="nw")
     criaBotao(self.frameTelaGerarFaturamento, "Próximo - Observações", 0.25, 0.94, 0.15, lambda: salvarEFechar(self)).place(anchor="nw")
->>>>>>> master
 
     self.descontoTotal.bind("<KeyRelease>", lambda event: self.calcularTotal())
     self.acrescimoTotal.bind(
