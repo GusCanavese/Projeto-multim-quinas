@@ -184,39 +184,30 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, EhNotaDoConsumid
             self.row += 1
             if hasattr(self, "botaoRemoverParcela") and self.botaoRemoverParcela.winfo_exists():
                 self.botaoRemoverParcela.destroy()
-            self.botaoRemoverParcela = ctk.CTkButton(
-                self.frameTelaGerarFaturamento, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: removerParcela(self))
+            self.botaoRemoverParcela = ctk.CTkButton(self.frameTelaGerarFaturamento, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: removerParcela(self))
             self.yParcelas += 0.038
             self.botaoRemoverParcela.place(relx=0.8, rely=self.yParcelas)
             adicionaParcela(self)
 
     for i, coluna in enumerate(valores):
         posicaox = 0.2 + i * largura_label
-        colunas = ctk.CTkLabel(
-            self.frameTelaGerarFaturamento, text=coluna, fg_color=self.cor)
-        colunas.place(relx=posicaox, rely=posicaoy,
-                      relwidth=largura_label-0.001)
+        colunas = ctk.CTkLabel(self.frameTelaGerarFaturamento, text=coluna, fg_color=self.cor)
+        colunas.place(relx=posicaox, rely=posicaoy, relwidth=largura_label-0.001)
 
     def salvarEFechar(self):
         try:
-            confirmarSalvamentoDoFaturamentoNota(
-                self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, self.variavelRepeticao)
+            confirmarSalvamentoDoFaturamentoNota(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, self.variavelRepeticao)
         except:
-            confirmarSalvamentoDoFaturamentoNota(
-                self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, "99/99/9999", self.variavelRepeticao)
+            confirmarSalvamentoDoFaturamentoNota(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, "99/99/9999", self.variavelRepeticao)
 
         telaObservacoesNotaSaida(self, EhNotaDoConsumidor)
 
-    criaBotao(self.frameTelaGerarFaturamento, "Voltar", 0.05, 0.94, 0.15,
-              lambda: self.frameTelaGerarFaturamento.destroy()).place(anchor="nw")
-    criaBotao(self.frameTelaGerarFaturamento, "Próximo - Observações",
-              0.25, 0.94, 0.15, lambda: salvarEFechar(self)).place(anchor="nw")
+    criaBotao(self.frameTelaGerarFaturamento, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaGerarFaturamento.destroy()).place(anchor="nw")
+    criaBotao(self.frameTelaGerarFaturamento, "Próximo - Observações", 0.25, 0.94, 0.15, lambda: salvarEFechar(self)).place(anchor="nw")
 
     self.descontoTotal.bind("<KeyRelease>", lambda event: self.calcularTotal())
-    self.acrescimoTotal.bind(
-        "<KeyRelease>", lambda event: self.calcularTotal())
-    self.entradasTotais.bind(
-        "<KeyRelease>", lambda event: self.calcularTotal())
+    self.acrescimoTotal.bind("<KeyRelease>", lambda event: self.calcularTotal())
+    self.entradasTotais.bind("<KeyRelease>", lambda event: self.calcularTotal())
     self.ValorOriginal.bind("<KeyRelease>", lambda event: self.calcularTotal())
 
 

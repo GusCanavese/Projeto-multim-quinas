@@ -18,6 +18,9 @@ Número do pedido vinculado a nota na tela de gerar                  ✅
 Relatório pra nota fiscal                                           ✅
 Tabela de notas fiscais com filtro                                  ✅
 colocar cfop na nota dentro do banco                                ✅
+tela Transporte tem que ter a função "seleciona transportador"
+tela de faturamento, valor ainda não ta puxando o total da nota
+conectar campos agora corretos na nota fiscal
 Notas referenciadas
 arrumar tela de produtos no fluxo de importar nota                     (Gabriel) completa com os valores dos produtos que são puxados pela nota. A tela de produtos, a função "lerNotaFiscal" e a "EscolherNotaFiscal", ce pod ejogar no gpt e pedir pra ele enviar esses dados para os respectivos campos da tela de produtos.  outro detalhe, pra mais preciso, pede o chat pra nao criar funções extras, e alterar no código somente o que você pediu
 
