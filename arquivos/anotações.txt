@@ -18,6 +18,7 @@ Número do pedido vinculado a nota na tela de gerar                  ✅
 Relatório pra nota fiscal                                           ✅
 Tabela de notas fiscais com filtro                                  ✅
 colocar cfop na nota dentro do banco                                ✅
+puxar dados do produto para dentro da aba de tributação e mandar para a nota
 tela Transporte tem que ter a função "seleciona transportador"
 tela de faturamento, valor ainda não ta puxando o total da nota
 conectar campos agora corretos na nota fiscal
