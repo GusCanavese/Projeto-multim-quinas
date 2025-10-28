@@ -16,7 +16,7 @@ def escolherNotaFiscal(self):
     self.label = ctk.CTkLabel(self.frameEscolherNotaFiscal, text="Escolher ficheiro", font=("Century Gothic bold", 15))
     self.label.place(relx=0.5, rely=0.4, anchor="center")
 
-    botaoEscolherFicheiro = ctk.CTkButton(self.frameEscolherNotaFiscal, width=40, command=lambda:lerNotaFiscal(self, self.frameEscolherNotaFiscal))
+    botaoEscolherFicheiro = ctk.CTkButton(self.frameEscolherNotaFiscal, text="Selecionar", width=40, command=lambda:lerNotaFiscal(self, self.frameEscolherNotaFiscal))
     botaoEscolherFicheiro.place(relx=0.4, rely=0.5, anchor="center")
 
     labelCaminhoDaNota = ctk.CTkLabel(self.frameEscolherNotaFiscal, textvariable=self.variavel, font=("Century Gothic bold", 12))
