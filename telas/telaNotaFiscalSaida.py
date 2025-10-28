@@ -113,6 +113,7 @@ def telaNotaFiscalSaida(self, valor, EhNotaDoConsumidor):
 
         self.variavelRazaoSocialRemetente.set(nome)
         self.inscricaoEstadualDestinatario.set(ie)
+        documento = (documento or '').replace('.', '').replace('/', '').replace('-', '')
         self.variavelCNPJRazaoSocialRemetente.set(documento)
 
         for label in self.resultadoLabels: 

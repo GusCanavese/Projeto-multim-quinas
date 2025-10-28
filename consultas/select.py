@@ -303,3 +303,16 @@ class Buscas:
             db.cursor.execute(queryBuscaClientes)
             resultado = db.cursor.fetchall()
             return resultado
+        
+
+    def buscaNotasFiscais(valor):
+        query = """select Status, tipo, operacao, destinatario_nome, serie, valor_total, cfop, dhEmi, numero
+        FROM notas_fiscais 
+        WHERE 
+            id LIKE %s
+            OR tipo LIKE %s
+            OR chave LIKE %s
+            OR status LIKE %s"""
+        db.cursor.execute(query, (f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%",))
+        resultado = db.cursor.fetchall()
+        return resultado

@@ -5,8 +5,6 @@ from funcoesTerceiras import criarNFe, criarNFCe
 
 
 def telaObservacoesNotaSaida(self, EhNotaDoConsumidor):
-    print(EhNotaDoConsumidor)
-    print(EhNotaDoConsumidor)
     self.frameTelaObservacoes = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     numeroPedidoVinculado = ctk.StringVar()

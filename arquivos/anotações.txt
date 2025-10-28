@@ -15,10 +15,22 @@ arrumar posição botao remover item da tela transporte nota de saida ✅
 Colocar dinheiro na forma de pagamento                              ✅
 Faturamento puxar valor                                             ✅
 Número do pedido vinculado a nota na tela de gerar                  ✅
+<<<<<<< HEAD
 Notas referenciadas
 arrumar tela de produtos no fluxo de importar nota                     (Gabriel) completa com os valores dos produtos que são puxados pela nota. A tela de produtos, a função "lerNotaFiscal" e a "EscolherNotaFiscal", ce pod ejogar no gpt e pedir pra ele enviar esses dados para os respectivos campos da tela de produtos.  outro detalhe, pra mais preciso, pede o chat pra nao criar funções extras, e alterar no código somente o que você pediu
 Relatório pra nota fiscal                                           🟡(Gustavo)
 Tabela de notas fiscais com filtro                                  🟡(Gustavo)
+=======
+Relatório pra nota fiscal                                           ✅
+Tabela de notas fiscais com filtro                                  ✅
+colocar cfop na nota dentro do banco                                ✅
+puxar dados do produto para dentro da aba de tributação e mandar para a nota
+tela Transporte tem que ter a função "seleciona transportador"
+tela de faturamento, valor ainda não ta puxando o total da nota
+conectar campos agora corretos na nota fiscal
+Notas referenciadas
+arrumar tela de produtos no fluxo de importar nota                     (Gabriel) completa com os valores dos produtos que são puxados pela nota. A tela de produtos, a função "lerNotaFiscal" e a "EscolherNotaFiscal", ce pod ejogar no gpt e pedir pra ele enviar esses dados para os respectivos campos da tela de produtos.  outro detalhe, pra mais preciso, pede o chat pra nao criar funções extras, e alterar no código somente o que você pediu
+>>>>>>> master
 
 
 
@@ -40,11 +52,16 @@ Clonar nota
 
 ———————————————————————
 NFC-E
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> master
 Mudar as mesmas coisas de Tributação do NC-E                        ✅
 Tirar tela de transporte.                                           ✅
 
 ———————————————————————
+NF-E (entrada)
 
 Adicionar opção de entrar sem XML
 Município gerador no transporte, puxar dados do município 
