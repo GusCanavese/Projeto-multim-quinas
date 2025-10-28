@@ -23,9 +23,9 @@ def acessar(dados, *caminho, default=""):
     return dados if isinstance(dados, str) else default
 
 
-def telaRegistroCredito(self, dadosNota):
+def telaNotaFiscalEntrada(self, dadosNota):
     self.dadosNotaPegar = []
-    self.frameTelaRegistraCredito = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
+    self.frameTelaNotaFiscalEntrada = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
 
     def buscaNatureza(cfop):
@@ -179,40 +179,40 @@ def telaRegistroCredito(self, dadosNota):
     ]
 
     # Layout do formulário
-    criarLabelEntry(self.frameTelaRegistraCredito, "Número da NF", 0.1, 0.05, 0.07, variavelNumeroDaNota)
-    criarLabelEntry(self.frameTelaRegistraCredito, "Série", 0.2, 0.05, 0.07, variavelSerieDaNota)
-    criarLabelEntry(self.frameTelaRegistraCredito, "Chave da NF", 0.3, 0.05, 0.3, variavelChaveDaNota)
+    criarLabelEntry(self.frameTelaNotaFiscalEntrada, "Número da NF", 0.1, 0.05, 0.07, variavelNumeroDaNota)
+    criarLabelEntry(self.frameTelaNotaFiscalEntrada, "Série", 0.2, 0.05, 0.07, variavelSerieDaNota)
+    criarLabelEntry(self.frameTelaNotaFiscalEntrada, "Chave da NF", 0.3, 0.05, 0.3, variavelChaveDaNota)
 
-    ctk.CTkLabel(self.frameTelaRegistraCredito, text="Destinatário----------").place(relx=0.1, rely=0.15)
-    criarLabelEntry(self.frameTelaRegistraCredito, "Razão social", 0.1, 0.20, 0.3, variavelRazaoSocialRemetente)
-    criarLabelEntry(self.frameTelaRegistraCredito, "CNPJ", 0.45, 0.20, 0.15, variavelCNPJRazaoSocialRemetente)
+    ctk.CTkLabel(self.frameTelaNotaFiscalEntrada, text="Destinatário----------").place(relx=0.1, rely=0.15)
+    criarLabelEntry(self.frameTelaNotaFiscalEntrada, "Razão social", 0.1, 0.20, 0.3, variavelRazaoSocialRemetente)
+    criarLabelEntry(self.frameTelaNotaFiscalEntrada, "CNPJ", 0.45, 0.20, 0.15, variavelCNPJRazaoSocialRemetente)
 
-    ctk.CTkLabel(self.frameTelaRegistraCredito, text="Emitente----------").place(relx=0.1, rely=0.3)
-    criarLabelEntry(self.frameTelaRegistraCredito, "Razão social", 0.1, 0.35, 0.3, variavelRazaoSocialEmitente)
-    criarLabelEntry(self.frameTelaRegistraCredito, "CNPJ", 0.45, 0.35, 0.15, variavelCNPJRazaoSocialEmitente)
+    ctk.CTkLabel(self.frameTelaNotaFiscalEntrada, text="Emitente----------").place(relx=0.1, rely=0.3)
+    criarLabelEntry(self.frameTelaNotaFiscalEntrada, "Razão social", 0.1, 0.35, 0.3, variavelRazaoSocialEmitente)
+    criarLabelEntry(self.frameTelaNotaFiscalEntrada, "CNPJ", 0.45, 0.35, 0.15, variavelCNPJRazaoSocialEmitente)
 
 
 
     variavelHoraEntradaSaida.set('')
-    criarLabelLateralEntry(self.frameTelaRegistraCredito, "Status",             0.75, 0.09, 0.1, variavelStatus)
-    criarLabelLateralEntry(self.frameTelaRegistraCredito, "Data documento",     0.75, 0.14, 0.1, variavelDataDocumento)
-    criarLabelLateralEntry(self.frameTelaRegistraCredito, "Data entrada",       0.75, 0.19, 0.1, data)
-    criarLabelLateralEntry(self.frameTelaRegistraCredito, "Hora entrada/saída", 0.75, 0.24, 0.1, variavelHoraEntradaSaida)
-    criarLabelLateralEntry(self.frameTelaRegistraCredito, "Data criação",       0.75, 0.29, 0.1, data)
-    criarLabelLateralEntry(self.frameTelaRegistraCredito, "Data confirmação",   0.75, 0.34, 0.1, variavelDataConfirmacao)
-    criarLabelLateralEntry(self.frameTelaRegistraCredito, "Tipo da nota",       0.75, 0.39, 0.1, variavelEntradaOuSaida)
-    criarLabelLateralComboBox(self.frameTelaRegistraCredito, "Data finalidade", 0.75, 0.44, 0.1, opcoesFinalidade)
-    criarLabelLateralComboBox(self.frameTelaRegistraCredito, "Data situação",   0.75, 0.49, 0.1, opcoesSituacao)
+    criarLabelLateralEntry(self.frameTelaNotaFiscalEntrada, "Status",             0.75, 0.09, 0.1, variavelStatus)
+    criarLabelLateralEntry(self.frameTelaNotaFiscalEntrada, "Data documento",     0.75, 0.14, 0.1, variavelDataDocumento)
+    criarLabelLateralEntry(self.frameTelaNotaFiscalEntrada, "Data entrada",       0.75, 0.19, 0.1, data)
+    criarLabelLateralEntry(self.frameTelaNotaFiscalEntrada, "Hora entrada/saída", 0.75, 0.24, 0.1, variavelHoraEntradaSaida)
+    criarLabelLateralEntry(self.frameTelaNotaFiscalEntrada, "Data criação",       0.75, 0.29, 0.1, data)
+    criarLabelLateralEntry(self.frameTelaNotaFiscalEntrada, "Data confirmação",   0.75, 0.34, 0.1, variavelDataConfirmacao)
+    criarLabelLateralEntry(self.frameTelaNotaFiscalEntrada, "Tipo da nota",       0.75, 0.39, 0.1, variavelEntradaOuSaida)
+    criarLabelLateralComboBox(self.frameTelaNotaFiscalEntrada, "Data finalidade", 0.75, 0.44, 0.1, opcoesFinalidade)
+    criarLabelLateralComboBox(self.frameTelaNotaFiscalEntrada, "Data situação",   0.75, 0.49, 0.1, opcoesSituacao)
 
-    cfop = criarLabelEntry(self.frameTelaRegistraCredito, "CFOP", 0.1, 0.49, 0.07, variavelCFOP)
+    cfop = criarLabelEntry(self.frameTelaNotaFiscalEntrada, "CFOP", 0.1, 0.49, 0.07, variavelCFOP)
     cfop.configure(validate="key",validatecommand=(self.register(lambda text: len(text) <= 4), '%P'))
     cfop.bind("<KeyRelease>", lambda event: variavelNatureza.set(buscaNatureza(variavelCFOP.get())))
-    criarLabelEntry(self.frameTelaRegistraCredito, "Natureza da Operação", 0.2, 0.49, 0.4, variavelNatureza)
+    criarLabelEntry(self.frameTelaNotaFiscalEntrada, "Natureza da Operação", 0.2, 0.49, 0.4, variavelNatureza)
 
-    ctk.CTkLabel(self.frameTelaRegistraCredito, text="Transporte----------").place(relx=0.1, rely=0.59)
-    self.modalidadeDoFrete = criarLabelComboBox(self.frameTelaRegistraCredito, "Modalidade do frete", 0.1, 0.64, 0.27, opcoesTransporte)
-    formasPag = criarLabelComboBox(self.frameTelaRegistraCredito, "Forma de pagamento", 0.4, 0.64, 0.2, opcoesPagamento)
+    ctk.CTkLabel(self.frameTelaNotaFiscalEntrada, text="Transporte----------").place(relx=0.1, rely=0.59)
+    self.modalidadeDoFrete = criarLabelComboBox(self.frameTelaNotaFiscalEntrada, "Modalidade do frete", 0.1, 0.64, 0.27, opcoesTransporte)
+    formasPag = criarLabelComboBox(self.frameTelaNotaFiscalEntrada, "Forma de pagamento", 0.4, 0.64, 0.2, opcoesPagamento)
     formasPag.set(formaDePagamento.get())
 
-    criaBotao(self.frameTelaRegistraCredito, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutos(self, dadosNota, 0, cfop)).place(anchor="nw")
-    criaBotao(self.frameTelaRegistraCredito, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaRegistraCredito.destroy()).place(anchor="nw")
+    criaBotao(self.frameTelaNotaFiscalEntrada, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutos(self, dadosNota, 0, cfop)).place(anchor="nw")
+    criaBotao(self.frameTelaNotaFiscalEntrada, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaNotaFiscalEntrada.destroy()).place(anchor="nw")

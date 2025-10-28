@@ -7,13 +7,14 @@ from tkinter import messagebox
 import requests
 from PIL import Image
 import datetime
+from telas.telaTotaisNotaSaida import telaTotaisNotaSaida
 from telas.telaTransporteNotaSaida import telaTransporteNotaSaida
 from componentes import criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel, criaEntry, criaSimouNaoLateral, criaTextAreaModal, criarLabelEntry, criarLabelComboBox, criarLabelLateralComboBox, criarLabelLateralEntry
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
-def telaProdutosNotaSaida(self, cnpj, cfop, cons):
-
+def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
+    print("entrou na certa")
     self.row=1
     self.posicaoy = 0.2
     self.posicaox = 0.024
@@ -22,7 +23,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
     self.contadorDeLinhas = 0
     self.yNovo = 0.24
     self.entradaProduto = 0
-    self.valorSubtotal = 0
     self.linhas = []
 
 
@@ -435,107 +435,23 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
 
 
         def calculaValores():
+
+            # calcula a base de calculo
+            # redução base de calculo
+            # aliquota
+            # e valor
+            # tudo do icms
+
             try:
-                vo = float(linha["subtotal"].get().replace(",", "."))
+                auxiliarBCPIS = float(self.bc_icms.get())
+                auxiliar = float(self.bc_icms.get())*float(self.red_bc_icms.get())/100
+                self.bc_icms.set(float(self.bc_icms.get())-auxiliar)          
             except:
-                try:
-                    preco = float((linha["preco"].get() or "0").replace(",", "."))
-                except:
-                    preco = 0.0
-                try:
-                    qtd = float(linha["quantidade"].get() or "0")
-                except:
-                    qtd = 0.0
-                try:
-                    acresc = float((linha["acrescimo"].get() or "0").replace(",", "."))
-                except:
-                    acresc = 0.0
-                try:
-                    desc_real = float((linha["desc_real"].get() or "0").replace(",", "."))
-                except:
-                    desc_real = 0.0
-                try:
-                    desc_perc = float((linha["desc_porcentagem"].get() or "0").replace(",", "."))
-                except:
-                    desc_perc = 0.0
-                vo = preco * qtd - desc_real - (preco * qtd * (desc_perc / 100.0)) + acresc
-                if vo < 0:
-                    vo = 0.0
-
-            # -----------------------
-            # ICMS PRÓPRIO (CST 00)
-            # -----------------------
-            mod_icms = self.mod_bc_icms.get()
-            try:
-                red_icms = float((self.red_bc_icms.get() or "0").replace(",", "."))
-            except:
-                red_icms = 0.0
-            try:
-                aliq_icms = float((self.aliq_icms.get() or "0").replace(",", "."))
-            except:
-                aliq_icms = 0.0
-
-            vbc_icms = vo * (1.0 - (red_icms / 100.0))
-            vicms = vbc_icms * (aliq_icms / 100.0)
-
-            auxiliarBCPIS = float(self.bc_icms.get())
-            auxiliar = float(self.bc_icms.get())*float(self.red_bc_icms.get())/100
-            self.bc_icms.set(float(self.bc_icms.get())-auxiliar)          
-
-            valorICMS = float(self.bc_icms.get())*(aliq_icms / 100.0)
+                raise ValueError("Os valores não devem estar em branco")
+            valorICMS = float(self.bc_icms.get())*(float(self.aliq_icms.get()) / 100.0)
             self.vr_icms.set(f"{valorICMS:.2f}")
 
-            # -----------------------
-            # ICMS ST (se houver)
-            # -----------------------
-            mod_st = self.mod_bc_icms_st.get()
-            try:
-                red_st = float((self.red_bc_icms_st.get() or "0").replace(",", "."))
-            except:
-                red_st = 0.0
-            try:
-                mva = float((self.mva_icms_st.get() or "0").replace(",", "."))
-            except:
-                mva = 0.0
-            try:
-                aliq_st = float((self.aliq_icms_st.get() or "0").replace(",", "."))
-            except:
-                aliq_st = 0.0
-
-            # Base ST conforme modalidade
-            vbc_st = 0.0
-            if mod_st == "Margem Valor Agregado (%)":
-                vbc_pre = vo * (1.0 - (red_st / 100.0))
-                vbc_st = vbc_pre * (1.0 + (mva / 100.0))
-            elif mod_st in ("Pauta (Valor)", "Preço Tabelado Máx. (Valor)"):
-                # Campo "Valor BC ICMS" (override/pauta)
-                try:
-                    vbc_st = float((self.vr_bc_ICMS.get() or "0").replace(",", "."))
-                except:
-                    vbc_st = 0.0
-            elif mod_st == "Valor da Operação":
-                vbc_st = vo * (1.0 - (red_st / 100.0))
-            else:
-                vbc_st = 0.0
-
-            self.bc_icms_st.set(f"{vbc_st:.2f}" if vbc_st > 0 else "")
-
-            vicmsst_bruto = vbc_st * (aliq_st / 100.0)
-            vicmsst = vicmsst_bruto - vicms
-            if vicmsst < 0:
-                vicmsst = 0.0
-
-            if vbc_st > 0:
-                self.vr_icms_st.set(f"{vicmsst:.2f}")
-                self.vr_bc_icms_st_ret.set(f"{vbc_st:.2f}")
-                self.vr_icms_st_ret.set(f"{vicmsst:.2f}")
-                self.vr_icms_subst.set(f"{vicmsst:.2f}")
-            else:
-                self.vr_icms_st.set("")
-                self.vr_bc_icms_st_ret.set("")
-                self.vr_icms_st_ret.set("")
-                self.vr_icms_subst.set("")
-
+            
             # --- PIS 
             aliq_pis = 0.00065
             valorBCPis = auxiliarBCPIS - valorICMS
@@ -551,10 +467,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
             self.vr_cofins.set(f"{vr_cofins:.2f}")
 
 
-
-
-
-        # calculaValores()
         
 
 
@@ -659,6 +571,8 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
             entry_subtotal.delete(0, "end")
             entry_subtotal.insert(0, f"{novo_subtotal:.2f}")
             total += novo_subtotal
+
+        self.valorSubtotalFaturamento = total
 
     for i, coluna in enumerate(listaLabels):
         if i == 0:
@@ -815,10 +729,12 @@ def telaProdutosNotaSaida(self, cnpj, cfop, cons):
             }
             self.valoresDosItens.append(item)
 
-
-    criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, cons))).place(anchor="nw")
+    #nota do consumidor não precisa de tela de transporte
+    if EhNotaDoConsumidor:
+            criaBotao(frameTelaNotaProduto, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTotaisNotaSaida(self, EhNotaDoConsumidor))).place(anchor="nw")
+    else:
+        criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, EhNotaDoConsumidor))).place(anchor="nw")
     criaBotao(frameTelaNotaProduto, "Voltar", 0.05, 0.94, 0.15, lambda: frameTelaNotaProduto.destroy()).place(anchor="nw")
-
     aplicar_maiusculo_em_todos_entries(self)
 
     

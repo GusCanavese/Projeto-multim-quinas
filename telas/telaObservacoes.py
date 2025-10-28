@@ -94,7 +94,7 @@ def telaObservacoes(self, dadosNota):
     def insereRetorna():
         Insere.inserir_nota_fiscal(**dados_insercao)
         try:
-            self.frameTelaRegistraCredito.destroy()
+            self.frameTelaNotaFiscalEntrada.destroy()
             self.frameTelaProdutos.destroy()
             self.frameTelaTotais.destroy()
             self.frameTelaGerarFaturamento.destroy()

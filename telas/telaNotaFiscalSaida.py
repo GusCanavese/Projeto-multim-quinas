@@ -9,10 +9,11 @@ from funcoesTerceiras import filtrar, verificaSeQuerFiltrarPorPeriodo
 from componentes import checkbox, criaFrameJanela, criaBotao, criarLabelComboBox, criarLabelEntry, criarLabelLateralComboBox, criarLabelLateralEntry
 from consultas.select import Buscas 
 from telas.telaNotaReferenciada import telaNotaReferenciada
+from telas.telaCadastroClientes import telaCadastroClientes
 
 
 
-def telaNotaFiscalSaida(self, valor, cons):
+def telaNotaFiscalSaida(self, valor, EhNotaDoConsumidor):
     self.frameTelaNotaSaida = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     usuarioLogado =" self.logado"
     usuarioLogado = usuarioLogado.capitalize()
@@ -28,7 +29,8 @@ def telaNotaFiscalSaida(self, valor, cons):
 
     def buscaCliente(event=None): 
         nomeDoCliente = self.Rs.get()
-        dadosCliente = Buscas.buscaClientesFiscal(nomeDoCliente)
+        cnpjCliente = self.cnpjClienteNotaSaida.get()
+        dadosCliente = Buscas.buscaClientesFiscal(nomeDoCliente, cnpjCliente)
 
 
         if hasattr(self, 'resultadoLabels'):
@@ -37,13 +39,21 @@ def telaNotaFiscalSaida(self, valor, cons):
         self.resultadoLabels = []
             
         yNovo = 0.16
-        for i, row in enumerate(dadosCliente):
-            if i >= 5:
-                break
-            label = ctk.CTkButton(self.frameTelaNotaSaida,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], documento=row[1], ie=row[2], rua=row[3], num=row[4], cep=row[5], bairro=row[6], cidade=row[7], estado=row[8]: selecionaCliente(nome, documento, ie, rua, num, cep, bairro, cidade, estado))
+        if len(dadosCliente) > 0:
+            for i, row in enumerate(dadosCliente):
+                if i >= 5:
+                    break
+                label = ctk.CTkButton(self.frameTelaNotaSaida,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command = lambda  nome=row[0], documento=row[1], ie=row[2], rua=row[3], num=row[4], cep=row[5], bairro=row[6], cidade=row[7], estado=row[8]: selecionaCliente(nome, documento, ie, rua, num, cep, bairro, cidade, estado))
+                label.place(relx=0.1, rely=yNovo, relwidth=0.3)
+                self.resultadoLabels.append(label)  
+                yNovo += 0.0399
+        else:
+            print("entrou")
+            label = ctk.CTkButton(self.frameTelaNotaSaida,  text="+ Cadastrar cliente", corner_radius=0, fg_color=self.cor, font=("Century Gothic bold", 15), command = lambda: telaCadastroClientes(self, 1))
             label.place(relx=0.1, rely=yNovo, relwidth=0.3)
             self.resultadoLabels.append(label)  
             yNovo += 0.0399
+            
 
 
     def selecionaCliente(nome, documento, ie, rua, num, cep, bairro, cidade, estado):
@@ -103,6 +113,7 @@ def telaNotaFiscalSaida(self, valor, cons):
 
         self.variavelRazaoSocialRemetente.set(nome)
         self.inscricaoEstadualDestinatario.set(ie)
+        documento = (documento or '').replace('.', '').replace('/', '').replace('-', '')
         self.variavelCNPJRazaoSocialRemetente.set(documento)
 
         for label in self.resultadoLabels: 
@@ -252,9 +263,13 @@ def telaNotaFiscalSaida(self, valor, cons):
 
     ctk.CTkLabel(self.frameTelaNotaSaida, text="Destinatário----------").place(relx=0.1, rely=0.05)
     self.Rs = criarLabelEntry(self.frameTelaNotaSaida, "Razão social", 0.1, 0.10, 0.3, self.variavelRazaoSocialRemetente)
-    cnpj = criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.10, 0.15, self.variavelCNPJRazaoSocialRemetente)
+    self.cnpjClienteNotaSaida = criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.10, 0.15, self.variavelCNPJRazaoSocialRemetente)
+    
     self.Rs.bind("<KeyRelease>", buscaCliente)
     self.Rs.bind("<Button-1>", buscaCliente)
+
+    self.cnpjClienteNotaSaida.bind("<KeyRelease>", buscaCliente)
+    self.cnpjClienteNotaSaida.bind("<Button-1>", buscaCliente)
 
 
     criarLabelEntry(self.frameTelaNotaSaida, "Inscrição Estadual", 0.1, 0.20, 0.15, self.inscricaoEstadualDestinatario)
@@ -286,6 +301,6 @@ def telaNotaFiscalSaida(self, valor, cons):
 
 
 
-    criaBotao(self.frameTelaNotaSaida, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutosNotaSaida(self, emt.get(), cfop.get(), cons)).place(anchor="nw")
+    criaBotao(self.frameTelaNotaSaida, "Próximo - Tela de Produtos", 0.25, 0.94, 0.15, lambda: telaProdutosNotaSaida(self, emt.get(), cfop.get(), EhNotaDoConsumidor)).place(anchor="nw")
     criaBotao(self.frameTelaNotaSaida, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaNotaSaida.destroy()).place(anchor="nw")
     checkBox = checkbox(self.frameTelaNotaSaida, "Movimentação dos produtos", 0.7, 0.60, None, lambda: self.movimentacaoProdutos.set(checkBox.get()))

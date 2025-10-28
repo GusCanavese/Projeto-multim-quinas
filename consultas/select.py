@@ -5,7 +5,6 @@ import db
 
 
 class Buscas:
-    
     def buscaProduto(nomeDoProduto):
         queryBuscaProduto = "SELECT nome_do_produto, valor_de_venda, quantidade FROM produtos WHERE nome_do_produto LIKE %s"
         db.cursor.execute(queryBuscaProduto, (f"%{nomeDoProduto}%",))
@@ -182,7 +181,6 @@ class Buscas:
 
         return resultado
     
-
     def buscaEstoqueProdutosFiscal(valor, cnpj):
         if cnpj == "Todos":
             queryBuscaProdutosEstoque = """SELECT ﻿descricao_do_produto, cadigo_interno, codigo_de_barras, codigo_grade, codigo_NCM, CST_A, valor_venda, custo, quantidade_em_estoque, CFOP, estoque_MIN, estoque_MAX, CEST, cnpj FROM produtos_fiscal
@@ -229,8 +227,6 @@ class Buscas:
 
         return resultado
 
-
-
     def buscaFuncionarios(valor):
         queryBuscaFuncionarios = """SELECT nome, cargo FROM funcionarios 
         WHERE 
@@ -240,9 +236,83 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
     
-    def buscaClientesFiscal(valor):
-        queryBuscaClientes = """SELECT nome_razao_social, CPF_CNPJ, inscricao_estadual, Logradouro, Numero, CEP, Bairro, Cidade, Estado
-        FROM clientes_fiscal"""
-        db.cursor.execute(queryBuscaClientes)
+    def buscaClientesFiscal(nome, cnpj):
+        if cnpj:
+            cnpj = cnpj.strip()
+            cnpj_limpo = cnpj.replace('.', '').replace('/', '').replace('-', '')
+
+            queryBuscaClientes = """SELECT nome_razao_social, CPF_CNPJ, inscricao_estadual, Logradouro, Numero, CEP, Bairro, Cidade, Estado
+            FROM clientes_fiscal 
+                WHERE 
+                    REPLACE(REPLACE(REPLACE(CPF_CNPJ, '.', ''), '/', ''), '-', '') LIKE %s"""
+
+            db.cursor.execute(queryBuscaClientes, (f"{cnpj_limpo}%",))
+            resultado = db.cursor.fetchall()
+            return resultado
+        
+        elif nome:
+            queryBuscaClientes = """SELECT nome_razao_social, CPF_CNPJ, inscricao_estadual, Logradouro, Numero, CEP, Bairro, Cidade, Estado
+            FROM clientes_fiscal 
+                WHERE 
+                    nome_razao_social LIKE %s"""
+
+            db.cursor.execute(queryBuscaClientes, (f"{nome}%",))
+            resultado = db.cursor.fetchall()
+            return resultado
+        else:
+            queryBuscaClientes = """SELECT nome_razao_social, CPF_CNPJ, inscricao_estadual, Logradouro, Numero, CEP, Bairro, Cidade, Estado
+            FROM clientes_fiscal 
+                WHERE 
+                    nome_razao_social OR CPF_CNPJ LIKE "%%" """
+
+            db.cursor.execute(queryBuscaClientes)
+            resultado = db.cursor.fetchall()
+            return resultado
+        
+
+
+    def buscaTransportador(nome, cnpj):
+        if cnpj:
+            cnpj = cnpj.strip()
+            cnpj_limpo = cnpj.replace('.', '').replace('/', '').replace('-', '')
+
+            queryBuscaClientes = """SELECT nome_real, cpf_cnpj
+            FROM transportadoras 
+                WHERE 
+                    REPLACE(REPLACE(REPLACE(cpf_cnpj, '.', ''), '/', ''), '-', '') LIKE %s"""
+
+            db.cursor.execute(queryBuscaClientes, (f"{cnpj_limpo}%",))
+            resultado = db.cursor.fetchall()
+            return resultado
+        
+        elif nome:
+            queryBuscaClientes = """SELECT nome_real, cpf_cnpj
+            FROM transportadoras 
+                WHERE 
+                    nome_real LIKE %s"""
+
+            db.cursor.execute(queryBuscaClientes, (f"{nome}%",))
+            resultado = db.cursor.fetchall()
+            return resultado
+        else:
+            queryBuscaClientes = """SELECT nome_real, cpf_cnpj
+            FROM transportadoras 
+                WHERE 
+                    nome_real OR cpf_cnpj LIKE "%%" """
+
+            db.cursor.execute(queryBuscaClientes)
+            resultado = db.cursor.fetchall()
+            return resultado
+        
+
+    def buscaNotasFiscais(valor):
+        query = """select Status, tipo, operacao, destinatario_nome, serie, valor_total, cfop, dhEmi, numero
+        FROM notas_fiscais 
+        WHERE 
+            id LIKE %s
+            OR tipo LIKE %s
+            OR chave LIKE %s
+            OR status LIKE %s"""
+        db.cursor.execute(query, (f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%",))
         resultado = db.cursor.fetchall()
         return resultado

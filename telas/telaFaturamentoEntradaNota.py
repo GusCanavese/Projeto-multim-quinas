@@ -10,7 +10,7 @@ from datetime import date
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, cons):
+def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, EhNotaDoConsumidor):
 
     self.variavelRepeticao = 0
     self.row = 1
@@ -28,9 +28,11 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, cons):
     self.y = 0.138
     self.teste = 0.038
     self.yParcelas = 0.138
-    self.totais = 0
     self.totaisFormasDePagamento = ctk.StringVar()
-    self.totaisFormasDePagamento.set(self.totais)
+    try:
+        self.totaisFormasDePagamento.set(self.valorSubtotalFaturamento)
+    except:
+        self.totaisFormasDePagamento.set(0)
 
     self.descontoTotalVindoDoPedido = ctk.StringVar()
     self.acrescimoTotalVindoDoPedido = ctk.StringVar()
@@ -203,12 +205,10 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, cons):
             confirmarSalvamentoDoFaturamentoNota(
                 self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, "99/99/9999", self.variavelRepeticao)
 
-        telaObservacoesNotaSaida(self, cons)
+        telaObservacoesNotaSaida(self, EhNotaDoConsumidor)
 
-    criaBotao(self.frameTelaGerarFaturamento, "Voltar", 0.05, 0.94, 0.15,
-              lambda: self.frameTelaGerarFaturamento.destroy()).place(anchor="nw")
-    criaBotao(self.frameTelaGerarFaturamento, "Próximo - Observações",
-              0.25, 0.94, 0.15, lambda: salvarEFechar(self)).place(anchor="nw")
+    criaBotao(self.frameTelaGerarFaturamento, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaGerarFaturamento.destroy()).place(anchor="nw")
+    criaBotao(self.frameTelaGerarFaturamento, "Próximo - Observações", 0.25, 0.94, 0.15, lambda: salvarEFechar(self)).place(anchor="nw")
 
     self.descontoTotal.bind("<KeyRelease>", lambda event: self.calcularTotal())
     self.acrescimoTotal.bind(

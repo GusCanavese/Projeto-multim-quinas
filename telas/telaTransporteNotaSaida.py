@@ -1,30 +1,58 @@
 import sys
 import os
-from tkinter import messagebox
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
-from datetime import date
-from funcoesTerceiras import calculaParcelasFaturamento
-from componentes import criaBotaoPequeno, criaEntry, criaFrameJanela, criaLabel, criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criaBotao
-from telas.telaObservacoes import telaObservacoes
-from telas.telaTotaisNota import telaTotaisNotaSaida
+from consultas.select import Buscas
+from componentes import criaBotaoPequeno, criaEntry, criaFrameJanela, criaLabel, criarLabelEntry, criarLabelComboBox, criaBotao
+from telas.telaCadastroTransportadoras import telaCadastroTransportadoras 
+from telas.telaTotaisNotaSaida import telaTotaisNotaSaida
 
+def telaTransporteNotaSaida(self, EhNotaDoConsumidor):
+    self.frametelaTransporte = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
+    def buscaTransportador(event=None): 
+        nomeDoTransportador = self.nomeTransportador.get()
+        cnpjTransportador   = self.documentoTransportador.get()
+        dadosTransportador  = Buscas.buscaTransportador(nomeDoTransportador, cnpjTransportador)
 
-
-def acessar(dados, *caminho, default=""):
-    for chave in caminho:
-        if isinstance(dados, dict) and chave in dados:
-            dados = dados[chave]
+        if hasattr(self, 'resultadoLabels'):
+            for label in self.resultadoLabels: 
+                label.destroy()
+        self.resultadoLabels = []
+            
+        yNovo = 0.16
+        if len(dadosTransportador) > 0:
+            for i, row in enumerate(dadosTransportador):
+                if i >= 5:
+                    break
+                label = ctk.CTkButton(self.frametelaTransporte,  text=row[0], corner_radius=0, fg_color=self.cor, font=("Century Gothic bold", 15), command = lambda  nome=row[0], documento=row[1]: selecionaCliente(nome, documento))
+                label.place(relx=0.35, rely=yNovo, relwidth=0.3)
+                self.resultadoLabels.append(label)  
+                yNovo += 0.0399
         else:
-            return default
-    if isinstance(dados, dict) and "#text" in dados:
-        return dados["#text"]
-    return dados if isinstance(dados, str) else default
-
-
-def telaTransporteNotaSaida(self, cons):
+            print("entrou")
+            label = ctk.CTkButton(self.frametelaTransporte,  text="+ Cadastrar Transportador", corner_radius=0, fg_color=self.cor, font=("Century Gothic bold", 15), command = lambda: telaCadastroTransportadoras(self))
+            label.place(relx=0.35, rely=yNovo, relwidth=0.3)
+            self.resultadoLabels.append(label)  
+            yNovo += 0.0399
     
+    def selecionaCliente(nome, documento):
+
+        # --------------------------------------------------
+
+        self.nomeDestinatario = nome
+        self.documentoDestinatario = documento
+
+        self.variavelRazaoSocialRemetente.set(nome)
+        self.variavelCNPJRazaoSocialRemetente.set(documento)
+
+        for label in self.resultadoLabels: 
+            label.destroy()
+
+
+
+
+
     listaLabels = ["Quantidade", "Espécie",	"Marca", "Numeração", "Peso Bruto",	"Peso Líquido"]
     opcoesTransporte = [
         "Contratação do Frete por conta do Remetente (CIF)",
@@ -37,21 +65,19 @@ def telaTransporteNotaSaida(self, cons):
 
 
     
-    self.frametelaTransporte = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
-
-    # opções
-    opcoesSerie = ["", "B", "C", "U"]
-
+    
     # variáveis
     variavelTransportador = ctk.StringVar()
     variavelCNPJTransportador = ctk.StringVar()
 
 
     criarLabelComboBox(self.frametelaTransporte, "Modalidade do frete", 0.05, 0.1, 0.25, opcoesTransporte)
-    criarLabelEntry(self.frametelaTransporte, "Transportador", 0.35, 0.1, 0.3, variavelTransportador)
-    criarLabelEntry(self.frametelaTransporte, "CPF/CNPJ", 0.7, 0.1, 0.1, variavelCNPJTransportador)
-
-
+    self.nomeTransportador = criarLabelEntry(self.frametelaTransporte, "Transportador", 0.35, 0.1, 0.3, variavelTransportador)
+    self.documentoTransportador = criarLabelEntry(self.frametelaTransporte, "CPF/CNPJ", 0.7, 0.1, 0.2, variavelCNPJTransportador)
+    self.nomeTransportador.bind("<KeyRelease>",buscaTransportador)
+    self.nomeTransportador.bind("<Button-1>",buscaTransportador)
+    self.documentoTransportador.bind("<Button-1>",buscaTransportador)
+    self.documentoTransportador.bind("<KeyRelease>",buscaTransportador)
 
     self.posicaoy = 0.3
     self.posicaox = 0.05
@@ -60,11 +86,8 @@ def telaTransporteNotaSaida(self, cons):
     self.valorSubtotal = 0
     self.linhasTransporte = []
 
-
     self.botaoRemoverItem = ctk.CTkButton(self.frametelaTransporte, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: removerItem(self))
     self.botaoRemoverItem.place(relx=0.80, rely=self.posicaoyBotao-0.04)
-
-
 
     for i, coluna in enumerate(listaLabels):
         criaLabel(self.frametelaTransporte, coluna, self.posicaox, self.posicaoy, 0.145, self.cor)
@@ -92,10 +115,6 @@ def telaTransporteNotaSaida(self, cons):
         self.posicaox = 0.05
         self.linhasTransporte.append(linha_widgets)
 
-
-
-
-
     def removerItem(self):
         print(f"removi, tamanho: {self.posicaoyBotaoTransp}")
         if len(self.linhasTransporte) > 1:
@@ -122,5 +141,5 @@ def telaTransporteNotaSaida(self, cons):
 
 
 
-    criaBotao(self.frametelaTransporte, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: telaTotaisNotaSaida(self, cons)).place(anchor="nw")
+    criaBotao(self.frametelaTransporte, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: telaTotaisNotaSaida(self, EhNotaDoConsumidor)).place(anchor="nw")
     criaBotao(self.frametelaTransporte, "Voltar", 0.05, 0.94, 0.15, lambda: self.frametelaTransporte.destroy()).place(anchor="nw")

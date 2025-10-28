@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from tkinter import filedialog
 import xml.etree.ElementTree as ET
-from telas.telaRegistraCredito import telaRegistroCredito
+from telas.telaNotaFiscalEntrada import telaNotaFiscalEntrada
 
 
 import xml.etree.ElementTree as ET
@@ -52,7 +52,7 @@ def lerNotaFiscal(self, frame):
 
         if self.variavel.get() != "":
             dados = pegarDadosDaNota(self.variavel.get())
-            buttonPegarDados = ctk.CTkButton(frame, text="Prosseguir", command=lambda: telaRegistroCredito(self, dados))
+            buttonPegarDados = ctk.CTkButton(frame, text="Prosseguir", command=lambda: telaNotaFiscalEntrada(self, dados))
             buttonPegarDados.place(relx=0.445, rely=0.6)
         else:
             self.variavel.set("Nenhum arquivo selecionado")

@@ -5,7 +5,7 @@ from tkinter import messagebox
 from consultas.insert import Insere
 
 # é chamado quando é cadastrado um novo cliente
-def registraClienteNoBanco(self, frame):
+def registraClienteNoBanco(self, frame, ehFiscal):
 
     telefone   = self.telefoneCliente.get()
     nome       = self.nomeCliente.get()
@@ -25,5 +25,5 @@ def registraClienteNoBanco(self, frame):
     if not nome or not (cpf or cnpj) or not rua or not numero or not bairro or not cidade or not estado or not telefone: 
         messagebox.showinfo(title="Registro falhou", message="Campos obrigatórios não podem estar em branco")
     else:
-        Insere.insereClienteNoBanco(nome, cpf, cnpj, IE, RG, CEP, rua, numero, bairro, cidade, estado, referencia, telefone)
+        Insere.insereClienteNoBanco(nome, cpf, cnpj, IE, RG, CEP, rua, numero, bairro, cidade, estado, referencia, telefone, ehFiscal)
         frame.destroy()
