@@ -1071,7 +1071,7 @@ def criarNFE(self):
     os.makedirs(ACBR_CMD_DIR, exist_ok=True)
     os.makedirs(ACBR_RSP_DIR, exist_ok=True)
 
-    # 1) SET CERTIFICADO (COMANDO ISOLADO)
+    # 1) Certificado
     cert_cmd  = os.path.join(ACBR_CMD_DIR, "cert.txt")
     cert_resp = os.path.join(ACBR_RSP_DIR, "cert-resp.txt")
     try:
@@ -1079,15 +1079,13 @@ def criarNFE(self):
             os.remove(cert_resp)
     except Exception:
         pass
-
     with open(cert_cmd, "w", encoding="utf-8", newline="") as f:
         f.write(f'NFe.SetCertificado("{self.caminhoCertificado}","{self.senhaCertificado}")\r\n')
-
     r1 = aguarda_acbr_resposta(cert_resp, timeout=60, interval=0.2)
     if not r1.get("ok"):
-        return r1  # se falhou o certificado, para aqui
+        return r1
 
-    # 2) CRIAR/ENVIAR NFe (COMANDO COMPLETO)
+    # 2) Criar/Enviar NFe
     cmd_path  = os.path.join(ACBR_CMD_DIR, "enviar.txt")
     resp_path = os.path.join(ACBR_RSP_DIR, "enviar-resp.txt")
     try:
@@ -1096,12 +1094,84 @@ def criarNFE(self):
     except Exception:
         pass
 
-    criaComandoACBr(self, cmd_path)  # agora escreve só o CriarEnviarNFe(...)
+    criaComandoACBr(self, cmd_path)  # escreve o NFe.CriarEnviarNFe(...)
     _preencher_enderecos_faltantes_arquivo(self, cmd_path)
 
-    resultado = aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5)
+    # ---- PATCH: garantir vPIS/vCOFINS em [Total] e imprimir no DANFE Fortes via infCpl ----
+    try:
+        import re
+        from decimal import Decimal, ROUND_HALF_UP
 
-        
+        with open(cmd_path, "r", encoding="utf-8", errors="ignore") as f:
+            txt = f.read()
+
+        # soma valores por seção
+        def _sum_field(section_prefix, key):
+            tot = Decimal("0.00")
+            sec_re = re.compile(rf"\[{re.escape(section_prefix)}(\d{{3}})\]\r?\n(.*?)(?=(\r?\n\[)|\Z)", re.S | re.M)
+            for m in sec_re.finditer(txt):
+                body = m.group(2)
+                kv = re.search(rf"(?mi)^{key}\s*=\s*([0-9\.,]+)\s*$", body)
+                if kv:
+                    try:
+                        tot += Decimal(kv.group(1).replace(",", "."))
+                    except Exception:
+                        pass
+            return tot.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+
+        tot_pis = _sum_field("PIS", "vPIS")
+        tot_cof = _sum_field("COFINS", "vCOFINS")
+
+        # garante linhas em [Total]
+        sec_total = re.search(r"(\[Total\]\r?\n)(.*?)(?=(\r?\n\[)|\Z)", txt, re.S | re.M)
+        if sec_total:
+            header, body = sec_total.group(1), sec_total.group(2)
+            def _set_line(b, key, value):
+                pat = re.compile(rf"(?mi)^{key}\s*=.*$", re.M)
+                if pat.search(b):
+                    b = pat.sub(f"{key}={value}", b)
+                else:
+                    if not b.endswith("\r\n"):
+                        b += "\r\n"
+                    b += f"{key}={value}\r\n"
+                return b
+            body = _set_line(body, "vPIS", f"{tot_pis:.2f}")
+            body = _set_line(body, "vCOFINS", f"{tot_cof:.2f}")
+            start, end = sec_total.span()
+            txt = txt[:start] + header + body + txt[end:]
+
+        # garante texto em [DadosAdicionais].infCpl para sair no DANFE Fortes
+        inf_line = f"Totais: PIS R$ {tot_pis:.2f} | COFINS R$ {tot_cof:.2f}"
+        sec_da = re.search(r"(\[DadosAdicionais\]\r?\n)(.*?)(?=(\r?\n\[)|\Z)", txt, re.S | re.M)
+        if sec_da:
+            h, b = sec_da.group(1), sec_da.group(2)
+            m = re.search(r"(?mi)^infCpl\s*=\s*(.*)$", b)
+            if m:
+                val = m.group(1).strip()
+                if val == "" or val == "{_inf_cpl}":
+                    b = re.sub(r"(?mi)^infCpl\s*=.*$", f"infCpl={inf_line}", b)
+                else:
+                    nv = (val + " | " + inf_line)[:5000]
+                    b = re.sub(r"(?mi)^infCpl\s*=.*$", f"infCpl={nv}", b)
+            else:
+                if not b.endswith("\r\n"):
+                    b += "\r\n"
+                b += f"infCpl={inf_line}\r\n"
+            s, e = sec_da.span()
+            txt = txt[:s] + h + b + txt[e:]
+        else:
+            if not txt.endswith("\r\n"):
+                txt += "\r\n"
+            txt += "[DadosAdicionais]\r\n"
+            txt += f"infCpl={inf_line}\r\n"
+
+        with open(cmd_path, "w", encoding="utf-8", newline="") as f:
+            f.write(txt)
+    except Exception:
+        pass
+    # ---- FIM PATCH ------------------------------------------------------------------------
+
+    resultado = aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5)
     status = "AUTORIZADA" if str(resultado.get("cStat")) in ("100", "150") else "GERADA"
     xml_path = resultado.get("xml") or ""
     inserir_nota_fiscal(self, tipo="NFe", xml_path=xml_path, status=status)
