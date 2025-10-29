@@ -831,6 +831,7 @@ def criaComandoACBr(self, nome_arquivo):
 
             orig      = prod.get("orig",  prod.get("origem", "0"))
             csosn_txt = (prod.get("csosn") or prod.get("CSOSN") or "").strip()
+            cst_b_fallback = (prod.get("cst_b_produto") or prod.get("cst_b") or "").strip()
             cst_txt   = (prod.get("cst")   or prod.get("CST")   or "").strip()
             vBC       = prod['bc_icms'] or prod['vBC_ICMS'] or prod.get("vBC")
             print(vBC)

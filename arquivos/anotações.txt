@@ -1,26 +1,28 @@
-Começa digitando pelo CNPJ                                          ✅
-cadastrar novo caso não existe (cliente e fornecedor)               ✅ ? onde era o fornecedor você quis dizer transportador?
-Verificar dados do produto tag                                      ✅
-Tirar FCP da tela de tributação                                     ✅ 
-Valor de venda = valor final do produto***                          ✅
-BC IMS = valor de venda                                             ✅
-Redução base icms (%) influência no valor da base de cálculo BC IMS ✅
-VLR ICMS = Alíquota (%) * BC IMS                                    ✅
-Dar funcionalidade redução BC icms                                  ✅
-BC PIS = base produto - VLR ICMS                                    ✅
-Tirar cofins pis ST                                                 ✅
-Pesquisar transportador via CNPJ                                    ✅
-Tirar segunda linha nota transporte saída                           ✅
-arrumar posição botao remover item da tela transporte nota de saida ✅
-Colocar dinheiro na forma de pagamento                              ✅
-Faturamento puxar valor                                             ✅
-Número do pedido vinculado a nota na tela de gerar                  ✅
-Relatório pra nota fiscal                                           ✅
-Tabela de notas fiscais com filtro                                  ✅
-colocar cfop na nota dentro do banco                                ✅
+Começa digitando pelo CNPJ                                                   ✅
+cadastrar novo caso não existe (cliente e fornecedor)                        ✅ ? onde era o fornecedor você quis dizer transportador?
+Verificar dados do produto tag                                               ✅
+Tirar FCP da tela de tributação                                              ✅ 
+Valor de venda = valor final do produto***                                   ✅
+BC IMS = valor de venda                                                      ✅
+Redução base icms (%) influência no valor da base de cálculo BC IMS          ✅
+VLR ICMS = Alíquota (%) * BC IMS                                             ✅
+Dar funcionalidade redução BC icms                                           ✅
+BC PIS = base produto - VLR ICMS                                             ✅
+Tirar cofins pis ST                                                          ✅
+Pesquisar transportador via CNPJ                                             ✅
+Tirar segunda linha nota transporte saída                                    ✅
+arrumar posição botao remover item da tela transporte nota de saida          ✅
+Colocar dinheiro na forma de pagamento                                       ✅
+Faturamento puxar valor                                                      ✅
+Número do pedido vinculado a nota na tela de gerar                           ✅
+Relatório pra nota fiscal                                                    ✅
+Tabela de notas fiscais com filtro                                           ✅
+colocar cfop na nota dentro do banco                                         ✅
 puxar dados do produto para dentro da aba de tributação e mandar para a nota
 tela Transporte tem que ter a função "seleciona transportador"
 tela de faturamento, valor ainda não ta puxando o total da nota
+cst do produto, nao vai para a nota
+dados de pis e cofins não estão aparecendo na nota
 conectar campos agora corretos na nota fiscal
 Notas referenciadas
 arrumar tela de produtos no fluxo de importar nota                     (Gabriel) completa com os valores dos produtos que são puxados pela nota. A tela de produtos, a função "lerNotaFiscal" e a "EscolherNotaFiscal", ce pod ejogar no gpt e pedir pra ele enviar esses dados para os respectivos campos da tela de produtos.  outro detalhe, pra mais preciso, pede o chat pra nao criar funções extras, e alterar no código somente o que você pediu
@@ -45,7 +47,6 @@ Clonar nota
 
 ———————————————————————
 NFC-E
-
 Mudar as mesmas coisas de Tributação do NC-E                        ✅
 Tirar tela de transporte.                                           ✅
 

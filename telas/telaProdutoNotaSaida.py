@@ -57,11 +57,11 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
         for i, row in enumerate(Buscas.buscaEstoqueProdutosFiscal(nomeDoProduto, cnpj)):
             if i >= 5:
                 break     
-            label = criaBotao(frameParaItensNoFrame, row[0], 0.195, yNovo+0.02 + i * 0.02, 0.26, lambda nome=row[0], valor=row[6].replace(',', '.'), quantidade=row[8].replace(',', '.'), ncm=row[4], cst=row[5], cest=row[12], ent=entradaProduto: selecionaProduto(nome, valor, quantidade, ncm, cst, cest, ent))    
+            label = criaBotao(frameParaItensNoFrame,row[0],0.195,yNovo+0.02 + i * 0.02,0.26,lambda nome=row[0], valor=row[6].replace(',', '.'), quantidade=row[8].replace(',', '.'), ent=entradaProduto, ncm=row[4]:selecionaProduto(nome, valor, quantidade, ent, ncm))
             label.configure(fg_color=self.cor, corner_radius=0, font=("TkDefaultFont", 14))
             self.resultadoLabelsProduto.append(label)
 
-    def selecionaProduto(nome, valor, quantidade, entradaProduto):
+    def selecionaProduto(nome, valor, quantidade, entradaProduto, ncm):
         entradaProduto.delete(0, "end")
         entradaProduto.insert(0, nome)
 
@@ -70,7 +70,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
             if linha["produto"] == entradaProduto:
                 linha["preco"].delete(0, "end")
                 linha["preco"].insert(0, valor)
-                # linha["preco"].configure(state="disabled")
 
 
                 linha["quantidade"].delete(0, "end")
@@ -93,6 +92,8 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
                 linha["subtotal"].insert(0, valor)
 
                 linha["subtotal_original"] = float(valor)
+
+                linha["ncm"] = ncm
 
                 break
 
@@ -323,6 +324,8 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
         criarLabelEntry(frame, "Produto:",                   0.05, 0.05+posGera, 0.25, produto)
         criarLabelEntry(frame, "Código:",                    0.31, 0.05+posGera, 0.15, self.codigoEntry)
         criarLabelEntry(frame, "NCM:",                       0.47, 0.05+posGera, 0.10, self.NCMEntry)
+        if "ncm" in linha and linha["ncm"]:
+            self.NCMEntry.set(linha["ncm"])
         criarLabelEntry(frame, "CSET:",                      0.58, 0.05+posGera, 0.10, self.CSETEntry)
         criarLabelEntry(frame, "QTD:",                       0.69, 0.05+posGera, 0.05, self.quantidadeEntry)
         criarLabelEntry(frame, "Beneficio Fisc:",            0.75, 0.05+posGera, 0.15, self.beneficioEntry)
@@ -332,6 +335,8 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
         criarLabelEntry(frame, "Alíq. Cálc. Créd. (%)",      0.59, 0.19+posGera, 0.13, self.aliquEntry)
         criarLabelEntry(frame, "Vr. Cred. ICMS",             0.77, 0.19+posGera, 0.13, self.credICMSEntry)
         self.cst_b = criarLabelComboBox(frame, "CST B",      0.05, 0.27+posGera, 0.85, opcoes_CST_B)
+        if "cst_b_produto" in linha and linha["cst_b_produto"]:
+            self.cst_b.set(linha["cst_b_produto"])
 
 
 
@@ -526,6 +531,8 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
                 "aliq_cofins_st": self.aliq_cofins_st.get(),
 
             }
+            linha["ncm"] = self.NCMEntry.get()
+            linha["cst_b_produto"] = self.cst_b.get()
             print(self.dadosProdutos)
 
             destroyModal()
