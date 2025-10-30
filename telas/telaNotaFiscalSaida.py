@@ -180,6 +180,7 @@ def telaNotaFiscalSaida(self, valor, EhNotaDoConsumidor):
             self.variavelCEPEnd             = "36301194"
             self.variavelCodigoMunicipioEnd = "3162500"
             self.variavelTelefoneEnd        = "3233716171"
+            self.variavelCSCToken           = "fc61ad002385a054543bbf619d0247b5"
 
             self.caminhoCertificado = r"C:\Users\gus\Desktop\Projeto-multim-quinas\certificados\certificadoNutrigel.pfx"
             self.senhaCertificado   = "nutri@00995"
@@ -199,6 +200,7 @@ def telaNotaFiscalSaida(self, valor, EhNotaDoConsumidor):
             self.variavelCEPEnd             = "36301194"
             self.variavelCodigoMunicipioEnd = "3162500"
             self.variavelTelefoneEnd        = "3233713382"
+            self.variavelCSCToken           = "7ea94a1685c35cc42d21a839c1dc840f"
 
             self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoMultimaquinas.pfx"
             self.senhaCertificado   = "multi2025"
@@ -217,7 +219,9 @@ def telaNotaFiscalSaida(self, valor, EhNotaDoConsumidor):
             self.variavelUFEnd              = "ES"
             self.variavelCEPEnd             = "29111630"
             self.variavelCodigoMunicipioEnd = "3205200"
-            self.variavelTelefoneEnd        = "3233713382" 
+            self.variavelTelefoneEnd        = "3233713382"
+            self.variavelCSCToken           = "a985151a07100b97c8af2c1e179908cd"
+
 
             self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoPolimaquinas.pfx"
             self.senhaCertificado   = "23889"

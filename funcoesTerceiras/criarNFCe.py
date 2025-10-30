@@ -47,9 +47,9 @@ def _ensure_key_in_section(section_text, key, value):
             return section_text[:start] + str(value) + section_text[end:]
         return section_text
     # Caso não exista a chave, adiciona ao final da seção
-    if not section_text.endswith("\r\n"):
-        section_text += "\r\n"
-    section_text += f"{key}={value}\r\n"
+    if not section_text.endswith("\n"):
+        section_text += "\n"
+    section_text += f"{key}={value}\n"
     return section_text
 
 def _preencher_enderecos_faltantes_arquivo(self, ini_path):
@@ -417,57 +417,57 @@ def criaComandoACBr(self, nome_arquivo):
     ini_path     = r"C:\ACBrMonitorPLUS\ACBrMonitor.ini"
 
 
-    with open(nome_arquivo, "w", encoding="utf-8", newline="") as f:
+    with open(nome_arquivo, "w", encoding="utf-8", newline="\r\n") as f:
         # 2) Criar e enviar a NFe (BLOCO ÚNICO)
-        f.write('NFe.CriarEnviarNFe(\r\n"\r\n')
+        f.write('NFe.CriarEnviarNFe(\n"\n')
 
         # [infNFe] / [Identificacao]
-        f.write("[infNFe]\r\nversao=4.00\r\n\r\n")
-        f.write("[Identificacao]\r\n")
-        f.write(f"cNF={random.randint(10_000_000, 99_999_999)}\r\n")
-        f.write(f"natOp={natop}\r\n")
-        f.write("mod=65\r\n")
-        f.write(f"serie={serie_int}\r\n")
-        f.write(f"nNF={nnf_int}\r\n")
-        f.write(f"dhEmi={data_ptbr} {hora}\r\n")
-        f.write(f"tpNF={1}\r\n")
-        f.write(f"idDest={idDest}\r\n")
-        f.write("tpAmb=2\r\n")
-        f.write("tpImp=4\r\n")
-        f.write("tpEmis=1\r\n")
-        f.write("finNFe=1\r\n")
-        f.write("indFinal=1\r\n")
-        f.write(f"indPres={indPres}\r\n")
-        f.write("procEmi=0\r\n")
-        f.write("verProc=Sistema Python\r\n")
+        f.write("[infNFe]\nversao=4.00\n\n")
+        f.write("[Identificacao]\n")
+        f.write(f"cNF={random.randint(10_000_000, 99_999_999)}\n")
+        f.write(f"natOp={natop}\n")
+        f.write("mod=65\n")
+        f.write(f"serie={serie_int}\n")
+        f.write(f"nNF={nnf_int}\n")
+        f.write(f"dhEmi={data_ptbr} {hora}\n")
+        f.write(f"tpNF={1}\n")
+        f.write(f"idDest={idDest}\n")
+        f.write("tpAmb=2\n")
+        f.write("tpImp=4\n")
+        f.write("tpEmis=1\n")
+        f.write("finNFe=1\n")
+        f.write("indFinal=1\n")
+        f.write(f"indPres={indPres}\n")
+        f.write("procEmi=0\n")
+        f.write("verProc=Sistema Python\n")
         # >>> NOVO: indicativo do intermediador conforme indPres
         if indPres in {"2", "3", "4", "9"}:
             if len(marketplace_cnpj) == 14:
                 # Houve marketplace/intermediador
-                f.write("indIntermed=1\r\n\r\n")
-                f.write("[infIntermed]\r\n")
-                f.write(f"CNPJ={marketplace_cnpj}\r\n")
+                f.write("indIntermed=1\n\n")
+                f.write("[infIntermed]\n")
+                f.write(f"CNPJ={marketplace_cnpj}\n")
                 if marketplace_id:
-                    f.write(f"idCadIntTran={marketplace_id}\r\n")
-                f.write("\r\n")
+                    f.write(f"idCadIntTran={marketplace_id}\n")
+                f.write("\n")
             else:
                 # Sem marketplace (operação não presencial direta)
-                f.write("indIntermed=0\r\n\r\n")
+                f.write("indIntermed=0\n\n")
         else:
             # Para 0,1,5 não deve enviar indIntermed
-            f.write("\r\n")
+            f.write("\n")
         # <<< NOVO
 
         # [Emitente]
-        f.write("[Emitente]\r\n")
+        f.write("[Emitente]\n")
         cnpj_ok = cnpjEmit if len(cnpjEmit) == 14 else ""
-        f.write(f"CNPJ={cnpj_ok}\r\n")
-        f.write(f"xNome={xNomeEmit}\r\n")
+        f.write(f"CNPJ={cnpj_ok}\n")
+        f.write(f"xNome={xNomeEmit}\n")
         ie_num = _so_digitos(ieEmit)
         if ie_num and 2 <= len(ie_num) <= 14 and int(ie_num) > 0:
-            f.write(f"IE={ie_num}\r\n")
+            f.write(f"IE={ie_num}\n")
         else:
-            f.write("IE=ISENTO\r\n")
+            f.write("IE=ISENTO\n")
         # CRT se existir nas telas; se não, 1 (Simples) por padrão
 
 
@@ -478,39 +478,41 @@ def criaComandoACBr(self, nome_arquivo):
                V("crt", "")).strip()
         if crt not in {"1", "2", "3"}:
             crt = "3"  # se não vier da tela, regime normal por segurança
-        f.write(f"CRT={crt}\r\n")
+        f.write(f"CRT={crt}\n")
+        if crt not in {"1","2","3"}:
+            crt = "3"
 
-        if emit_xLgr:    f.write(f"xLgr={emit_xLgr}\r\n")
-        if emit_nro:     f.write(f"nro={emit_nro}\r\n")
-        if emit_xCpl:    f.write(f"xCpl={emit_xCpl}\r\n")
-        if emit_xBairro: f.write(f"xBairro={emit_xBairro}\r\n")
-        f.write(f"cMun={emit_cMun or '3162500'}\r\n")
-        f.write(f"xMun={emit_xMun or 'SAO JOAO DEL REI'}\r\n")
-        f.write(f"UF={emit_UF or 'MG'}\r\n")
-        f.write(f"CEP={emit_CEP}\r\n")
-        f.write("cPais=1058\r\nxPais=BRASIL\r\n")
-        if emit_fone: f.write(f"Fone={emit_fone}\r\n")
-        f.write("\r\n")
+        if emit_xLgr:    f.write(f"xLgr={emit_xLgr}\n")
+        if emit_nro:     f.write(f"nro={emit_nro}\n")
+        if emit_xCpl:    f.write(f"xCpl={emit_xCpl}\n")
+        if emit_xBairro: f.write(f"xBairro={emit_xBairro}\n")
+        f.write(f"cMun={emit_cMun or '3162500'}\n")
+        f.write(f"xMun={emit_xMun or 'SAO JOAO DEL REI'}\n")
+        f.write(f"UF={emit_UF or 'MG'}\n")
+        f.write(f"CEP={emit_CEP}\n")
+        f.write("cPais=1058\nxPais=BRASIL\n")
+        if emit_fone: f.write(f"Fone={emit_fone}\n")
+        f.write("\n")
 
         # [Destinatario]
-        f.write("[Destinatario]\r\n")
+        f.write("[Destinatario]\n")
         cnpjDest_num = _so_digitos(cnpjDest)
         if cnpjDest_num:
-            f.write(f"CNPJCPF={cnpjDest_num}\r\n")
-        f.write(f"xNome={xNomeDest}\r\n")
+            f.write(f"CNPJCPF={cnpjDest_num}\n")
+        f.write(f"xNome={xNomeDest}\n")
         ie_dest_num = _so_digitos(ieDest)
         if ie_dest_num and 2 <= len(ie_dest_num) <= 14 and int(ie_dest_num) > 0:
-            f.write("indIEDest=9\r\n")
-        if dest_xLgr:    f.write(f"xLgr={dest_xLgr}\r\n")
-        if dest_nro:     f.write(f"nro={dest_nro}\r\n")
-        if dest_xBairro: f.write(f"xBairro={dest_xBairro}\r\n")
-        f.write(f"cMun={dest_cMun or '3162500'}\r\n")
-        f.write(f"xMun={dest_xMun or emit_xMun or 'SAO JOAO DEL REI'}\r\n")
-        f.write(f"UF={dest_UF or emit_UF or 'MG'}\r\n")
-        f.write(f"CEP={dest_CEP}\r\n")
-        f.write("cPais=1058\r\nxPais=BRASIL\r\n")
-        if dest_fone: f.write(f"Fone={dest_fone}\r\n")
-        f.write("\r\n")
+            f.write("indIEDest=9\n")
+        if dest_xLgr:    f.write(f"xLgr={dest_xLgr}\n")
+        if dest_nro:     f.write(f"nro={dest_nro}\n")
+        if dest_xBairro: f.write(f"xBairro={dest_xBairro}\n")
+        f.write(f"cMun={dest_cMun or '3162500'}\n")
+        f.write(f"xMun={dest_xMun or emit_xMun or 'SAO JOAO DEL REI'}\n")
+        f.write(f"UF={dest_UF or emit_UF or 'MG'}\n")
+        f.write(f"CEP={dest_CEP}\n")
+        f.write("cPais=1058\nxPais=BRASIL\n")
+        if dest_fone: f.write(f"Fone={dest_fone}\n")
+        f.write("\n")
 
         # ---------------- [Produtos] + tributos por item ----------------
         tot_vBC = Decimal("0.00"); tot_vICMS = Decimal("0.00"); tot_vBCST = Decimal("0.00"); tot_vST = Decimal("0.00")
@@ -556,7 +558,7 @@ def criaComandoACBr(self, nome_arquivo):
 # <<< FIM AJUSTE
 
 
-            crt   = (V("CRT_emitente","") or V("variavelCRTEmitente","") or V("variavelCRT","") or V("crt","") or "1").strip()
+            crt
             csosn = str(prod.get("CSOSN", prod.get("csosn", ""))).strip()
             cst_icms = str(prod.get("CST_ICMS", prod.get("cst_icms", "00"))).zfill(2)
 
@@ -607,9 +609,9 @@ def criaComandoACBr(self, nome_arquivo):
             except:
                 pass
 
-            f.write(f"[Produto{idx:03d}]\r\n")
-            f.write(f"cProd={cProd}\r\nxProd={xProd}\r\nNCM={NCM}\r\nCFOP={5102}\r\n")
-            f.write(f"uCom={uCom}\r\nqCom={qCom}\r\nvUnCom={vUnCom}\r\nvProd={vProd}\r\nindTot=1\r\n\r\n")
+            f.write(f"[Produto{idx:03d}]\n")
+            f.write(f"cProd={cProd}\nxProd={xProd}\nNCM={NCM}\nCFOP={CFOP}\n")
+            f.write(f"uCom={uCom}\nqCom={qCom}\nvUnCom={vUnCom}\nvProd={vProd}\nindTot=1\n\n")
             # --- FIM NORMALIZAÇÃO ---
 
             # ===== ICMS por item =====
@@ -659,35 +661,9 @@ def criaComandoACBr(self, nome_arquivo):
             vBC      = _d(prod.get("bc_icms",  prod.get("vBC", "0")))
             vICMS    = (vBC * aliquota / _d("100"))
 
-
-            f.write(f"[ICMS{idx:03d}]\r\n")
-            f.write(f"orig={orig}\r\n")
-
-            if crt == "1":  # Simples Nacional → usa CSOSN
-                # se não vier CSOSN da tela, define um padrão coerente
-                if not csosn:
-                    csosn = "500" if is_st else "102"
-                f.write(f"CSOSN={csosn}\r\n")
-
-                # Para SN, só informe base/alíquota/valor quando houver crédito/tributação que exija esses campos
-                # (ex.: 101/201/202/203/900). Ajuste conforme sua regra de negócio:
-                if aliquota > 0 and csosn in ("101", "201", "202", "203", "900"):
-                    if vBC > 0:      f.write(f"vBC={vBC}\r\n")
-                    f.write(f"pICMS={aliquota}\r\n")
-                    f.write(f"vICMS={vICMS}\r\n")
-            else:  # Regime Normal → usa CST
-                f.write(f"CST={cst_icms}\r\n")
-                if vBC > 0:      f.write(f"vBC={vBC}\r\n")
-                if aliquota > 0: f.write(f"pICMS={aliquota}\r\n")
-                if vICMS > 0:    f.write(f"vICMS={vICMS}\r\n")
-
-            f.write("\r\n")
-
-            
-            if False:
-                # Se veio CSOSN no item, escreve CSOSN e não força CST nem valores de ICMS padrão
-                f.write(f"CSOSN={csosn_txt}\r\n\r\n")
-            elif cst_txt:
+            if cst_txt:
+                f.write(f"[ICMS{idx:03d}]\r\n")
+                f.write(f"orig={orig}\r\n")
                 _num = lambda x: float(str(x).replace(",", ".").strip() or "0")
                 bc_num    = _num(vBC)
                 aliq_num  = _num(pICMS)
@@ -718,41 +694,59 @@ def criaComandoACBr(self, nome_arquivo):
                         aliq_num = (vicms_num / bc_num) * 100.0
                         pICMS = f"{aliq_num:.4f}"
 
-                f.write(f"CST={cst_txt}\r\n")
-                f.write("modBC=3\r\n")  # <<< troque 0 por 3 (valor da operação)
+                f.write(f"CST={cst_txt}\n")
+                f.write("modBC=3\n")  # <<< troque 0 por 3 (valor da operação)
                 _bc = str(vBC).strip().replace(',', '.')
                 if not _bc:
                     _bc = bc_num
-                f.write(f"vBC={_bc}\r\n")
+                f.write(f"vBC={_bc}\n")
                 
-                f.write(f"pICMS={pICMS}\r\n")
-                f.write(f"vICMS={vICMS}\r\n")
-                if vBCST:   f.write(f"vBCST={vBCST}\r\n")
-                if vICMSST: f.write(f"vICMSST={vICMSST}\r\n")
-                f.write("\r\n")
+                f.write(f"pICMS={pICMS}\n")
+                f.write(f"vICMS={vICMS}\n")
+                if vBCST:   f.write(f"vBCST={vBCST}\n")
+                if vICMSST: f.write(f"vICMSST={vICMSST}\n")
+                f.write("\n")
 
             
             else:
+                f.write(f"[ICMS{idx:03d}]\r\n")
+                f.write(f"orig={orig}\r\n")
                 vBCST = ""
                 vICMSST = ""
                 if crt in ("1", "2"):   # Simples
-                    f.write(f"CSOSN={(getattr(self, 'csosn_padrao', '') or '102')}\r\n\r\n")
+                    f.write(f"CSOSN={(getattr(self, 'csosn_padrao', '') or '102')}\n\n")
                 else:                    # Regime Normal
                     _num = lambda x: float(str(x).replace(",", ".").strip() or "0")
                     if _num(vBC) <= 0:
                         vBC = vProd   # usa o vProd já calculado acima como base do item
 
-                    f.write("CST=00\r\n")
-                    f.write("modBC=3\r\n")  # <<< aqui também 3
+                    f.write("CST=00\n")
+                    f.write("modBC=3\n")  # <<< aqui também 3
                 _bc = str(vBC).strip().replace(',', '.')
                 if not _bc:
                     _bc = '0.00'
-                f.write(f"vBC={_bc}\r\n")
-                f.write(f"pICMS={pICMS}\r\n")
-                f.write(f"vICMS={vICMS}\r\n")
-                if vBCST:   f.write(f"vBCST={vBCST}\r\n")
-                if vICMSST: f.write(f"vICMSST={vICMSST}\r\n")
-                f.write("\r\n")
+                f.write(f"vBC={_bc}\n")
+                # --- força coerência do vICMS = vBC * pICMS / 100 quando aplicável (evita 528) ---
+                try:
+                    _bc_num = float(str(_bc).replace(",", "."))
+                except:
+                    _bc_num = 0.0
+                try:
+                    _aliq_num = float(str(pICMS).replace(",", "."))
+                except:
+                    _aliq_num = 0.0
+                _vicms_calc = round(_bc_num * _aliq_num / 100.0, 2)
+                try:
+                    _vicms_num = float(str(vICMS).replace(",", "."))
+                except:
+                    _vicms_num = 0.0
+                if (_aliq_num > 0 and _bc_num > 0) and (abs(_vicms_calc - _vicms_num) > 0.01):
+                    vICMS = f"{_vicms_calc:.2f}"
+                f.write(f"pICMS={pICMS}\n")
+                f.write(f"vICMS={vICMS}\n")
+                if vBCST:   f.write(f"vBCST={vBCST}\n")
+                if vICMSST: f.write(f"vICMSST={vICMSST}\n")
+                f.write("\n")
                 
             def _fnum(x):
                 try:
@@ -779,11 +773,11 @@ def criaComandoACBr(self, nome_arquivo):
                 except:
                     pis_vvl = "0.00"
 
-            f.write(f"[PIS{idx:03d}]\r\n")
-            f.write(f"CST={pis_cst}\r\n")
-            f.write(f"vBC={pis_vbc}\r\n")
-            f.write(f"pPIS={pis_ppc}\r\n")
-            f.write(f"vPIS={pis_vvl}\r\n\r\n")
+            f.write(f"[PIS{idx:03d}]\n")
+            f.write(f"CST={pis_cst}\n")
+            f.write(f"vBC={pis_vbc}\n")
+            f.write(f"pPIS={pis_ppc}\n")
+            f.write(f"vPIS={pis_vvl}\n\n")
 
             # +++ NOVO: acumula total PIS
             tot_vPIS += _fnum(pis_vvl)
@@ -801,11 +795,11 @@ def criaComandoACBr(self, nome_arquivo):
                 except:
                     cof_vvl = "0.00"
 
-            f.write(f"[COFINS{idx:03d}]\r\n")
-            f.write(f"CST={cof_cst}\r\n")
-            f.write(f"vBC={cof_vbc}\r\n")
-            f.write(f"pCOFINS={cof_ppc}\r\n")
-            f.write(f"vCOFINS={cof_vvl}\r\n\r\n")
+            f.write(f"[COFINS{idx:03d}]\n")
+            f.write(f"CST={cof_cst}\n")
+            f.write(f"vBC={cof_vbc}\n")
+            f.write(f"pCOFINS={cof_ppc}\n")
+            f.write(f"vCOFINS={cof_vvl}\n\n")
 
             # +++ NOVO: acumula total COFINS
             tot_vCOFINS += _fnum(cof_vvl)
@@ -856,30 +850,30 @@ def criaComandoACBr(self, nome_arquivo):
         if tot_vST == Decimal("0.00"):
             tot_vBCST = Decimal("0.00")
 # ---------------- [Total] ----------------
-        f.write("[Total]\r\n")
-        f.write(f"vBC={tot_vBC:.2f}\r\n")
-        f.write(f"vBCST={tot_vBCST:.2f}\r\n")
-        f.write(f"vST={tot_vST:.2f}\r\n")
-        f.write(f"vProd={tot_vProd:.2f}\r\n")
-        f.write(f"vNF={vNF}\r\n")
+        f.write("[Total]\n")
+        f.write(f"vBC={tot_vBC:.2f}\n")
+        f.write(f"vBCST={tot_vBCST:.2f}\n")
+        f.write(f"vST={tot_vST:.2f}\n")
+        f.write(f"vProd={tot_vProd:.2f}\n")
+        f.write(f"vNF={vNF}\n")
         # não escreva vFrete na NFC-e
-        f.write(f"vSeg={vSeg}\r\n")
-        f.write(f"vDesc={vDesc}\r\n")
-        f.write(f"vOutro={vOutro}\r\n")
-        f.write(f"vICMS={tot_vICMS:.2f}\r\n")
-        f.write(f"vIPI={vIPI}\r\n")
-        f.write(f"vPIS={vPIS}\r\n")
-        f.write(f"vCOFINS={vCOFINS}\r\n\r\n")
+        f.write(f"vSeg={vSeg}\n")
+        f.write(f"vDesc={vDesc}\n")
+        f.write(f"vOutro={vOutro}\n")
+        f.write(f"vICMS={tot_vICMS:.2f}\n")
+        f.write(f"vIPI={vIPI}\n")
+        f.write(f"vPIS={vPIS}\n")
+        f.write(f"vCOFINS={vCOFINS}\n\n")
 
         # >>> FORÇAR SEMPRE modFrete=9 NA NFC-e
-        f.write("[Transportador]\r\n")
-        f.write("modFrete=9\r\n\r\n")
+        f.write("[Transportador]\n")
+        f.write("modFrete=9\n\n")
         # <<<
 
         # ---------------- [pag001] ----------------
-        f.write("[pag001]\r\n")
-        f.write("tpag=01\r\n")
-        f.write(f"vPag={vNF}\r\n\r\n")
+        f.write("[pag001]\n")
+        f.write("tpag=01\n")
+        f.write(f"vPag={vNF}\n\n")
 
 
         # Encerramento do comando
@@ -899,8 +893,8 @@ def criarNFE(self):
         pass
 
     with open(cert_cmd, "w", encoding="utf-8", newline="") as f:
-        f.write(f'NFe.SetCertificado("{self.caminhoCertificado}","{self.senhaCertificado}")\r\n')
-        f.write('NFe.SetModeloDF("65")\r\n')
+        f.write(f'NFe.SetCertificado("{self.caminhoCertificado}","{self.senhaCertificado}")\n')
+        f.write('NFe.SetModeloDF("65")\n')
 
     r1 = aguarda_acbr_resposta(cert_resp, timeout=60, interval=0.2)
     if not r1.get("ok"):
