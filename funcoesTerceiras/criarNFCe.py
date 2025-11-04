@@ -289,7 +289,7 @@ def criaComandoACBr(self, nome_arquivo):
     # ---------------- Destinatário ----------------
     xNomeDest = self.nomeDestinatario
     cnpjDest  = self.documentoDestinatario
-    ieDest    = self.inscricaoEstadualDestinatario.get()
+    ieDest    = ''
     dest_xLgr = self.ruaDestinatario
     dest_nro  = self.numeroDestinatario
     dest_xBairro = self.bairroDestinatario
@@ -298,8 +298,6 @@ def criaComandoACBr(self, nome_arquivo):
     dest_UF = self.estadoDestinatario
     dest_CEP = self.cepDestinatario
     dest_fone = ''
-
-    print(xNomeDest, cnpjDest, ieDest, dest_xLgr, dest_nro, dest_xBairro, dest_cMun, dest_xMun, dest_UF, dest_CEP, dest_fone)
 
     cfop_hint = _so_digitos(V("variavelCFOP", ""))  # ex.: "5102", "6102", "7102"
     if cfop_hint:
@@ -498,20 +496,19 @@ def criaComandoACBr(self, nome_arquivo):
         f.write("[Destinatario]\n")
         cnpjDest_num = _so_digitos(cnpjDest)
         if cnpjDest_num:
-            f.write(f"CNPJCPF={cnpjDest_num}\n")
-        f.write(f"xNome={xNomeDest}\n")
+            f.write(f"CNPJCPF=\n")
+        f.write(f"xNome=\n")
         ie_dest_num = _so_digitos(ieDest)
-        if ie_dest_num and 2 <= len(ie_dest_num) <= 14 and int(ie_dest_num) > 0:
-            f.write("indIEDest=9\n")
-        if dest_xLgr:    f.write(f"xLgr={dest_xLgr}\n")
-        if dest_nro:     f.write(f"nro={dest_nro}\n")
-        if dest_xBairro: f.write(f"xBairro={dest_xBairro}\n")
-        f.write(f"cMun={dest_cMun or '3162500'}\n")
-        f.write(f"xMun={dest_xMun or emit_xMun or 'SAO JOAO DEL REI'}\n")
-        f.write(f"UF={dest_UF or emit_UF or 'MG'}\n")
-        f.write(f"CEP={dest_CEP}\n")
+        f.write("indIEDest=\n")
+        if dest_xLgr:    f.write(f"xLgr=\n")
+        if dest_nro:     f.write(f"nro=\n")
+        if dest_xBairro: f.write(f"xBairro=\n")
+        f.write(f"cMun=\n")
+        f.write(f"xMun=\n")
+        f.write(f"UF=\n")
+        f.write(f"CEP=\n")
         f.write("cPais=1058\nxPais=BRASIL\n")
-        if dest_fone: f.write(f"Fone={dest_fone}\n")
+        if dest_fone: f.write(f"Fone=\n")
         f.write("\n")
 
         # ---------------- [Produtos] + tributos por item ----------------
@@ -521,7 +518,6 @@ def criaComandoACBr(self, nome_arquivo):
 
         for idx, base in enumerate(itens_base, start=1):
             prod = dict(base)
-            print(prod)
             if idx-1 < len(trib_list):
                 try:
                     prod.update({k: v for k, v in dict(trib_list[idx-1]).items() if v not in (None, "", "None")})
@@ -673,11 +669,9 @@ def criaComandoACBr(self, nome_arquivo):
                 if cst_txt == "00":
                     vBCST = ""
                     vICMSST = ""
-                    # Base do ICMS do item = vProd (se não informada)
-                    if bc_num <= 0:
-                        bc_num = vprod_num
-                        print(bc_num)
-                        vBC = f"{bc_num:.2f}"
+                    # Base do ICMS do item = vProd (CST=00 não tem redução)
+                    bc_num = vprod_num
+                    vBC = f"{bc_num:.2f}"  # FORCADO: base ICMS = vProd (temporário)
 
                     # Se tudo veio zerado, use a alíquota global (se existir) para fechar com o total
                     if aliq_num <= 0 and vicms_num <= 0 and _aliq_icms_global > 0:
@@ -773,6 +767,9 @@ def criaComandoACBr(self, nome_arquivo):
                 except:
                     pis_vvl = "0.00"
 
+            # FORCADO: PIS zerado temporariamente
+            pis_ppc = "0.00"
+            pis_vvl = "0.00"
             f.write(f"[PIS{idx:03d}]\n")
             f.write(f"CST={pis_cst}\n")
             f.write(f"vBC={pis_vbc}\n")
@@ -784,7 +781,8 @@ def criaComandoACBr(self, nome_arquivo):
 
 
             # ===== COFINS por item =====
-            cof_cst = (prod.get('cst_cofins') or prod.get('CST_COFINS') or '99')
+            # cof_cst = (prod.get('cst_cofins') or prod.get('CST_COFINS') or '99')
+            cof_cst = '99'
             cof_vbc = (prod.get('bc_cofins')  or prod.get('vBC_COFINS') or '0.00')
             cof_ppc = (prod.get('aliq_cofins') or prod.get('pCOFINS') or '0.00')
             cof_vvl = (prod.get('vr_cofins') or prod.get('valor_cofins') or prod.get('vCOFINS'))
@@ -795,6 +793,9 @@ def criaComandoACBr(self, nome_arquivo):
                 except:
                     cof_vvl = "0.00"
 
+            # FORCADO: COFINS zerado temporariamente
+            cof_ppc = "0.00"
+            cof_vvl = "0.00"
             f.write(f"[COFINS{idx:03d}]\n")
             f.write(f"CST={cof_cst}\n")
             f.write(f"vBC={cof_vbc}\n")
@@ -838,11 +839,9 @@ def criaComandoACBr(self, nome_arquivo):
                     pass
             return f"{tot:.2f}"
 
-        if not str(vPIS).strip() or str(vPIS).strip() in {"0", "0.0", "0.00"}:
-            vPIS = f"{tot_vPIS:.2f}"
+        vPIS = f"{tot_vPIS:.2f}"  # FORCADO: total PIS = 0
 
-        if not str(vCOFINS).strip() or str(vCOFINS).strip() in {"0", "0.0", "0.00"}:
-            vCOFINS = f"{tot_vCOFINS:.2f}"
+        vCOFINS = f"{tot_vCOFINS:.2f}"  # FORCADO: total COFINS = 0
 
 
         
@@ -895,6 +894,9 @@ def criarNFE(self):
     with open(cert_cmd, "w", encoding="utf-8", newline="") as f:
         f.write(f'NFe.SetCertificado("{self.caminhoCertificado}","{self.senhaCertificado}")\n')
         f.write('NFe.SetModeloDF("65")\n')
+        csc_val = str(self.variavelCSCToken)
+        # f.write(f'NFe.SetCSC("{csc_val}",1)\n')
+        f.write(f'NFCe.SetCSC("{csc_val}",1)\n')
 
     r1 = aguarda_acbr_resposta(cert_resp, timeout=60, interval=0.2)
     if not r1.get("ok"):
@@ -924,8 +926,7 @@ def criarNFE(self):
         status = "AUTORIZADA" if str(resultado.get("cStat")) in ("100", "150") else "GERADA"
         inserir_nota_fiscal(self, tipo="NFCe", xml_path=resultado.get("xml"), status=status)
     except Exception as e:
-        print("Falha ao salvar NFCe no banco:", e)
-    return resultado
+        return resultado
 
 
 # compatibilidade (se alguma parte do seu app ainda chamar gerarNFe)
