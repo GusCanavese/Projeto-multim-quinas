@@ -17,7 +17,6 @@ import telas.telaEstoque
 import telas.telaGerarPedido
 import telas.telaLogin
 import telas.telaProdutos
-import telas.telaRegistraCredito
 import telas.telaRelatorioDeVendas
 import telas.telaTotais
 import telas.telaTransporte

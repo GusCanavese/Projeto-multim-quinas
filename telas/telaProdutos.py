@@ -867,8 +867,14 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
             }
             self.valoresDosItens.append(item)
 
-    # ======= NOVO: Pré-carregar itens da NF-e (lógica portada da primeira estrutura) =======
+    
+    # ======= NOVO: Pré-carregar itens da NF-e (com CFOP e dados para tributação) =======
     if dadosNota:
+        # Garante que existe um dicionário para dados fiscais por produto
+        if not hasattr(self, "dadosProdutos") or not isinstance(getattr(self, "dadosProdutos"), dict):
+            self.dadosProdutos = {}
+
+        # Extrai a lista de itens da NF-e lida
         try:
             itens = dadosNota["NFe"]["infNFe"]["det"]
             if not isinstance(itens, list):
@@ -881,71 +887,91 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
                 cur = d
                 for k in keys:
                     cur = cur[k]
-                # Alguns nós vêm como {'#text': 'valor'}
-                if isinstance(cur, dict) and "#text" in cur:
-                    return cur.get("#text", default)
-                # Ou diretamente como string/num
-                return cur
+                if isinstance(cur, dict) and "#text" in cur:  # alguns nós vêm como {'#text': 'valor'}
+                    return str(cur.get("#text", default))
+                return str(cur)
             except Exception:
                 return default
 
-        # Usa a 1ª linha já criada; para demais itens, cria novas linhas
+        # Primeira linha já existe; demais itens criam novas linhas
         for idx, item in enumerate(itens):
-            if idx == 0:
+            if idx == 0 and self.linhas:
                 linha_widgets = self.linhas[-1]
             else:
                 adicionarItem(self)
                 linha_widgets = self.linhas[-1]
 
-            # Mapeia campos conforme cabeçalhos da segunda estrutura
-            xProd = _get_text(item, "prod", "xProd", default="")
-            qCom  = _get_text(item, "prod", "qCom", default="0")
-            uCom  = _get_text(item, "prod", "uCom", default="")
-            vUn   = _get_text(item, "prod", "vUnCom", default="0.00")
-            vProd = _get_text(item, "prod", "vProd", default="0.00")
+        prod = item.get("prod", {}) if isinstance(item, dict) else {}
+        xProd = _get_text(item, "prod", "xProd", default="")
+        cProd = _get_text(item, "prod", "cProd", default="")
+        qCom  = _get_text(item, "prod", "qCom",  default="0")
+        uCom  = _get_text(item, "prod", "uCom",  default="")
+        vUn   = _get_text(item, "prod", "vUnCom", default="0.00")
+        vProd = _get_text(item, "prod", "vProd", default="0.00")
+        ncm   = _get_text(item, "prod", "NCM",   default="")
+        cfop_item = _get_text(item, "prod", "CFOP", default="")
 
-            # Normaliza para 2 casas onde faz sentido
-            try:
-                vUn_fmt = f"{float(str(vUn).replace(',', '.')):.2f}"
-            except:
-                vUn_fmt = str(vUn)
+        # Normaliza valores numéricos
+        try:
+            vUn_fmt = f"{float(str(vUn).replace(',', '.')):.2f}"
+        except Exception:
+            vUn_fmt = "0.00"
+        try:
+            vProd_fmt = f"{float(str(vProd).replace(',', '.')):.2f}"
+        except Exception:
+            vProd_fmt = vUn_fmt
 
-            try:
-                qCom_fmt = str(float(str(qCom).replace(',', '.'))).rstrip('0').rstrip('.')
-            except:
-                qCom_fmt = str(qCom)
+        # Preenche os campos visíveis da linha
+        linha_widgets["produto"].delete(0, "end")
+        linha_widgets["produto"].insert(0, xProd)
 
-            try:
-                vProd_fmt = f"{float(str(vProd).replace(',', '.')):.2f}"
-            except:
-                # fallback: preço * quantidade
-                try:
-                    vProd_fmt = f"{float(str(vUn).replace(',', '.')) * float(str(qCom).replace(',', '.')):.2f}"
-                except:
-                    vProd_fmt = str(vProd)
+        linha_widgets["preco"].delete(0, "end")
+        linha_widgets["preco"].insert(0, vUn_fmt)
 
-            # Preenche entradas
-            for key, val in [
-                ("produto", xProd),
-                ("preco", vUn_fmt),
-                ("quantidade", qCom_fmt),
-                ("estoque", "0"),
-                ("desc_real", "0"),
-                ("desc_porcentagem", "0"),
-                ("acrescimo", "0"),
-                ("subtotal", vProd_fmt),
-            ]:
-                if key in linha_widgets:
-                    linha_widgets[key].delete(0, "end")
-                    linha_widgets[key].insert(0, val)
+        linha_widgets["quantidade"].delete(0, "end")
+        linha_widgets["quantidade"].insert(0, str(qCom))
 
-            # Guarda subtotal original para manter comportamento do recalculo
-            linha_widgets["subtotal_original"] = float(str(vUn_fmt).replace(",", ".") or 0)
+        linha_widgets["estoque"].delete(0, "end")
+        linha_widgets["estoque"].insert(0, "0")
+        linha_widgets["estoque"].configure(state="disabled")
 
-        # Atualiza totais após o preenchimento
-        atualizarTotalGeral()
+        linha_widgets["desc_real"].delete(0, "end")
+        linha_widgets["desc_real"].insert(0, "0")
 
-    criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, EhNotaDoConsumidor))).place(anchor="nw")
+        linha_widgets["desc_porcentagem"].delete(0, "end")
+        linha_widgets["desc_porcentagem"].insert(0, "0")
+
+        linha_widgets["acrescimo"].delete(0, "end")
+        linha_widgets["acrescimo"].insert(0, "0")
+
+        linha_widgets["subtotal"].delete(0, "end")
+        linha_widgets["subtotal"].insert(0, vProd_fmt or vUn_fmt)
+        linha_widgets["subtotal_original"] = float(vProd_fmt or vUn_fmt)
+
+        # Atualiza CFOP (campo compartilha a mesma StringVar em todas as linhas)
+        try:
+            if cfop_item:
+                variavelCfop.set(cfop_item)
+        except Exception:
+            pass
+
+        # Salva dados essenciais para a tela de tributação (modal)
+        chave = xProd or cProd or f"ITEM_{idx+1}"
+        self.dadosProdutos[chave] = {
+            "codigo": cProd,
+            "ncm": ncm,
+            "quantidade": str(qCom),
+            "uCom": uCom,
+            "cfop": cfop_item,
+        }
+    
+    criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, EhNotaDoConsumidor, True))).place(anchor="nw")
     criaBotao(frameTelaNotaProduto, "Voltar", 0.05, 0.94, 0.15, lambda: frameTelaNotaProduto.destroy()).place(anchor="nw")
 
-    aplicar_maiusculo_em_todos_entries(self)
+    # aplicar_maiusculo_em_todos_entries(self)
+    # Recalcula o total geral após o pré-carregamento
+    try:
+        atualizarTotalGeral()
+    except Exception:
+        pass
+# ======= FIM Pré-carregar itens da NF-e =======

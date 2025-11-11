@@ -7,7 +7,7 @@ from componentes import criaBotaoPequeno, criaEntry, criaFrameJanela, criaLabel,
 from telas.telaCadastroTransportadoras import telaCadastroTransportadoras 
 from telas.telaTotaisNotaSaida import telaTotaisNotaSaida
 
-def telaTransporteNotaSaida(self, EhNotaDoConsumidor):
+def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
     self.frametelaTransporte = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     def buscaTransportador(event=None): 
@@ -141,5 +141,208 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor):
 
 
 
-    criaBotao(self.frametelaTransporte, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: telaTotaisNotaSaida(self, EhNotaDoConsumidor)).place(anchor="nw")
-    criaBotao(self.frametelaTransporte, "Voltar", 0.05, 0.94, 0.15, lambda: self.frametelaTransporte.destroy()).place(anchor="nw")
+
+# ===== Pré-preencher TRANSPORTE a partir da NF-e (somente se ehNotaEntrada) =====
+    if ehNotaEntrada:
+        print("entrou")
+        dados = None
+        if hasattr(self, "dadosNota") and self.dadosNota:
+            dados = self.dadosNota
+        elif hasattr(self, "dadosNFeEntrada") and self.dadosNFeEntrada:
+            dados = self.dadosNFeEntrada
+
+        if isinstance(dados, dict):
+            # ----------------- transporta: nome / documento -----------------
+            try:
+                transp = dados["NFe"]["infNFe"]["transp"]
+
+                # Nome do transportador
+                nomeTransp = ""
+                try:
+                    nomeTransp = transp["transporta"]["xNome"]
+                    if isinstance(nomeTransp, dict) and "#text" in nomeTransp:
+                        nomeTransp = nomeTransp["#text"]
+                except Exception:
+                    nomeTransp = ""
+                try:
+                    atual = (self.nomeTransportador.get() or "").strip()
+                    if atual == "" and (str(nomeTransp).strip() != ""):
+                        self.nomeTransportador.delete(0, "end")
+                        self.nomeTransportador.insert(0, str(nomeTransp))
+                except Exception:
+                    pass
+
+                # Documento (CNPJ/CPF)
+                docTransp = ""
+                try:
+                    docTransp = transp["transporta"].get("CNPJ", "")
+                    if not docTransp:
+                        docTransp = transp["transporta"].get("CPF", "")
+                    if isinstance(docTransp, dict) and "#text" in docTransp:
+                        docTransp = docTransp["#text"]
+                except Exception:
+                    docTransp = ""
+                try:
+                    atual = (self.documentoTransportador.get() or "").strip()
+                    if atual == "" and (str(docTransp).strip() != ""):
+                        self.documentoTransportador.delete(0, "end")
+                        self.documentoTransportador.insert(0, str(docTransp))
+                except Exception:
+                    pass
+
+                # ----------------- volumes: qVol, esp, marca, nVol, pesoB, pesoL -----------------
+                vols = None
+                try:
+                    vols = transp["vol"]
+                except Exception:
+                    vols = None
+
+                if vols:
+                    if isinstance(vols, dict):
+                        vols = [vols]
+
+                    for i, vol in enumerate(vols):
+                        # garante linha disponível
+                        if i == 0:
+                            linha = self.linhasTransporte[0] if len(self.linhasTransporte) > 0 else None
+                        else:
+                            adicionarItem(self)
+                            linha = self.linhasTransporte[-1] if len(self.linhasTransporte) > 0 else None
+                        if not isinstance(linha, dict):
+                            continue
+
+                        # Quantidade -> qVol
+                        val = ""
+                        try:
+                            val = vol.get("qVol", "")
+                            if isinstance(val, dict) and "#text" in val:
+                                val = val["#text"]
+                        except Exception:
+                            val = ""
+                        if "Quantidade" in linha and str(val).strip() != "":
+                            try:
+                                cur = (linha["Quantidade"].get() or "").strip() if hasattr(linha["Quantidade"], "get") else ""
+                            except Exception:
+                                cur = ""
+                            if cur in ("", "0", "0.0", "0.00"):
+                                try:
+                                    linha["Quantidade"].delete(0, "end")
+                                    linha["Quantidade"].insert(0, str(val))
+                                except Exception:
+                                    pass
+
+                        # Espécie -> esp
+                        val = ""
+                        try:
+                            val = vol.get("esp", "")
+                            if isinstance(val, dict) and "#text" in val:
+                                val = val["#text"]
+                        except Exception:
+                            val = ""
+                        if "Espécie" in linha and str(val).strip() != "":
+                            try:
+                                cur = (linha["Espécie"].get() or "").strip() if hasattr(linha["Espécie"], "get") else ""
+                            except Exception:
+                                cur = ""
+                            if cur == "":
+                                try:
+                                    linha["Espécie"].delete(0, "end")
+                                    linha["Espécie"].insert(0, str(val))
+                                except Exception:
+                                    pass
+
+                        # Marca -> marca
+                        val = ""
+                        try:
+                            val = vol.get("marca", "")
+                            if isinstance(val, dict) and "#text" in val:
+                                val = val["#text"]
+                        except Exception:
+                            val = ""
+                        if "Marca" in linha and str(val).strip() != "":
+                            try:
+                                cur = (linha["Marca"].get() or "").strip() if hasattr(linha["Marca"], "get") else ""
+                            except Exception:
+                                cur = ""
+                            if cur == "":
+                                try:
+                                    linha["Marca"].delete(0, "end")
+                                    linha["Marca"].insert(0, str(val))
+                                except Exception:
+                                    pass
+
+                        # Numeração -> nVol
+                        val = ""
+                        try:
+                            val = vol.get("nVol", "")
+                            if isinstance(val, dict) and "#text" in val:
+                                val = val["#text"]
+                        except Exception:
+                            val = ""
+                        if "Numeração" in linha and str(val).strip() != "":
+                            try:
+                                cur = (linha["Numeração"].get() or "").strip() if hasattr(linha["Numeração"], "get") else ""
+                            except Exception:
+                                cur = ""
+                            if cur == "":
+                                try:
+                                    linha["Numeração"].delete(0, "end")
+                                    linha["Numeração"].insert(0, str(val))
+                                except Exception:
+                                    pass
+
+                        # Peso Bruto -> pesoB
+                        val = ""
+                        try:
+                            val = vol.get("pesoB", "")
+                            if isinstance(val, dict) and "#text" in val:
+                                val = val["#text"]
+                        except Exception:
+                            val = ""
+                        if "Peso Bruto" in linha and str(val).strip() != "":
+                            try:
+                                cur = (linha["Peso Bruto"].get() or "").strip() if hasattr(linha["Peso Bruto"], "get") else ""
+                            except Exception:
+                                cur = ""
+                            if cur in ("", "0", "0.0", "0.00"):
+                                try:
+                                    linha["Peso Bruto"].delete(0, "end")
+                                    linha["Peso Bruto"].insert(0, str(val))
+                                except Exception:
+                                    pass
+
+                        # Peso Líquido -> pesoL
+                        val = ""
+                        try:
+                            val = vol.get("pesoL", "")
+                            if isinstance(val, dict) and "#text" in val:
+                                val = val["#text"]
+                        except Exception:
+                            val = ""
+                        if "Peso Líquido" in linha and str(val).strip() != "":
+                            try:
+                                cur = (linha["Peso Líquido"].get() or "").strip() if hasattr(linha["Peso Líquido"], "get") else ""
+                            except Exception:
+                                cur = ""
+                            if cur in ("", "0", "0.0", "0.00"):
+                                try:
+                                    linha["Peso Líquido"].delete(0, "end")
+                                    linha["Peso Líquido"].insert(0, str(val))
+                                except Exception:
+                                    pass
+
+                # opcional: salvar modFrete para uso em outra tela
+                try:
+                    mf = transp.get("modFrete", "")
+                    if isinstance(mf, dict) and "#text" in mf:
+                        mf = mf["#text"]
+                    self.modFrete = str(mf)
+                except Exception:
+                    pass
+
+            except Exception:
+                pass
+    # ===== Fim do pré-preenchimento de transporte =====
+
+        criaBotao(self.frametelaTransporte, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: telaTotaisNotaSaida(self, EhNotaDoConsumidor)).place(anchor="nw")
+        criaBotao(self.frametelaTransporte, "Voltar", 0.05, 0.94, 0.15, lambda: self.frametelaTransporte.destroy()).place(anchor="nw")
