@@ -183,10 +183,6 @@ ACBR_RSP_DIR = "NotaFiscal/ReceberComando"
 # ------------------------ ACBr I/O ------------------------
 
 def aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5):
-    """
-    Espera o arquivo .../enviar-resp.txt que o Monitor grava.
-    Retorna dict com {ok, cStat, xMotivo, xml, resposta_bruta}.
-    """
     t0 = time.time()
     ultimo = ""
     while time.time() - t0 < timeout:
@@ -196,9 +192,9 @@ def aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5):
                     txt = f.read()
                 if txt and txt != ultimo:
                     ultimo = txt
-                    if ("[Retorno]" in txt) or ("CStat=" in txt) or txt.startswith("OK"):
-                        break
+                    break
             except Exception:
+                print("opa")
                 pass
         time.sleep(interval)
 
@@ -287,17 +283,30 @@ def criaComandoACBr(self, nome_arquivo):
 
 
     # ---------------- Destinatário ----------------
-    xNomeDest = self.nomeDestinatario
-    cnpjDest  = self.documentoDestinatario
-    ieDest    = ''
-    dest_xLgr = self.ruaDestinatario
-    dest_nro  = self.numeroDestinatario
-    dest_xBairro = self.bairroDestinatario
-    dest_cMun = ''
-    dest_xMun = self.cidadeDestinatario
-    dest_UF = self.estadoDestinatario
-    dest_CEP = self.cepDestinatario
-    dest_fone = ''
+    try:
+        xNomeDest = self.nomeDestinatario
+        cnpjDest  = self.documentoDestinatario
+        ieDest    = ''
+        dest_xLgr = self.ruaDestinatario
+        dest_nro  = self.numeroDestinatario
+        dest_xBairro = self.bairroDestinatario
+        dest_cMun = ''
+        dest_xMun = self.cidadeDestinatario
+        dest_UF = self.estadoDestinatario
+        dest_CEP = self.cepDestinatario
+        dest_fone = ''
+    except:
+        xNomeDest    = "Não informado"
+        cnpjDest     = ""
+        ieDest       = ""
+        dest_xLgr    = ""
+        dest_nro     = ""
+        dest_xBairro = ""
+        dest_cMun    = "Não informado"
+        dest_xMun    = "Não informado"
+        dest_UF      = "MG"
+        dest_CEP     = ""
+        dest_fone    = ""
 
     cfop_hint = _so_digitos(V("variavelCFOP", ""))  # ex.: "5102", "6102", "7102"
     if cfop_hint:
@@ -492,24 +501,62 @@ def criaComandoACBr(self, nome_arquivo):
         if emit_fone: f.write(f"Fone={emit_fone}\n")
         f.write("\n")
 
-        # [Destinatario]
+
+        #destinatario
         f.write("[Destinatario]\n")
+
+        # Documento (CPF/CNPJ)
         cnpjDest_num = _so_digitos(cnpjDest)
+
         if cnpjDest_num:
-            f.write(f"CNPJCPF=\n")
-        f.write(f"xNome=\n")
-        ie_dest_num = _so_digitos(ieDest)
-        f.write("indIEDest=\n")
-        if dest_xLgr:    f.write(f"xLgr=\n")
-        if dest_nro:     f.write(f"nro=\n")
-        if dest_xBairro: f.write(f"xBairro=\n")
-        f.write(f"cMun=\n")
-        f.write(f"xMun=\n")
-        f.write(f"UF=\n")
-        f.write(f"CEP=\n")
+            f.write(f"CNPJCPF={cnpjDest_num}\n")
+            xNomeDest_txt = (xNomeDest or "").strip()
+            f.write(f"xNome={xNomeDest_txt}\n")
+        else:
+            f.write("CNPJCPF=Não informado\n")
+            xNomeDest_txt = (xNomeDest or "").strip()
+            f.write(f"xNome=Não informado\n")
+
+
+
+        # IE e indIEDest
+        ie_dest_raw = (V("inscricaoEstadualDestinatario", "") or ieDest or "").strip()
+        ie_dest_num = _so_digitos(ie_dest_raw)
+        if ie_dest_num:
+            f.write(f"IE={ie_dest_num}\n")
+            f.write("indIEDest=1\n")  # contribuinte com IE
+        else:
+            if ie_dest_raw.upper() == "ISENTO":
+                f.write("IE=ISENTO\n")
+                f.write("indIEDest=2\n")
+            else:
+                f.write("IE=\n")
+                f.write("indIEDest=9\n")  # não contribuinte
+
+        # Endereço
+        xlgr    = (dest_xLgr or "").strip()
+        nro     = (dest_nro or "S/N")
+        xbairro = (dest_xBairro or "").strip()
+        cep     = _so_digitos(dest_CEP)
+        uf      = (dest_UF or "").strip().upper()[:2]
+        cmu     = (dest_cMun or "")
+        xmun    = (dest_xMun or "")
+
+        if xlgr:    f.write(f"xLgr={xlgr}\n")
+        if nro:     f.write(f"nro={nro}\n")
+        if xbairro: f.write(f"xBairro={xbairro}\n")
+        if cmu:     f.write(f"cMun={cmu}\n")
+        if xmun:    f.write(f"xMun={xmun}\n")
+        if uf:      f.write(f"UF={uf}\n")
+        if cep:     f.write(f"CEP={cep}\n")
         f.write("cPais=1058\nxPais=BRASIL\n")
-        if dest_fone: f.write(f"Fone=\n")
+
+        fone_num = _so_digitos(dest_fone)
+        if fone_num:
+            f.write(f"Fone={fone_num}\n")
+
         f.write("\n")
+
 
         # ---------------- [Produtos] + tributos por item ----------------
         tot_vBC = Decimal("0.00"); tot_vICMS = Decimal("0.00"); tot_vBCST = Decimal("0.00"); tot_vST = Decimal("0.00")
@@ -891,12 +938,15 @@ def criarNFE(self):
     except Exception:
         pass
 
-    with open(cert_cmd, "w", encoding="utf-8", newline="") as f:
+
+    csc_val = str(self.variavelCSCToken)
+
+    with open(cert_cmd, "w", encoding="utf-8", newline="\r\n") as f:
         f.write(f'NFe.SetCertificado("{self.caminhoCertificado}","{self.senhaCertificado}")\n')
         f.write('NFe.SetModeloDF("65")\n')
-        csc_val = str(self.variavelCSCToken)
-        # f.write(f'NFe.SetCSC("{csc_val}",1)\n')
         f.write(f'NFCe.SetCSC("{csc_val}",1)\n')
+        f.flush()
+        os.fsync(f.fileno())
 
     r1 = aguarda_acbr_resposta(cert_resp, timeout=60, interval=0.2)
     if not r1.get("ok"):
