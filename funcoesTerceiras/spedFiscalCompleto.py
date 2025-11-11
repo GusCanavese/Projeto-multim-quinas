@@ -247,19 +247,31 @@ def gerar_sped_fiscal_completo(
                     "VL_IPI": vIPI, "VL_PIS": vPIS, "VL_COFINS": vCOFINS, "VL_PIS_ST": 0.0, "VL_COFINS_ST": 0.0,
                     "C190": defaultdict(lambda: {"VL_OPR":0.0,"VL_BC_ICMS":0.0,"VL_ICMS":0.0,"VL_BC_ICMS_ST":0.0,"VL_ICMS_ST":0.0,"VL_RED_BC":0.0,"VL_IPI":0.0}),
                 }
-                for it in items:
-                    cfop = str(it.get("CFOP") or it.get("cfop") or "5102")
-                    cst  = _norm_cst(it.get("CST") or it.get("CSOSN") or it.get("cst") or it.get("csosn") or "00")
-                    aliq = _num(it.get("pICMS") or it.get("aliqICMS") or it.get("pIcms") or 0)
-                    v_item = _num(it.get("vProd") or it.get("valor_produto") or it.get("valor") or 0)
-                    vbc_i  = _num(it.get("vBC") or it.get("bc_icms") or 0)
-                    vicms_i= _num(it.get("vICMS") or it.get("icms") or 0)
-                    k = (cst, cfop, round(aliq,2))
-                    ag = c100["C190"][k]
-                    ag["VL_OPR"] += v_item; ag["VL_BC_ICMS"] += vbc_i; ag["VL_ICMS"] += vicms_i
-                    ag["VL_BC_ICMS_ST"] += _num(it.get("vBCST") or 0)
-                    ag["VL_ICMS_ST"] += _num(it.get("vICMSST") or 0)
-                    ag["VL_IPI"] += _num(it.get("vIPI") or 0)
+                
+                
+                # MINFIX: NFC-e (modelo 65) - remover COD_PART e zerar campos proibidos no C100
+                if str(c100.get("COD_MOD")) == "65":
+                    c100["COD_PART"] = ""
+                    for _k in ("VL_BC_ICMS_ST","VL_ICMS_ST","VL_IPI","VL_PIS","VL_COFINS","VL_PIS_ST","VL_COFINS_ST"):
+                        c100[_k] = 0.0
+# MINFIX: NFC-e (modelo 65) - remover COD_PART e zerar campos proibidos no C100
+                if str(c100.get("COD_MOD")) == "65":
+                    c100["COD_PART"] = ""
+                    for _k in ("VL_BC_ICMS_ST","VL_ICMS_ST","VL_IPI","VL_PIS","VL_COFINS","VL_PIS_ST","VL_COFINS_ST"):
+                        c100[_k] = 0.0
+                    for it in items:
+                        cfop = str(it.get("CFOP") or it.get("cfop") or "5102")
+                        cst  = _norm_cst(it.get("CST") or it.get("CSOSN") or it.get("cst") or it.get("csosn") or "00")
+                        aliq = _num(it.get("pICMS") or it.get("aliqICMS") or it.get("pIcms") or 0)
+                        v_item = _num(it.get("vProd") or it.get("valor_produto") or it.get("valor") or 0)
+                        vbc_i  = _num(it.get("vBC") or it.get("bc_icms") or 0)
+                        vicms_i= _num(it.get("vICMS") or it.get("icms") or 0)
+                        k = (cst, cfop, round(aliq,2))
+                        ag = c100["C190"][k]
+                        ag["VL_OPR"] += v_item; ag["VL_BC_ICMS"] += vbc_i; ag["VL_ICMS"] += vicms_i
+                        ag["VL_BC_ICMS_ST"] += _num(it.get("vBCST") or 0)
+                        ag["VL_ICMS_ST"] += _num(it.get("vICMSST") or 0)
+                        ag["VL_IPI"] += _num(it.get("vIPI") or 0)
 
                 notas.append(c100)
     except Exception:
@@ -372,19 +384,22 @@ def gerar_sped_fiscal_completo(
 
         # 0150 (somente participantes usados)
         for cod, p in sorted(partes.items()):
+                # MINFIX: não gerar 0150 para códigos 'CF-xxx' (consumidor final sem identificação)
+            if str(cod).startswith('CF-'):
+                continue
             add("|0150|{COD_PART}|{NOME}|{COD_PAIS}|{CNPJ}|{CPF}|{IE}|{COD_MUN}|{SUFRAMA}|{END}|{NUM}|{COMPL}|{BAIRRO}|".format(
-                COD_PART=str(cod)[:60],
-                NOME=_s(p.get("NOME") or "PARTICIPANTE")[:100],
-                COD_PAIS=p.get("COD_PAIS","1058"),
-                CNPJ=_somente_dig(p.get("CNPJ","")),
-                CPF=_somente_dig(p.get("CPF","")),
-                IE=_somente_dig(p.get("IE","")),
-                COD_MUN=_somente_dig(p.get("COD_MUN","")),
-                SUFRAMA=_s(p.get("SUFRAMA","")),
-                END=_s(p.get("END",""))[:60],
-                NUM=_s(p.get("NUM",""))[:10],
-                COMPL=_s(p.get("COMPL",""))[:60],
-                BAIRRO=_s(p.get("BAIRRO",""))[:60],
+            COD_PART=str(cod)[:60],
+            NOME=_s(p.get("NOME") or "PARTICIPANTE")[:100],
+            COD_PAIS=p.get("COD_PAIS","1058"),
+            CNPJ=_somente_dig(p.get("CNPJ","")),
+            CPF=_somente_dig(p.get("CPF","")),
+            IE=_somente_dig(p.get("IE","")),
+            COD_MUN=_somente_dig(p.get("COD_MUN","")),
+            SUFRAMA=_s(p.get("SUFRAMA","")),
+            END=_s(p.get("END",""))[:60],
+            NUM=_s(p.get("NUM",""))[:10],
+            COMPL=_s(p.get("COMPL",""))[:60],
+            BAIRRO=_s(p.get("BAIRRO",""))[:60],
             ), "0150")
         qtd_0 = (len(linhas) - b0) + 1
         add(f"|0990|{qtd_0}|", "0990")
