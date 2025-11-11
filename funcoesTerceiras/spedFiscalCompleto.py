@@ -17,7 +17,7 @@ def gerar_sped_fiscal_completo(
     dt_fin,
     pasta_logs=None,
     usar_fallback_xml=True,
-    blocos_ativos=("0", "C", "9"),
+    blocos_ativos=("0","B","C","D","E","G","H","K","1","9"),
     incluir_0005=False,
     incluir_0100=False,
 ):
