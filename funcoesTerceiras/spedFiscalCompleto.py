@@ -95,7 +95,7 @@ def gerar_sped_fiscal_completo(
     emit = {
         "COD_VER": "019",
         "FINALIDADE": 0,
-        "NOME": _get("variavelRazaoSocialEmitente", "") or _get("razaoSocialEmitente", "EMITENTE"),
+        "NOME": "NUTRIGEL DISTRIBUIDORA EIRELI",
         "CNPJ": _somente_dig(_get("variavelCNPJRazaoSocialEmitente", "") or _get("cnpjEmitente", "")),
         "UF": (_get("variavelUFEnd", "") or _get("estadoEmitente", "MG")).strip().upper() or "MG",
         "IE": _somente_dig(_get("variavelInscEstadualEmitente", "") or _get("ieEmitente", "")) or "ISENTO",
@@ -195,6 +195,7 @@ def gerar_sped_fiscal_completo(
                     d_emis = datetime.datetime(d_emis.year, d_emis.month, d_emis.day)
 
                 mod = str(rec.get("modelo") or "55")
+                print(mod)
                 serie = int(rec.get("serie") or 0)
                 nnf = int(rec.get("numero") or 0)
                 chv = str(rec.get("chave") or "")
@@ -237,7 +238,7 @@ def gerar_sped_fiscal_completo(
                     "IND_OPER": "1" if tpNF=="1" else "0",
                     "IND_EMIT": "0",
                     "COD_PART": cod_part,
-                    "COD_MOD": mod,
+                    "COD_MOD": 0,
                     "COD_SIT": "00",
                     "SER": serie, "NUM_DOC": nnf, "CHV_NFE": chv,
                     "DT_DOC": d_emis.strftime("%d%m%Y"), "DT_E_S": d_emis.strftime("%d%m%Y"),
@@ -254,7 +255,7 @@ def gerar_sped_fiscal_completo(
                     c100["COD_PART"] = ""
                     for _k in ("VL_BC_ICMS_ST","VL_ICMS_ST","VL_IPI","VL_PIS","VL_COFINS","VL_PIS_ST","VL_COFINS_ST"):
                         c100[_k] = 0.0
-# MINFIX: NFC-e (modelo 65) - remover COD_PART e zerar campos proibidos no C100
+                # MINFIX: NFC-e (modelo 65) - remover COD_PART e zerar campos proibidos no C100
                 if str(c100.get("COD_MOD")) == "65":
                     c100["COD_PART"] = ""
                     for _k in ("VL_BC_ICMS_ST","VL_ICMS_ST","VL_IPI","VL_PIS","VL_COFINS","VL_PIS_ST","VL_COFINS_ST"):
@@ -416,18 +417,68 @@ def gerar_sped_fiscal_completo(
         if notas:
             add("|C001|0|", "C001")
             for n in notas:
-                add("|C100|{IND_OPER}|{IND_EMIT}|{COD_PART}|{COD_MOD}|{COD_SIT}|{SER}|{NUM_DOC}|{CHV_NFE}|{DT_DOC}|{DT_E_S}|{VL_DOC}|{IND_PGTO}|{VL_DESC}|{VL_ABAT_NT}|{VL_MERC}|{IND_FRT}|{VL_FRT}|{VL_SEG}|{VL_OUT_DA}|{VL_BC_ICMS}|{VL_ICMS}|{VL_BC_ICMS_ST}|{VL_ICMS_ST}|{VL_IPI}|{VL_PIS}|{VL_COFINS}|{VL_PIS_ST}|{VL_COFINS_ST}|".format(
-                    IND_OPER=n["IND_OPER"], IND_EMIT=n["IND_EMIT"], COD_PART=str(n["COD_PART"])[:60],
-                    COD_MOD=n["COD_MOD"], COD_SIT=n["COD_SIT"], SER=n["SER"], NUM_DOC=n["NUM_DOC"],
-                    CHV_NFE=n["CHV_NFE"], DT_DOC=n["DT_DOC"], DT_E_S=n["DT_E_S"],
-                    VL_DOC=_fmt(n["VL_DOC"]), IND_PGTO=n["IND_PGTO"], VL_DESC=_fmt(n["VL_DESC"]),
-                    VL_ABAT_NT=_fmt(n["VL_ABAT_NT"]), VL_MERC=_fmt(n["VL_MERC"]), IND_FRT=n["IND_FRT"],
-                    VL_FRT=_fmt(n["VL_FRT"]), VL_SEG=_fmt(n["VL_SEG"]), VL_OUT_DA=_fmt(n["VL_OUT_DA"]),
-                    VL_BC_ICMS=_fmt(n["VL_BC_ICMS"]), VL_ICMS=_fmt(n["VL_ICMS"]),
-                    VL_BC_ICMS_ST=_fmt(n["VL_BC_ICMS_ST"]), VL_ICMS_ST=_fmt(n["VL_ICMS_ST"]),
-                    VL_IPI=_fmt(n["VL_IPI"]), VL_PIS=_fmt(n["VL_PIS"]), VL_COFINS=_fmt(n["VL_COFINS"]),
-                    VL_PIS_ST=_fmt(n["VL_PIS_ST"]), VL_COFINS_ST=_fmt(n["VL_COFINS_ST"]),
-                ), "C100")
+                if n["COD_MOD"] == "65":
+                    add("|C100|{IND_OPER}|{IND_EMIT}|{COD_PART}|{COD_MOD}|{COD_SIT}|{SER}|{NUM_DOC}|{CHV_NFE}|{DT_DOC}|{DT_E_S}|{VL_DOC}|{IND_PGTO}|{VL_DESC}|{VL_ABAT_NT}|{VL_MERC}|{IND_FRT}|{VL_FRT}|{VL_SEG}|{VL_OUT_DA}|{VL_BC_ICMS}|{VL_ICMS}|{VL_BC_ICMS_ST}|{VL_ICMS_ST}|{VL_IPI}|{VL_PIS}|{VL_COFINS}|{VL_PIS_ST}|{VL_COFINS_ST}|".format(
+                        VL_DOC       =_fmt(n["VL_DOC"]), 
+                        VL_DESC      =_fmt(n["VL_DESC"]),
+                        VL_ABAT_NT   =_fmt(n["VL_ABAT_NT"]), 
+                        VL_MERC      =_fmt(n["VL_MERC"]), 
+                        VL_FRT       =_fmt(n["VL_FRT"]), 
+                        VL_SEG       =_fmt(n["VL_SEG"]), 
+                        VL_OUT_DA    =_fmt(n["VL_OUT_DA"]),
+                        VL_BC_ICMS   =_fmt(n["VL_BC_ICMS"]), 
+                        VL_ICMS      =_fmt(n["VL_ICMS"]),
+                        IND_OPER     =n["IND_OPER"], 
+                        IND_EMIT     =n["IND_EMIT"], 
+                        COD_MOD      =n["COD_MOD"], 
+                        COD_SIT      =n["COD_SIT"], 
+                        SER          =n["SER"], 
+                        NUM_DOC      =n["NUM_DOC"],
+                        CHV_NFE      =n["CHV_NFE"], 
+                        DT_DOC       =n["DT_DOC"], 
+                        DT_E_S       =n["DT_E_S"],
+                        IND_PGTO     =n["IND_PGTO"], 
+                        IND_FRT      =n["IND_FRT"],
+                        VL_COFINS_ST ="",
+                        VL_BC_ICMS_ST="", 
+                        VL_ICMS_ST   ="",
+                        VL_IPI       ="", 
+                        VL_PIS       ="", 
+                        VL_COFINS    ="",
+                        VL_PIS_ST    ="", 
+                        COD_PART     ="",
+                    ), "C100")
+                else:
+                    add("|C100|{IND_OPER}|{IND_EMIT}|{COD_PART}|{COD_MOD}|{COD_SIT}|{SER}|{NUM_DOC}|{CHV_NFE}|{DT_DOC}|{DT_E_S}|{VL_DOC}|{IND_PGTO}|{VL_DESC}|{VL_ABAT_NT}|{VL_MERC}|{IND_FRT}|{VL_FRT}|{VL_SEG}|{VL_OUT_DA}|{VL_BC_ICMS}|{VL_ICMS}|{VL_BC_ICMS_ST}|{VL_ICMS_ST}|{VL_IPI}|{VL_PIS}|{VL_COFINS}|{VL_PIS_ST}|{VL_COFINS_ST}|".format(
+                        IND_OPER     =n["IND_OPER"], 
+                        IND_EMIT     =n["IND_EMIT"], 
+                        COD_PART     =str(n["COD_PART"])[:60],
+                        COD_MOD      =n["COD_MOD"], 
+                        COD_SIT      =n["COD_SIT"], 
+                        SER          =n["SER"], 
+                        NUM_DOC      =n["NUM_DOC"],
+                        CHV_NFE      =n["CHV_NFE"], 
+                        DT_DOC       =n["DT_DOC"], 
+                        DT_E_S       =n["DT_E_S"],
+                        VL_DOC       =_fmt(n["VL_DOC"]), 
+                        IND_PGTO     =n["IND_PGTO"], 
+                        VL_DESC      =_fmt(n["VL_DESC"]),
+                        VL_ABAT_NT   =_fmt(n["VL_ABAT_NT"]), 
+                        VL_MERC      =_fmt(n["VL_MERC"]), 
+                        IND_FRT      =n["IND_FRT"],
+                        VL_FRT       =_fmt(n["VL_FRT"]), 
+                        VL_SEG       =_fmt(n["VL_SEG"]), 
+                        VL_OUT_DA    =_fmt(n["VL_OUT_DA"]),
+                        VL_BC_ICMS   =_fmt(n["VL_BC_ICMS"]), 
+                        VL_ICMS      =_fmt(n["VL_ICMS"]),
+                        VL_BC_ICMS_ST=_fmt(n["VL_BC_ICMS_ST"]), 
+                        VL_ICMS_ST   =_fmt(n["VL_ICMS_ST"]),
+                        VL_IPI       =_fmt(n["VL_IPI"]), 
+                        VL_PIS       =_fmt(n["VL_PIS"]), 
+                        VL_COFINS    =_fmt(n["VL_COFINS"]),
+                        VL_PIS_ST    =_fmt(n["VL_PIS_ST"]), 
+                        VL_COFINS_ST =_fmt(n["VL_COFINS_ST"]),
+                    ), "C100")
                 for (cst, cfop, aliq), v in sorted(n["C190"].items()):
                     add(f"|C190|{cst}|{cfop}|{_fmt(aliq)}|{_fmt(v['VL_OPR'])}|{_fmt(v['VL_BC_ICMS'])}|{_fmt(v['VL_ICMS'])}|{_fmt(v['VL_BC_ICMS_ST'])}|{_fmt(v['VL_ICMS_ST'])}|{_fmt(v['VL_RED_BC'])}|{_fmt(v['VL_IPI'])}||", "C190")
             qtd_c = (len(linhas) - bc) + 1
@@ -476,6 +527,6 @@ def gerar_sped_fiscal_completo(
     out = Path(caminho_txt)
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", encoding="latin-1") as f:
-        linhas_sem_espaco = [l.replace(" ", "") for l in linhas]
+        linhas_sem_espaco = [l.replace(" ", " ") for l in linhas]
         f.write("\r\n".join(linhas_sem_espaco) + "\r\n")
     return str(out)
