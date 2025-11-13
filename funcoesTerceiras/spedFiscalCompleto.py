@@ -17,7 +17,7 @@ def gerar_sped_fiscal_completo(
     dt_ini,
     dt_fin,
     pasta_logs=None,
-    usar_fallback_xml=True,
+    usar_fallback_xml=False,
     blocos_ativos=("0","B","C","D","E","G","H","K","1","9"),
     incluir_0005=True,
     incluir_0100=True,
@@ -123,11 +123,11 @@ def gerar_sped_fiscal_completo(
         pasta_logs = getattr(self, "caminhoLogsAcbr", r"C:\ACBrMonitorPLUS\Logs")
     pasta_logs = os.path.abspath(pasta_logs)
     xmls = []
-    if usar_fallback_xml:
-        pats = ["*-procNFe.xml", "*-procNFCe.xml", "*-nfe.xml", "*-nfce.xml"]
-        for p in pats:
-            xmls += glob.glob(os.path.join(pasta_logs, p))
-        xmls = sorted(set(xmls))
+    # if usar_fallback_xml:
+    #     pats = ["*-procNFe.xml", "*-procNFCe.xml", "*-nfe.xml", "*-nfce.xml"]
+    #     for p in pats:
+    #         xmls += glob.glob(os.path.join(pasta_logs, p))
+    #     xmls = sorted(set(xmls))
 
     emit = {
         "COD_VER": "019",
@@ -174,29 +174,30 @@ def gerar_sped_fiscal_completo(
             pass
 
     # fallback via primeiro XML
-    if usar_fallback_xml and (len(emit["CNPJ"])!=14 or not emit["UF"] or not emit["COD_MUN"] or emit["IE"]=="ISENTO"):
-        for xp in xmls:
-            try:
-                root = ET.parse(xp).getroot()
-                ns = {"n": root.tag.split("}")[0].strip("{")}
-                inf = root.find(".//n:infNFe", ns)
-                if inf is None: continue
-                e = inf.find("n:emit", ns); end = e.find("n:enderEmit", ns) if e is not None else None
-                if e is not None:
-                    cnpj_xml = _somente_dig(_safe(e, "CNPJ", ns))
-                    if len(emit["CNPJ"])!=14 and len(cnpj_xml)==14: emit["CNPJ"]=cnpj_xml
-                    ie_xml = _somente_dig(_safe(e, "IE", ns))
-                    if emit["IE"]=="ISENTO" and ie_xml: emit["IE"]=ie_xml
-                    nome_xml = _safe(e, "xNome", ns)
-                    if emit["NOME"]=="EMITENTE" and nome_xml: emit["NOME"]=nome_xml
-                if end is not None:
-                    cod_mun_xml = _somente_dig(_safe(end, "cMun", ns))
-                    if not emit["COD_MUN"] and cod_mun_xml: emit["COD_MUN"]=cod_mun_xml
-                    uf_xml = (_safe(end, "UF", ns) or "").strip().upper()
-                    if not emit["UF"] and uf_xml: emit["UF"]=uf_xml
-                break
-            except Exception:
-                continue
+    # usar_fallback_xml = False
+    # if usar_fallback_xml and (len(emit["CNPJ"])!=14 or not emit["UF"] or not emit["COD_MUN"] or emit["IE"]=="ISENTO"):
+    #     for xp in xmls:
+    #         try:
+    #             root = ET.parse(xp).getroot()
+    #             ns = {"n": root.tag.split("}")[0].strip("{")}
+    #             inf = root.find(".//n:infNFe", ns)
+    #             if inf is None: continue
+    #             e = inf.find("n:emit", ns); end = e.find("n:enderEmit", ns) if e is not None else None
+    #             if e is not None:
+    #                 cnpj_xml = _somente_dig(_safe(e, "CNPJ", ns))
+    #                 if len(emit["CNPJ"])!=14 and len(cnpj_xml)==14: emit["CNPJ"]=cnpj_xml
+    #                 ie_xml = _somente_dig(_safe(e, "IE", ns))
+    #                 if emit["IE"]=="ISENTO" and ie_xml: emit["IE"]=ie_xml
+    #                 nome_xml = _safe(e, "xNome", ns)
+    #                 if emit["NOME"]=="EMITENTE" and nome_xml: emit["NOME"]=nome_xml
+    #             if end is not None:
+    #                 cod_mun_xml = _somente_dig(_safe(end, "cMun", ns))
+    #                 if not emit["COD_MUN"] and cod_mun_xml: emit["COD_MUN"]=cod_mun_xml
+    #                 uf_xml = (_safe(end, "UF", ns) or "").strip().upper()
+    #                 if not emit["UF"] and uf_xml: emit["UF"]=uf_xml
+    #             break
+    #         except Exception:
+    #             continue
 
     # garantias mínimas (validador indicará se inválido)
     if len(emit["CNPJ"])!=14: emit["CNPJ"]="00000000000000"
@@ -207,177 +208,157 @@ def gerar_sped_fiscal_completo(
     partes = {}
 
     # Banco (prioridade)
-    try:
-        if db and getattr(db, "cursor", None):
-            cur = db.cursor
-            di = datetime.datetime(d_i.year, d_i.month, d_i.day, 0,0,0)
-            df = datetime.datetime(d_f.year, d_f.month, d_f.day, 23,59,59)
-            cur.execute("""
-                SELECT modelo, serie, numero, chave, tpNF, dhEmi,
-                       valor_total, valor_desconto, valor_produtos, valor_frete, valor_seguro, valor_outras_despesas,
-                       valor_bc_icms, valor_icms, valor_bc_icms_st, valor_icms_st, valor_ipi, valor_pis, valor_cofins, itens_json,
-                       destinatario_cnpj, destinatario_nome
-                  FROM notas_fiscais
-                 WHERE dhEmi BETWEEN %s AND %s AND COALESCE(cancelada,0)=0
-            """, (di, df))
-            rows = cur.fetchall()
-            cols = [d[0] for d in cur.description]
-            for r in rows:
-                rec = dict(zip(cols, r))
-                d_emis = rec.get("dhEmi")
-                if isinstance(d_emis, str):
-                    try: d_emis = datetime.datetime.fromisoformat(d_emis)
-                    except Exception: d_emis = di
-                if isinstance(d_emis, datetime.date) and not isinstance(d_emis, datetime.datetime):
-                    d_emis = datetime.datetime(d_emis.year, d_emis.month, d_emis.day)
+    if db and getattr(db, "cursor", None):
+        cur = db.cursor
+        di = datetime.datetime(d_i.year, d_i.month, d_i.day, 0,0,0)
+        df = datetime.datetime(d_f.year, d_f.month, d_f.day, 23,59,59)
+        cur.execute("""
+            SELECT modelo, serie, numero, chave, tpNF, dhEmi,
+                    valor_total, valor_desconto, valor_produtos, valor_frete, valor_seguro, valor_outras_despesas,
+                    valor_bc_icms, valor_icms, valor_bc_icms_st, valor_icms_st, valor_ipi, valor_pis, valor_cofins, itens_json,
+                    destinatario_cnpjcpf, destinatario_nome
+                FROM notas_fiscais
+                WHERE dhEmi BETWEEN %s AND %s AND COALESCE(cancelada,0)=0
+        """, (di, df))
+        rows = cur.fetchall()
+        cols = [d[0] for d in cur.description]
+        for r in rows:
+            rec = dict(zip(cols, r))
+            d_emis = rec.get("dhEmi")
+            if isinstance(d_emis, str):
+                try: d_emis = datetime.datetime.fromisoformat(d_emis)
+                except Exception: d_emis = di
+            if isinstance(d_emis, datetime.date) and not isinstance(d_emis, datetime.datetime):
+                d_emis = datetime.datetime(d_emis.year, d_emis.month, d_emis.day)
 
-                mod = str(rec.get("modelo") or "55")
-                print(mod)
-                serie = int(rec.get("serie") or 0)
-                nnf = int(rec.get("numero") or 0)
-                chv = str(rec.get("chave") or "")
-                tpNF = str(rec.get("tpNF") or "1")
+            mod = str(rec.get("modelo") or "55")
+            serie = int(rec.get("serie") or 0)
+            nnf = int(rec.get("numero") or 0)
+            chv = str(rec.get("chave") or "")
+            tpNF = str(rec.get("tpNF") or "1")
 
-                vNF = float(rec.get("valor_total") or 0.0)
-                vDesc = float(rec.get("valor_desconto") or 0.0)
-                vProd = float(rec.get("valor_produtos") or 0.0)
-                vFrete = float(rec.get("valor_frete") or 0.0)
-                vSeg = float(rec.get("valor_seguro") or 0.0)
-                vOutros = float(rec.get("valor_outras_despesas") or 0.0)
+            vNF = float(rec.get("valor_total") or 0.0)
+            vDesc = float(rec.get("valor_desconto") or 0.0)
+            vProd = float(rec.get("valor_produtos") or 0.0)
+            vFrete = float(rec.get("valor_frete") or 0.0)
+            vSeg = float(rec.get("valor_seguro") or 0.0)
+            vOutros = float(rec.get("valor_outras_despesas") or 0.0)
 
-                vBC = float(rec.get("valor_bc_icms") or 0.0)
-                vICMS = float(rec.get("valor_icms") or 0.0)
-                vBCST = float(rec.get("valor_bc_icms_st") or 0.0)
-                vICMSST = float(rec.get("valor_icms_st") or 0.0)
-                vIPI = float(rec.get("valor_ipi") or 0.0)
-                vPIS = float(rec.get("valor_pis") or 0.0)
-                vCOFINS = float(rec.get("valor_cofins") or 0.0)
+            vBC = float(rec.get("valor_bc_icms") or 0.0)
+            vICMS = float(rec.get("valor_icms") or 0.0)
+            vBCST = float(rec.get("valor_bc_icms_st") or 0.0)
+            vICMSST = float(rec.get("valor_icms_st") or 0.0)
+            vIPI = float(rec.get("valor_ipi") or 0.0)
+            vPIS = float(rec.get("valor_pis") or 0.0)
+            vCOFINS = float(rec.get("valor_cofins") or 0.0)
 
-                cod_part = _somente_dig(rec.get("destinatario_cnpj") or "") or f"CF-{nnf}"
-                nome_dest = (rec.get("destinatario_nome") or "CONSUMIDOR FINAL").strip() or "CONSUMIDOR FINAL"
-                partes.setdefault(cod_part, {
-                    "NOME": nome_dest[:100], "CNPJ": _somente_dig(rec.get("destinatario_cnpj") or ""),
-                    "CPF": "", "COD_PAIS": "1058", "IE": "", "COD_MUN": "", "SUFRAMA": "",
-                    "END": "", "NUM": "", "COMPL": "", "BAIRRO": "",
-                })
+            cod_part = _somente_dig(rec.get("destinatario_cnpj") or "") or f"CF-{nnf}"
+            nome_dest = (rec.get("destinatario_nome") or "CONSUMIDOR FINAL").strip() or "CONSUMIDOR FINAL"
+            partes.setdefault(cod_part, {
+                "NOME": nome_dest[:100], "CNPJ": _somente_dig(rec.get("destinatario_cnpj") or ""),
+                "CPF": "", "COD_PAIS": "1058", "IE": "", "COD_MUN": "", "SUFRAMA": "",
+                "END": "", "NUM": "", "COMPL": "", "BAIRRO": "",
+            })
 
-                items = []
-                raw = rec.get("itens_json")
-                if raw:
-                    try:
-                        if isinstance(raw, (bytes, bytearray)): raw = raw.decode("utf-8", "ignore")
-                        data = json.loads(raw)
-                        items = data.get("itens", []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
-                    except Exception:
-                        items = []
+            items = []
+            raw = rec.get("itens_json")
+            if raw:
+                try:
+                    if isinstance(raw, (bytes, bytearray)): raw = raw.decode("utf-8", "ignore")
+                    data = json.loads(raw)
+                    items = data.get("itens", []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
+                except Exception:
+                    items = []
 
+            if str(cod_part).startswith('CF-'):
+                cod_part=""
+
+            if str(rec.get("modelo")) == "65":
+                c100 = {
+                    "IND_OPER": "1" if tpNF=="1" else "0",
+                    "IND_EMIT": "0",
+                    "COD_MOD": rec.get("modelo"),
+                    "COD_SIT": "00",
+                    "SER": serie, 
+                    "NUM_DOC": nnf, 
+                    "CHV_NFE": chv,
+                    "DT_DOC": d_emis.strftime("%d%m%Y"), 
+                    "DT_E_S": d_emis.strftime("%d%m%Y"),
+                    "VL_DOC": vNF, 
+                    "IND_PGTO": "0", 
+                    "VL_DESC": vDesc, 
+                    "VL_ABAT_NT": 0.0,
+                    "VL_MERC": vProd, 
+                    "IND_FRT": "0", 
+                    "VL_FRT": vFrete, 
+                    "VL_SEG": vSeg, 
+                    "VL_OUT_DA": vOutros,
+                    "VL_BC_ICMS": vBC, 
+                    "VL_ICMS": vICMS, 
+                    "VL_BC_ICMS_ST": "", 
+                    "VL_ICMS_ST": "",
+                    "VL_IPI": "", 
+                    "VL_PIS": "", 
+                    "VL_COFINS": "", 
+                    "VL_PIS_ST": "", 
+                    "VL_COFINS_ST": "",
+                    "COD_PART": "",
+                    "C190": defaultdict(lambda:{"VL_OPR":0.0,"VL_BC_ICMS":vBC,"VL_ICMS":vICMS,"VL_BC_ICMS_ST":0.0,"VL_ICMS_ST":0.0,"VL_RED_BC":0.0,"VL_IPI":0.0,}),
+                }
+            else:
+                print("caiu aqui")
                 c100 = {
                     "IND_OPER": "1" if tpNF=="1" else "0",
                     "IND_EMIT": "0",
                     "COD_PART": cod_part,
-                    "COD_MOD": 0,
+                    "COD_MOD": rec.get("modelo"),
                     "COD_SIT": "00",
-                    "SER": serie, "NUM_DOC": nnf, "CHV_NFE": chv,
-                    "DT_DOC": d_emis.strftime("%d%m%Y"), "DT_E_S": d_emis.strftime("%d%m%Y"),
-                    "VL_DOC": vNF, "IND_PGTO": "0", "VL_DESC": vDesc, "VL_ABAT_NT": 0.0,
-                    "VL_MERC": vProd, "IND_FRT": "0", "VL_FRT": vFrete, "VL_SEG": vSeg, "VL_OUT_DA": vOutros,
-                    "VL_BC_ICMS": vBC, "VL_ICMS": vICMS, "VL_BC_ICMS_ST": vBCST, "VL_ICMS_ST": vICMSST,
-                    "VL_IPI": vIPI, "VL_PIS": vPIS, "VL_COFINS": vCOFINS, "VL_PIS_ST": 0.0, "VL_COFINS_ST": 0.0,
-                    "C190": defaultdict(lambda: {"VL_OPR":0.0,"VL_BC_ICMS":0.0,"VL_ICMS":0.0,"VL_BC_ICMS_ST":0.0,"VL_ICMS_ST":0.0,"VL_RED_BC":0.0,"VL_IPI":0.0}),
+                    "SER": serie, 
+                    "NUM_DOC": nnf, 
+                    "CHV_NFE": chv,
+                    "DT_DOC": d_emis.strftime("%d%m%Y"), 
+                    "DT_E_S": d_emis.strftime("%d%m%Y"),
+                    "VL_DOC": vNF, 
+                    "IND_PGTO": "0", 
+                    "VL_DESC": vDesc, 
+                    "VL_ABAT_NT": 0.0,
+                    "VL_MERC": vProd, 
+                    "IND_FRT": "0", 
+                    "VL_FRT": vFrete, 
+                    "VL_SEG": vSeg, 
+                    "VL_OUT_DA": vOutros,
+                    "VL_BC_ICMS": vBC, 
+                    "VL_ICMS": vICMS, 
+                    "VL_BC_ICMS_ST": vBCST, 
+                    "VL_ICMS_ST": vICMSST,
+                    "VL_IPI": vIPI, 
+                    "VL_PIS": vPIS, 
+                    "VL_COFINS": vCOFINS, 
+                    "VL_PIS_ST": 0.0, 
+                    "VL_COFINS_ST": 0.0,
+                    "C190": defaultdict(lambda:{"VL_OPR":0.0,"VL_BC_ICMS":vBC,"VL_ICMS":vICMS,"VL_BC_ICMS_ST":0.0,"VL_ICMS_ST":0.0,"VL_RED_BC":0.0,"VL_IPI":0.0,}),
                 }
-                
-                
-                # MINFIX: NFC-e (modelo 65) - remover COD_PART e zerar campos proibidos no C100
-                if str(c100.get("COD_MOD")) == "65":
-                    c100["COD_PART"] = ""
-                    for _k in ("VL_BC_ICMS_ST","VL_ICMS_ST","VL_IPI","VL_PIS","VL_COFINS","VL_PIS_ST","VL_COFINS_ST"):
-                        c100[_k] = 0.0
-                # MINFIX: NFC-e (modelo 65) - remover COD_PART e zerar campos proibidos no C100
-                if str(c100.get("COD_MOD")) == "65":
-                    c100["COD_PART"] = ""
-                    for _k in ("VL_BC_ICMS_ST","VL_ICMS_ST","VL_IPI","VL_PIS","VL_COFINS","VL_PIS_ST","VL_COFINS_ST"):
-                        c100[_k] = 0.0
-                    for it in items:
-                        cfop = str(it.get("CFOP") or it.get("cfop") or "5102")
-                        cst  = _norm_cst(it.get("CST") or it.get("CSOSN") or it.get("cst") or it.get("csosn") or "00")
-                        aliq = _num(it.get("pICMS") or it.get("aliqICMS") or it.get("pIcms") or 0)
-                        v_item = _num(it.get("vProd") or it.get("valor_produto") or it.get("valor") or 0)
-                        vbc_i  = _num(it.get("vBC") or it.get("bc_icms") or 0)
-                        vicms_i= _num(it.get("vICMS") or it.get("icms") or 0)
-                        k = (cst, cfop, round(aliq,2))
-                        ag = c100["C190"][k]
-                        ag["VL_OPR"] += v_item; ag["VL_BC_ICMS"] += vbc_i; ag["VL_ICMS"] += vicms_i
-                        ag["VL_BC_ICMS_ST"] += _num(it.get("vBCST") or 0)
-                        ag["VL_ICMS_ST"] += _num(it.get("vICMSST") or 0)
-                        ag["VL_IPI"] += _num(it.get("vIPI") or 0)
-
-                notas.append(c100)
-    except Exception:
-        pass
-
-    # Fallback via XML (se nada no banco)
-    if usar_fallback_xml and not notas:
-        for xp in xmls:
-            try:
-                root = ET.parse(xp).getroot()
-                ns = {"n": root.tag.split("}")[0].strip("{")}
-                inf = root.find(".//n:infNFe", ns)
-                if inf is None: continue
-                ide = inf.find("n:ide", ns); tot = inf.find("n:total/n:ICMSTot", ns)
-                d_doc = _safe(ide, "dEmi", ns); dhEmi = _safe(ide, "dhEmi", ns)
-                if d_doc: d_emis = datetime.date.fromisoformat(d_doc)
-                else: d_emis = datetime.date.fromisoformat((dhEmi or "0000-01-01")[:10])
-                if not (d_i <= d_emis <= d_f): continue
-
-                mod = _safe(ide, "mod", ns) or "55"
-                serie = int(_safe(ide, "serie", ns) or "1")
-                nnf = int(_safe(ide, "nNF", ns) or "0")
-                tpNF = _safe(ide, "tpNF", ns) or "1"
-                chv = (inf.attrib.get("Id","") or "").replace("NFe","")
-
-                dest = inf.find("n:dest", ns)
-                d_nome = _safe(dest, "xNome", ns) or "CONSUMIDOR FINAL"
-                d_cnpj = _somente_dig(_safe(dest, "CNPJ", ns))
-                d_cpf  = _somente_dig(_safe(dest, "CPF", ns))
-                cod_part = (d_cnpj or d_cpf) or f"CF-{nnf}"
-                partes.setdefault(cod_part, {"NOME": d_nome[:100], "CNPJ": d_cnpj, "CPF": d_cpf,
-                                             "COD_PAIS":"1058", "IE":"", "COD_MUN":"", "SUFRAMA":"",
-                                             "END":"", "NUM":"", "COMPL":"", "BAIRRO":""})
-
-                def g(x): return _num(_safe(tot, x, ns) or "0")
-                vNF, vDesc, vProd = g("vNF"), g("vDesc"), g("vProd")
-                vBC, vICMS = g("vBC"), g("vICMS")
-                vBCST, vICMSST = g("vBCST"), g("vICMSST")
-                vIPI, vPIS, vCOFINS = g("vIPI"), g("vPIS"), g("vCOFINS")
-                vFrete, vSeg, vOutros = g("vFrete"), g("vSeg"), g("vOutro")
-
-                c100 = {
-                    "IND_OPER": "1" if tpNF=="1" else "0",
-                    "IND_EMIT": "0", "COD_PART": cod_part, "COD_MOD": mod, "COD_SIT": "00",
-                    "SER": serie, "NUM_DOC": nnf, "CHV_NFE": chv,
-                    "DT_DOC": d_emis.strftime("%d%m%Y"), "DT_E_S": d_emis.strftime("%d%m%Y"),
-                    "VL_DOC": vNF, "IND_PGTO": "0", "VL_DESC": vDesc, "VL_ABAT_NT": 0.0,
-                    "VL_MERC": vProd, "IND_FRT": "0", "VL_FRT": vFrete, "VL_SEG": vSeg, "VL_OUT_DA": vOutros,
-                    "VL_BC_ICMS": vBC, "VL_ICMS": vICMS, "VL_BC_ICMS_ST": vBCST, "VL_ICMS_ST": vICMSST,
-                    "VL_IPI": vIPI, "VL_PIS": vPIS, "VL_COFINS": vCOFINS, "VL_PIS_ST": 0.0, "VL_COFINS_ST": 0.0,
-                    "C190": defaultdict(lambda: {"VL_OPR":0.0,"VL_BC_ICMS":0.0,"VL_ICMS":0.0,"VL_BC_ICMS_ST":0.0,"VL_ICMS_ST":0.0,"VL_RED_BC":0.0,"VL_IPI":0.0}),
-                }
-
-                for det in inf.findall("n:det", ns):
-                    prod = det.find("n:prod", ns); icms = det.find("n:imposto/n:ICMS", ns)
-                    cfop = _safe(prod, "CFOP", ns) or "5102"
-                    n = list(icms)[0] if (icms is not None and len(icms)) else None
-                    cst = _safe(n, "CST", ns) or _safe(n, "CSOSN", ns)
-                    aliq = _num(_safe(n, "pICMS", ns) or "0")
-                    v_item = _num(_safe(prod, "vProd", ns) or "0")
-                    vbc_i  = _num(_safe(n, "vBC", ns) or "0")
-                    vicms_i= _num(_safe(n, "vICMS", ns) or "0")
-                    k = (_norm_cst(cst) if cst else "000", cfop, round(aliq,2))
+            
+            
+            # MINFIX: NFC-e (modelo 65) - remover COD_PART e zerar campos proibidos no C100
+            if str(c100.get("COD_MOD")) == "65":
+                c100["COD_PART"] = ""
+                for it in items:
+                    cfop = str(it.get("CFOP") or it.get("cfop") or "5102")
+                    cst  = _norm_cst(it.get("CST") or it.get("CSOSN") or it.get("cst") or it.get("csosn") or "00")
+                    aliq = _num(it.get("pICMS") or it.get("aliqICMS") or it.get("pIcms") or 0)
+                    v_item = _num(it.get("vProd") or it.get("valor_produto") or it.get("valor") or 0)
+                    vbc_i  = _num(it.get("vBC") or it.get("bc_icms") or 0)
+                    vicms_i= _num(it.get("vICMS") or it.get("icms") or 0)
+                    k = (cst, cfop, round(aliq,2))
                     ag = c100["C190"][k]
                     ag["VL_OPR"] += v_item; ag["VL_BC_ICMS"] += vbc_i; ag["VL_ICMS"] += vicms_i
-                notas.append(c100)
-            except Exception:
-                continue
+
+            notas.append(c100)
+            print(c100)
+            # print(notas)
+
+
 
     # ---------------- linhas ----------------
     linhas = []
@@ -455,7 +436,7 @@ def gerar_sped_fiscal_completo(
         if notas:
             add("|C001|0|", "C001")
             for n in notas:
-                if n["COD_MOD"] == "65":
+                if str(rec.get("modelo")) == "65":
                     add("|C100|{IND_OPER}|{IND_EMIT}|{COD_PART}|{COD_MOD}|{COD_SIT}|{SER}|{NUM_DOC}|{CHV_NFE}|{DT_DOC}|{DT_E_S}|{VL_DOC}|{IND_PGTO}|{VL_DESC}|{VL_ABAT_NT}|{VL_MERC}|{IND_FRT}|{VL_FRT}|{VL_SEG}|{VL_OUT_DA}|{VL_BC_ICMS}|{VL_ICMS}|{VL_BC_ICMS_ST}|{VL_ICMS_ST}|{VL_IPI}|{VL_PIS}|{VL_COFINS}|{VL_PIS_ST}|{VL_COFINS_ST}|".format(
                         VL_DOC       =_fmt(n["VL_DOC"]), 
                         VL_DESC      =_fmt(n["VL_DESC"]),
@@ -487,6 +468,7 @@ def gerar_sped_fiscal_completo(
                         COD_PART     ="",
                     ), "C100")
                 else:
+                    print("caiu aqui21")
                     add("|C100|{IND_OPER}|{IND_EMIT}|{COD_PART}|{COD_MOD}|{COD_SIT}|{SER}|{NUM_DOC}|{CHV_NFE}|{DT_DOC}|{DT_E_S}|{VL_DOC}|{IND_PGTO}|{VL_DESC}|{VL_ABAT_NT}|{VL_MERC}|{IND_FRT}|{VL_FRT}|{VL_SEG}|{VL_OUT_DA}|{VL_BC_ICMS}|{VL_ICMS}|{VL_BC_ICMS_ST}|{VL_ICMS_ST}|{VL_IPI}|{VL_PIS}|{VL_COFINS}|{VL_PIS_ST}|{VL_COFINS_ST}|".format(
                         IND_OPER     =n["IND_OPER"], 
                         IND_EMIT     =n["IND_EMIT"], 

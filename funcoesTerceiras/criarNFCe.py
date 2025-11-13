@@ -13,6 +13,9 @@ import time
 import random
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
+from consultas.insert import Insere
+from funcoesTerceiras import extrairDadosNotaFiscal
+
 
 # --- helper injetado: preenche campos faltantes de endereço nos blocos [Emitente] e [Destinatario]
 def _V_get(self, attr, default=""):
@@ -173,6 +176,62 @@ def _proximo_numero_nfe(cnpj_sem_mascara, serie_int):
     except Exception:
         pass
     return proximo
+
+def _buscar_xml_nfe(cnpj_sem_mascara, serie_int, numero_int, logs_dir=r"C:\ACBrMonitorPLUS\Logs"):
+    """
+    Procura nos XMLs do ACBr (Logs) o arquivo da NFe desse CNPJ/Série/Número
+    e devolve o caminho completo, ou None se não achar.
+    """
+    try:
+        import glob
+        import xml.etree.ElementTree as ET
+
+        candidatos = []
+        padroes = ("*-procNFe.xml", "*-nfe.xml")
+        for pad in padroes:
+            for path in glob.glob(os.path.join(logs_dir, pad)):
+                try:
+                    tree = ET.parse(path)
+                    root = tree.getroot()
+                    ns = {"n": root.tag.split("}")[0].strip("{")}
+                    inf = root.find(".//n:infNFe", ns)
+                    if inf is None:
+                        continue
+                    ide = inf.find("n:ide", ns)
+                    emit = inf.find("n:emit", ns)
+                    if ide is None or emit is None:
+                        continue
+
+                    nNF_el   = ide.find("n:nNF", ns)
+                    serie_el = ide.find("n:serie", ns)
+                    cnpj_el  = emit.find("n:CNPJ", ns)
+                    if nNF_el is None or serie_el is None or cnpj_el is None:
+                        continue
+
+                    n_nf_xml  = int(re.sub(r"\D+", "", nNF_el.text or "0") or "0")
+                    serie_xml = int(re.sub(r"\D+", "", serie_el.text or "0") or "0")
+                    cnpj_xml  = _so_digitos(cnpj_el.text)
+
+                    if n_nf_xml != int(numero_int):
+                        continue
+                    if serie_xml != int(serie_int):
+                        continue
+                    if cnpj_xml != cnpj_sem_mascara:
+                        continue
+
+                    candidatos.append(path)
+                except Exception:
+                    continue
+
+        if not candidatos:
+            return None
+
+        # pega o mais recente (último gerado)
+        candidatos.sort(key=lambda p: os.path.getmtime(p), reverse=True)
+        return candidatos[0]
+    except Exception:
+        return None
+
 # ------------------------ FIM Sequência ------------------------
 
 
@@ -182,7 +241,11 @@ ACBR_RSP_DIR = "NotaFiscal/ReceberComando"
 
 # ------------------------ ACBr I/O ------------------------
 
-def aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5):
+def aguarda_acbr_resposta(resp_path, timeout=3, interval=0.5):
+    """
+    Espera o arquivo .../enviar-resp.txt que o Monitor grava.
+    Retorna dict com {ok, cStat, xMotivo, xml, resposta_bruta}.
+    """
     t0 = time.time()
     ultimo = ""
     while time.time() - t0 < timeout:
@@ -192,14 +255,11 @@ def aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5):
                     txt = f.read()
                 if txt and txt != ultimo:
                     ultimo = txt
-                    break
+                    if ("[Retorno]" in txt) or ("CStat=" in txt) or txt.startswith("OK"):
+                        break
             except Exception:
-                print("opa")
                 pass
         time.sleep(interval)
-
-    if not ultimo:
-        return {"ok": False, "mensagem": "Sem resposta do ACBr no tempo limite.", "cStat": None, "xMotivo": None, "xml": None, "resposta_bruta": ""}
 
     def _find(pat, default=None, flags=re.IGNORECASE):
         m = re.search(pat, ultimo, flags)
@@ -242,6 +302,16 @@ def criaComandoACBr(self, nome_arquivo):
         nnf_int = int(_so_digitos(raw_nnf))
     else:
         nnf_int = _proximo_numero_nfe(cnpj_emit_for_seq, serie_int)
+
+    if hasattr(self, "variavelNumeroDaNota") and hasattr(self.variavelNumeroDaNota, "set"):
+        self.variavelNumeroDaNota.set(str(nnf_int))
+    else:
+        self.variavelNumeroDaNota = str(nnf_int)
+
+    if hasattr(self, "variavelSerieDaNota") and hasattr(self.variavelSerieDaNota, "set"):
+        self.variavelSerieDaNota.set(str(serie_int))
+    else:
+        self.variavelSerieDaNota = str(serie_int)
 
 
     # Data/Hora
@@ -923,7 +993,7 @@ def criaComandoACBr(self, nome_arquivo):
 
 
         # Encerramento do comando
-        f.write('",1,1,1,1)')
+        f.write('"\r\n,1,1,1, ,1)')
 
 def criarNFE(self):
     os.makedirs(ACBR_CMD_DIR, exist_ok=True)
@@ -948,7 +1018,7 @@ def criarNFE(self):
         f.flush()
         os.fsync(f.fileno())
 
-    r1 = aguarda_acbr_resposta(cert_resp, timeout=60, interval=0.2)
+    r1 = aguarda_acbr_resposta(cert_resp, timeout=1, interval=0.2)
     if not r1.get("ok"):
         return r1  # se falhou o certificado, para aqui
 
@@ -964,19 +1034,68 @@ def criarNFE(self):
     criaComandoACBr(self, cmd_path)  # agora escreve só o CriarEnviarNFe(...)
     _preencher_enderecos_faltantes_arquivo(self, cmd_path)
 
-    resultado = aguarda_acbr_resposta(resp_path, timeout=120, interval=0.5)
-    try:
-        try:
-            from consultas.insert import inserir_nota_fiscal
-        except Exception:
-            import sys
-            sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-            from consultas.insert import inserir_nota_fiscal
+    print("chegou aqui")
+    resultado = aguarda_acbr_resposta(resp_path, timeout=3, interval=0.5)
+    print("teste")
 
-        status = "AUTORIZADA" if str(resultado.get("cStat")) in ("100", "150") else "GERADA"
-        inserir_nota_fiscal(self, tipo="NFCe", xml_path=resultado.get("xml"), status=status)
-    except Exception as e:
-        return resultado
+    # cStat vindo da resposta (se vier)
+    cstat = str(resultado.get("cStat") or "").strip()
+    xml_path = (resultado.get("xml") or "").strip()
+
+    # ---------------- FALLBACK 1: se não veio caminho do XML na resposta,
+    # tenta pegar pelos logs do ACBr (CNPJ + Série + Número)
+    if not xml_path:
+        try:
+            cnpj_var = getattr(self, "variavelCNPJRazaoSocialEmitente", "")
+            if hasattr(cnpj_var, "get"):
+                cnpj_var = cnpj_var.get()
+            cnpj_emit = _so_digitos(cnpj_var)
+        except Exception:
+            cnpj_emit = ""
+
+        try:
+            num_var = getattr(self, "variavelNumeroDaNota", "")
+            if hasattr(num_var, "get"):
+                num_var = num_var.get()
+            numero_int = int(re.sub(r"\D+", "", str(num_var) or "0") or "0")
+        except Exception:
+            numero_int = 0
+
+        try:
+            serie_var = getattr(self, "variavelSerieDaNota", "")
+            if hasattr(serie_var, "get"):
+                serie_var = serie_var.get()
+            serie_int = int(re.sub(r"\D+", "", str(serie_var) or "1") or "1")
+        except Exception:
+            serie_int = 1
+
+        if cnpj_emit and numero_int:
+            t0 = time.time()
+            # espera curta só para dar tempo do ACBr gravar o XML
+            while not xml_path and (time.time() - t0) < 8:
+                caminho = _buscar_xml_nfe(cnpj_emit, serie_int, numero_int)
+                if caminho:
+                    xml_path = caminho
+                    break
+                time.sleep(0.5)
+
+    # ---------------- FALLBACK 2: se já temos o XML, tenta pegar cStat de dentro do procNFe
+    if xml_path and not cstat:
+        try:
+            import xml.etree.ElementTree as ET
+            tree = ET.parse(xml_path)
+            root = tree.getroot()
+            ns = {"n": root.tag.split("}")[0].strip("{")}
+            c_el = root.find(".//n:protNFe/n:infProt/n:cStat", ns)
+            if c_el is not None and c_el.text:
+                cstat = c_el.text.strip()
+        except Exception:
+            pass
+
+    # status final
+    status = "AUTORIZADA" if cstat in ("100", "150") else "GERADA"
+    extrairDadosNotaFiscal.extrairDadosDaNota(self, xml_path, "NFCe", status)
+    return resultado
 
 
 # compatibilidade (se alguma parte do seu app ainda chamar gerarNFe)

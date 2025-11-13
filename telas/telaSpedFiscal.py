@@ -53,28 +53,27 @@ def telaSpeedFiscal(self):
         pass
 
     def criarSpeed():
-        try:
-            mes = cbMes.get()
-            ano = int(cbAno.get())
-            meses_map = {"Janeiro":1,"Fevereiro":2,"Março":3,"Abril":4,"Maio":5,"Junho":6, "Julho":7,"Agosto":8,"Setembro":9,"Outubro":10,"Novembro":11,"Dezembro":12}
-            m = meses_map.get(mes)
+        
+        mes = cbMes.get()
+        ano = int(cbAno.get())
+        meses_map = {"Janeiro":1,"Fevereiro":2,"Março":3,"Abril":4,"Maio":5,"Junho":6, "Julho":7,"Agosto":8,"Setembro":9,"Outubro":10,"Novembro":11,"Dezembro":12}
+        m = meses_map.get(mes)
 
-            # Datas para o gerador (YYYYMMDD)
-            di = f"{ano:04d}{m:02d}01"
-            df = f"{ano:04d}{m:02d}{calendar.monthrange(ano, m)[1]:02d}"
+        # Datas para o gerador (YYYYMMDD)
+        di = f"{ano:04d}{m:02d}01"
+        df = f"{ano:04d}{m:02d}{calendar.monthrange(ano, m)[1]:02d}"
 
-            # Saída padrão em pasta SPED na raiz do projeto
-            base = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-            saida_dir = os.path.join(base, "SPED")
-            os.makedirs(saida_dir, exist_ok=True)
-            caminho_txt = os.path.join(saida_dir, f"efd_icmsipi_{ano}_{m:02d}.txt")
+        # Saída padrão em pasta SPED na raiz do projeto
+        base = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        saida_dir = os.path.join(base, "SPED")
+        os.makedirs(saida_dir, exist_ok=True)
+        caminho_txt = os.path.join(saida_dir, f"efd_icmsipi_{ano}_{m:02d}.txt")
 
-            # Geração: o módulo completo já lê os dados diretamente de self (mesmo modelo do criarNFe/NFCe)
-            gerar_sped_fiscal_completo(self, cnpjUsadoParaSped.get(), caminho_txt=caminho_txt, dt_ini=di, dt_fin=df)
+        # Geração: o módulo completo já lê os dados diretamente de self (mesmo modelo do criarNFe/NFCe)
+        gerar_sped_fiscal_completo(self, cnpjUsadoParaSped.get(), caminho_txt=caminho_txt, dt_ini=di, dt_fin=df)
 
-            messagebox.showinfo("SPED Fiscal", f"Arquivo gerado com sucesso:\n{caminho_txt}")
-        except Exception as e:
-            messagebox.showerror("SPED Fiscal", f"Falha ao gerar SPED:\n{e}")
+        messagebox.showinfo("SPED Fiscal", f"Arquivo gerado com sucesso:\n{caminho_txt}")
+
 
     criaBotao(frame, "◀️ Voltar", 0.33, 0.80, 0.18, lambda: frame.destroy())
     criaBotao(frame, "Criar Sped", 0.66, 0.80, 0.18, criarSpeed)

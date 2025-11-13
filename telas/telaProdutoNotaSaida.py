@@ -14,7 +14,6 @@ from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
 def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
-    print("entrou na certa")
     self.row=1
     self.posicaoy = 0.2
     self.posicaox = 0.024
@@ -386,8 +385,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
 
 
         if hasattr(self, "dadosProdutos") and produto.get() in self.dadosProdutos:
-            print(self.dadosProdutos)
-
             dados_salvos = self.dadosProdutos[produto.get()]
 
             # Já existentes
@@ -740,7 +737,7 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
     if EhNotaDoConsumidor:
             criaBotao(frameTelaNotaProduto, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTotaisNotaSaida(self, EhNotaDoConsumidor))).place(anchor="nw")
     else:
-        criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, EhNotaDoConsumidor))).place(anchor="nw")
+        criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, EhNotaDoConsumidor, False))).place(anchor="nw")
     criaBotao(frameTelaNotaProduto, "Voltar", 0.05, 0.94, 0.15, lambda: frameTelaNotaProduto.destroy()).place(anchor="nw")
     aplicar_maiusculo_em_todos_entries(self)
 

@@ -140,124 +140,40 @@ class Insere:
 
 
 
-def inserir_nota_fiscal(self, tipo, xml_path=None, status=None):
-    print("To aqui")
-
-    def V(nome, default=""):
-        v = getattr(self, nome, default)
-        return v.get() if hasattr(v, "get") else (v if v is not None else default)
-
-    def dig(s):
-        s = "" if s is None else str(s)
-        return "".join(ch for ch in s if ch.isdigit())
-
-    def f(v):
-        s = str(v).strip().replace(".", "").replace(",", ".")
-        try:
-            return float(s)
-        except:
-            return 0.0
-
-    # tipo/modelo
-    t = str(tipo)
-    modelo_int = 65 if t.upper().startswith("NFC") else 55
-    tipo_str = "NFCe" if modelo_int == 65 else t  # respeita parâmetro (NFe/NFeEntrada)
-
-    # número e série (inteiros)
-    num_str = dig(V("variavelNumeroDaNota", V("nNF", "")))
-    serie_str = dig(V("variavelSerieDaNota", V("serie", "1")))
-    numero_int = int(num_str) if num_str else 0
-    serie_int = int(serie_str) if serie_str else 1
-
-    # emitente/destinatário
-    emitente_cnpj = dig(V("variavelCNPJRazaoSocialEmitente", ""))
-    emitente_nome = str(V("variavelRazaoSocialEmitente", "")).strip()
-    dest_cnpj     = dig(V("variavelCNPJDestinatario", ""))
-    dest_nome     = str(V("variavelNomeRazaoDestinatario", "")).strip()
-
-    # datas (DATETIME)
-    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    dhEmi = str(V("variavelDataEmissao", "")).strip() or now_str
-    dhSaiEnt = str(V("variavelDataSaida", "")).strip() or dhEmi
-
-    # chave e cUF
-    xml_caminho = xml_path or ""
-    chave_nfe = ""
-    m = re.search(r"(\d{44})", xml_caminho)
-    if m:
-        chave_nfe = m.group(1)
-    if not chave_nfe:
-        chave_nfe = dig(V("chaveNFe", ""))
-    cUF = chave_nfe[:2] if len(chave_nfe) >= 2 else "31"
-
-    # ambiente e tipo da operação
-    tpAmb = 2  # homologação por padrão
-    ent_saida = str(getattr(self, "variavelEntradaOuSaida", "Saída")).lower()
-    tpNF = 0 if "entra" in ent_saida else 1
-
-    # totais
-    valor_total        = f(V("variavelValorTotalNota", 0))
-    valor_produtos     = f(V("variavelValorProdutos", 0))
-    valor_desconto     = f(V("variavelValorDesconto", 0))
-    valor_frete        = f(V("variavelValorFrete", 0))
-    valor_seguro       = f(V("variavelValorSeguro", 0))
-    valor_outros       = f(V("variavelOutros", 0))
-    valor_bc_icms      = f(V("variavelBaseICMS", 0))
-    valor_icms         = f(V("variavelValorICMS", 0))
-    valor_icms_deson   = f(V("variavelICMSDesonerado", 0))
-    valor_bc_icms_st   = f(V("variavelBaseICMSST", 0))
-    valor_icms_st      = f(V("variavelValorICMSST", 0))
-    valor_ipi          = f(V("variavelValorIPI", 0))
-    valor_pis          = f(V("variavelValorPIS", 0))
-    valor_cofins       = f(V("variavelValorCOFINS", 0))
-    valor_bc_irrf      = f(V("variavelBaseIRRF", 0))
-
-    # transporte
-    transportadora_cnpj = dig(V("variavelCNPJTransportadora", ""))
-    transportadora_nome = str(V("variavelNomeTransportadora", "")).strip()
-
-    # status
-    status_str = status or "AUTORIZADA"
-
-    # itens JSON (lista simples da UI se existir)
-    itens = getattr(self, "listaItensNotaSaida", None)
-    if not isinstance(itens, (list, tuple)):
-        itens = []
-    itens_json = json.dumps(itens, ensure_ascii=False)
-
-    # INSERT conforme sua tabela
-    print("to aqui")
-    db.cursor.execute(
-        """
-        INSERT INTO notas_fiscais (
-            tipo, status, modelo, serie, numero, chave,
-            cUF, tpAmb, tpNF,
-            dhEmi, dhSaiEnt,
-            emitente_cnpjcpf, emitente_nome,
-            destinatario_cnpjcpf, destinatario_nome,
-            valor_total, valor_produtos, valor_desconto,
-            valor_frete, valor_seguro, valor_outras_despesas,
-            valor_bc_icms, valor_icms, valor_icms_desonerado,
-            valor_bc_icms_st, valor_icms_st,
-            valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
-            transportadora_cnpjcpf, transportadora_nome,
-            xml_path, itens_json
-        ) VALUES (
-            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-        (
-            tipo_str, status_str, int(modelo_int), int(serie_int), int(numero_int), chave_nfe,
-            cUF, int(tpAmb), int(tpNF),
-            dhEmi, dhSaiEnt,
-            emitente_cnpj, emitente_nome,
-            dest_cnpj, dest_nome,
-            valor_total, valor_produtos, valor_desconto,
-            valor_frete, valor_seguro, valor_outros,
-            valor_bc_icms, valor_icms, valor_icms_deson,
-            valor_bc_icms_st, valor_icms_st,
-            valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
-            transportadora_cnpj, transportadora_nome,
-            xml_caminho, itens_json
+    def inserir_nota_fiscal_saida(tipo,modelo,serie,numero,chave,cUF,
+        uf_emit,uf_dest,tpAmb,tpNF,idDest,natOp,dhEmi, dhSaiEnt,emitente_cnpjcpf,emitente_nome,
+        emitente_ie,destinatario_cnpjcpf,destinatario_nome,destinatario_ie,valor_total,valor_produtos,
+        valor_desconto,valor_frete,valor_seguro,valor_outras_despesas,valor_bc_icms,valor_icms,
+        valor_icms_desonerado,valor_fcp,valor_bc_icms_st,valor_icms_st,valor_ipi,valor_pis,valor_cofins,
+        valor_bc_irrf,transportadora_cnpjcpf,transportadora_nome,mod_frete,placa_veiculo,uf_veiculo,rntc,volum_qVol,
+        volum_esp,volum_marca,volum_nVol,peso_liquido,peso_bruto,cStat,xMotivo,protocolo,nRec,dhRecbto,status,qrcode_url,
+        data_vencimento,itens_json,cfop,operacao):
+        
+        query = """ INSERT INTO notas_fiscais (tipo,modelo,serie,numero,chave,cUF,
+                                     uf_emit,uf_dest,tpAmb,tpNF,idDest,natOp,dhEmi,
+                                     dhSaiEnt,emitente_cnpjcpf,emitente_nome,
+                                     emitente_ie,destinatario_cnpjcpf,destinatario_nome,
+                                     destinatario_ie,valor_total,valor_produtos,
+                                     valor_desconto,valor_frete,valor_seguro,
+                                     valor_outras_despesas,valor_bc_icms,valor_icms,
+                                     valor_icms_desonerado,valor_fcp,valor_bc_icms_st,
+                                     valor_icms_st,valor_ipi,valor_pis,valor_cofins,
+                                     valor_bc_irrf,transportadora_cnpjcpf,transportadora_nome,
+                                     mod_frete,placa_veiculo,uf_veiculo,rntc,volum_qVol,
+                                     volum_esp,volum_marca,volum_nVol,peso_liquido,peso_bruto,
+                                     cStat,xMotivo,protocolo,nRec,dhRecbto,status,qrcode_url,
+                                     data_vencimento,itens_json,cfop,operacao) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                                                                                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                                                                                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                                                                                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
+        dados = (tipo,modelo,serie,numero,chave,cUF,uf_emit,uf_dest,tpAmb,
+                 tpNF,idDest,natOp,dhEmi, dhSaiEnt,emitente_cnpjcpf,emitente_nome,emitente_ie,destinatario_cnpjcpf,destinatario_nome,
+                 destinatario_ie,valor_total,valor_produtos,valor_desconto,valor_frete,valor_seguro,valor_outras_despesas,valor_bc_icms,valor_icms,valor_icms_desonerado,
+                 valor_fcp,valor_bc_icms_st,valor_icms_st,valor_ipi,valor_pis,valor_cofins,valor_bc_irrf,transportadora_cnpjcpf,transportadora_nome,mod_frete,
+                 placa_veiculo,uf_veiculo,rntc,volum_qVol,volum_esp,volum_marca,volum_nVol,peso_liquido,peso_bruto,cStat,
+                 xMotivo,protocolo,nRec,dhRecbto,status,qrcode_url,data_vencimento,itens_json,cfop,operacao,
         )
-    )
-    db.conn.commit()
-    return getattr(db.cursor, "lastrowid", None)
+
+        db.cursor.execute(query, dados)
+        db.conn.commit()
+        messagebox.showinfo("Sucesso", "Nota fiscal criada e inserida com sucesso!")

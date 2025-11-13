@@ -344,5 +344,5 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
                 pass
     # ===== Fim do pré-preenchimento de transporte =====
 
-        criaBotao(self.frametelaTransporte, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: telaTotaisNotaSaida(self, EhNotaDoConsumidor)).place(anchor="nw")
-        criaBotao(self.frametelaTransporte, "Voltar", 0.05, 0.94, 0.15, lambda: self.frametelaTransporte.destroy()).place(anchor="nw")
+    criaBotao(self.frametelaTransporte, "Próximo - Tela Totais", 0.25, 0.94, 0.15, lambda: telaTotaisNotaSaida(self, EhNotaDoConsumidor)).place(anchor="nw")
+    criaBotao(self.frametelaTransporte, "Voltar", 0.05, 0.94, 0.15, lambda: self.frametelaTransporte.destroy()).place(anchor="nw")
