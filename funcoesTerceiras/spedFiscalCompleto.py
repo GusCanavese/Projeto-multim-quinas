@@ -45,6 +45,7 @@ def gerar_sped_fiscal_completo(
         Bairro = "FABRICAS"
         telefone = "3233716171"
         Email = "multimaquinas_financeiro@yahoo.com.br"
+        codigoMunicipio = "3162500"
 
 
     if cnpjUsadoParaSped == "Multimáquinas":
@@ -57,6 +58,7 @@ def gerar_sped_fiscal_completo(
         Bairro = "FABRICAS"
         telefone = "3233713382"
         Email = "multimaquinas_financeiro@yahoo.com.br"
+        codigoMunicipio = "3162500"
 
     if cnpjUsadoParaSped == "Polimáquinas":
         nome = "ANA F COELHO RESENDE"
@@ -134,7 +136,7 @@ def gerar_sped_fiscal_completo(
         "CNPJ": documento,
         "UF": (_get("variavelUFEnd", "") or _get("estadoEmitente", "MG")).strip().upper() or "MG",
         "IE": inscEstadual,
-        "COD_MUN": _somente_dig(_get("variavelCodigoMunicipioEnd", "") or _get("codigoIBGEEmitente", "") or _get("codMunEmitente", "")),
+        "COD_MUN": codigoMunicipio,
         "IM": _get("imEmitente", ""),
         "SUFRAMA": "",
         "IND_ATIV": "1",
@@ -431,9 +433,9 @@ def gerar_sped_fiscal_completo(
             CNPJ=_somente_dig(p.get("CNPJ","")),
             CPF=_somente_dig(p.get("CPF","")),
             IE=_somente_dig(p.get("IE","")),
-            COD_MUN=_somente_dig(p.get("COD_MUN","")),
+            COD_MUN=codigoMunicipio,
             SUFRAMA=_s(p.get("SUFRAMA","")),
-            END=_s(p.get("END",""))[:60],
+            END=logradouro,
             NUM=_s(p.get("NUM",""))[:10],
             COMPL=_s(p.get("COMPL",""))[:60],
             BAIRRO=_s(p.get("BAIRRO",""))[:60],
