@@ -12,21 +12,57 @@ except Exception:
 
 def gerar_sped_fiscal_completo(
     self,
+    cnpjUsadoParaSped,
     caminho_txt,
     dt_ini,
     dt_fin,
     pasta_logs=None,
     usar_fallback_xml=True,
     blocos_ativos=("0","B","C","D","E","G","H","K","1","9"),
-    incluir_0005=False,
-    incluir_0100=False,
+    incluir_0005=True,
+    incluir_0100=True,
 ):
-    """
-    EFD ICMS/IPI parametrizável, com ordem de blocos canônica e Bloco 9 sem duplicidade.
-    Ordem: 0, B, C, D, E, G, H, K, 1, 9 (o 9 sempre por último).
-    - Blocos extras (B, D, E, G, H, K, 1) saem "sem movimento" quando incluídos.
-    - C190 com 11 campos + COD_OBS vazio (|| no final), alíquota e valores com vírgula.
-    """
+    
+    nome = ""
+    documento = ""
+    inscEstadual = ""
+    Cep = ""
+    logradouro = ""
+    numero = ""
+    Bairro = ""
+    telefone = ""
+    Email = ""
+
+
+
+    if cnpjUsadoParaSped == "Nutrigel":
+        nome = "NUTRIGEL DISTRIBUIDORA EIRELI"
+        inscEstadual= "6259569630086"
+        documento = "00995044000107"
+        Cep = "36301194"
+        logradouro = "RUA DOUTOR OSCAR DA CUNHA"
+        numero = "75"
+        Bairro = "FABRICAS"
+        telefone = "3233716171"
+        Email = "multimaquinas_financeiro@yahoo.com.br"
+
+
+    if cnpjUsadoParaSped == "Multimáquinas":
+        nome = "MULTIMAQUINAS REFRIGERACAO E MAQUINAS DEL REI LTDA"
+        documento = "05704180000106"
+        inscEstadual= "6252430230046"
+        Cep = "36301194"
+        logradouro = "RUA DOUTOR OSCAR DA CUNHA"
+        numero = "97"
+        Bairro = "FABRICAS"
+        telefone = "3233713382"
+        Email = "multimaquinas_financeiro@yahoo.com.br"
+
+    if cnpjUsadoParaSped == "Polimáquinas":
+        nome = "ANA F COELHO RESENDE"
+        documento = "23889618000150"
+        inscEstadual= "84549874"
+
 
     # ---------------- helpers ----------------
     def _somente_dig(s): 
@@ -91,14 +127,13 @@ def gerar_sped_fiscal_completo(
             xmls += glob.glob(os.path.join(pasta_logs, p))
         xmls = sorted(set(xmls))
 
-    # ---------------- emitente (0000) ----------------
     emit = {
         "COD_VER": "019",
         "FINALIDADE": 0,
-        "NOME": "NUTRIGEL DISTRIBUIDORA EIRELI",
-        "CNPJ": _somente_dig(_get("variavelCNPJRazaoSocialEmitente", "") or _get("cnpjEmitente", "")),
+        "NOME": nome,
+        "CNPJ": documento,
         "UF": (_get("variavelUFEnd", "") or _get("estadoEmitente", "MG")).strip().upper() or "MG",
-        "IE": _somente_dig(_get("variavelInscEstadualEmitente", "") or _get("ieEmitente", "")) or "ISENTO",
+        "IE": inscEstadual,
         "COD_MUN": _somente_dig(_get("variavelCodigoMunicipioEnd", "") or _get("codigoIBGEEmitente", "") or _get("codMunEmitente", "")),
         "IM": _get("imEmitente", ""),
         "SUFRAMA": "",
@@ -353,34 +388,35 @@ def gerar_sped_fiscal_completo(
     if ativo("0"):
         b0 = len(linhas)
         add(f"|0000|{emit['COD_VER']}|{emit['FINALIDADE']}|{d_i.strftime('%d%m%Y')}|{d_f.strftime('%d%m%Y')}|{emit['NOME']}|{emit['CNPJ']}||{emit['UF']}|{emit['IE']}|{emit['COD_MUN']}|{emit['IM']}|{emit['SUFRAMA']}|{emit['PERFIL']}|{emit['IND_ATIV']}|", "0000")
-        add("|0001|0|", "0001")
+        add(f"|0001|{'0' if (incluir_0005 or incluir_0100) else '1'}|", "0001")
+
 
         if incluir_0005:
-            fantasia = _get("variavelFantasiaRazaoSocialEmitente", "") or _get("variavelFantasiaEmitente", "") or emit["NOME"]
-            cep      = _somente_dig(_get("variavelCEPEnd", ""))[:8] or "00000000"
-            end      = _get("variavelLogradouroEnd", "") or _get("variavelEnderecoRazaoSocialEmitente", "") or "NAO INFORMADO"
-            num      = _get("variavelNumeroEnd", "")
-            compl    = _get("variavelComplementoEnd", "")
-            bairro   = _get("variavelBairroEnd", "") or "NAO INFORMADO"
-            fone     = _somente_dig(_get("variavelTelefoneEnd", ""))[:11]
-            fax      = _somente_dig(_get("variavelFaxEnd", ""))[:11]
-            email    = _get("variavelEmailEmitente", "") or _get("emailEmitente", "")
+            fantasia = nome
+            cep      = Cep
+            end      = logradouro
+            num      = numero
+            compl    = ""
+            bairro   = Bairro
+            fone     = telefone
+            fax      = ""
+            email    = Email
             add(f"|0005|{_s(fantasia)}|{_s(cep)}|{_s(end)}|{_s(num)}|{_s(compl)}|{_s(bairro)}|{_s(fone)}|{_s(fax)}|{_s(email)}|", "0005")
 
         if incluir_0100:
-            nome_cont = _get("variavelNomeContador", "") or _get("nomeContador", "") or "RESPONSAVEL CONTABIL"
-            cpf_cont  = _somente_dig(_get("variavelCPFContador", "") or _get("cpfContador", ""))[:11] or "00000000000"
-            crc_cont  = _get("variavelCRCContador", "") or _get("crcContador", "") or "0000000"
-            cnpj_escr = _somente_dig(_get("variavelCNPJEscritorio", "") or _get("cnpjEscritorio", ""))
-            cep_cont  = _somente_dig(_get("variavelCEPContador", "") or _get("cepContador", ""))[:8]
-            end_cont  = _get("variavelEnderecoContador", "") or _get("enderecoContador", "")
-            num_cont  = _get("variavelNumeroContador", "") or _get("numeroContador", "")
-            compl_cont= _get("variavelComplementoContador", "") or _get("complementoContador", "")
-            bairro_cont=_get("variavelBairroContador", "") or _get("bairroContador", "")
-            fone_cont = _somente_dig(_get("variavelTelefoneContador", "") or _get("telefoneContador", ""))[:11]
-            fax_cont  = _somente_dig(_get("variavelFaxContador", "") or _get("faxContador", ""))[:11]
-            email_cont= _get("variavelEmailContador", "") or _get("emailContador", "") or "contato@exemplo.com"
-            cod_mun_cont = _somente_dig(_get("variavelCodigoMunicipioContador", "") or _get("codMunContador", "") or emit["COD_MUN"])
+            nome_cont = "RICARDO LIMA BEFENATI"
+            cpf_cont  = "03404667662"
+            crc_cont  = "094666O3"
+            cnpj_escr = ""
+            cep_cont  = "36307302"
+            end_cont  = "RUA QUITINO BOCAIUVA"
+            num_cont  = "50"
+            compl_cont= ""
+            bairro_cont= "CENTRO"
+            fone_cont = ""
+            fax_cont  = ""
+            email_cont= "liracontabilidade@cofresieg.com.br"
+            cod_mun_cont = "3162500"
             add(f"|0100|{_s(nome_cont)}|{_s(cpf_cont)}|{_s(crc_cont)}|{_s(cnpj_escr)}|{_s(cep_cont)}|{_s(end_cont)}|{_s(num_cont)}|{_s(compl_cont)}|{_s(bairro_cont)}|{_s(fone_cont)}|{_s(fax_cont)}|{_s(email_cont)}|{_s(cod_mun_cont)}|", "0100")
 
         # 0150 (somente participantes usados)
@@ -491,13 +527,18 @@ def gerar_sped_fiscal_completo(
     for letra in ("D","E","G","H","K"):
         if ativo(letra):
             ini = len(linhas)
-            add(f"|{letra}001|1|", f"{letra}001")
+            if letra == "E" and notas:
+                add("|E001|0|", "E001")
+                add(f"|E100|{d_i.strftime('%d%m%Y')}|{d_f.strftime('%d%m%Y')}|", "E100")
+            else:
+                add(f"|{letra}001|1|", f"{letra}001")
             add(f"|{letra}990|{(len(linhas)-ini)+1}|", f"{letra}990")
 
-    # ===== Bloco 1 sem movimento =====
     if ativo("1"):
         ini = len(linhas)
-        add("|1001|1|", "1001")
+        add("|1001|0|", "1001")  # com dados, pois haverá 1010
+        # 1010: todos “N” quando não há obrigação de sub-blocos (ajuste “S” se sua UF exigir)
+        add("|1010|N|N|N|N|N|N|N|N|N|N|N|N|N|", "1010")
         add(f"|1990|{(len(linhas)-ini)+1}|", "1990")
 
     # ===== Bloco 9 (sempre por último) =====

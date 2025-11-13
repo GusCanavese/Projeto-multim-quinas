@@ -12,16 +12,18 @@ from funcoesTerceiras.spedFiscalCompleto import gerar_sped_fiscal_completo
 def telaSpeedFiscal(self):
     frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
-    opcoesMes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
-    opcoesAno = [str(a) for a in range(2016, date.today().year + 1)]
+    opcoesMes        = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+    opcoesAno        = [str(a) for a in range(2016, date.today().year + 1)]
     opcoesFinalidade = ["Remessa do arquivo original", "Remessa do arquivo substituto"]
-    opcoesPerfil = ["Perfil A", "Perfil B", "Perfil C"]
+    opcoesPerfil     = ["Perfil A", "Perfil B", "Perfil C"]
+    opcoesCNPJ       = ["Multimáquinas", "Polimáquinas", "Nutrigel"]
 
     # Guarda os widgets para ler os valores “crus”
-    self.cbMes         = criarLabelComboBox(frame, "Selecionar período", 0.2, 0.10, 0.15, opcoesMes)
-    self.cbAno         = criarLabelComboBox(frame, "",                 0.40, 0.10, 0.15, opcoesAno)
-    self.cbFinalidade  = criarLabelComboBox(frame, "Código da finalidade do arquivo", 0.2, 0.24, 0.35, opcoesFinalidade)
-    self.cbPerfil      = criarLabelComboBox(frame, "Perfil de apresentação do arquivo fiscal", 0.2, 0.38, 0.35, opcoesPerfil)
+    cbMes             = criarLabelComboBox(frame, "Selecionar período", 0.2, 0.10, 0.15, opcoesMes)
+    cbAno             = criarLabelComboBox(frame, "",                 0.40, 0.10, 0.15, opcoesAno)
+    cbFinalidade      = criarLabelComboBox(frame, "Código da finalidade do arquivo", 0.2, 0.24, 0.35, opcoesFinalidade)
+    self.cbPerfil     = criarLabelComboBox(frame, "Perfil de apresentação do arquivo fiscal", 0.2, 0.38, 0.35, opcoesPerfil)
+    cnpjUsadoParaSped = criarLabelComboBox(frame, "Qual cnpj será utilizado?", 0.2, 0.50, 0.35, opcoesCNPJ)
 
     # Checkboxes com variáveis (criadas aqui para podermos ler o estado)
     self.varBloco0 = ctk.IntVar(value=1)
@@ -43,17 +45,17 @@ def telaSpeedFiscal(self):
 
     # Defaults
     try:
-        self.cbMes.set(opcoesMes[0])
-        self.cbAno.set(str(date.today().year))
-        self.cbFinalidade.set(opcoesFinalidade[0])
-        self.cbPerfil.set(opcoesPerfil[0])
+        cbMes.set(opcoesMes[0])
+        cbAno.set(str(date.today().year))
+        cbFinalidade.set(opcoesFinalidade[0])
+        self.self.cbPerfil.set(opcoesPerfil[0])
     except Exception:
         pass
 
     def criarSpeed():
         try:
-            mes = self.cbMes.get()
-            ano = int(self.cbAno.get())
+            mes = cbMes.get()
+            ano = int(cbAno.get())
             meses_map = {"Janeiro":1,"Fevereiro":2,"Março":3,"Abril":4,"Maio":5,"Junho":6, "Julho":7,"Agosto":8,"Setembro":9,"Outubro":10,"Novembro":11,"Dezembro":12}
             m = meses_map.get(mes)
 
@@ -68,7 +70,7 @@ def telaSpeedFiscal(self):
             caminho_txt = os.path.join(saida_dir, f"efd_icmsipi_{ano}_{m:02d}.txt")
 
             # Geração: o módulo completo já lê os dados diretamente de self (mesmo modelo do criarNFe/NFCe)
-            gerar_sped_fiscal_completo(self, caminho_txt=caminho_txt, dt_ini=di, dt_fin=df)
+            gerar_sped_fiscal_completo(self, cnpjUsadoParaSped.get(), caminho_txt=caminho_txt, dt_ini=di, dt_fin=df)
 
             messagebox.showinfo("SPED Fiscal", f"Arquivo gerado com sucesso:\n{caminho_txt}")
         except Exception as e:
