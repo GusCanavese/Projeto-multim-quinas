@@ -3,6 +3,7 @@ import os, re, glob, json, datetime
 from collections import Counter, defaultdict
 from pathlib import Path
 from xml.etree import ElementTree as ET
+import locale
 
 try:
     import db  # opcional: deve expor 'cursor'
@@ -12,17 +13,23 @@ except Exception:
 
 def gerar_sped_fiscal_completo(
     self,
+    mes,
+    ano,
     cnpjUsadoParaSped,
     caminho_txt,
     dt_ini,
     dt_fin,
     pasta_logs=None,
-    usar_fallback_xml=False,
     blocos_ativos=("0","B","C","D","E","G","H","K","1","9"),
     incluir_0005=True,
     incluir_0100=True,
 ):
-    
+    ano = ano.get()
+    mes = mes.get().lower()
+    locale.setlocale(locale.LC_TIME, "Portuguese_Brazil.1252")
+    mesNumero = datetime.datetime.strptime(mes, "%B").month
+    dataRefarencia = datetime.datetime(int(ano), int(mesNumero), 1)
+
     nome = ""
     documento = ""
     inscEstadual = ""
@@ -150,55 +157,30 @@ def gerar_sped_fiscal_completo(
         emit["PERFIL"] = {"Perfil A":"A","Perfil B":"B","Perfil C":"C"}.get(cbp.get(), emit["PERFIL"])
 
     # fallbacks via DB
-    if (len(emit["CNPJ"])!=14 or not emit["UF"] or not emit["COD_MUN"] or emit["IE"]=="ISENTO") and db and getattr(db, "cursor", None):
-        try:
-            cur = db.cursor
-            cur.execute("""
-                SELECT emitente_cnpjcpf, emitente_nome, emitente_ie, emitente_cod_mun, emitente_uf
-                FROM notas_fiscais
-                WHERE COALESCE(cancelada,0)=0
-                ORDER BY dhEmi DESC LIMIT 1
-            """)
-            r = cur.fetchone()
-            if r:
-                cnpj_db = _somente_dig(r[0] or "")
-                if len(emit["CNPJ"])!=14 and len(cnpj_db)==14: emit["CNPJ"]=cnpj_db
-                if not emit["NOME"] and r[1]: emit["NOME"]=str(r[1])
-                ie_db = _somente_dig(r[2] or "")
-                if emit["IE"]=="ISENTO" and ie_db: emit["IE"]=ie_db
-                cm_db = _somente_dig(r[3] or "")
-                if not emit["COD_MUN"] and cm_db: emit["COD_MUN"]=cm_db
-                uf_db = (r[4] or "").strip().upper()
-                if not emit["UF"] and uf_db: emit["UF"]=uf_db
-        except Exception:
-            pass
+    # if (len(emit["CNPJ"])!=14 or not emit["UF"] or not emit["COD_MUN"] or emit["IE"]=="ISENTO") and db and getattr(db, "cursor", None):
+        # try:
+        #     cur = db.cursor
+        #     cur.execute("""
+        #         SELECT emitente_cnpjcpf, emitente_nome, emitente_ie, emitente_cod_mun, emitente_uf
+        #         FROM notas_fiscais
+        #         WHERE COALESCE(cancelada,0)=0
+        #         ORDER BY dhEmi DESC LIMIT 1
+        #     """)
+        #     r = cur.fetchone()
+        #     if r:
+        #         cnpj_db = _somente_dig(r[0] or "")
+        #         if len(emit["CNPJ"])!=14 and len(cnpj_db)==14: emit["CNPJ"]=cnpj_db
+        #         if not emit["NOME"] and r[1]: emit["NOME"]=str(r[1])
+        #         ie_db = _somente_dig(r[2] or "")
+        #         if emit["IE"]=="ISENTO" and ie_db: emit["IE"]=ie_db
+        #         cm_db = _somente_dig(r[3] or "")
+        #         if not emit["COD_MUN"] and cm_db: emit["COD_MUN"]=cm_db
+        #         uf_db = (r[4] or "").strip().upper()
+        #         if not emit["UF"] and uf_db: emit["UF"]=uf_db
+        # except Exception:
+        #     pass
 
-    # fallback via primeiro XML
-    # usar_fallback_xml = False
-    # if usar_fallback_xml and (len(emit["CNPJ"])!=14 or not emit["UF"] or not emit["COD_MUN"] or emit["IE"]=="ISENTO"):
-    #     for xp in xmls:
-    #         try:
-    #             root = ET.parse(xp).getroot()
-    #             ns = {"n": root.tag.split("}")[0].strip("{")}
-    #             inf = root.find(".//n:infNFe", ns)
-    #             if inf is None: continue
-    #             e = inf.find("n:emit", ns); end = e.find("n:enderEmit", ns) if e is not None else None
-    #             if e is not None:
-    #                 cnpj_xml = _somente_dig(_safe(e, "CNPJ", ns))
-    #                 if len(emit["CNPJ"])!=14 and len(cnpj_xml)==14: emit["CNPJ"]=cnpj_xml
-    #                 ie_xml = _somente_dig(_safe(e, "IE", ns))
-    #                 if emit["IE"]=="ISENTO" and ie_xml: emit["IE"]=ie_xml
-    #                 nome_xml = _safe(e, "xNome", ns)
-    #                 if emit["NOME"]=="EMITENTE" and nome_xml: emit["NOME"]=nome_xml
-    #             if end is not None:
-    #                 cod_mun_xml = _somente_dig(_safe(end, "cMun", ns))
-    #                 if not emit["COD_MUN"] and cod_mun_xml: emit["COD_MUN"]=cod_mun_xml
-    #                 uf_xml = (_safe(end, "UF", ns) or "").strip().upper()
-    #                 if not emit["UF"] and uf_xml: emit["UF"]=uf_xml
-    #             break
-    #         except Exception:
-    #             continue
-
+    
     # garantias mínimas (validador indicará se inválido)
     if len(emit["CNPJ"])!=14: emit["CNPJ"]="00000000000000"
     if not emit["COD_MUN"]: emit["COD_MUN"]="0000000"
@@ -208,6 +190,7 @@ def gerar_sped_fiscal_completo(
     partes = {}
 
     # Banco (prioridade)
+
     if db and getattr(db, "cursor", None):
         cur = db.cursor
         di = datetime.datetime(d_i.year, d_i.month, d_i.day, 0,0,0)
@@ -218,8 +201,8 @@ def gerar_sped_fiscal_completo(
                     valor_bc_icms, valor_icms, valor_bc_icms_st, valor_icms_st, valor_ipi, valor_pis, valor_cofins, itens_json,
                     destinatario_cnpjcpf, destinatario_nome
                 FROM notas_fiscais
-                WHERE dhEmi BETWEEN %s AND %s AND COALESCE(cancelada,0)=0
-        """, (di, df))
+                WHERE dhEmi BETWEEN %s AND %s AND COALESCE(cancelada,0)=0 and emitente_nome = %s;
+        """, (di, df, nome))
         rows = cur.fetchall()
         cols = [d[0] for d in cur.description]
         for r in rows:
@@ -341,18 +324,21 @@ def gerar_sped_fiscal_completo(
             
             
             # MINFIX: NFC-e (modelo 65) - remover COD_PART e zerar campos proibidos no C100
+            # NFC-e (65): sem participante e campos vedados no C100
             if str(c100.get("COD_MOD")) == "65":
                 c100["COD_PART"] = ""
-                for it in items:
-                    cfop = str(it.get("CFOP") or it.get("cfop") or "5102")
-                    cst  = _norm_cst(it.get("CST") or it.get("CSOSN") or it.get("cst") or it.get("csosn") or "00")
-                    aliq = _num(it.get("pICMS") or it.get("aliqICMS") or it.get("pIcms") or 0)
-                    v_item = _num(it.get("vProd") or it.get("valor_produto") or it.get("valor") or 0)
-                    vbc_i  = _num(it.get("vBC") or it.get("bc_icms") or 0)
-                    vicms_i= _num(it.get("vICMS") or it.get("icms") or 0)
-                    k = (cst, cfop, round(aliq,2))
-                    ag = c100["C190"][k]
-                    ag["VL_OPR"] += v_item; ag["VL_BC_ICMS"] += vbc_i; ag["VL_ICMS"] += vicms_i
+            for it in items:
+                cfop = str(it.get("CFOP") or it.get("cfop") or "5102")
+                cst  = _norm_cst(it.get("CST") or it.get("CSOSN") or it.get("cst") or it.get("csosn") or "00")
+                aliq = _num(it.get("pICMS") or it.get("aliqICMS") or it.get("pIcms") or 0)
+                v_item = _num(it.get("vProd") or it.get("valor_produto") or it.get("valor") or 0)
+                vbc_i  = _num(it.get("vBC") or it.get("bc_icms") or 0)
+                vicms_i= _num(it.get("vICMS") or it.get("icms") or 0)
+                k = (cst, cfop, round(aliq,2))
+                ag = c100["C190"][k]
+                ag["VL_OPR"] += v_item
+                ag["VL_BC_ICMS"] += vbc_i
+                ag["VL_ICMS"] += vicms_i
 
             notas.append(c100)
             print(c100)
@@ -436,7 +422,7 @@ def gerar_sped_fiscal_completo(
         if notas:
             add("|C001|0|", "C001")
             for n in notas:
-                if str(rec.get("modelo")) == "65":
+                if str(n.get("COD_MOD")) == "65":
                     add("|C100|{IND_OPER}|{IND_EMIT}|{COD_PART}|{COD_MOD}|{COD_SIT}|{SER}|{NUM_DOC}|{CHV_NFE}|{DT_DOC}|{DT_E_S}|{VL_DOC}|{IND_PGTO}|{VL_DESC}|{VL_ABAT_NT}|{VL_MERC}|{IND_FRT}|{VL_FRT}|{VL_SEG}|{VL_OUT_DA}|{VL_BC_ICMS}|{VL_ICMS}|{VL_BC_ICMS_ST}|{VL_ICMS_ST}|{VL_IPI}|{VL_PIS}|{VL_COFINS}|{VL_PIS_ST}|{VL_COFINS_ST}|".format(
                         VL_DOC       =_fmt(n["VL_DOC"]), 
                         VL_DESC      =_fmt(n["VL_DESC"]),
@@ -514,6 +500,27 @@ def gerar_sped_fiscal_completo(
             if letra == "E" and notas:
                 add("|E001|0|", "E001")
                 add(f"|E100|{d_i.strftime('%d%m%Y')}|{d_f.strftime('%d%m%Y')}|", "E100")
+                # E110 (apuração) – mínimos em zero para satisfazer o filho obrigatório
+                # VL_TOT_DEBITOS = soma do VL_ICMS dos C190 com CFOP 5xxx/6xxx/7xxx/1605
+                tot_debitos = 0.0
+                for n in notas:
+                    for (cst, cfop, aliq), v in n["C190"].items():
+                        cf = str(cfop)
+                        if cf.startswith(("5", "6", "7")) or cf == "1605":
+                            tot_debitos += float(v["VL_ICMS"])
+
+                vl_tot_debitos   = _fmt(tot_debitos)
+                vl_sld_apurado   = vl_tot_debitos   # sem créditos/ajustes, saldo = débitos
+                vl_icms_recolher = vl_tot_debitos   # idem
+
+                add(f"|E110|{vl_tot_debitos}|0,00|0,00|0,00|0,00|0,00|0,00|0,00|0,00|{vl_sld_apurado}|0,00|{vl_icms_recolher}|0,00|0,00|", "E110")
+                total_obrig = tot_debitos  # igual ao que usamos em vl_icms_recolher
+
+                # vencimento: 15 do mês seguinte ao fim do período (qualquer data válida serve p/ passar a regra)
+                first_next_month = (d_f.replace(day=1) + datetime.timedelta(days=32)).replace(day=1)
+                vcto = first_next_month + datetime.timedelta(days=14)  # dia 15
+
+                add(f"|E116|000|{_fmt(total_obrig)}|{vcto.strftime('%d%m%Y')}|1206|||||{dataRefarencia.strftime("%m%Y")}|", "E116")
             else:
                 add(f"|{letra}001|1|", f"{letra}001")
             add(f"|{letra}990|{(len(linhas)-ini)+1}|", f"{letra}990")

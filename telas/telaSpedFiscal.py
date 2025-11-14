@@ -70,7 +70,7 @@ def telaSpeedFiscal(self):
         caminho_txt = os.path.join(saida_dir, f"efd_icmsipi_{ano}_{m:02d}.txt")
 
         # Geração: o módulo completo já lê os dados diretamente de self (mesmo modelo do criarNFe/NFCe)
-        gerar_sped_fiscal_completo(self, cnpjUsadoParaSped.get(), caminho_txt=caminho_txt, dt_ini=di, dt_fin=df)
+        gerar_sped_fiscal_completo(self, cbMes, cbAno, cnpjUsadoParaSped.get(), caminho_txt=caminho_txt, dt_ini=di, dt_fin=df)
 
         messagebox.showinfo("SPED Fiscal", f"Arquivo gerado com sucesso:\n{caminho_txt}")
 
