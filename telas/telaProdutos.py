@@ -37,7 +37,7 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
     listaLabels = ["Item", "Produto", "Preço", "Quantidade", "Estoque", "Desconto $", "Desconto %", "Acréscimo", "Subtotal", "cfop"]
 
     variavelCfop = ctk.StringVar()
-    variavelCfop.set(cfop)
+    variavelCfop.set(str(cfop) if cfop is not None else "")
 
     frameTelaNotaProduto = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     frameParaItens = ctk.CTkScrollableFrame(frameTelaNotaProduto, height=800, orientation="vertical", fg_color=self.corFundo)
@@ -57,7 +57,7 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
 
         self.resultadoLabelsProduto = []
 
-        for i, row in enumerate(Buscas.buscaEstoqueProdutosFiscal(nomeDoProduto)):
+        for i, row in enumerate(Buscas.buscaEstoqueProdutosFiscal(nomeDoProduto, "Todos")):
             if i >= 5:
                 break     
             label = criaBotao(frameParaItensNoFrame,row[0],0.195,yNovo+0.02 + i * 0.02,0.26,lambda nome=row[0], valor=row[6].replace(',', '.'), quantidade=row[8].replace(',', '.'), ent=entradaProduto:selecionaProduto(nome, valor, quantidade, ent))
