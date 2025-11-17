@@ -316,3 +316,52 @@ class Buscas:
         db.cursor.execute(query, (f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%",))
         resultado = db.cursor.fetchall()
         return resultado
+
+    def buscaNotaFiscalCompleta(numero):
+        query = """
+            SELECT
+                status,
+                tipo,
+                operacao,
+                destinatario_nome,
+                destinatario_cnpjcpf,
+                destinatario_ie,
+                serie,
+                modelo,
+                numero,
+                cfop,
+                dhEmi,
+                data_vencimento,
+                valor_total,
+                valor_produtos,
+                valor_desconto,
+                valor_frete,
+                valor_seguro,
+                valor_outras_despesas,
+                valor_bc_icms,
+                valor_icms,
+                valor_icms_desonerado,
+                valor_fcp,
+                valor_bc_icms_st,
+                valor_icms_st,
+                valor_ipi,
+                valor_pis,
+                valor_cofins,
+                emitente_nome,
+                emitente_cnpjcpf,
+                emitente_ie,
+                chave,
+                protocolo,
+                nRec,
+                qrcode_url
+            FROM notas_fiscais
+            WHERE numero = %s
+            LIMIT 1
+        """
+        db.cursor.execute(query, (numero,))
+        resultado = db.cursor.fetchone()
+        if not resultado:
+            return None
+
+        colunas = [coluna[0] for coluna in db.cursor.description]
+        return dict(zip(colunas, resultado))
