@@ -147,6 +147,6 @@ def extrairDadosDaNota(self, xmlCaminho, tipo, status):
                                      mod_frete,placa_veiculo,uf_veiculo,rntc,volum_qVol,
                                      volum_esp,volum_marca,volum_nVol,peso_liquido,peso_bruto,
                                      cStat,xMotivo,protocolo,nRec,dhRecbto,status,qrcode_url,
-                                     data_vencimento,itens_json,cfop,operacao,)
+                                     data_vencimento,itens_json,cfop,operacao, "Saída")
 
 

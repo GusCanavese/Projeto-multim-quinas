@@ -147,7 +147,7 @@ class Insere:
         valor_icms_desonerado,valor_fcp,valor_bc_icms_st,valor_icms_st,valor_ipi,valor_pis,valor_cofins,
         valor_bc_irrf,transportadora_cnpjcpf,transportadora_nome,mod_frete,placa_veiculo,uf_veiculo,rntc,volum_qVol,
         volum_esp,volum_marca,volum_nVol,peso_liquido,peso_bruto,cStat,xMotivo,protocolo,nRec,dhRecbto,status,qrcode_url,
-        data_vencimento,itens_json,cfop,operacao):
+        data_vencimento,itens_json,cfop,operacao, ehEntradaOuSaida):
         
         query = """ INSERT INTO notas_fiscais (tipo,modelo,serie,numero,chave,cUF,
                                      uf_emit,uf_dest,tpAmb,tpNF,idDest,natOp,dhEmi,
@@ -162,16 +162,16 @@ class Insere:
                                      mod_frete,placa_veiculo,uf_veiculo,rntc,volum_qVol,
                                      volum_esp,volum_marca,volum_nVol,peso_liquido,peso_bruto,
                                      cStat,xMotivo,protocolo,nRec,dhRecbto,status,qrcode_url,
-                                     data_vencimento,itens_json,cfop,operacao) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                                                                                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                                                                                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
-                                                                                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
+                                     data_vencimento,itens_json,cfop,operacao, entradaOuSaida) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                                                                                                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                                                                                                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                                                                                                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
         dados = (tipo,modelo,serie,numero,chave,cUF,uf_emit,uf_dest,tpAmb,
                  tpNF,idDest,natOp,dhEmi, dhSaiEnt,emitente_cnpjcpf,emitente_nome,emitente_ie,destinatario_cnpjcpf,destinatario_nome,
                  destinatario_ie,valor_total,valor_produtos,valor_desconto,valor_frete,valor_seguro,valor_outras_despesas,valor_bc_icms,valor_icms,valor_icms_desonerado,
                  valor_fcp,valor_bc_icms_st,valor_icms_st,valor_ipi,valor_pis,valor_cofins,valor_bc_irrf,transportadora_cnpjcpf,transportadora_nome,mod_frete,
                  placa_veiculo,uf_veiculo,rntc,volum_qVol,volum_esp,volum_marca,volum_nVol,peso_liquido,peso_bruto,cStat,
-                 xMotivo,protocolo,nRec,dhRecbto,status,qrcode_url,data_vencimento,itens_json,cfop,operacao,
+                 xMotivo,protocolo,nRec,dhRecbto,status,qrcode_url,data_vencimento,itens_json,cfop,operacao,ehEntradaOuSaida,
         )
 
         db.cursor.execute(query, dados)

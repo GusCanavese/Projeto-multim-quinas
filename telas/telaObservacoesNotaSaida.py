@@ -80,7 +80,7 @@ def telaObservacoesNotaSaida(self, EhNotaDoConsumidor):
             return
         try:
             parametros = montar_parametros_nota_saida(dados_nfe)
-            Insere.inserir_nota_fiscal_saida(*parametros)
+            Insere.inserir_nota_fiscal_saida(*parametros, "Entrada")
             destruir_quadros_fluxo_entrada(self)
         except Exception as exc:
             messagebox.showerror("Erro", f"Falha ao salvar nota importada: {exc}")
