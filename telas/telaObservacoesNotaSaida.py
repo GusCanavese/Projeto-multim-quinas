@@ -2,6 +2,8 @@ import customtkinter as ctk
 from tkinter import messagebox
 from componentes import criaFrameJanela, criaBotao, criaTextArea, criarLabelEntry
 from funcoesTerceiras import criarNFe, criarNFCe
+from consultas.insert import Insere
+from telas.telaObservacoes import montar_parametros_nota_saida, destruir_quadros_fluxo_entrada
 
 
 def acessar(dados, *caminho, default=""):
@@ -25,6 +27,7 @@ def telaObservacoesNotaSaida(self, EhNotaDoConsumidor):
     self.numeroPedidoVinculadoVar = numeroPedidoVinculado
 
     dados_nfe = getattr(self, "dadosNota", None)
+    nota_entrada_importada = bool(getattr(self, "importouNotaEntrada", False) and dados_nfe)
     texto_contribuinte = acessar(dados_nfe, "NFe", "infNFe", "infAdic", "infCpl", default=" ")
     texto_fisco = acessar(dados_nfe, "NFe", "infNFe", "infAdic", "infAdFisco", default=" ")
 
@@ -70,25 +73,47 @@ def telaObservacoesNotaSaida(self, EhNotaDoConsumidor):
         atualizar_observacoes()
         modulo.gerarNFe(self)
 
-    if EhNotaDoConsumidor:
+    def salvar_nota_importada():
+        atualizar_observacoes()
+        if not dados_nfe:
+            messagebox.showerror("Erro", "Não há dados da nota importada para salvar.")
+            return
+        try:
+            parametros = montar_parametros_nota_saida(dados_nfe)
+            Insere.inserir_nota_fiscal_saida(*parametros)
+            destruir_quadros_fluxo_entrada(self)
+        except Exception as exc:
+            messagebox.showerror("Erro", f"Falha ao salvar nota importada: {exc}")
+
+    if nota_entrada_importada:
         criaBotao(
             self.frameTelaObservacoes,
-            "Salvar e gerar nfc-e",
-            0.40,
-            0.94,
-            0.15,
-            lambda: salvar_e_gerar(criarNFCe),
-        ).place(anchor="nw")
-    else:
-        criaBotao(
-            self.frameTelaObservacoes,
-            "Salvar e gerar nf-e",
+            "Salvar nota",
             0.25,
             0.94,
             0.15,
-            lambda: salvar_e_gerar(criarNFe),
+            salvar_nota_importada,
         ).place(anchor="nw")
-        criarLabelEntry(self.frameTelaObservacoes, "Número pedido vinculado", 0.05, 0.58, 0.15, numeroPedidoVinculado)
+    else:
+        if EhNotaDoConsumidor:
+            criaBotao(
+                self.frameTelaObservacoes,
+                "Salvar e gerar nfc-e",
+                0.40,
+                0.94,
+                0.15,
+                lambda: salvar_e_gerar(criarNFCe),
+            ).place(anchor="nw")
+        else:
+            criaBotao(
+                self.frameTelaObservacoes,
+                "Salvar e gerar nf-e",
+                0.25,
+                0.94,
+                0.15,
+                lambda: salvar_e_gerar(criarNFe),
+            ).place(anchor="nw")
+            criarLabelEntry(self.frameTelaObservacoes, "Número pedido vinculado", 0.05, 0.58, 0.15, numeroPedidoVinculado)
 
 
     # criaBotao(self.frameTelaObservacoes, "consultar", 0.55, 0.94, 0.15, lambda: criarNFe.consultar_ultimo_recibo(self)).place(anchor="nw")

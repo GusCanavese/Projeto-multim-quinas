@@ -18,30 +18,20 @@ def acessar(dados, *caminho, default=""):
     return dados if isinstance(dados, str) else default
 
 
-
-def telaObservacoes(self, dadosNota):
-
-    self.frameTelaObservacoes = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
-    
-
-
-    variavelObsFisco = ctk.StringVar()
-    variavelObsFisco.set(acessar(dadosNota, "NFe", "infNFe", "infAdic", "infAdFisco"))
-
-    variavelObsContribuinte = ctk.StringVar()
-    variavelObsContribuinte.set(acessar(dadosNota, "NFe", "infNFe", "infAdic", "infCpl"))
-
-    area1 = criaTextArea(self.frameTelaObservacoes, 0.5, 0.15, 0.4, "INFORMAÇÕES DO INTERESSE DO CONTRIBUINTE", variavelObsContribuinte.get())
-    area1.place(relheight=0.3)
-    area2 = criaTextArea(self.frameTelaObservacoes, 0.05, 0.15, 0.4, "INFORMAÇÕES DO INTERESSE DO FISCO", variavelObsFisco.get())
-    area2.place(relheight=0.3)
-                    
-
-    def pegar_valor(*caminhos, default=""):
+def montar_parametros_nota_saida(dadosNota):
+    def pegar_valor(dados, *caminhos, default=""):
         for caminho in caminhos:
-            valor = acessar(*caminho, default=default)
-            if valor not in (None, ""):
-                return valor
+            atual = dados
+            for chave in caminho:
+                if isinstance(atual, dict) and chave in atual:
+                    atual = atual[chave]
+                else:
+                    atual = None
+                    break
+            if atual not in (None, ""):
+                if isinstance(atual, dict) and "#text" in atual:
+                    return atual["#text"]
+                return atual
         return default
 
     def obter_estrutura(dados, *caminho):
@@ -53,24 +43,18 @@ def telaObservacoes(self, dadosNota):
                 return {}
         return atual
 
-    dados_base = dadosNota.get("nfeProc", dadosNota)
+    dados_base = (dadosNota or {}).get("nfeProc", dadosNota or {})
     nfe = obter_estrutura(dados_base, "NFe")
     inf_nfe = obter_estrutura(nfe, "infNFe")
     prot_nfe = obter_estrutura(dados_base, "protNFe", "infProt")
-
-    def valor_emitente(chave):
-        return acessar(inf_nfe, "emit", chave)
-
-    def valor_destinatario(chave):
-        return acessar(inf_nfe, "dest", chave)
 
     modelo = acessar(inf_nfe, "ide", "mod")
     tipo = {"55": "NF-e", "65": "NFC-e"}.get(modelo, "")
     serie = acessar(inf_nfe, "ide", "serie")
     numero = acessar(inf_nfe, "ide", "nNF")
-    chave = acessar(prot_nfe, "chNFe")
-    if not chave:
-        chave = acessar(inf_nfe, "Id").replace("NFe", "") if acessar(inf_nfe, "Id") else ""
+    chave = acessar(prot_nfe, "chNFe") or (
+        acessar(inf_nfe, "Id").replace("NFe", "") if acessar(inf_nfe, "Id") else ""
+    )
     cUF = acessar(inf_nfe, "ide", "cUF")
     uf_emit = acessar(inf_nfe, "emit", "enderEmit", "UF")
     uf_dest = acessar(inf_nfe, "dest", "enderDest", "UF")
@@ -81,13 +65,13 @@ def telaObservacoes(self, dadosNota):
     dhEmi = acessar(inf_nfe, "ide", "dhEmi")
     dhSaiEnt = acessar(inf_nfe, "ide", "dhSaiEnt")
 
-    emitente_cnpjcpf = pegar_valor((inf_nfe, "emit", "CNPJ"), (inf_nfe, "emit", "CPF"))
-    emitente_nome = valor_emitente("xNome")
-    emitente_ie = valor_emitente("IE")
+    emitente_cnpjcpf = pegar_valor(inf_nfe, ("emit", "CNPJ"), ("emit", "CPF"))
+    emitente_nome = acessar(inf_nfe, "emit", "xNome")
+    emitente_ie = acessar(inf_nfe, "emit", "IE")
 
-    destinatario_cnpjcpf = pegar_valor((inf_nfe, "dest", "CNPJ"), (inf_nfe, "dest", "CPF"))
-    destinatario_nome = valor_destinatario("xNome")
-    destinatario_ie = valor_destinatario("IE")
+    destinatario_cnpjcpf = pegar_valor(inf_nfe, ("dest", "CNPJ"), ("dest", "CPF"))
+    destinatario_nome = acessar(inf_nfe, "dest", "xNome")
+    destinatario_ie = acessar(inf_nfe, "dest", "IE")
 
     icms_tot = obter_estrutura(inf_nfe, "total", "ICMSTot")
     valor_total = acessar(icms_tot, "vNF")
@@ -108,7 +92,7 @@ def telaObservacoes(self, dadosNota):
     valor_bc_irrf = acessar(inf_nfe, "retTrib", "vIRRF")
 
     transp = obter_estrutura(inf_nfe, "transp")
-    transportadora_cnpjcpf = pegar_valor((transp, "transporta", "CNPJ"), (transp, "transporta", "CPF"))
+    transportadora_cnpjcpf = pegar_valor(transp, ("transporta", "CNPJ"), ("transporta", "CPF"))
     transportadora_nome = acessar(transp, "transporta", "xNome")
     mod_frete = acessar(transp, "modFrete")
     placa_veiculo = acessar(transp, "veicTransp", "placa")
@@ -166,7 +150,7 @@ def telaObservacoes(self, dadosNota):
     cfop = vazio_para_none(cfop)
     operacao = vazio_para_none(operacao)
 
-    parametros = (
+    return (
         tipo,
         modelo,
         serie,
@@ -228,17 +212,60 @@ def telaObservacoes(self, dadosNota):
         operacao,
     )
 
+
+def destruir_quadros_fluxo_entrada(self):
+    quadros = [
+        "frameTelaNotaFiscalEntrada",
+        "frameTelaProdutos",
+        "frameTelaTotais",
+        "frameTelaGerarFaturamento",
+        "frametelaTransporte",
+        "frameTelaObservacoes",
+        "frameEscolherNotaFiscal",
+    ]
+    for nome in quadros:
+        frame = getattr(self, nome, None)
+        if frame is not None:
+            try:
+                frame.destroy()
+            except Exception:
+                pass
+
+
+def telaObservacoes(self, dadosNota):
+
+    self.frameTelaObservacoes = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
+
+    variavelObsFisco = ctk.StringVar()
+    variavelObsFisco.set(acessar(dadosNota, "NFe", "infNFe", "infAdic", "infAdFisco"))
+
+    variavelObsContribuinte = ctk.StringVar()
+    variavelObsContribuinte.set(acessar(dadosNota, "NFe", "infNFe", "infAdic", "infCpl"))
+
+    area1 = criaTextArea(
+        self.frameTelaObservacoes,
+        0.5,
+        0.15,
+        0.4,
+        "INFORMAÇÕES DO INTERESSE DO CONTRIBUINTE",
+        variavelObsContribuinte.get(),
+    )
+    area1.place(relheight=0.3)
+    area2 = criaTextArea(
+        self.frameTelaObservacoes,
+        0.05,
+        0.15,
+        0.4,
+        "INFORMAÇÕES DO INTERESSE DO FISCO",
+        variavelObsFisco.get(),
+    )
+    area2.place(relheight=0.3)
+
+    parametros = montar_parametros_nota_saida(dadosNota)
+
     def insereRetorna():
         Insere.inserir_nota_fiscal_saida(*parametros)
-        try:
-            self.frameTelaNotaFiscalEntrada.destroy()
-            self.frameTelaProdutos.destroy()
-            self.frameTelaTotais.destroy()
-            self.frameTelaGerarFaturamento.destroy()
-            self.frametelaTransporte.destroy()
-            self.frameTelaObservacoes.destroy()
-            self.frameEscolherNotaFiscal.destroy()
-        except Exception as e:
-            print(f"Erro ao inserir nota fiscal: {e}")
+        destruir_quadros_fluxo_entrada(self)
+
     criaBotao(self.frameTelaObservacoes, "Salvar nota", 0.25, 0.94, 0.15, lambda: insereRetorna()).place(anchor="nw")
     criaBotao(self.frameTelaObservacoes, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaObservacoes.destroy()).place(anchor="nw")
