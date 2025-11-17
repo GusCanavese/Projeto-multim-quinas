@@ -10,6 +10,12 @@ from telas.telaTotaisNotaSaida import telaTotaisNotaSaida
 def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
     self.frametelaTransporte = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
+    self.dadosTransporteImportado = {
+        "transportador": {},
+        "volumes": [],
+        "modalidadeFrete": "",
+    }
+
     def buscaTransportador(event=None): 
         nomeDoTransportador = self.nomeTransportador.get()
         cnpjTransportador   = self.documentoTransportador.get()
@@ -190,6 +196,11 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
                 except Exception:
                     pass
 
+                self.dadosTransporteImportado["transportador"] = {
+                    "nome": str(nomeTransp).strip(),
+                    "documento": str(docTransp).strip(),
+                }
+
                 # ----------------- volumes: qVol, esp, marca, nVol, pesoB, pesoL -----------------
                 vols = None
                 try:
@@ -211,6 +222,8 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
                         if not isinstance(linha, dict):
                             continue
 
+                        volume_info = {}
+
                         # Quantidade -> qVol
                         val = ""
                         try:
@@ -219,6 +232,7 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
                                 val = val["#text"]
                         except Exception:
                             val = ""
+                        volume_info["quantidade"] = str(val).strip()
                         if "Quantidade" in linha and str(val).strip() != "":
                             try:
                                 cur = (linha["Quantidade"].get() or "").strip() if hasattr(linha["Quantidade"], "get") else ""
@@ -239,6 +253,7 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
                                 val = val["#text"]
                         except Exception:
                             val = ""
+                        volume_info["especie"] = str(val).strip()
                         if "Espécie" in linha and str(val).strip() != "":
                             try:
                                 cur = (linha["Espécie"].get() or "").strip() if hasattr(linha["Espécie"], "get") else ""
@@ -259,6 +274,7 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
                                 val = val["#text"]
                         except Exception:
                             val = ""
+                        volume_info["marca"] = str(val).strip()
                         if "Marca" in linha and str(val).strip() != "":
                             try:
                                 cur = (linha["Marca"].get() or "").strip() if hasattr(linha["Marca"], "get") else ""
@@ -279,6 +295,7 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
                                 val = val["#text"]
                         except Exception:
                             val = ""
+                        volume_info["numeracao"] = str(val).strip()
                         if "Numeração" in linha and str(val).strip() != "":
                             try:
                                 cur = (linha["Numeração"].get() or "").strip() if hasattr(linha["Numeração"], "get") else ""
@@ -299,6 +316,7 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
                                 val = val["#text"]
                         except Exception:
                             val = ""
+                        volume_info["peso_bruto"] = str(val).strip()
                         if "Peso Bruto" in linha and str(val).strip() != "":
                             try:
                                 cur = (linha["Peso Bruto"].get() or "").strip() if hasattr(linha["Peso Bruto"], "get") else ""
@@ -319,6 +337,7 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
                                 val = val["#text"]
                         except Exception:
                             val = ""
+                        volume_info["peso_liquido"] = str(val).strip()
                         if "Peso Líquido" in linha and str(val).strip() != "":
                             try:
                                 cur = (linha["Peso Líquido"].get() or "").strip() if hasattr(linha["Peso Líquido"], "get") else ""
@@ -331,12 +350,16 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
                                 except Exception:
                                     pass
 
+                        if volume_info:
+                            self.dadosTransporteImportado["volumes"].append(volume_info)
+
                 # opcional: salvar modFrete para uso em outra tela
                 try:
                     mf = transp.get("modFrete", "")
                     if isinstance(mf, dict) and "#text" in mf:
                         mf = mf["#text"]
                     self.modFrete = str(mf)
+                    self.dadosTransporteImportado["modalidadeFrete"] = self.modFrete
                 except Exception:
                     pass
 

@@ -23,6 +23,14 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
     pré-carregados automaticamente nas linhas (produto, preço, quantidade, subtotal).
     """
 
+    nota_importada = bool(dadosNota)
+    if nota_importada:
+        self.dadosNota = dadosNota
+        # compatibilidade com telas que já utilizavam esse atributo
+        self.dadosNFeEntrada = dadosNota
+
+    self.importouNotaEntrada = nota_importada
+
     self.row=1
     self.posicaoy = 0.2
     self.posicaox = 0.024
@@ -549,6 +557,8 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
             entry_subtotal.insert(0, f"{novo_subtotal:.2f}")
             total += novo_subtotal
 
+        self.valorSubtotalFaturamento = total
+
     # Cabeçalhos
     for i, coluna in enumerate(listaLabels):
         if i == 0:
@@ -561,7 +571,18 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
             criaLabel(frameParaItensNoFrame, coluna, self.posicaox, self.posicaoy, 0.08, self.cor)
             self.posicaox +=0.081
     self.posicaox = 0.024
-    campos_obrigatorios = {"quantidade", "valor", "nome"}
+    campos_obrigatorios = ("produto", "preco", "quantidade")
+
+    def ultima_linha_preenchida():
+        if not self.linhas:
+            return True
+
+        linha = self.linhas[-1]
+        for campo in campos_obrigatorios:
+            widget = linha.get(campo)
+            if hasattr(widget, "get") and widget.get().strip() == "":
+                return False
+        return True
 
     self.botaoAdicionarItem = criaBotaoPequeno(
         frameParaItensNoFrame,
@@ -570,12 +591,11 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
         self.posicaoyBotao,
         0.07,
         lambda: (
-            messagebox.showerror("Campos vazios", "Preencha todos os campos da última linha antes de adicionar um novo item")
-            if any(
-                hasattr(widget, "get") and widget.get().strip() == ""
-                for chave, widget in self.linhas[-1].items()
-                if chave in campos_obrigatorios
+            messagebox.showerror(
+                "Campos vazios",
+                "Preencha todos os campos da última linha antes de adicionar um novo item",
             )
+            if not ultima_linha_preenchida()
             else adicionarItem(self)
         )
     )
@@ -798,7 +818,17 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
                 "cfop": cfop_item,
             }
     
-    criaBotao(frameTelaNotaProduto, "Próximo - Tela Transporte", 0.25, 0.94, 0.15, lambda: (montarValoresDosItens(frameTelaNotaProduto), telaTransporteNotaSaida(self, EhNotaDoConsumidor, True))).place(anchor="nw")
+    criaBotao(
+        frameTelaNotaProduto,
+        "Próximo - Tela Transporte",
+        0.25,
+        0.94,
+        0.15,
+        lambda: (
+            montarValoresDosItens(frameTelaNotaProduto),
+            telaTransporteNotaSaida(self, EhNotaDoConsumidor, nota_importada),
+        ),
+    ).place(anchor="nw")
     criaBotao(frameTelaNotaProduto, "Voltar", 0.05, 0.94, 0.15, lambda: frameTelaNotaProduto.destroy()).place(anchor="nw")
 
     # aplicar_maiusculo_em_todos_entries(self)
