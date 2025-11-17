@@ -316,7 +316,7 @@ class Buscas:
         db.cursor.execute(query, (f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%",))
         resultado = db.cursor.fetchall()
         return resultado
-
+    
     def buscaNotaFiscalCompleta(numero):
         query = """
             SELECT

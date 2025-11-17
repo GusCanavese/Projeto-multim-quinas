@@ -3,9 +3,11 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), ".")))
 import customtkinter as ctk
 from tkinter import messagebox
+from datetime import datetime
 from consultas.update import Atualiza
 from consultas.select import Buscas
 from componentes import criaFrameJanela, criaBotao, criarLabelEntry
+from funcoesTerceiras.acbr_comandos import cancelar_nfe, inutilizar_nfe
 
 
 def telaVer(self, p):
@@ -111,33 +113,134 @@ def telaVer(self, p):
     criarLabelEntry(tab_totais, "Valor PIS", x_dir, 0.55, largura, valor_pis)
     criarLabelEntry(tab_totais, "Valor COFINS", x_dir, 0.65, largura, valor_cofins)
 
-    def atualiza():
-        params = (
+    def numero_atualizado():
+        valor = (numero.get() or "").strip()
+        return valor if valor else numero_original
+
+    def obter_parametros():
+        return (
             status.get(), tipo.get(), op.get(), destinatario.get(), serie.get(),
-            valor_total.get(), cfop.get(), data_emissao.get(), numero.get()
+            valor_total.get(), cfop.get(), data_emissao.get(), numero_atualizado()
         )
+
+    def gravar_dados(mostrar_msg=True, fechar=False):
         try:
-            Atualiza.atualizaNotaFiscal(params, numero_original)
-            messagebox.showinfo(title="Notificação", message="Atualizado com sucesso")
-            frame.destroy()
+            Atualiza.atualizaNotaFiscal(obter_parametros(), numero_original)
+            if mostrar_msg:
+                messagebox.showinfo(title="Notificação", message="Atualizado com sucesso")
+            if fechar:
+                frame.destroy()
+            return True
         except Exception as e:
             messagebox.showinfo(title="Erro", message=f"Falha ao atualizar: {e}")
+            return False
+
+    def atualiza():
+        gravar_dados(mostrar_msg=True, fechar=True)
+
+    def solicitar_justificativa(titulo, mensagem):
+        try:
+            dialogo = ctk.CTkInputDialog(title=titulo, text=mensagem)
+        except Exception:
+            return None
+        resposta = dialogo.get_input()
+        return resposta.strip() if resposta else None
+
+    def ano_para_inutilizacao():
+        texto_data = (data_emissao.get() or "").strip()
+        formatos = ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%d/%m/%Y", "%d/%m/%Y %H:%M:%S"]
+        for fmt in formatos:
+            try:
+                return datetime.strptime(texto_data[:len(fmt)], fmt).year
+            except Exception:
+                continue
+        return datetime.now().year
+
+    def somente_digitos(valor):
+        return "".join(filter(str.isdigit, str(valor or "")))
 
     def executar_acao():
         acao = combo_acoes.get()
         numero_atual = numero.get() or numero_original
         if acao == "Cancelar NFe":
-            status.set("Cancelada")
-            messagebox.showinfo(
+            chave_atual = (chave.get() or "").strip()
+            protocolo_atual = (protocolo.get() or "").strip()
+            cnpj_emitente_atual = somente_digitos(emitente_documento.get())
+
+            if len(somente_digitos(chave_atual)) != 44:
+                messagebox.showwarning("Cancelar NFe", "Chave de acesso inválida para cancelamento.")
+                return
+            if not protocolo_atual:
+                messagebox.showwarning("Cancelar NFe", "Informe o protocolo de autorização antes de cancelar.")
+                return
+            if len(cnpj_emitente_atual) != 14:
+                messagebox.showwarning("Cancelar NFe", "Informe o CNPJ do emitente para concluir o cancelamento.")
+                return
+
+            justificativa = solicitar_justificativa(
                 "Cancelar NFe",
-                f"Nota {numero_atual} marcada para cancelamento. Confirme no ACBr Monitor."
+                "Descreva o motivo do cancelamento (mínimo 15 caracteres)."
             )
+            if not justificativa:
+                return
+
+            try:
+                retorno = cancelar_nfe(chave_atual, justificativa, protocolo_atual, cnpj_emitente_atual)
+            except Exception as exc:
+                messagebox.showerror("Cancelar NFe", f"Falha ao cancelar a nota: {exc}")
+                return
+
+            if retorno.get("sucesso"):
+                status.set("Cancelada")
+                gravar_dados(mostrar_msg=False)
+                mensagem = retorno.get("motivo") or "Cancelamento efetuado com sucesso."
+                if retorno.get("protocolo"):
+                    mensagem += f"\nProtocolo: {retorno['protocolo']}"
+                messagebox.showinfo("Cancelar NFe", mensagem)
+            else:
+                mensagem = retorno.get("motivo") or "Cancelamento rejeitado pela SEFAZ."
+                messagebox.showerror("Cancelar NFe", mensagem)
         elif acao == "Inutilizar NFe":
-            status.set("Inutilizada")
-            messagebox.showinfo(
+            cnpj_emitente_atual = somente_digitos(emitente_documento.get())
+            if len(cnpj_emitente_atual) != 14:
+                messagebox.showwarning("Inutilizar NFe", "Informe o CNPJ do emitente para inutilizar a numeração.")
+                return
+
+            numero_inicial = somente_digitos(numero_atual)
+            if not numero_inicial:
+                messagebox.showwarning("Inutilizar NFe", "Número da nota inválido para inutilização.")
+                return
+
+            justificativa = solicitar_justificativa(
                 "Inutilizar NFe",
-                f"Nota {numero_atual} marcada como inutilizada. Finalize o processo pelo ACBr."
+                "Descreva o motivo da inutilização (mínimo 15 caracteres)."
             )
+            if not justificativa:
+                return
+
+            ano_referencia = str(ano_para_inutilizacao())
+
+            try:
+                retorno = inutilizar_nfe(
+                    cnpj_emitente_atual,
+                    justificativa,
+                    ano_referencia,
+                    modelo.get() or "55",
+                    serie.get() or "1",
+                    numero_inicial,
+                )
+            except Exception as exc:
+                messagebox.showerror("Inutilizar NFe", f"Falha ao inutilizar a numeração: {exc}")
+                return
+
+            if retorno.get("sucesso"):
+                status.set("Inutilizada")
+                gravar_dados(mostrar_msg=False)
+                mensagem = retorno.get("motivo") or "Numeração inutilizada com sucesso."
+                messagebox.showinfo("Inutilizar NFe", mensagem)
+            else:
+                mensagem = retorno.get("motivo") or "Inutilização rejeitada pela SEFAZ."
+                messagebox.showerror("Inutilizar NFe", mensagem)
         elif acao == "Enviar XML":
             chave_atual = chave.get().strip()
             if not chave_atual:
