@@ -182,7 +182,7 @@ def telaNotaFiscalSaida(self, valor, EhNotaDoConsumidor):
             self.variavelTelefoneEnd        = "3233716171"
             self.variavelCSCToken           = "fc61ad002385a054543bbf619d0247b5"
 
-            self.caminhoCertificado = r"C:\Users\gus\Desktop\Projeto-multim-quinas\certificados\certificadoNutrigel.pfx"
+            self.caminhoCertificado = r"C:\Users\Gustavo\Desktop\Projeto-multim-quinas\certificados\certificadoNutrigel.pfx"
             self.senhaCertificado   = "nutri@00995"
 
         if valor == "Multimáquinas":
