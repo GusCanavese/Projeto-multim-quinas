@@ -19,6 +19,11 @@ def telaNotaFiscalSaida(self, valor, EhNotaDoConsumidor):
     usuarioLogado = usuarioLogado.capitalize()
 
 
+    def _caminho_certificado(nome_arquivo):
+        base_dir = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        return os.path.join(base_dir, "certificados", nome_arquivo)
+
+
 
     def decideATela(valor):
         if valor == "Devolução" or valor == "Complementar":
@@ -181,8 +186,8 @@ def telaNotaFiscalSaida(self, valor, EhNotaDoConsumidor):
             self.variavelCodigoMunicipioEnd = "3162500"
             self.variavelTelefoneEnd        = "3233716171"
             self.variavelCSCToken           = "fc61ad002385a054543bbf619d0247b5"
-            
-            self.caminhoCertificado = r"C:\Users\GABRIEL\Desktop\dist\certificados\certificadoNutrigel.pfx"
+
+            self.caminhoCertificado = _caminho_certificado("certificadoNutrigel.pfx")
             self.senhaCertificado   = "nutri@00995"
 
         if valor == "Multimáquinas":
@@ -202,7 +207,7 @@ def telaNotaFiscalSaida(self, valor, EhNotaDoConsumidor):
             self.variavelTelefoneEnd        = "3233713382"
             self.variavelCSCToken           = "7ea94a1685c35cc42d21a839c1dc840f"
 
-            self.caminhoCertificado = r"C:\Users\GABRIEL\Desktop\dist\certificados\certificadoMultimaquinas.pfx"
+            self.caminhoCertificado = _caminho_certificado("certificadoMultimaquinas.pfx")
             self.senhaCertificado   = "multi2025"
 
         if valor == "Polimáquinas":
@@ -223,7 +228,7 @@ def telaNotaFiscalSaida(self, valor, EhNotaDoConsumidor):
             self.variavelCSCToken           = "a985151a07100b97c8af2c1e179908cd"
 
 
-            self.caminhoCertificado = r"C:\Users\GABRIEL\Desktop\dist\certificados\certificadoPolimaquinas.pfx"
+            self.caminhoCertificado = _caminho_certificado("certificadoPolimaquinas.pfx")
             self.senhaCertificado   = "23889"
 
     
