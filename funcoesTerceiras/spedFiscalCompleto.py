@@ -235,12 +235,26 @@ def gerar_sped_fiscal_completo(
             vPIS = float(rec.get("valor_pis") or 0.0)
             vCOFINS = float(rec.get("valor_cofins") or 0.0)
 
-            cod_part = _somente_dig(rec.get("destinatario_cnpj") or "") or f"CF-{nnf}"
+            doc_dest = _somente_dig(rec.get("destinatario_cnpjcpf") or "")
+            cod_part = doc_dest or f"CF-{nnf}"
             nome_dest = (rec.get("destinatario_nome") or "CONSUMIDOR FINAL").strip() or "CONSUMIDOR FINAL"
+
+            # Identifica se o documento informado é CNPJ ou CPF para popular corretamente o 0150
+            cnpj_dest = doc_dest if len(doc_dest) == 14 else ""
+            cpf_dest  = doc_dest if len(doc_dest) == 11 else ""
+
             partes.setdefault(cod_part, {
-                "NOME": nome_dest[:100], "CNPJ": _somente_dig(rec.get("destinatario_cnpj") or ""),
-                "CPF": "", "COD_PAIS": "1058", "IE": "", "COD_MUN": "", "SUFRAMA": "",
-                "END": "", "NUM": "", "COMPL": "", "BAIRRO": "",
+                "NOME": nome_dest[:100],
+                "CNPJ": cnpj_dest,
+                "CPF": cpf_dest,
+                "COD_PAIS": "1058",
+                "IE": "",
+                "COD_MUN": "",
+                "SUFRAMA": "",
+                "END": "",
+                "NUM": "",
+                "COMPL": "",
+                "BAIRRO": "",
             })
 
             items = []
