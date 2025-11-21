@@ -5,6 +5,7 @@ import customtkinter as ctk
 from tkinter import messagebox
 from datetime import datetime
 from consultas.update import Atualiza
+from consultas.delete import deleta
 from consultas.select import Buscas
 from componentes import criaFrameJanela, criaBotao, criarLabelEntry
 from funcoesTerceiras.acbr_comandos import cancelar_nfe, inutilizar_nfe
@@ -252,10 +253,30 @@ def telaVer(self, p):
                 "Enviar XML",
                 f"Envie o arquivo XML localizado em:\n{xml_path}"
             )
+        elif acao == "Excluir NFe":
+            numero_para_excluir = numero_atualizado()
+            if not numero_para_excluir:
+                messagebox.showwarning("Excluir NFe", "Número da nota não encontrado para exclusão.")
+                return
+
+            if not messagebox.askyesno(
+                "Excluir NFe",
+                "Tem certeza que deseja excluir esta nota fiscal? Esta ação não pode ser desfeita."
+            ):
+                return
+
+            try:
+                deleta.deletarNotaFiscal(numero_para_excluir)
+            except Exception as exc:
+                messagebox.showerror("Excluir NFe", f"Falha ao excluir a nota fiscal: {exc}")
+                return
+
+            messagebox.showinfo("Excluir NFe", "Nota fiscal excluída com sucesso.")
+            frame.destroy()
         else:
             messagebox.showwarning("Ações", "Selecione uma ação antes de continuar.")
 
-    combo_acoes = ctk.CTkComboBox(frame, values=["Cancelar NFe", "Inutilizar NFe", "Enviar XML"])
+    combo_acoes = ctk.CTkComboBox(frame, values=["Cancelar NFe", "Inutilizar NFe", "Enviar XML", "Excluir NFe"])
     combo_acoes.set("Selecione uma ação")
     combo_acoes.place(relx=0.5, rely=0.8, relwidth=0.3, anchor="center")
 
