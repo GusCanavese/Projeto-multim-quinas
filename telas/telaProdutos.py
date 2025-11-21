@@ -434,6 +434,9 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
             
 
 
+        base_calculo_original = None
+        base_reduzida_anterior = None
+
         def calculaValores():
 
             # calcula a base de calculo
@@ -443,25 +446,40 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
             # tudo do icms
 
             try:
-                auxiliarBCPIS = float(self.bc_icms.get())
-                auxiliar = float(self.bc_icms.get())*float(self.red_bc_icms.get())/100
-                self.bc_icms.set(float(self.bc_icms.get())-auxiliar)          
+                base_informada = float(self.bc_icms.get())
+                reducao_percentual = float(self.red_bc_icms.get())
             except:
                 raise ValueError("Os valores não devem estar em branco")
-            valorICMS = float(self.bc_icms.get())*(float(self.aliq_icms.get()) / 100.0)
+
+            nonlocal base_calculo_original, base_reduzida_anterior
+
+            # Garante que a base usada no cálculo sempre seja a original informada,
+            # evitando reduções cumulativas a cada clique em "Calcular".
+            if base_calculo_original is None:
+                base_calculo_original = base_informada
+            elif base_informada not in (base_calculo_original, base_reduzida_anterior):
+                base_calculo_original = base_informada
+
+            base_calculo = base_calculo_original
+            auxiliar = base_calculo * reducao_percentual / 100
+            base_reduzida = base_calculo - auxiliar
+            base_reduzida_anterior = base_reduzida
+            self.bc_icms.set(f"{base_reduzida:.2f}")
+
+            valorICMS = base_reduzida * (float(self.aliq_icms.get()) / 100.0)
             self.vr_icms.set(f"{valorICMS:.2f}")
 
             
             # --- PIS 
             aliq_pis = 0.00065
-            valorBCPis = auxiliarBCPIS - valorICMS
+            valorBCPis = base_calculo - valorICMS
             self.bc_pis.set(f"{valorBCPis:.2f}")
             vr_pis = (valorBCPis * aliq_pis * 10)
             self.vr_pis.set(f"{vr_pis:.2f}")
 
             # --- COFINS (mesma lógica do PIS) ---
             aliq_cofins = 0.03
-            valorBCCofins = auxiliarBCPIS - valorICMS
+            valorBCCofins = base_calculo - valorICMS
             self.bc_cofins.set(f"{valorBCCofins:.2f}")
             vr_cofins = (valorBCCofins * aliq_cofins)
             self.vr_cofins.set(f"{vr_cofins:.2f}")

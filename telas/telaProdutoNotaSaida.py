@@ -177,10 +177,14 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
 
         calculo_executado = False
         botao_calcular = None
+        base_calculo_original = None
+        base_reduzida_anterior = None
 
         def marcar_como_nao_calculado(event=None):
-            nonlocal calculo_executado, botao_calcular
+            nonlocal calculo_executado, botao_calcular, base_calculo_original, base_reduzida_anterior
             calculo_executado = False
+            base_calculo_original = None
+            base_reduzida_anterior = None
             if botao_calcular is not None:
                 botao_calcular.configure(state="normal")
 
@@ -463,11 +467,10 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
 
 
         def calculaValores():
-            nonlocal calculo_executado, botao_calcular
-            if calculo_executado:
-                return
+            nonlocal calculo_executado, botao_calcular, base_calculo_original, base_reduzida_anterior
 
-            base_calculo = _parse_decimal(self.bc_icms.get())
+            base_informada = _parse_decimal(self.bc_icms.get())
+            base_calculo = base_informada
             if base_calculo is None:
                 messagebox.showerror("BC ICMS", "Informe um valor válido para BC ICMS antes de calcular.")
                 return
@@ -475,7 +478,16 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
             reducao = _parse_decimal(self.red_bc_icms.get(), 0.0) or 0.0
             aliquota_icms = _parse_decimal(self.aliq_icms.get(), 0.0) or 0.0
 
+            # Salva a base original para evitar reduções cumulativas a cada clique em "Calcular".
+            if base_calculo_original is None:
+                base_calculo_original = base_calculo
+            elif base_calculo not in (base_calculo_original, base_reduzida_anterior):
+                base_calculo_original = base_calculo
+
+            base_calculo = base_calculo_original
+
             base_reduzida = base_calculo - (base_calculo * reducao / 100.0)
+            base_reduzida_anterior = base_reduzida
             self.bc_icms.set(f"{base_reduzida:.2f}")
 
             valorICMS = base_reduzida * (aliquota_icms / 100.0)
@@ -496,8 +508,6 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
             self.vr_cofins.set(f"{vr_cofins:.2f}")
 
             calculo_executado = True
-            if botao_calcular is not None:
-                botao_calcular.configure(state="disabled")
 
 
         def salvar_dados_e_sair():

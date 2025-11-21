@@ -221,10 +221,17 @@ def telaTotaisNotaSaida(self, EhNotaDoConsumidor):
         except Exception as e:
             print("Aviso (soma de tributos):", e)
 
+    base_produtos_inicial = _decimal_from_var(self.valorTotalProdutos)
+    if base_produtos_inicial == Decimal("0.00"):
+        base_produtos_inicial = _decimal_from_number(getattr(self, "valorSubtotalFaturamento", 0.0))
+    self.valorBaseProdutosFaturamento = base_produtos_inicial.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    def restaurar_base_produtos():
+        self.valorTotalProdutos.set(f"{self.valorBaseProdutosFaturamento:.2f}")
+
     def atualizar_total_para_faturamento():
-        base_produtos = _decimal_from_var(self.valorTotalProdutos)
-        if base_produtos == Decimal("0.00") and hasattr(self, "valorSubtotalFaturamento"):
-            base_produtos = _decimal_from_number(getattr(self, "valorSubtotalFaturamento", 0.0))
+        restaurar_base_produtos()
+        base_produtos = getattr(self, "valorBaseProdutosFaturamento", Decimal("0.00"))
 
         frete = _decimal_from_var(self.totalFrete)
         seguro = _decimal_from_var(self.totalSeguro)
@@ -235,7 +242,7 @@ def telaTotaisNotaSaida(self, EhNotaDoConsumidor):
         total = base_produtos + frete + seguro + outras_despesas + valor_servico - desconto
         total = total.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
         self.valorLiquido.set(f"{total:.2f}")
-        self.valorSubtotalFaturamento = float(total)
+        self.valorTotalNotaFaturamento = float(total)
 
     def registrar_totais_importados():
         atualizar_total_para_faturamento()
@@ -267,6 +274,7 @@ def telaTotaisNotaSaida(self, EhNotaDoConsumidor):
             "valor_previdencia": self.valorPrevidencia.get(),
         }
 
+    restaurar_base_produtos()
     atualizar_total_para_faturamento()
     registrar_totais_importados()
 
@@ -332,4 +340,11 @@ def telaTotaisNotaSaida(self, EhNotaDoConsumidor):
         0.15,
         lambda: ir_para_faturamento(),
     ).place(anchor="nw")
-    criaBotao(self.frameTelaTotais, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaTotais.destroy()).place(anchor="nw")
+
+    def fechar_tela_totais():
+        restaurar_base_produtos()
+        self.valorLiquido.set(f"{self.valorBaseProdutosFaturamento:.2f}")
+        self.valorTotalNotaFaturamento = float(self.valorBaseProdutosFaturamento)
+        self.frameTelaTotais.destroy()
+
+    criaBotao(self.frameTelaTotais, "Voltar", 0.05, 0.94, 0.15, lambda: fechar_tela_totais()).place(anchor="nw")
