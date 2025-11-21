@@ -31,6 +31,18 @@ def telaTotaisNotaSaida(self, EhNotaDoConsumidor):
         v.set("0.00")
         return v
 
+    def _decimal_from_var(var):
+        try:
+            return Decimal(str(var.get()).replace(",", "."))
+        except Exception:
+            return Decimal("0.00")
+
+    def _decimal_from_number(valor):
+        try:
+            return Decimal(str(valor).replace(",", "."))
+        except Exception:
+            return Decimal("0.00")
+
     self.totalFrete                 = nova_var()
     self.totalSeguro                = nova_var()
     self.totalDesconto              = nova_var()
@@ -189,6 +201,13 @@ def telaTotaisNotaSaida(self, EhNotaDoConsumidor):
                     except:
                         pass
 
+            try:
+                self.valorTotalProdutos.set(
+                    f"{Decimal(str(getattr(self, 'valorSubtotalFaturamento', 0.0))).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)}"
+                )
+            except Exception:
+                pass
+
             self.totalBCICMS.set(f"{tot_bc_icms:.2f}")
             self.valorICMS.set(f"{tot_v_icms:.2f}")
             self.totalBCICMSST.set(f"{tot_bc_icms_st:.2f}")
@@ -202,7 +221,24 @@ def telaTotaisNotaSaida(self, EhNotaDoConsumidor):
         except Exception as e:
             print("Aviso (soma de tributos):", e)
 
+    def atualizar_total_para_faturamento():
+        base_produtos = _decimal_from_var(self.valorTotalProdutos)
+        if base_produtos == Decimal("0.00") and hasattr(self, "valorSubtotalFaturamento"):
+            base_produtos = _decimal_from_number(getattr(self, "valorSubtotalFaturamento", 0.0))
+
+        frete = _decimal_from_var(self.totalFrete)
+        seguro = _decimal_from_var(self.totalSeguro)
+        desconto = _decimal_from_var(self.totalDesconto)
+        outras_despesas = _decimal_from_var(self.outrasDespesas)
+        valor_servico = _decimal_from_var(self.valorServico)
+
+        total = base_produtos + frete + seguro + outras_despesas + valor_servico - desconto
+        total = total.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        self.valorLiquido.set(f"{total:.2f}")
+        self.valorSubtotalFaturamento = float(total)
+
     def registrar_totais_importados():
+        atualizar_total_para_faturamento()
         self.totaisNotaImportada = {
             "frete": self.totalFrete.get(),
             "seguro": self.totalSeguro.get(),
@@ -231,17 +267,18 @@ def telaTotaisNotaSaida(self, EhNotaDoConsumidor):
             "valor_previdencia": self.valorPrevidencia.get(),
         }
 
+    atualizar_total_para_faturamento()
     registrar_totais_importados()
 
     # Primeira coluna
-    criarLabelLateralEntry(self.frameTelaTotais, "Total frete",     0.12, 0.05, 0.11, self.totalFrete)
-    criarLabelLateralEntry(self.frameTelaTotais, "Total Seguro",    0.12, 0.10, 0.11, self.totalSeguro)
-    criarLabelLateralEntry(self.frameTelaTotais, "Total Desconto",  0.12, 0.15, 0.11, self.totalDesconto)
-    criarLabelLateralEntry(self.frameTelaTotais, "Outras despesas", 0.12, 0.20, 0.11, self.outrasDespesas)
+    entradaTotalFrete = criarLabelLateralEntry(self.frameTelaTotais, "Total frete",     0.12, 0.05, 0.11, self.totalFrete)
+    entradaTotalSeguro = criarLabelLateralEntry(self.frameTelaTotais, "Total Seguro",    0.12, 0.10, 0.11, self.totalSeguro)
+    entradaTotalDesconto = criarLabelLateralEntry(self.frameTelaTotais, "Total Desconto",  0.12, 0.15, 0.11, self.totalDesconto)
+    entradaOutrasDespesas = criarLabelLateralEntry(self.frameTelaTotais, "Outras despesas", 0.12, 0.20, 0.11, self.outrasDespesas)
 
     # Segunda coluna
-    criarLabelLateralEntry(self.frameTelaTotais, "Total Produtos",   0.35, 0.05, 0.11, self.valorTotalProdutos)
-    criarLabelLateralEntry(self.frameTelaTotais, "Valor do serviço", 0.35, 0.10, 0.11, self.valorServico)
+    entradaTotalProdutos = criarLabelLateralEntry(self.frameTelaTotais, "Total Produtos",   0.35, 0.05, 0.11, self.valorTotalProdutos)
+    entradaValorServico = criarLabelLateralEntry(self.frameTelaTotais, "Valor do serviço", 0.35, 0.10, 0.11, self.valorServico)
     criarLabelLateralEntry(self.frameTelaTotais, "Total BC ICMS",    0.35, 0.15, 0.11, self.totalBCICMS)
     criarLabelLateralEntry(self.frameTelaTotais, "ICMS",             0.35, 0.20, 0.11, self.valorICMS)
     criarLabelLateralEntry(self.frameTelaTotais, "Total BC ICMS ST", 0.35, 0.25, 0.11, self.totalBCICMSST)
@@ -258,6 +295,16 @@ def telaTotaisNotaSaida(self, EhNotaDoConsumidor):
     criarLabelLateralEntry(self.frameTelaTotais, "Total PIS ST",     0.85, 0.10, 0.11, self.totalPISST)
     criarLabelLateralEntry(self.frameTelaTotais, "Total COFINS",     0.85, 0.15, 0.11, self.totalCOFINS)
     criarLabelLateralEntry(self.frameTelaTotais, "Valor líquido",    0.85, 0.20, 0.11, self.valorLiquido)
+
+    for entrada in (
+        entradaTotalFrete,
+        entradaTotalSeguro,
+        entradaTotalDesconto,
+        entradaOutrasDespesas,
+        entradaTotalProdutos,
+        entradaValorServico,
+    ):
+        entrada.bind("<KeyRelease>", lambda event: atualizar_total_para_faturamento())
 
     destinatario = ctk.CTkLabel(self.frameTelaTotais, text="Valores retidos-----------------------------------------------------------------------------")
     destinatario.place(relx=0.02, rely=0.45)

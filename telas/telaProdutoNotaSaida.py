@@ -160,9 +160,33 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
         self.bc_cofins_st = ctk.StringVar()
         self.vr_cofins_st = ctk.StringVar()
 
+        def _parse_decimal(valor, default=None):
+            texto = str(valor).strip()
+            if texto == "":
+                return default
+            try:
+                return float(texto.replace(",", "."))
+            except ValueError:
+                return default
+
+        def _format_decimal(valor):
+            try:
+                return f"{float(str(valor).replace(',', '.')):.2f}"
+            except Exception:
+                return str(valor)
+
+        calculo_executado = False
+        botao_calcular = None
+
+        def marcar_como_nao_calculado(event=None):
+            nonlocal calculo_executado, botao_calcular
+            calculo_executado = False
+            if botao_calcular is not None:
+                botao_calcular.configure(state="normal")
+
         def PisCofins(frame):
             if hasattr(self, "framePisCofins") and self.framePisCofins.winfo_exists():
-                self.framePisCofins.lift()  
+                self.framePisCofins.lift()
             else:
                 self.framePisCofins = criaFrameJanela(frameTelaNotaProduto, 0.5, 0.5, 0.8, 0.9, self.corModal)
                 criaBotaoPequeno(self.framePisCofins, "Calcular", 0.4, 0.95, 0.1, lambda:calculaValores())
@@ -341,10 +365,12 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
 
         self.mod_bc_icms = criarLabelLateralComboBox(frame, "Mod. BC ICMS",     0.11, 0.37+posGera, 0.09, opcoes_MOD_ICMS)
         self.bc_icms.set(linha["subtotal"].get())
-        criarLabelLateralEntry(frame, "BC ICMS",             0.11, 0.41+posGera, 0.09, self.bc_icms)
-        criarLabelLateralEntry(frame, "Red. BC ICMS (%)",    0.11, 0.45+posGera, 0.09, self.red_bc_icms)
-        criarLabelLateralEntry(frame, "Aliq. ICMS (%)",      0.11, 0.49+posGera, 0.09, self.aliq_icms)
+        bc_icms_entry = criarLabelLateralEntry(frame, "BC ICMS",             0.11, 0.41+posGera, 0.09, self.bc_icms)
+        red_bc_icms_entry = criarLabelLateralEntry(frame, "Red. BC ICMS (%)",    0.11, 0.45+posGera, 0.09, self.red_bc_icms)
+        aliq_icms_entry = criarLabelLateralEntry(frame, "Aliq. ICMS (%)",      0.11, 0.49+posGera, 0.09, self.aliq_icms)
         criarLabelLateralEntry(frame, "Vr. ICMS",            0.11, 0.53+posGera, 0.09, self.vr_icms)
+        for entry in (bc_icms_entry, red_bc_icms_entry, aliq_icms_entry):
+            entry.bind("<KeyRelease>", marcar_como_nao_calculado)
 
         self.mod_bc_icms_st = criarLabelLateralComboBox(frame, "Mod. BC ICMS ST",  0.34, 0.37+posGera, 0.09, opcoes_MOD_ICMS)
         self.vr_bc_icms = criarLabelLateralEntry(frame, "Valor BC ICMS",       0.34, 0.41+posGera, 0.09, self.vr_bc_ICMS)
@@ -380,7 +406,7 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
 
         criaBotaoPequeno(frame, "PIS/COFINS", 0.7, 0.95, 0.1, lambda:PisCofins(frame))
         criaBotaoPequeno(frame, "Salvar e Sair", 0.1, 0.95, 0.1, lambda:salvar_dados_e_sair())
-        criaBotaoPequeno(frame, "Calcular", 0.4, 0.95, 0.1, lambda:calculaValores())
+        botao_calcular = criaBotaoPequeno(frame, "Calcular", 0.4, 0.95, 0.1, lambda:calculaValores())
         ctk.CTkButton(frame, text="X", width=10, height=10, corner_radius=0,command=destroyModal).place(relx=0.989, rely=0.018, anchor="center")
 
 
@@ -437,45 +463,55 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
 
 
         def calculaValores():
+            nonlocal calculo_executado, botao_calcular
+            if calculo_executado:
+                return
 
-            # calcula a base de calculo
-            # redução base de calculo
-            # aliquota
-            # e valor
-            # tudo do icms
+            base_calculo = _parse_decimal(self.bc_icms.get())
+            if base_calculo is None:
+                messagebox.showerror("BC ICMS", "Informe um valor válido para BC ICMS antes de calcular.")
+                return
 
-            try:
-                auxiliarBCPIS = float(self.bc_icms.get())
-                auxiliar = float(self.bc_icms.get())*float(self.red_bc_icms.get())/100
-                self.bc_icms.set(float(self.bc_icms.get())-auxiliar)          
-            except:
-                raise ValueError("Os valores não devem estar em branco")
-            valorICMS = float(self.bc_icms.get())*(float(self.aliq_icms.get()) / 100.0)
+            reducao = _parse_decimal(self.red_bc_icms.get(), 0.0) or 0.0
+            aliquota_icms = _parse_decimal(self.aliq_icms.get(), 0.0) or 0.0
+
+            base_reduzida = base_calculo - (base_calculo * reducao / 100.0)
+            self.bc_icms.set(f"{base_reduzida:.2f}")
+
+            valorICMS = base_reduzida * (aliquota_icms / 100.0)
             self.vr_icms.set(f"{valorICMS:.2f}")
 
-            
-            # --- PIS 
+            # --- PIS
             aliq_pis = 0.00065
-            valorBCPis = auxiliarBCPIS - valorICMS
+            valorBCPis = base_calculo - valorICMS
             self.bc_pis.set(f"{valorBCPis:.2f}")
             vr_pis = (valorBCPis * aliq_pis * 10)
             self.vr_pis.set(f"{vr_pis:.2f}")
 
             # --- COFINS (mesma lógica do PIS) ---
             aliq_cofins = 0.03
-            valorBCCofins = auxiliarBCPIS - valorICMS
+            valorBCCofins = base_calculo - valorICMS
             self.bc_cofins.set(f"{valorBCCofins:.2f}")
             vr_cofins = (valorBCCofins * aliq_cofins)
             self.vr_cofins.set(f"{vr_cofins:.2f}")
 
-
-        
-
+            calculo_executado = True
+            if botao_calcular is not None:
+                botao_calcular.configure(state="disabled")
 
 
         def salvar_dados_e_sair():
             if not hasattr(self, "dadosProdutos"):
                 self.dadosProdutos = {}
+
+            cst_b_escolhido = (self.cst_b.get() or "").strip()
+            bc_icms_valor = (self.bc_icms.get() or "").strip()
+
+            if cst_b_escolhido.startswith("20") and bc_icms_valor == "":
+                messagebox.showerror("BC ICMS", "Para CST B '20 - Com redução de base de cálculo' informe a BC ICMS.")
+                return
+            if bc_icms_valor:
+                self.bc_icms.set(_format_decimal(bc_icms_valor))
 
 
 
