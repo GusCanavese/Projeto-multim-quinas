@@ -6,7 +6,7 @@ from telas.telaTotais import telaTotais
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from consultas.select import Buscas
-from tkinter import messagebox
+from tkinter import messagebox, TclError
 import requests
 from PIL import Image
 import datetime
@@ -165,9 +165,15 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
         self.bc_cofins_st = ctk.StringVar()
         self.vr_cofins_st = ctk.StringVar()
 
+        def _pis_cofins_frame_aberto():
+            try:
+                return hasattr(self, "framePisCofins") and self.framePisCofins.winfo_exists()
+            except TclError:
+                return False
+
         def PisCofins(frame):
-            if hasattr(self, "framePisCofins") and self.framePisCofins.winfo_exists():
-                self.framePisCofins.lift()  
+            if _pis_cofins_frame_aberto():
+                self.framePisCofins.lift()
             else:
                 self.framePisCofins = criaFrameJanela(frameTelaNotaProduto, 0.5, 0.5, 0.8, 0.9, self.corModal)
                 criaBotaoPequeno(self.framePisCofins, "Calcular", 0.4, 0.95, 0.1, lambda:calculaValores())
@@ -313,6 +319,7 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
             frame.destroy()
             if hasattr(self, "framePisCofins"):
                 self.framePisCofins.destroy()
+                self.framePisCofins = None
 
         posGera=-0.03
 
