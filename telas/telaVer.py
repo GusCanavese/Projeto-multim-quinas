@@ -192,7 +192,7 @@ def telaVer(self, p):
                 return
 
             if retorno.get("sucesso"):
-                status.set("Cancelada")
+                status.set("cancelada")
                 gravar_dados(mostrar_msg=False)
                 mensagem = retorno.get("motivo") or "Cancelamento efetuado com sucesso."
                 if retorno.get("protocolo"):

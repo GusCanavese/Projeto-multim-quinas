@@ -1,10 +1,24 @@
 import os
 import re
+import sys
 import time
+from pathlib import Path
 from typing import Dict, Optional
 
-ACBR_CMD_DIR = os.path.join("NotaFiscal", "EnviarComando")
-ACBR_RSP_DIR = os.path.join("NotaFiscal", "ReceberComando")
+
+def _base_dir() -> Path:
+    """Retorna o diretório base onde os comandos do ACBr devem ser lidos/escritos."""
+
+    # Quando empacotado (ex.: PyInstaller), o executável fica em ``sys.executable``.
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+
+    # Em desenvolvimento, usamos a raiz do projeto (pai de funcoesTerceiras).
+    return Path(__file__).resolve().parent.parent
+
+
+ACBR_CMD_DIR = _base_dir() / "NotaFiscal" / "EnviarComando"
+ACBR_RSP_DIR = _base_dir() / "NotaFiscal" / "ReceberComando"
 _SUCESSO_CSTAT = {"100", "101", "102", "104", "135", "151", "155"}
 
 
@@ -71,8 +85,8 @@ def _executar_comando(conteudo: str, prefixo: str, timeout: int = 20) -> Dict[st
 
     timestamp = int(time.time() * 1000)
     base_nome = f"{prefixo}-{timestamp}"
-    cmd_path = os.path.join(ACBR_CMD_DIR, f"{base_nome}.txt")
-    resp_path = os.path.join(ACBR_RSP_DIR, f"{base_nome}-resp.txt")
+    cmd_path = ACBR_CMD_DIR / f"{base_nome}.txt"
+    resp_path = ACBR_RSP_DIR / f"{base_nome}-resp.txt"
 
     for caminho in (cmd_path, resp_path):
         try:
@@ -85,9 +99,12 @@ def _executar_comando(conteudo: str, prefixo: str, timeout: int = 20) -> Dict[st
         if not conteudo.endswith("\r\n"):
             arquivo.write("\r\n")
 
-    resposta_bruta = _aguardar_resposta(resp_path, timeout=timeout)
+    resposta_bruta = _aguardar_resposta(str(resp_path), timeout=timeout)
     if not resposta_bruta:
-        raise RuntimeError("ACBr Monitor não retornou nenhuma resposta para o comando enviado.")
+        raise RuntimeError(
+            "ACBr Monitor não retornou nenhuma resposta para o comando enviado. "
+            f"Verifique se o monitor está observando a pasta: {resp_path.parent}"
+        )
 
     return _interpretar_resposta(resposta_bruta)
 
