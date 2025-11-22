@@ -606,12 +606,11 @@ def criaComandoACBr(self, nome_arquivo):
 
         if cnpjDest_num:
             f.write(f"CNPJCPF={cnpjDest_num}\n")
-            xNomeDest_txt = (xNomeDest or "").strip()
-            f.write(f"xNome={xNomeDest_txt}\n")
         else:
-            f.write("CNPJCPF=Não informado\n")
-            xNomeDest_txt = (xNomeDest or "").strip()
-            f.write(f"xNome=Não informado\n")
+            xNomeDest = xNomeDest or "Não informado"
+
+        xNomeDest_txt = (xNomeDest or "").strip()
+        f.write(f"xNome={xNomeDest_txt}\n")
 
 
 
