@@ -38,11 +38,20 @@ def extrairDadosDaNota(self, xmlCaminho, tipo, status):
     dados = xmltodict.parse(xml_conteudo, force_list=("det", "dup"), dict_constructor=dict)
     print(dados)
 
-    nfe_proc = dados.get("nfeProc", {}) or {}
-    if not nfe_proc and "NFe" in dados:
+    if "nfeProc" in dados and isinstance(dados.get("nfeProc"), dict):
+        nfe_proc = dados["nfeProc"]
+    elif "NFe" in dados and isinstance(dados.get("NFe"), dict):
         nfe_proc = {"NFe": dados["NFe"], "protNFe": dados.get("protNFe", {})}
+    elif "infNFe" in dados and isinstance(dados.get("infNFe"), dict):
+        nfe_proc = {"NFe": {"infNFe": dados["infNFe"]}, "protNFe": dados.get("protNFe", {})}
+    else:
+        raise KeyError(
+            "Estrutura de XML inválida: não foi possível localizar os dados de infNFe."
+        )
 
     nfe = acessar(nfe_proc, "NFe", "infNFe", default=None)
+    if isinstance(nfe, list):
+        nfe = nfe[0] if nfe else None
     if not isinstance(nfe, dict):
         raise KeyError(
             "Estrutura de XML inválida: não foi possível localizar os dados de infNFe."
