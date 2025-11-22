@@ -8,7 +8,9 @@
 
 import os
 import pathlib
+from pathlib import Path
 import re
+import sys
 import time
 import random
 from datetime import datetime
@@ -35,6 +37,29 @@ def _first_nonempty(*vals):
         elif v:
             return str(v)
     return ""
+
+
+def _base_dir() -> Path:
+    """Retorna o diretório base para os arquivos do ACBr."""
+
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+
+    return Path(__file__).resolve().parent.parent
+
+
+def _logs_dir_default() -> Path:
+    """Resolve o caminho dos logs do ACBr, respeitando variáveis de ambiente."""
+
+    env_dir = os.environ.get("ACBR_LOG_DIR")
+    if env_dir:
+        return Path(env_dir)
+
+    base_logs = _base_dir() / "NotaFiscal" / "Logs"
+    if base_logs.exists():
+        return base_logs
+
+    return Path(r"C:\\ACBrMonitorPLUS\\Logs")
 
 def _ensure_key_in_section(section_text, key, value):
     # Se não houver valor, não mexe
@@ -177,19 +202,20 @@ def _proximo_numero_nfe(cnpj_sem_mascara, serie_int):
         pass
     return proximo
 
-def _buscar_xml_nfe(cnpj_sem_mascara, serie_int, numero_int, logs_dir=r"C:\ACBrMonitorPLUS\Logs"):
+def _buscar_xml_nfe(cnpj_sem_mascara, serie_int, numero_int, logs_dir=None):
     """
     Procura nos XMLs do ACBr (Logs) o arquivo da NFe desse CNPJ/Série/Número
     e devolve o caminho completo, ou None se não achar.
     """
     try:
+        logs_base = os.fspath(logs_dir or _logs_dir_default())
         import glob
         import xml.etree.ElementTree as ET
 
         candidatos = []
         padroes = ("*-procNFe.xml", "*-nfe.xml")
         for pad in padroes:
-            for path in glob.glob(os.path.join(logs_dir, pad)):
+            for path in glob.glob(os.path.join(logs_base, pad)):
                 try:
                     tree = ET.parse(path)
                     root = tree.getroot()
@@ -236,8 +262,8 @@ def _buscar_xml_nfe(cnpj_sem_mascara, serie_int, numero_int, logs_dir=r"C:\ACBrM
 
 
 # Diretórios padrão do ACBr Monitor (ajuste se necessário)
-ACBR_CMD_DIR = "NotaFiscal/EnviarComando"
-ACBR_RSP_DIR = "NotaFiscal/ReceberComando"
+ACBR_CMD_DIR = os.fspath(_base_dir() / "NotaFiscal" / "EnviarComando")
+ACBR_RSP_DIR = os.fspath(_base_dir() / "NotaFiscal" / "ReceberComando")
 
 # ------------------------ ACBr I/O ------------------------
 

@@ -20,6 +20,19 @@ def acessar(dados, *caminho, default=""):
 
 
 def extrairDadosDaNota(self, xmlCaminho, tipo, status):
+    xmlCaminho = (xmlCaminho or "").strip()
+    if not xmlCaminho:
+        raise FileNotFoundError(
+            "O caminho do XML não foi retornado pelo ACBr Monitor. "
+            "Verifique se o monitor está configurado para gravar os logs/arquivos na mesma pasta do executável."
+        )
+
+    if not os.path.isabs(xmlCaminho):
+        xmlCaminho = os.path.abspath(xmlCaminho)
+
+    if not os.path.exists(xmlCaminho):
+        raise FileNotFoundError(f"XML da nota não encontrado: {xmlCaminho}")
+
     with open(xmlCaminho, "r", encoding="utf-8", errors="ignore") as f:
             xml_conteudo = f.read()
     dados = xmltodict.parse(xml_conteudo, force_list=("det", "dup"), dict_constructor=dict)
