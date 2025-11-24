@@ -19,9 +19,47 @@ def acessar(dados, *caminho, default=""):
 
 
 
+def _remover_prefixos_namespace(dados):
+    """Remove prefixos de namespace (ex.: "nfe:infNFe") para facilitar o acesso."""
+
+    if isinstance(dados, dict):
+        normalizado = {}
+        for chave, valor in dados.items():
+            chave_normalizada = chave.split(":", 1)[-1] if ":" in chave else chave
+            normalizado[chave_normalizada] = _remover_prefixos_namespace(valor)
+        return normalizado
+    if isinstance(dados, list):
+        return [_remover_prefixos_namespace(item) for item in dados]
+    return dados
+
+
+def _buscar_primeira_ocorrencia(dados, chave_procurada):
+    """Retorna a primeira ocorrência de uma chave (ignorando prefixos) em qualquer nível."""
+
+    if isinstance(dados, dict):
+        for chave, valor in dados.items():
+            chave_normalizada = chave.split(":", 1)[-1] if ":" in chave else chave
+            if chave_normalizada == chave_procurada:
+                return valor
+            encontrado = _buscar_primeira_ocorrencia(valor, chave_procurada)
+            if encontrado is not None:
+                return encontrado
+    elif isinstance(dados, list):
+        for item in dados:
+            encontrado = _buscar_primeira_ocorrencia(item, chave_procurada)
+            if encontrado is not None:
+                return encontrado
+    return None
+
+
 def extrairDadosDaNota(self, xmlCaminho, tipo, status):
+    print("XML PATH4:", xmlCaminho)
+
     xmlCaminho = (xmlCaminho or "").strip()
+    print("XML PATH5:", xmlCaminho)
+
     if not xmlCaminho:
+        print("XML PATHI:", xmlCaminho)
         raise FileNotFoundError(
             "O caminho do XML não foi retornado pelo ACBr Monitor. "
             "Verifique se o monitor está configurado para gravar os logs/arquivos na mesma pasta do executável."
@@ -29,14 +67,20 @@ def extrairDadosDaNota(self, xmlCaminho, tipo, status):
 
     if not os.path.isabs(xmlCaminho):
         xmlCaminho = os.path.abspath(xmlCaminho)
+        print("XML PATHI:", xmlCaminho)
 
     if not os.path.exists(xmlCaminho):
+        print("XML PATHI:", xmlCaminho)
         raise FileNotFoundError(f"XML da nota não encontrado: {xmlCaminho}")
+    
 
     with open(xmlCaminho, "r", encoding="utf-8", errors="ignore") as f:
+            print("XML PATHI:", xmlCaminho)
             xml_conteudo = f.read()
+            print("XML CONTENT:", xml_conteudo)
     dados = xmltodict.parse(xml_conteudo, force_list=("det", "dup"), dict_constructor=dict)
-    print(dados)
+    dados = _remover_prefixos_namespace(dados)
+    # print(dados)
 
     if "nfeProc" in dados and isinstance(dados.get("nfeProc"), dict):
         nfe_proc = dados["nfeProc"]
@@ -45,11 +89,18 @@ def extrairDadosDaNota(self, xmlCaminho, tipo, status):
     elif "infNFe" in dados and isinstance(dados.get("infNFe"), dict):
         nfe_proc = {"NFe": {"infNFe": dados["infNFe"]}, "protNFe": dados.get("protNFe", {})}
     else:
-        raise KeyError(
-            "Estrutura de XML inválida: não foi possível localizar os dados de infNFe."
-        )
+        inf_nfe = _buscar_primeira_ocorrencia(dados, "infNFe")
+        prot_nfe = _buscar_primeira_ocorrencia(dados, "protNFe") or {}
+
+        if isinstance(inf_nfe, dict):
+            nfe_proc = {"NFe": {"infNFe": inf_nfe}, "protNFe": prot_nfe}
+        else:
+            raise KeyError(
+                "Estrutura de XML inválida: não foi possível localizar os dados de infNFe."
+            )
 
     nfe = acessar(nfe_proc, "NFe", "infNFe", default=None)
+    print("o caminho da nota {}", nfe)
     if isinstance(nfe, list):
         nfe = nfe[0] if nfe else None
     if not isinstance(nfe, dict):

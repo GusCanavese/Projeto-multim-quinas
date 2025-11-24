@@ -328,7 +328,7 @@ ACBR_RSP_DIR = os.fspath(_base_dir() / "NotaFiscal" / "ReceberComando")
 
 # ------------------------ ACBr I/O ------------------------
 
-def aguarda_acbr_resposta(resp_path, timeout=3, interval=0.5):
+def aguarda_acbr_resposta(resp_path, timeout=5, interval=0.5):
     """
     Espera o arquivo .../enviar-resp.txt que o Monitor grava.
     Retorna dict com {ok, cStat, xMotivo, xml, resposta_bruta}.
@@ -1152,7 +1152,7 @@ def criarNFE(self):
         pass
     with open(cert_cmd, "w", encoding="utf-8", newline="") as f:
         f.write(f'NFe.SetCertificado("{self.caminhoCertificado}","{self.senhaCertificado}")\r\n')
-    r1 = aguarda_acbr_resposta(cert_resp, timeout=1, interval=0.2)
+    r1 = aguarda_acbr_resposta(cert_resp, timeout=3, interval=0.2)
     if not r1.get("ok"):
         return r1
 
@@ -1242,11 +1242,12 @@ def criarNFE(self):
         pass
     # ---- FIM PATCH ------------------------------------------------------------------------
     print("chegou aqui")
-    resultado = aguarda_acbr_resposta(resp_path, timeout=3, interval=0.5)
+    resultado = aguarda_acbr_resposta(resp_path, timeout=5, interval=0.5)
 
     # cStat vindo da resposta (se vier)
     cstat = str(resultado.get("cStat") or "").strip()
     xml_path = (resultado.get("xml") or "").strip()
+    print("XML PATH1:", xml_path)
 
     # ---------------- FALLBACK 1: se não veio caminho do XML na resposta,
     # tenta pegar pelos logs do ACBr (CNPJ + Série + Número)
@@ -1280,6 +1281,7 @@ def criarNFE(self):
             # espera curta só para dar tempo do ACBr gravar o XML
             while not xml_path and (time.time() - t0) < 8:
                 caminho = _buscar_xml_nfe(cnpj_emit, serie_int, numero_int)
+                print(caminho)
                 if caminho:
                     xml_path = caminho
                     break
@@ -1287,6 +1289,7 @@ def criarNFE(self):
 
     # ---------------- FALLBACK 2: se já temos o XML, tenta pegar cStat de dentro do procNFe
     if xml_path and not cstat:
+        print("XML PATH2:", xml_path)
         try:
             import xml.etree.ElementTree as ET
             tree = ET.parse(xml_path)
@@ -1302,6 +1305,7 @@ def criarNFE(self):
     status = "AUTORIZADA" if cstat in ("100", "150") else "GERADA"
 
     # Insere.inserir_nota_fiscal_saida(self, tipo="NFe", xml_path=xml_path, status=status)
+    print("XML PATH3:", xml_path)
     extrairDadosNotaFiscal.extrairDadosDaNota(self, xml_path, "NFe", status)
     return resultado
 
