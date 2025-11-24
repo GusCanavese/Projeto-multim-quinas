@@ -15,7 +15,7 @@ def acessar(dados, *caminho, default=""):
             return default
     if isinstance(dados, dict) and "#text" in dados:
         return dados["#text"]
-    return dados if isinstance(dados, str) else default
+    return dados
 
 
 
