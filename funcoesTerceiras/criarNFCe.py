@@ -17,6 +17,7 @@ from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
 from consultas.insert import Insere
 from funcoesTerceiras import extrairDadosNotaFiscal
+from funcoesTerceiras.acbr_utils import extrair_caminho_xml
 
 
 # --- helper injetado: preenche campos faltantes de endereço nos blocos [Emitente] e [Destinatario]
@@ -294,6 +295,10 @@ def aguarda_acbr_resposta(resp_path, timeout=3, interval=0.5):
     cstat = _find(r"\bCStat\s*=\s*([0-9]{2,3})")
     xmot  = _find(r"\bxMotivo\s*=\s*(.+)")
     xml   = _find(r"\bArquivo\s*=\s*(.+)")
+
+    # fallback: tenta extrair o caminho do XML direto do texto bruto do ACBr
+    if not xml:
+        xml = extrair_caminho_xml(ultimo)
     return {"ok": True, "cStat": cstat, "xMotivo": xmot, "xml": xml, "resposta_bruta": ultimo}
 
 # ------------------------ COMANDO ------------------------

@@ -264,7 +264,7 @@ def telaObservacoes(self, dadosNota):
     parametros = montar_parametros_nota_saida(dadosNota)
 
     def insereRetorna():
-        Insere.inserir_nota_fiscal_saida(*parametros)
+        Insere.inserir_nota_fiscal_saida(*parametros, "Saída")
         destruir_quadros_fluxo_entrada(self)
 
     criaBotao(self.frameTelaObservacoes, "Salvar nota", 0.25, 0.94, 0.15, lambda: insereRetorna()).place(anchor="nw")
