@@ -1247,7 +1247,6 @@ def criarNFE(self):
     # cStat vindo da resposta (se vier)
     cstat = str(resultado.get("cStat") or "").strip()
     xml_path = (resultado.get("xml") or "").strip()
-    print("XML PATH1:", xml_path)
 
     # ---------------- FALLBACK 1: se não veio caminho do XML na resposta,
     # tenta pegar pelos logs do ACBr (CNPJ + Série + Número)
@@ -1289,7 +1288,6 @@ def criarNFE(self):
 
     # ---------------- FALLBACK 2: se já temos o XML, tenta pegar cStat de dentro do procNFe
     if xml_path and not cstat:
-        print("XML PATH2:", xml_path)
         try:
             import xml.etree.ElementTree as ET
             tree = ET.parse(xml_path)
@@ -1305,7 +1303,6 @@ def criarNFE(self):
     status = "AUTORIZADA" if cstat in ("100", "150") else "GERADA"
 
     # Insere.inserir_nota_fiscal_saida(self, tipo="NFe", xml_path=xml_path, status=status)
-    print("XML PATH3:", xml_path)
     extrairDadosNotaFiscal.extrairDadosDaNota(self, xml_path, "NFe", status)
     return resultado
 
