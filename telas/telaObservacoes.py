@@ -146,6 +146,7 @@ def montar_parametros_nota_saida(dadosNota):
     xMotivo = vazio_para_none(xMotivo)
     protocolo = vazio_para_none(protocolo)
     nRec = vazio_para_none(nRec)
+    dhRecbto = vazio_para_none(dhRecbto)
     data_vencimento = vazio_para_none(data_vencimento)
     cfop = vazio_para_none(cfop)
     operacao = vazio_para_none(operacao)
