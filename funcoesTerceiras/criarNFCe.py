@@ -6,6 +6,7 @@
 # - indIntermed conforme indPres (NT 2020.006): indIntermed=0/1 e bloco [infIntermed] quando houver marketplace
 # - NOVO: nNF auto-incremental por CNPJ+Série quando não informado (evita duplicidade 539)
 
+import hashlib
 import os
 import pathlib
 from pathlib import Path
@@ -171,6 +172,17 @@ def _d(valor, casas=2):
         return Decimal(str(valor)).quantize(Decimal("1." + ("0"*casas)), rounding=ROUND_HALF_UP)
     except Exception:
         return Decimal("0.00")
+    
+def _cnf_estavel(cnpj_sem_mascara: str, serie_int: int, nnf_int: int) -> str:
+    """
+    Gera um cNF determinístico (8 dígitos) para um par CNPJ+Série+nNF.
+    Evita mudar a chave da NFC-e em reenvios (previne rejeição 539).
+    """
+
+    chave = f"{_so_digitos(cnpj_sem_mascara).zfill(14)}-{int(serie_int)}-{int(nnf_int)}"
+    digest = hashlib.sha256(chave.encode("utf-8")).digest()
+    numero = int.from_bytes(digest[:4], "big") % 90_000_000 + 10_000_000
+    return f"{numero:08d}"
 
 def _seq_path(cnpj_sem_mascara, serie_int):
     os.makedirs(SEQ_BASE_DIR, exist_ok=True)
@@ -258,6 +270,41 @@ def _buscar_xml_nfe(cnpj_sem_mascara, serie_int, numero_int, logs_dir=None):
         return candidatos[0]
     except Exception:
         return None
+
+
+def _extrair_cnf_de_xml(path_xml):
+    """Tenta extrair o cNF do XML informado (NFC-e/NF-e)."""
+    try:
+        import xml.etree.ElementTree as ET
+
+        tree = ET.parse(path_xml)
+        root = tree.getroot()
+        ns = {"n": root.tag.split("}")[0].strip("{")}
+        ide = root.find(".//n:ide", ns)
+        if ide is not None:
+            cnf_el = ide.find("n:cNF", ns)
+            if cnf_el is not None and cnf_el.text and cnf_el.text.strip():
+                return re.sub(r"\D+", "", cnf_el.text)[:8].zfill(8)
+
+        # fallback: tenta extrair dos últimos 8 dígitos do Id da infNFe
+        inf = root.find(".//n:infNFe", ns)
+        if inf is not None:
+            inf_id = inf.attrib.get("Id", "")
+            m = re.search(r"([0-9]{44})", inf_id)
+            if m:
+                return m.group(1)[35:43]
+    except Exception:
+        return None
+
+    return None
+
+def _cnf_existente(cnpj_sem_mascara, serie_int, nnf_int):
+    """Se já existir XML dessa NFC-e, reutiliza o cNF para evitar nova chave."""
+    path_xml = _buscar_xml_nfe(cnpj_sem_mascara, serie_int, nnf_int)
+    if not path_xml:
+        return None
+    return _extrair_cnf_de_xml(path_xml)
+
 
 # ------------------------ FIM Sequência ------------------------
 
