@@ -45,7 +45,11 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
     listaLabels = ["Item", "Produto", "Preço", "Quantidade", "Estoque", "Desconto $", "Desconto %", "Acréscimo", "Subtotal", "cfop"]
 
     variavelCfop = ctk.StringVar()
-    variavelCfop.set(cfop)
+    try:
+        valor_cfop = cfop.get()
+    except Exception:
+        valor_cfop = cfop if isinstance(cfop, str) else ""
+    variavelCfop.set(valor_cfop)
 
     frameTelaNotaProduto = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     frameParaItens = ctk.CTkScrollableFrame(frameTelaNotaProduto, height=800, orientation="vertical", fg_color=self.corFundo)
@@ -787,7 +791,9 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
             vUn   = _get_text(item, "prod", "vUnCom", default="0.00")
             vProd = _get_text(item, "prod", "vProd", default="0.00")
             ncm   = _get_text(item, "prod", "NCM",   default="")
-            cfop_item = _get_text(item, "prod", "CFOP", default="")
+            # CFOP dos itens deve seguir o valor informado na tela anterior,
+            # ignorando o CFOP que vem da nota importada
+            cfop_item = valor_cfop
 
             # Normaliza valores numéricos
             try:
@@ -833,14 +839,56 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
             except Exception:
                 pass
 
-            # Salva dados essenciais para a tela de tributação (modal)
+            imposto = item.get("imposto", {}) if isinstance(item, dict) else {}
+
+            def _primeiro_dict(dado):
+                if isinstance(dado, dict):
+                    for valor in dado.values():
+                        if isinstance(valor, dict):
+                            return valor
+                return {}
+
+            icms_bloco = _primeiro_dict(imposto.get("ICMS", {}))
+            pis_bloco = imposto.get("PIS", {}) if isinstance(imposto, dict) else {}
+            cofins_bloco = imposto.get("COFINS", {}) if isinstance(imposto, dict) else {}
+
             chave = xProd or cProd or f"ITEM_{idx+1}"
             self.dadosProdutos[chave] = {
                 "codigo": cProd,
                 "ncm": ncm,
                 "quantidade": str(qCom),
                 "uCom": uCom,
-                "cfop": cfop_item,
+                "cfop": cfop_item or valor_cfop,
+                "csosn": _get_text(icms_bloco, "CSOSN", default=""),
+                "cst_a": _get_text(icms_bloco, "CST", default=""),
+                "cst_b": _get_text(icms_bloco, "CST", default=""),
+                "mod_bc_icms": _get_text(icms_bloco, "modBC", default=""),
+                "red_bc_icms": _get_text(icms_bloco, "pRedBC", default=""),
+                "bc_icms": _get_text(icms_bloco, "vBC", default=""),
+                "aliq_icms": _get_text(icms_bloco, "pICMS", default=""),
+                "vr_icms": _get_text(icms_bloco, "vICMS", default=""),
+                "mod_bc_icms_st": _get_text(icms_bloco, "modBCST", default=""),
+                "vr_bc_icms": _get_text(icms_bloco, "vBC", default=""),
+                "mva_icms_st": _get_text(icms_bloco, "pMVAST", default=""),
+                "bc_icms_st": _get_text(icms_bloco, "vBCST", default=""),
+                "red_bc_icms_st": _get_text(icms_bloco, "pRedBCST", default=""),
+                "vr_icms_st": _get_text(icms_bloco, "vICMSST", default=""),
+                "vr_bc_icms_st_ret": _get_text(icms_bloco, "vBCSTRet", default=""),
+                "vr_icms_st_ret": _get_text(icms_bloco, "vICMSSTRet", default=""),
+                "aliq_icms_cfop": _get_text(icms_bloco, "pFCP", default=""),
+                "bc_icms_st_dest": _get_text(icms_bloco, "vBCSTDest", default=""),
+                "vr_icms_subst": _get_text(icms_bloco, "vICMSSubstituto", default=""),
+                "aliq_icms_st": _get_text(icms_bloco, "pICMSST", default=""),
+                "vr_icms_st_dest": _get_text(icms_bloco, "vICMSSTDest", default=""),
+                "aliq_pis": _get_text(pis_bloco, "PISAliq", "pPIS", default=""),
+                "bc_pis": _get_text(pis_bloco, "PISAliq", "vBC", default=""),
+                "vr_pis": _get_text(pis_bloco, "PISAliq", "vPIS", default=""),
+                "aliq_pis_st": _get_text(pis_bloco, "PISST", "pPIS", default=""),
+                "bc_pis_st": _get_text(pis_bloco, "PISST", "vBC", default=""),
+                "aliq_cofins": _get_text(cofins_bloco, "COFINSAliq", "pCOFINS", default=""),
+                "bc_cofins": _get_text(cofins_bloco, "COFINSAliq", "vBC", default=""),
+                "vr_cofins": _get_text(cofins_bloco, "COFINSAliq", "vCOFINS", default=""),
+                "aliq_cofins_st": _get_text(cofins_bloco, "COFINSST", "pCOFINS", default=""),
             }
     
     criaBotao(

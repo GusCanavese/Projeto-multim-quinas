@@ -2,8 +2,8 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import db
-from tkinter import messagebox
 import json
+from tkinter import messagebox
 import re
 from datetime import datetime
 
@@ -131,6 +131,59 @@ class Insere:
             
             db.cursor.execute(query, dados)
             db.conn.commit()
+
+            def registrar_produtos_entrada():
+                try:
+                    itens = json.loads(itens_json) if isinstance(itens_json, str) else itens_json
+                except Exception:
+                    itens = []
+
+                if isinstance(itens, dict):
+                    itens = [itens]
+
+                for item in itens:
+                    prod = item.get("prod", {}) if isinstance(item, dict) else {}
+                    nome = prod.get("xProd", "")
+                    valor_custo = prod.get("vUnCom", 0)
+                    quantidade = prod.get("qCom", 0)
+                    codigo_interno = prod.get("cProd", "")
+                    ncm = prod.get("NCM", "")
+                    cfop = prod.get("CFOP", "")
+                    cest = prod.get("CEST", "")
+                    origem_cst = prod.get("orig", "")
+                    marca = prod.get("xProd", "")
+
+                    try:
+                        query_produto = (
+                            "INSERT INTO produtos("
+                            "nome_do_produto, valor_de_custo, valor_de_venda, quantidade, "
+                            "codigo_interno, codigo_ncm, codigo_cfop, codigo_cest, origem_cst, descricao, CNPJ, marca"
+                            ") VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
+                            "ON DUPLICATE KEY UPDATE quantidade = quantidade + VALUES(quantidade)"
+                        )
+
+                        db.cursor.execute(
+                            query_produto,
+                            (
+                                nome,
+                                valor_custo,
+                                valor_custo,
+                                quantidade,
+                                codigo_interno,
+                                ncm,
+                                cfop,
+                                cest,
+                                origem_cst,
+                                nome,
+                                destinatario_cnpj,
+                                marca,
+                            ),
+                        )
+                        db.conn.commit()
+                    except Exception:
+                        continue
+
+            registrar_produtos_entrada()
             messagebox.showinfo("Sucesso", "Nota fiscal inserida com sucesso!")
 
 
