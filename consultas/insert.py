@@ -64,12 +64,23 @@ class Insere:
 
     def registraFaturamentoEntradaNoBanco(confirmado, vencimento, descricao, total, numero_nfe, emitente_nome, dados_completos=None):
         dados = dados_completos or {}
-        itens = dados.get("itens", None)
-        if isinstance(itens, dict) or isinstance(itens, list):
-            try:
-                itens = json.dumps(itens)
-            except Exception:
-                itens = None
+        hoje = datetime.now().strftime("%Y-%m-%d")
+        data_emissao = dados.get("data_emissao") or hoje
+        data_saida = dados.get("data_saida") or data_emissao
+        dados_atualizados = {
+            **dados,
+            "data_emissao": data_emissao,
+            "data_saida": data_saida,
+        }
+        itens = dados.get("itens") or dados.get("items") or []
+        if isinstance(itens, dict):
+            itens = list(itens.values())
+        try:
+            itens = json.dumps(itens)
+        except Exception:
+            itens = "[]"
+        if not itens:
+            itens = "[]"
 
         campos = [
             "chave_nfe",
@@ -101,40 +112,81 @@ class Insere:
             "data_vencimento",
         ]
 
+        descricao_valor = descricao if descricao is not None else ""
+        vencimento_valor = vencimento if vencimento is not None else ""
+
         valores = [
             dados.get("chave_nfe", ""),
             numero_nfe,
-            dados.get("serie_nfe", ""),
-            dados.get("data_emissao", None),
-            dados.get("data_saida", None),
-            dados.get("emitente_cnpj", ""),
+            dados_atualizados.get("serie_nfe", ""),
+            dados_atualizados.get("data_emissao", None),
+            dados_atualizados.get("data_saida", None),
+            dados_atualizados.get("emitente_cnpj", ""),
             emitente_nome,
-            dados.get("destinatario_cnpj", ""),
-            dados.get("destinatario_nome", ""),
+            dados_atualizados.get("destinatario_cnpj", ""),
+            dados_atualizados.get("destinatario_nome", ""),
             total,
-            dados.get("valor_produtos", 0),
-            dados.get("valor_bc_icms", 0),
-            dados.get("valor_icms", 0),
-            dados.get("valor_icms_desonerado", 0),
-            dados.get("valor_bc_icms_st", 0),
-            dados.get("valor_icms_st", 0),
-            dados.get("valor_ipi", 0),
-            dados.get("valor_pis", 0),
-            dados.get("valor_cofins", 0),
-            dados.get("valor_bc_irrf", 0),
-            dados.get("transportadora_cnpj", ""),
-            dados.get("transportadora_nome", ""),
+            dados_atualizados.get("valor_produtos", 0),
+            dados_atualizados.get("valor_bc_icms", 0),
+            dados_atualizados.get("valor_icms", 0),
+            dados_atualizados.get("valor_icms_desonerado", 0),
+            dados_atualizados.get("valor_bc_icms_st", 0),
+            dados_atualizados.get("valor_icms_st", 0),
+            dados_atualizados.get("valor_ipi", 0),
+            dados_atualizados.get("valor_pis", 0),
+            dados_atualizados.get("valor_cofins", 0),
+            dados_atualizados.get("valor_bc_irrf", 0),
+            dados_atualizados.get("transportadora_cnpj", ""),
+            dados_atualizados.get("transportadora_nome", ""),
             itens,
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             confirmado,
-            descricao,
-            vencimento,
+            descricao_valor,
+            vencimento_valor,
         ]
 
         placeholders = ", ".join(["%s"] * len(campos))
         query = f"INSERT INTO contasapagar ({', '.join(campos)}) VALUES ({placeholders});"
         db.cursor.execute(query, tuple(valores))
         db.conn.commit()
+
+        if numero_nfe:
+            try:
+                db.cursor.execute(
+                    "SELECT 1 FROM notas_fiscais WHERE numero = %s AND serie = %s LIMIT 1",
+                    (numero_nfe, dados_atualizados.get("serie_nfe", "")),
+                )
+                existe = db.cursor.fetchone()
+                if not existe:
+                    query_nota = """
+                        INSERT INTO notas_fiscais (
+                            status, tipo, operacao, destinatario_nome, serie,
+                            valor_total, cfop, dhEmi, numero, entradaOuSaida,
+                            chave, emitente_nome, emitente_cnpjcpf, destinatario_cnpjcpf
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """
+                    db.cursor.execute(
+                        query_nota,
+                        (
+                            "Registrada",
+                            "NFe",
+                            "Entrada",
+                            dados_atualizados.get("destinatario_nome", emitente_nome),
+                            dados_atualizados.get("serie_nfe", ""),
+                            dados_atualizados.get("valor_total", total),
+                            dados_atualizados.get("cfop", ""),
+                            dados_atualizados.get("data_emissao", hoje),
+                            numero_nfe,
+                            "Entrada",
+                            dados_atualizados.get("chave_nfe", ""),
+                            emitente_nome,
+                            dados_atualizados.get("emitente_cnpj", ""),
+                            dados_atualizados.get("destinatario_cnpj", ""),
+                        ),
+                    )
+                    db.conn.commit()
+            except Exception:
+                pass
 
     
     def registraPedidoNoBanco(dadosPedido):     

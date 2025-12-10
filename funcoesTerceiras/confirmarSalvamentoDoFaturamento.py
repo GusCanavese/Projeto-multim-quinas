@@ -56,11 +56,20 @@ def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data
         dataBase = datetime.strptime(dataFaturamento, "%d/%m/%Y")
 
         valorParcela = round(float(valorTotal) / float(qtdParcelas), 2)
+        itens_da_nota = (
+            getattr(self, "itens", None)
+            or getattr(self, "dadosProdutos", None)
+            or getattr(self, "valoresDosItens", None)
+        )
+        if isinstance(itens_da_nota, dict):
+            itens_da_nota = list(itens_da_nota.values())
+
         dados_completos = {
             "chave_nfe": getattr(self, "chave_nfe", ""),
             "serie_nfe": getattr(self, "serie_nfe", ""),
             "data_emissao": getattr(self, "data_emissao", None),
             "data_saida": getattr(self, "data_saida", None),
+            "valor_total": float(valorTotal or 0),
             "emitente_cnpj": getattr(self, "emitente_cnpj", ""),
             "destinatario_cnpj": getattr(self, "destinatario_cnpj", ""),
             "destinatario_nome": getattr(self, "destinatario_nome", ""),
@@ -76,7 +85,7 @@ def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data
             "valor_bc_irrf": getattr(self, "valor_bc_irrf", 0),
             "transportadora_cnpj": getattr(self, "transportadora_cnpj", ""),
             "transportadora_nome": getattr(self, "transportadora_nome", ""),
-            "itens": getattr(self, "itens", None),
+            "itens": itens_da_nota,
         }
 
         for i in range(int(qtdParcelas)):
