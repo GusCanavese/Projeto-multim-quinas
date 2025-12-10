@@ -62,6 +62,80 @@ class Insere:
         db.cursor.execute(queryInserirCliente, (confirmado, vencimento, descricao, total, formaPag, qtdParcelas))
         db.conn.commit()
 
+    def registraFaturamentoEntradaNoBanco(confirmado, vencimento, descricao, total, numero_nfe, emitente_nome, dados_completos=None):
+        dados = dados_completos or {}
+        itens = dados.get("itens", None)
+        if isinstance(itens, dict) or isinstance(itens, list):
+            try:
+                itens = json.dumps(itens)
+            except Exception:
+                itens = None
+
+        campos = [
+            "chave_nfe",
+            "numero_nfe",
+            "serie_nfe",
+            "data_emissao",
+            "data_saida",
+            "emitente_cnpj",
+            "emitente_nome",
+            "destinatario_cnpj",
+            "destinatario_nome",
+            "valor_total",
+            "valor_produtos",
+            "valor_bc_icms",
+            "valor_icms",
+            "valor_icms_desonerado",
+            "valor_bc_icms_st",
+            "valor_icms_st",
+            "valor_ipi",
+            "valor_pis",
+            "valor_cofins",
+            "valor_bc_irrf",
+            "transportadora_cnpj",
+            "transportadora_nome",
+            "itens",
+            "data_registro",
+            "confirmado",
+            "descricao",
+            "data_vencimento",
+        ]
+
+        valores = [
+            dados.get("chave_nfe", ""),
+            numero_nfe,
+            dados.get("serie_nfe", ""),
+            dados.get("data_emissao", None),
+            dados.get("data_saida", None),
+            dados.get("emitente_cnpj", ""),
+            emitente_nome,
+            dados.get("destinatario_cnpj", ""),
+            dados.get("destinatario_nome", ""),
+            total,
+            dados.get("valor_produtos", 0),
+            dados.get("valor_bc_icms", 0),
+            dados.get("valor_icms", 0),
+            dados.get("valor_icms_desonerado", 0),
+            dados.get("valor_bc_icms_st", 0),
+            dados.get("valor_icms_st", 0),
+            dados.get("valor_ipi", 0),
+            dados.get("valor_pis", 0),
+            dados.get("valor_cofins", 0),
+            dados.get("valor_bc_irrf", 0),
+            dados.get("transportadora_cnpj", ""),
+            dados.get("transportadora_nome", ""),
+            itens,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            confirmado,
+            descricao,
+            vencimento,
+        ]
+
+        placeholders = ", ".join(["%s"] * len(campos))
+        query = f"INSERT INTO contasapagar ({', '.join(campos)}) VALUES ({placeholders});"
+        db.cursor.execute(query, tuple(valores))
+        db.conn.commit()
+
     
     def registraPedidoNoBanco(dadosPedido):     
         itens_json = json.dumps(dadosPedido['itens'])

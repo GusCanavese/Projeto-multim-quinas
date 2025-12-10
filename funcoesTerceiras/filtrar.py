@@ -85,8 +85,7 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
             self.dadosTelaVerPedidos.append(btnProxima)
 
 
-def filtrarContas(self, frame, valor, pagina=1):
-    self.valorAtualFiltroContas = valor
+def _aplicar_filtro_periodo(self):
     if hasattr(self, "datePickerInicio") and hasattr(self, "datePickerFim"):
         inicio = self.datePickerInicio.get()
         fim = self.datePickerFim.get()
@@ -95,76 +94,81 @@ def filtrarContas(self, frame, valor, pagina=1):
     else:
         inicio = None
         fim = None
-
-    contasReceber = Buscas.buscaContasAReceber(valor, inicio, fim)
-    contasPagar = Buscas.buscaContasAPagar(valor, inicio, fim)
-    contas = contasReceber + contasPagar
+    return inicio, fim
 
 
-
-    if hasattr(self, "dadosTelaFiltrarContas"):
-        for item in self.dadosTelaFiltrarContas:
+def _renderizar_contas(self, frame, contas, pagina, atributo_lista):
+    if hasattr(self, atributo_lista):
+        for item in getattr(self, atributo_lista):
             item.destroy()
-    self.dadosTelaFiltrarContas = []
+    setattr(self, atributo_lista, [])
 
-    inicioContas = (pagina - 1) * 10
-    fimContas = pagina * 10
-    contasPagina = contas[inicioContas:fimContas]
-    
+    inicio_contas = (pagina - 1) * 10
+    fim_contas = pagina * 10
+    contas_pagina = contas[inicio_contas:fim_contas]
+
     y = 0.1
 
-    for rowProduto, conta in enumerate(contasPagina, start=5):
+    for conta in contas_pagina:
         corDeFundo = "#1C60A0"
-        dadosContas = [conta[0], conta[2], conta[1], conta[3], conta[4]]
-        dataOriginal = dadosContas[2]
-        dataOriginal = str(dataOriginal)
+        dadosContas = [conta[0], conta[2], conta[1], conta[3]]
         x = 0.03
-
 
         for colNum, valor in enumerate(dadosContas):
             if colNum == 0:
                 if "Não" in conta[0]:
                     corDeFundo = self.corNegado
-                elif "Sim" in conta[2]:
+                elif "Sim" in conta[0]:
                     corDeFundo = self.corAfirma
                 label = criaLabel(frame, valor, x, y, 0.08, corDeFundo)
-                x+=0.085
-            elif colNum ==1:
+                x += 0.085
+            elif colNum == 1:
                 corDeFundo = "#1C60A0"
                 label = criaLabel(frame, valor, x, y, 0.4, corDeFundo)
-                x+=0.405
-            elif colNum ==2:
+                x += 0.405
+            elif colNum == 2:
                 corDeFundo = "#1C60A0"
                 label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
-                x+=0.175
-            elif colNum ==3:
+                x += 0.175
+            elif colNum == 3:
                 if "lançamento referente a nota" in conta[2]:
-                    valor1 = conta[3]
-                    valor1 = valor *-1
+                    valor_ajustado = valor * -1
                     corDeFundo = self.corNegado
-                    label = criaLabel(frame, valor1, x, y, 0.17, corDeFundo)
-                if "lançamento referente ao pedido" in conta[2]:
-                    corDeFundo = self.corAfirma 
+                    label = criaLabel(frame, valor_ajustado, x, y, 0.17, corDeFundo)
+                else:
+                    corDeFundo = self.corAfirma
                     label = criaLabel(frame, valor, x, y, 0.17, corDeFundo)
-                
-                x+=0.175
+                x += 0.175
 
-            self.dadosTelaFiltrarContas.append(label)
+            getattr(self, atributo_lista).append(label)
 
         btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=conta: telaVercontasApagar(self, p))
-        self.dadosTelaFiltrarContas.append(btn)
+        getattr(self, atributo_lista).append(btn)
 
         y += 0.06
-    
+
     if len(contas) > 10:
-
         if pagina > 1:
-            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.75, 0.2,lambda: filtrarContas(self, frame, self.valorAtualFiltroContas, pagina - 1))
-            self.dadosTelaFiltrarContas.append(btnAnterior)
+            btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.75, 0.2, lambda: _renderizar_contas(self, frame, contas, pagina - 1, atributo_lista))
+            getattr(self, atributo_lista).append(btnAnterior)
 
-        if fimContas < len(contas):
-            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.75, 0.2,lambda: filtrarContas(self, frame, self.valorAtualFiltroContas, pagina + 1))
-            self.dadosTelaFiltrarContas.append(btnProxima)
+        if fim_contas < len(contas):
+            btnProxima = criaBotao(frame, "Próximo →", 0.66, 0.75, 0.2, lambda: _renderizar_contas(self, frame, contas, pagina + 1, atributo_lista))
+            getattr(self, atributo_lista).append(btnProxima)
+
+
+def filtrarContasAReceber(self, frame, valor, inicio=None, pagina=1):
+    self.valorAtualFiltroContas = valor
+    inicio, fim = _aplicar_filtro_periodo(self)
+    contas = Buscas.buscaContasAReceber(valor, inicio, fim)
+    _renderizar_contas(self, frame, contas, pagina, "dadosTelaFiltrarContasReceber")
+
+
+def filtrarContasAPagar(self, frame, valor, inicio=None, pagina=1):
+    self.valorAtualFiltroContas = valor
+    inicio, fim = _aplicar_filtro_periodo(self)
+    contas = Buscas.buscaContasAPagar(valor, inicio, fim)
+    _renderizar_contas(self, frame, contas, pagina, "dadosTelaFiltrarContasPagar")
 
 
 def filtrarFuncionarios(self, frame, valor, pagina=1):
