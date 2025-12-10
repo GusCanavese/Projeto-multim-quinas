@@ -88,38 +88,81 @@ def telaVercontasApagar(self, d):
         varTransportadoraNome.set(d[24]),
         varItens.set(d[25]),
         varDataRegistro.set(d[26])
-        
-
-        criarLabelEntry(frame, "Cód. Identificador", 0.05, 0.05, 0.187, varNumeroNfe)
-        criarLabelEntry(frame, "Parcela", 0.287, 0.05, 0.187, None)
-        criarLabelEntry(frame, "Nota Fiscal/Pedido/O.S.", 0.524, 0.05, 0.187, None)
-        criarLabelEntry(frame, "Funcionário responsável", 0.761, 0.05, 0.187, None)
 
 
-        criarLabelEntry(frame, "Cód. Identificador", 0.05, 0.15, 0.267, varNumeroNfe)
-        criarLabelEntry(frame, "Parcela", 0.367, 0.15, 0.267, None)
-        criarLabelEntry(frame, "Nota Fiscal/Pedido/O.S.", 0.684, 0.15, 0.266, None)
+        tabs = ctk.CTkTabview(frame, fg_color="transparent")
+        tabs.place(relx=0.5, rely=0.5, relwidth=0.94, relheight=0.84, anchor="center")
 
-        criarLabelEntry(frame, "Descricao", 0.05, 0.25, 0.6, None)
-        criarLabelEntry(frame, "Número do documento", 0.7, 0.25, 0.25, None)
+        tab_dados = tabs.add("Dados")
+        tab_itens = tabs.add("Itens")
+        tabs.set("Dados")
 
-        criarLabelEntry(frame, "Forma de pagamento", 0.05, 0.35, 0.187, None)
-        criarLabelEntry(frame, "Conta bancária", 0.287, 0.35, 0.187, None)
-        criarLabelEntry(frame, "Plano orçamentário", 0.524, 0.35, 0.187, None)
-        criarLabelEntry(frame, "Departamento", 0.761, 0.35, 0.187, None)
-        
-        criarLabelEntry(frame, "Fornecedor", 0.05, 0.45, 0.9, None)
+        criarLabelEntry(tab_dados, "Confirmado", 0.05, 0.05, 0.2, varConfirmado)
+        criarLabelEntry(tab_dados, "Vencimento", 0.27, 0.05, 0.2, varVencimento)
+        criarLabelEntry(tab_dados, "Valor total", 0.49, 0.05, 0.2, varTotal)
+        criarLabelEntry(tab_dados, "Número NFE", 0.71, 0.05, 0.24, varNumeroNfe)
 
-        criarLabelEntry(frame, "Original", 0.05, 0.55, 0.187, varNumeroNfe)
-        criarLabelEntry(frame, "Bruto", 0.287, 0.55, 0.187, None)
-        criarLabelEntry(frame, "Pago", 0.524, 0.55, 0.187, None)
-        criarLabelEntry(frame, "Desconto", 0.761, 0.55, 0.187, None)
+        criarLabelEntry(tab_dados, "Descrição", 0.05, 0.15, 0.9, varDescricao)
 
-        criarLabelEntry(frame, "Acréscimo", 0.05, 0.65, 0.187, None)
-        criarLabelEntry(frame, "Júros por atraso", 0.287, 0.65, 0.187, None)
-        criarLabelEntry(frame, "Júros dia", 0.524, 0.65, 0.187, None)
+        criarLabelEntry(tab_dados, "Emitente", 0.05, 0.25, 0.42, varEmitenteNome)
+        criarLabelEntry(tab_dados, "Emitente CNPJ", 0.52, 0.25, 0.43, varEmitenteCnpj)
+
+        criarLabelEntry(tab_dados, "Destinatário", 0.05, 0.35, 0.42, varDestinatarioNome)
+        criarLabelEntry(tab_dados, "Destinatário CNPJ", 0.52, 0.35, 0.43, varDestinatarioCnpj)
+
+        criarLabelEntry(tab_dados, "Chave NFE", 0.05, 0.45, 0.42, varChaveNfe)
+        criarLabelEntry(tab_dados, "Série NFE", 0.52, 0.45, 0.43, varSerieNfe)
+
+        criarLabelEntry(tab_dados, "Data emissão", 0.05, 0.55, 0.2, varDataEmissao)
+        criarLabelEntry(tab_dados, "Data saída", 0.27, 0.55, 0.2, varDataSaida)
+        criarLabelEntry(tab_dados, "Data registro", 0.49, 0.55, 0.2, varDataRegistro)
+
+        criarLabelEntry(tab_dados, "Valor produtos", 0.05, 0.65, 0.2, varValorProdutos)
+        criarLabelEntry(tab_dados, "Valor BC ICMS", 0.27, 0.65, 0.2, varValorBcIcms)
+        criarLabelEntry(tab_dados, "Valor ICMS", 0.49, 0.65, 0.2, varValorIcms)
+        criarLabelEntry(tab_dados, "ICMS desonerado", 0.71, 0.65, 0.24, varValorIcmsDesonerado)
+
+        criarLabelEntry(tab_dados, "Valor BC ICMS ST", 0.05, 0.75, 0.2, varValorBcIcmsSt)
+        criarLabelEntry(tab_dados, "Valor ICMS ST", 0.27, 0.75, 0.2, varValorIcmsSt)
+        criarLabelEntry(tab_dados, "Valor IPI", 0.49, 0.75, 0.2, varValorIpi)
+        criarLabelEntry(tab_dados, "Valor PIS", 0.71, 0.75, 0.24, varValorPis)
+
+        criarLabelEntry(tab_dados, "Valor COFINS", 0.05, 0.85, 0.2, varValorCofins)
+        criarLabelEntry(tab_dados, "Valor BC IRRF", 0.27, 0.85, 0.2, varValorBcIrrf)
+        criarLabelEntry(tab_dados, "Transportadora CNPJ", 0.49, 0.85, 0.2, varTransportadoraCnpj)
+        criarLabelEntry(tab_dados, "Transportadora", 0.71, 0.85, 0.24, varTransportadoraNome)
+
+        ctk.CTkLabel(tab_itens, text="Itens", width=50, font=("TkDefaultFont", 15)).place(relx=0.05, rely=0.05, anchor="w")
+
+        itens_frame = ctk.CTkScrollableFrame(tab_itens, fg_color="transparent")
+        itens_frame.place(relx=0.05, rely=0.1, relwidth=0.9, relheight=0.8, anchor="nw")
+
+        def separar_itens_por_descricao(texto_itens):
+            linhas = [linha.strip() for linha in texto_itens.splitlines() if linha.strip()]
+            itens_separados = []
+            item_atual = []
+
+            for linha in linhas:
+                if linha.lower().startswith("descricao") or linha.lower().startswith("descrição"):
+                    if item_atual:
+                        itens_separados.append("\n".join(item_atual))
+                        item_atual = []
+                item_atual.append(linha)
+
+            if item_atual:
+                itens_separados.append("\n".join(item_atual))
+
+            if not itens_separados:
+                itens_separados.append("\n".join(linhas))
+
+            return itens_separados
+
+        for indice, item in enumerate(separar_itens_por_descricao(varItens.get()), start=1):
+            bloco_item = ctk.CTkFrame(itens_frame, corner_radius=8)
+            bloco_item.pack(fill="x", pady=5, padx=0)
+
+            ctk.CTkLabel(bloco_item, text=f"Item {indice}", font=("TkDefaultFont", 14, "bold"), anchor="w", justify="left").pack(anchor="w", padx=10, pady=(8, 0))
+            ctk.CTkLabel(bloco_item, text=item, anchor="w", justify="left", wraplength=750).pack(anchor="w", padx=10, pady=(0, 8))
 
         criaBotao(frame, "Voltar", 0.05, 0.94, 0.15, lambda: frame.destroy()).place(anchor="nw")
-        
-        
 

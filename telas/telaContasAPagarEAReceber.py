@@ -54,15 +54,8 @@ def telaContasAPagarEAReceber(self):
         if valor=="Importar XML":
             escolherNotaFiscal(self)
             
-    def creditoOuDebito():
-        if hasattr(self, "creditoOuDebito"):
-            self.creditoOuDebito.destroy()
-            self.creditoOuDebito = criaComboBox(frame, 0.13, 0.11, 0.15, opcoes, lambda valor:escolheTela(valor))
-        else:
-            self.creditoOuDebito = criaComboBox(frame, 0.13, 0.11, 0.15, opcoes, lambda valor:escolheTela(valor))
 
             
-    criaBotao(frame, "Registrar credito/débito", 0.13, 0.05, 0.15, lambda:creditoOuDebito()).configure(fg_color="#009351")
     criaBotao(frame, "◀️ Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
 
     # Cabeçalhos da tabela
