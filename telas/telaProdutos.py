@@ -171,7 +171,8 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
 
         def _pis_cofins_frame_aberto():
             try:
-                return hasattr(self, "framePisCofins") and self.framePisCofins.winfo_exists()
+                frame_pis_cofins = getattr(self, "framePisCofins", None)
+                return frame_pis_cofins is not None and frame_pis_cofins.winfo_exists()
             except TclError:
                 return False
 

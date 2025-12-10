@@ -189,7 +189,9 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
                 botao_calcular.configure(state="normal")
 
         def PisCofins(frame):
-            if hasattr(self, "framePisCofins") and self.framePisCofins.winfo_exists():
+            frame_pis_cofins = getattr(self, "framePisCofins", None)
+
+            if frame_pis_cofins is not None and frame_pis_cofins.winfo_exists():
                 self.framePisCofins.lift()
             else:
                 self.framePisCofins = criaFrameJanela(frameTelaNotaProduto, 0.5, 0.5, 0.8, 0.9, self.corModal)
