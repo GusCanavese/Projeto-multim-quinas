@@ -270,25 +270,14 @@ def telaVer(self, p):
                 )
                 return
 
-            if not messagebox.askokcancel(
-                "DANFE",
-                "Abra o ACBrMonitorPLUS e confirme para exibir o DANFE desta nota.",
-            ):
-                return
-
             try:
                 retorno = imprimir_danfe(xml_path)
             except Exception as exc:
-                messagebox.showerror("DANFE", f"Falha ao solicitar o DANFE ao ACBr: {exc}")
                 return
 
             if retorno.get("sucesso"):
                 messagebox.showinfo("DANFE", retorno.get("motivo") or "DANFE aberto no ACBr.")
-            else:
-                messagebox.showerror(
-                    "DANFE",
-                    retorno.get("motivo") or "ACBr não conseguiu exibir o DANFE."
-                )
+            # Caso o ACBr não responda ou retorne falha, o processo é encerrado sem exibir mensagens de erro.
         elif acao == "Excluir NFe":
             numero_para_excluir = numero_atualizado()
             if not numero_para_excluir:

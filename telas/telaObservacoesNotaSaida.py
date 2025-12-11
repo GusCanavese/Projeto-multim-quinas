@@ -69,30 +69,33 @@ def telaObservacoesNotaSaida(self, EhNotaDoConsumidor):
             "fisco": self.observacaoFiscoTexto,
         }
 
-    def voltar_para_tela_fiscal():
-        for frame_attr in [
-            "frameTelaObservacoes",
-            "frameTelaTotais",
-            "frametelaTransporte",
-            "frameTelaNotaSaida",
-            "frameTelaNotaFiscalEntrada",
-            "frameTelaGerarFaturamento",
-            "frameValorTotais",
-        ]:
-            frame = getattr(self, frame_attr, None)
-            if frame is not None:
-                try:
-                    frame.destroy()
-                except Exception:
-                    pass
+    def salvar_e_gerar(modulo):
+        atualizar_observacoes()
+        modulo.gerarNFe(self)
+        if getattr(self, "frameTelaObservacoes", None):
+            self.frameTelaObservacoes.destroy()
+        if getattr(self, "frameTelaTotais", None):
+            self.frameTelaTotais.destroy()
+        if getattr(self, "frametelaTransporte", None):
+            self.frametelaTransporte.destroy()
+        if getattr(self, "frameTelaNotaSaida", None):
+            self.frameTelaNotaSaida.destroy()
+        if getattr(self, "frameTelaNotaFiscalEntrada", None):
+            self.frameTelaNotaFiscalEntrada.destroy()
+        if getattr(self, "frameTelaGerarFaturamento", None):
+            self.frameTelaGerarFaturamento.destroy()
+        if getattr(self, "frameValorTotais", None):
+            self.frameValorTotais.destroy()
+        if getattr(self, "frameTelaNotaProduto", None):
+            self.frameTelaNotaProduto.destroy()
+        if getattr(self, "frameTelaFiscal", None):
+            self.frameTelaFiscal.destroy()
+        if getattr(self, "frameEscolherNotaFiscal", None):
+            self.frameEscolherNotaFiscal.destroy()
 
         from telas.telaFiscal import telaFiscal
 
         telaFiscal(self)
-
-    def salvar_e_gerar(modulo):
-        atualizar_observacoes()
-        modulo.gerarNFe(self)
 
     def salvar_nota_importada():
         atualizar_observacoes()
@@ -105,7 +108,30 @@ def telaObservacoesNotaSaida(self, EhNotaDoConsumidor):
                 *parametros,
                 "Entrada",
             )
-            voltar_para_tela_fiscal()
+            if getattr(self, "frameTelaObservacoes", None):
+                self.frameTelaObservacoes.destroy()
+            if getattr(self, "frameTelaTotais", None):
+                self.frameTelaTotais.destroy()
+            if getattr(self, "frametelaTransporte", None):
+                self.frametelaTransporte.destroy()
+            if getattr(self, "frameTelaNotaSaida", None):
+                self.frameTelaNotaSaida.destroy()
+            if getattr(self, "frameTelaNotaFiscalEntrada", None):
+                self.frameTelaNotaFiscalEntrada.destroy()
+            if getattr(self, "frameTelaGerarFaturamento", None):
+                self.frameTelaGerarFaturamento.destroy()
+            if getattr(self, "frameValorTotais", None):
+                self.frameValorTotais.destroy()
+            if getattr(self, "frameTelaNotaProduto", None):
+                self.frameTelaNotaProduto.destroy()
+            if getattr(self, "frameTelaFiscal", None):
+                self.frameTelaFiscal.destroy()
+            if getattr(self, "frameEscolherNotaFiscal", None):
+                self.frameEscolherNotaFiscal.destroy()
+
+            from telas.telaFiscal import telaFiscal
+
+            telaFiscal(self)
         except Exception as exc:
             messagebox.showerror("Erro", f"Falha ao salvar nota importada: {exc}")
 

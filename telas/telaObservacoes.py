@@ -244,33 +244,35 @@ def telaObservacoes(self, dadosNota):
 
     parametros = montar_parametros_nota_saida(dadosNota)
 
-    def voltar_para_tela_fiscal():
-        for frame_attr in [
-            "frameTelaObservacoes",
-            "frameTelaTotais",
-            "frametelaTransporte",
-            "frameTelaNotaSaida",
-            "frameTelaNotaFiscalEntrada",
-            "frameTelaGerarFaturamento",
-            "frameValorTotais",
-        ]:
-            frame = getattr(self, frame_attr, None)
-            if frame is not None:
-                try:
-                    frame.destroy()
-                except Exception:
-                    pass
-
-        from telas.telaFiscal import telaFiscal
-
-        telaFiscal(self)
-
     def insereRetorna():
         Insere.inserir_nota_fiscal_saida(
             *parametros,
             "Saída",
         )
-        voltar_para_tela_fiscal()
+        if getattr(self, "frameTelaObservacoes", None):
+            self.frameTelaObservacoes.destroy()
+        if getattr(self, "frameTelaTotais", None):
+            self.frameTelaTotais.destroy()
+        if getattr(self, "frametelaTransporte", None):
+            self.frametelaTransporte.destroy()
+        if getattr(self, "frameTelaNotaSaida", None):
+            self.frameTelaNotaSaida.destroy()
+        if getattr(self, "frameTelaNotaFiscalEntrada", None):
+            self.frameTelaNotaFiscalEntrada.destroy()
+        if getattr(self, "frameTelaGerarFaturamento", None):
+            self.frameTelaGerarFaturamento.destroy()
+        if getattr(self, "frameValorTotais", None):
+            self.frameValorTotais.destroy()
+        if getattr(self, "frameTelaNotaProduto", None):
+            self.frameTelaNotaProduto.destroy()
+        if getattr(self, "frameTelaFiscal", None):
+            self.frameTelaFiscal.destroy()
+        if getattr(self, "frameEscolherNotaFiscal", None):
+            self.frameEscolherNotaFiscal.destroy()
+
+        from telas.telaFiscal import telaFiscal
+
+        telaFiscal(self)
 
     criaBotao(self.frameTelaObservacoes, "Salvar nota", 0.25, 0.94, 0.15, lambda: insereRetorna()).place(anchor="nw")
     criaBotao(self.frameTelaObservacoes, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaObservacoes.destroy()).place(anchor="nw")
