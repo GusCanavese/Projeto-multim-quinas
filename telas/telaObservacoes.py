@@ -213,26 +213,6 @@ def montar_parametros_nota_saida(dadosNota):
         operacao,
     )
 
-
-def destruir_quadros_fluxo_entrada(self):
-    quadros = [
-        "frameTelaNotaFiscalEntrada",
-        "frameTelaProdutos",
-        "frameTelaTotais",
-        "frameTelaGerarFaturamento",
-        "frametelaTransporte",
-        "frameTelaObservacoes",
-        "frameEscolherNotaFiscal",
-    ]
-    for nome in quadros:
-        frame = getattr(self, nome, None)
-        if frame is not None:
-            try:
-                frame.destroy()
-            except Exception:
-                pass
-
-
 def telaObservacoes(self, dadosNota):
 
     self.frameTelaObservacoes = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
@@ -264,9 +244,33 @@ def telaObservacoes(self, dadosNota):
 
     parametros = montar_parametros_nota_saida(dadosNota)
 
+    def voltar_para_tela_fiscal():
+        for frame_attr in [
+            "frameTelaObservacoes",
+            "frameTelaTotais",
+            "frametelaTransporte",
+            "frameTelaNotaSaida",
+            "frameTelaNotaFiscalEntrada",
+            "frameTelaGerarFaturamento",
+            "frameValorTotais",
+        ]:
+            frame = getattr(self, frame_attr, None)
+            if frame is not None:
+                try:
+                    frame.destroy()
+                except Exception:
+                    pass
+
+        from telas.telaFiscal import telaFiscal
+
+        telaFiscal(self)
+
     def insereRetorna():
-        Insere.inserir_nota_fiscal_saida(*parametros, "Saída")
-        destruir_quadros_fluxo_entrada(self)
+        Insere.inserir_nota_fiscal_saida(
+            *parametros,
+            "Saída",
+        )
+        voltar_para_tela_fiscal()
 
     criaBotao(self.frameTelaObservacoes, "Salvar nota", 0.25, 0.94, 0.15, lambda: insereRetorna()).place(anchor="nw")
     criaBotao(self.frameTelaObservacoes, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaObservacoes.destroy()).place(anchor="nw")

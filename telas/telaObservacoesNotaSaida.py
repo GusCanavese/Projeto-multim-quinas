@@ -3,7 +3,7 @@ from tkinter import messagebox
 from componentes import criaFrameJanela, criaBotao, criaTextArea, criarLabelEntry
 from funcoesTerceiras import criarNFe, criarNFCe
 from consultas.insert import Insere
-from telas.telaObservacoes import montar_parametros_nota_saida, destruir_quadros_fluxo_entrada
+from telas.telaObservacoes import montar_parametros_nota_saida
 
 
 def acessar(dados, *caminho, default=""):
@@ -69,6 +69,27 @@ def telaObservacoesNotaSaida(self, EhNotaDoConsumidor):
             "fisco": self.observacaoFiscoTexto,
         }
 
+    def voltar_para_tela_fiscal():
+        for frame_attr in [
+            "frameTelaObservacoes",
+            "frameTelaTotais",
+            "frametelaTransporte",
+            "frameTelaNotaSaida",
+            "frameTelaNotaFiscalEntrada",
+            "frameTelaGerarFaturamento",
+            "frameValorTotais",
+        ]:
+            frame = getattr(self, frame_attr, None)
+            if frame is not None:
+                try:
+                    frame.destroy()
+                except Exception:
+                    pass
+
+        from telas.telaFiscal import telaFiscal
+
+        telaFiscal(self)
+
     def salvar_e_gerar(modulo):
         atualizar_observacoes()
         modulo.gerarNFe(self)
@@ -80,8 +101,11 @@ def telaObservacoesNotaSaida(self, EhNotaDoConsumidor):
             return
         try:
             parametros = montar_parametros_nota_saida(dados_nfe)
-            Insere.inserir_nota_fiscal_saida(*parametros, "Entrada")
-            destruir_quadros_fluxo_entrada(self)
+            Insere.inserir_nota_fiscal_saida(
+                *parametros,
+                "Entrada",
+            )
+            voltar_para_tela_fiscal()
         except Exception as exc:
             messagebox.showerror("Erro", f"Falha ao salvar nota importada: {exc}")
 

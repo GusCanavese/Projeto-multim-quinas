@@ -8,7 +8,7 @@ from consultas.update import Atualiza
 from consultas.delete import deleta
 from consultas.select import Buscas
 from componentes import criaFrameJanela, criaBotao, criarLabelEntry
-from funcoesTerceiras.acbr_comandos import cancelar_nfe, inutilizar_nfe
+from funcoesTerceiras.acbr_comandos import cancelar_nfe, imprimir_danfe, inutilizar_nfe
 
 
 def telaVer(self, p):
@@ -253,6 +253,42 @@ def telaVer(self, p):
                 "Enviar XML",
                 f"Envie o arquivo XML localizado em:\n{xml_path}"
             )
+        elif acao == "Visualizar DANFE":
+            chave_atual = (chave.get() or "").strip()
+            if not chave_atual:
+                messagebox.showwarning("DANFE", "Nenhuma chave de acesso disponível para localizar o XML.")
+                return
+
+            caminho_logs = getattr(self, "caminhoLogsAcbr", r"C:\\ACBrMonitorPLUS\\Logs")
+            xml_path = os.path.join(caminho_logs, f"{chave_atual}-nfe.xml")
+
+            if not os.path.exists(xml_path):
+                messagebox.showerror(
+                    "DANFE",
+                    "XML da nota não encontrado no diretório configurado do ACBr.\n"
+                    f"Caminho esperado:\n{xml_path}",
+                )
+                return
+
+            if not messagebox.askokcancel(
+                "DANFE",
+                "Abra o ACBrMonitorPLUS e confirme para exibir o DANFE desta nota.",
+            ):
+                return
+
+            try:
+                retorno = imprimir_danfe(xml_path)
+            except Exception as exc:
+                messagebox.showerror("DANFE", f"Falha ao solicitar o DANFE ao ACBr: {exc}")
+                return
+
+            if retorno.get("sucesso"):
+                messagebox.showinfo("DANFE", retorno.get("motivo") or "DANFE aberto no ACBr.")
+            else:
+                messagebox.showerror(
+                    "DANFE",
+                    retorno.get("motivo") or "ACBr não conseguiu exibir o DANFE."
+                )
         elif acao == "Excluir NFe":
             numero_para_excluir = numero_atualizado()
             if not numero_para_excluir:
@@ -276,7 +312,10 @@ def telaVer(self, p):
         else:
             messagebox.showwarning("Ações", "Selecione uma ação antes de continuar.")
 
-    combo_acoes = ctk.CTkComboBox(frame, values=["Cancelar NFe", "Inutilizar NFe", "Enviar XML", "Excluir NFe"])
+    combo_acoes = ctk.CTkComboBox(
+        frame,
+        values=["Cancelar NFe", "Inutilizar NFe", "Enviar XML", "Visualizar DANFE", "Excluir NFe"],
+    )
     combo_acoes.set("Selecione uma ação")
     combo_acoes.place(relx=0.5, rely=0.8, relwidth=0.3, anchor="center")
 

@@ -127,6 +127,18 @@ def cancelar_nfe(chave: str, justificativa: str, protocolo: str, cnpj_emitente: 
     return _executar_comando(comando, "cancelar")
 
 
+def imprimir_danfe(xml_path: str, visualizar: bool = True) -> Dict[str, str]:
+    """Solicita ao ACBr Monitor a impressão/visualização do DANFE do XML informado."""
+
+    if not xml_path:
+        raise ValueError("Informe o caminho do XML para imprimir o DANFE.")
+
+    # O parâmetro "1" força o preview no ACBr; com "0" ele manda direto para a impressora.
+    preview_flag = "1" if visualizar else "0"
+    comando = f'NFe.ImprimirDANFe("{xml_path}",{preview_flag})'
+    return _executar_comando(comando, "danfe")
+
+
 def inutilizar_nfe(
     cnpj_emitente: str,
     justificativa: str,
@@ -183,4 +195,4 @@ def inutilizar_nfe(
     return _executar_comando(comando, "inutilizar")
 
 
-__all__ = ["cancelar_nfe", "inutilizar_nfe"]
+__all__ = ["cancelar_nfe", "imprimir_danfe", "inutilizar_nfe"]

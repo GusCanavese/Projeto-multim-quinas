@@ -1,6 +1,5 @@
 from componentes import criaFrameJanela, criaBotao
 from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvamentoDoFaturamentoNota
-from telas.telaObservacoesNotaSaida import telaObservacoesNotaSaida
 from funcoesTerceiras import calculaParcelasFaturamento
 from datetime import date
 import customtkinter as ctk
@@ -196,6 +195,8 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, EhNotaDoConsumid
         colunas.place(relx=posicaox, rely=posicaoy, relwidth=largura_label-0.001)
 
     def salvarEFechar(self):
+        from telas.telaObservacoesNotaSaida import telaObservacoesNotaSaida
+
         try:
             confirmarSalvamentoDoFaturamentoNota(
                 self,
