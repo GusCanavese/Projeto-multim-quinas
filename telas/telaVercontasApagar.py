@@ -1,9 +1,13 @@
-import sys
 import os
+import sys
+from tkinter import messagebox
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
+from consultas.delete import deleta
+from consultas.update import Atualiza
 from telas import telaNotaFiscalEntrada, telaVerDebito
-from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criarLabelEntry, criaBotao
+from componentes import criaFrameJanela, criaFrame, criarLabelEntry, criaBotao
 
 def telaVercontasApagar(self, d):
     frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
@@ -97,9 +101,15 @@ def telaVercontasApagar(self, d):
         tab_itens = tabs.add("Itens")
         tabs.set("Dados")
 
-        criarLabelEntry(tab_dados, "Confirmado", 0.05, 0.05, 0.2, varConfirmado)
+        campos_destacados = []
+
+        def registrar_campo(widget):
+            campos_destacados.append(widget)
+            return widget
+
+        entrada_confirmado = registrar_campo(criarLabelEntry(tab_dados, "Confirmado", 0.05, 0.05, 0.2, varConfirmado))
         criarLabelEntry(tab_dados, "Vencimento", 0.27, 0.05, 0.2, varVencimento)
-        criarLabelEntry(tab_dados, "Valor total", 0.49, 0.05, 0.2, varTotal)
+        entrada_total = registrar_campo(criarLabelEntry(tab_dados, "Valor total", 0.49, 0.05, 0.2, varTotal))
         criarLabelEntry(tab_dados, "Número NFE", 0.71, 0.05, 0.24, varNumeroNfe)
 
         criarLabelEntry(tab_dados, "Descrição", 0.05, 0.15, 0.9, varDescricao)
@@ -132,6 +142,16 @@ def telaVercontasApagar(self, d):
         criarLabelEntry(tab_dados, "Transportadora CNPJ", 0.49, 0.85, 0.2, varTransportadoraCnpj)
         criarLabelEntry(tab_dados, "Transportadora", 0.71, 0.85, 0.24, varTransportadoraNome)
 
+        def atualizar_cor_confirmacao(confirmado):
+            cor = self.corAfirma if confirmado else self.corNegado
+            for widget in campos_destacados:
+                try:
+                    widget.configure(fg_color=cor, text_color="white")
+                except Exception:
+                    pass
+
+        atualizar_cor_confirmacao(varConfirmado.get().lower().startswith("sim"))
+
         ctk.CTkLabel(tab_itens, text="Itens", width=50, font=("TkDefaultFont", 15)).place(relx=0.05, rely=0.05, anchor="w")
 
         itens_frame = ctk.CTkScrollableFrame(tab_itens, fg_color="transparent")
@@ -163,6 +183,64 @@ def telaVercontasApagar(self, d):
 
             ctk.CTkLabel(bloco_item, text=f"Item {indice}", font=("TkDefaultFont", 14, "bold"), anchor="w", justify="left").pack(anchor="w", padx=10, pady=(8, 0))
             ctk.CTkLabel(bloco_item, text=item, anchor="w", justify="left", wraplength=750).pack(anchor="w", padx=10, pady=(0, 8))
+
+        def confirmar_faturamento():
+            numero_atual = varNumeroNfe.get()
+            if not numero_atual:
+                messagebox.showwarning("Confirmar faturamento", "Número da NFE não encontrado para confirmação.")
+                return
+            if not messagebox.askyesno(
+                "Confirmar faturamento",
+                "Deseja confirmar este faturamento? Ele ficará registrado como pago.",
+            ):
+                return
+            try:
+                Atualiza.confirmarContaAPagar(numero_atual, varSerieNfe.get())
+            except Exception as exc:
+                messagebox.showerror("Confirmar faturamento", f"Não foi possível confirmar: {exc}")
+                return
+            varConfirmado.set("Sim")
+            atualizar_cor_confirmacao(True)
+            messagebox.showinfo("Confirmar faturamento", "Faturamento confirmado com sucesso.")
+
+        def excluir_faturamento():
+            numero_atual = varNumeroNfe.get()
+            if not numero_atual:
+                messagebox.showwarning("Excluir faturamento", "Número da NFE não encontrado para exclusão.")
+                return
+            if not messagebox.askyesno(
+                "Excluir faturamento",
+                f"Tem certeza que deseja excluir o faturamento da nota {numero_atual}?",
+            ):
+                return
+            try:
+                deleta.deletarContaAPagar(numero_atual, varSerieNfe.get())
+            except Exception as exc:
+                messagebox.showerror("Excluir faturamento", f"Não foi possível excluir: {exc}")
+                return
+            messagebox.showinfo("Excluir faturamento", "Faturamento removido com sucesso.")
+            frame.destroy()
+
+        botoes_acoes = ctk.CTkFrame(frame, fg_color="transparent")
+        botoes_acoes.place(relx=0.5, rely=0.93, relwidth=0.9, anchor="center")
+
+        btn_confirmar = ctk.CTkButton(
+            botoes_acoes,
+            text="✅ Confirmar faturamento",
+            fg_color=self.corAfirma,
+            hover_color="#1f8f58",
+            command=confirmar_faturamento,
+        )
+        btn_confirmar.pack(side="left", expand=True, padx=10, pady=6)
+
+        btn_excluir = ctk.CTkButton(
+            botoes_acoes,
+            text="🗑️ Excluir faturamento",
+            fg_color=self.corNegado,
+            hover_color="#a83232",
+            command=excluir_faturamento,
+        )
+        btn_excluir.pack(side="left", expand=True, padx=10, pady=6)
 
         criaBotao(frame, "Voltar", 0.05, 0.94, 0.15, lambda: frame.destroy()).place(anchor="nw")
 

@@ -23,3 +23,8 @@ class deleta:
         queryDeletaNota = "DELETE FROM notas_fiscais WHERE numero = %s;"
         db.cursor.execute(queryDeletaNota, (numero,))
         db.conn.commit()
+
+    def deletarContaAPagar(numero_nfe, serie_nfe=""):
+        query = "DELETE FROM contasapagar WHERE numero_nfe = %s AND serie_nfe = %s LIMIT 1;"
+        db.cursor.execute(query, (numero_nfe, serie_nfe))
+        db.conn.commit()

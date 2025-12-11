@@ -51,6 +51,17 @@ class Atualiza:
              WHERE numero=%s
         """
         db.cursor.execute(query, (
-            params[0], params[1], params[2], params[3], params[4],params[5], params[6], params[7], params[8], numero_original                                
+            params[0], params[1], params[2], params[3], params[4],params[5], params[6], params[7], params[8], numero_original
         ))
+        db.conn.commit()
+
+    def confirmarContaAPagar(numero_nfe, serie_nfe=""):
+        query = """
+            UPDATE contasapagar
+               SET confirmado = 'Sim'
+             WHERE numero_nfe = %s
+               AND serie_nfe = %s
+            LIMIT 1
+        """
+        db.cursor.execute(query, (numero_nfe, serie_nfe))
         db.conn.commit()
