@@ -5,9 +5,10 @@ from pathlib import Path
 import re
 import time
 import random
+import hashlib
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
-from consultas.insert import Insere 
+from consultas.insert import Insere
 from funcoesTerceiras import extrairDadosNotaFiscal
 from funcoesTerceiras.acbr_utils import extrair_caminho_xml
 
@@ -156,6 +157,18 @@ def _so_digitos(s):
     except Exception:
         return ""
 
+
+def _cnf_estavel(cnpj_sem_mascara: str, serie_int: int, nnf_int: int) -> str:
+    """
+    Gera um cNF determinístico (8 dígitos) para um par CNPJ+Série+nNF.
+    Evita alterar a chave da NF-e em reenvios (previne rejeição 539).
+    """
+
+    chave = f"{_so_digitos(cnpj_sem_mascara).zfill(14)}-{int(serie_int)}-{int(nnf_int)}"
+    digest = hashlib.sha256(chave.encode("utf-8")).digest()
+    numero = int.from_bytes(digest[:4], "big") % 90_000_000 + 10_000_000
+    return f"{numero:08d}"
+
 def _seq_path(cnpj_sem_mascara, serie_int):
     os.makedirs(SEQ_BASE_DIR, exist_ok=True)
     cnpj_txt = (cnpj_sem_mascara or "00000000000000").zfill(14)
@@ -224,6 +237,41 @@ def _max_nnf_logs(cnpj_sem_mascara, serie_int, logs_dir=r"C:\ACBrMonitorPLUS\Log
         return max_n
     except Exception:
         return 0
+
+
+def _extrair_cnf_de_xml(path_xml):
+    """Tenta extrair o cNF do XML informado (NF-e)."""
+    try:
+        import xml.etree.ElementTree as ET
+
+        tree = ET.parse(path_xml)
+        root = tree.getroot()
+        ns = {"n": root.tag.split("}")[0].strip("{")}
+        ide = root.find(".//n:ide", ns)
+        if ide is not None:
+            cnf_el = ide.find("n:cNF", ns)
+            if cnf_el is not None and cnf_el.text and cnf_el.text.strip():
+                return re.sub(r"\D+", "", cnf_el.text)[:8].zfill(8)
+
+        inf = root.find(".//n:infNFe", ns)
+        if inf is not None:
+            inf_id = inf.attrib.get("Id", "")
+            m = re.search(r"([0-9]{44})", inf_id)
+            if m:
+                return m.group(1)[35:43]
+    except Exception:
+        return None
+
+    return None
+
+
+def _cnf_existente(cnpj_sem_mascara, serie_int, nnf_int):
+    """Se já existir XML dessa NF-e, reutiliza o cNF para evitar nova chave."""
+    path_xml = _buscar_xml_nfe(cnpj_sem_mascara, serie_int, nnf_int)
+    if not path_xml:
+        return None
+    return _extrair_cnf_de_xml(path_xml)
+
 
 def _grava_seq(cnpj_sem_mascara, serie_int, valor):
     path = _seq_path(cnpj_sem_mascara, serie_int)
@@ -429,6 +477,11 @@ def criaComandoACBr(self, nome_arquivo):
                V("variavelIndicadorPresenca", "") or
                "9").strip()  # 9 = operação não presencial (outros)
 
+    # cNF estável: reaproveita do XML existente ou gera determinístico (evita nova chave)
+    cnf_val = _cnf_existente(cnpj_emit_for_seq, serie_int, nnf_int)
+    if not cnf_val:
+        cnf_val = _cnf_estavel(cnpj_emit_for_seq, serie_int, nnf_int)
+
     # ---------------- Emitente ----------------
     xNomeEmit  = self.variavelRazaoSocialEmitente.get()
     cnpjEmit   = self.variavelCNPJRazaoSocialEmitente.get()
@@ -580,7 +633,7 @@ def criaComandoACBr(self, nome_arquivo):
         # [infNFe] / [Identificacao]
         f.write("[infNFe]\r\nversao=4.00\r\n\r\n")
         f.write("[Identificacao]\r\n")
-        f.write(f"cNF={random.randint(10_000_000, 99_999_999)}\r\n")
+        f.write(f"cNF={cnf_val}\r\n")
         f.write(f"natOp={natop}\r\n")
         f.write("mod=55\r\n")
         f.write(f"serie={serie_int}\r\n")
