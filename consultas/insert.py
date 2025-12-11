@@ -62,7 +62,16 @@ class Insere:
         db.cursor.execute(queryInserirCliente, (confirmado, vencimento, descricao, total, formaPag, qtdParcelas))
         db.conn.commit()
 
-    def registraFaturamentoEntradaNoBanco(confirmado, vencimento, descricao, total, numero_nfe, emitente_nome, dados_completos=None):
+    def registraFaturamentoEntradaNoBanco(
+        confirmado,
+        vencimento,
+        descricao,
+        total,
+        numero_nfe,
+        emitente_nome,
+        dados_completos=None,
+        numero_parcela=None,
+    ):
         dados = dados_completos or {}
         hoje = datetime.now().strftime("%Y-%m-%d")
         data_emissao = dados.get("data_emissao") or hoje
@@ -81,6 +90,9 @@ class Insere:
             itens = "[]"
         if not itens:
             itens = "[]"
+
+        chave_base = dados_atualizados.get("chave_nfe", "")
+        chave_parcela = f"{chave_base}-{numero_parcela}" if numero_parcela else chave_base
 
         campos = [
             "chave_nfe",
@@ -116,7 +128,7 @@ class Insere:
         vencimento_valor = vencimento if vencimento is not None else ""
 
         valores = [
-            dados.get("chave_nfe", ""),
+            chave_parcela,
             numero_nfe,
             dados_atualizados.get("serie_nfe", ""),
             dados_atualizados.get("data_emissao", None),
@@ -178,7 +190,7 @@ class Insere:
                             dados_atualizados.get("data_emissao", hoje),
                             numero_nfe,
                             "Entrada",
-                            dados_atualizados.get("chave_nfe", ""),
+            chave_parcela,
                             emitente_nome,
                             dados_atualizados.get("emitente_cnpj", ""),
                             dados_atualizados.get("destinatario_cnpj", ""),

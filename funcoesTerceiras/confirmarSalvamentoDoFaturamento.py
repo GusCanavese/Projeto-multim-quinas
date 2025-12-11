@@ -20,7 +20,9 @@ def confirmarSalvamentoDoFaturamento(self, quantidade, valor, formaPag, data, pe
         dataBase = datetime.strptime(dataFaturamento, "%d/%m/%Y")
 
         valorParcela = round(float(valorTotal) / int(qtdParcelas), 2)
-        for i in range(int(qtdParcelas)):
+        total_parcelas = int(qtdParcelas)
+
+        for i in range(total_parcelas):
             if repeticao == "Mensal":
                 dataParcela = dataBase + relativedelta(months=i)
             elif repeticao == "Bimestral":
@@ -88,7 +90,9 @@ def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data
             "itens": itens_da_nota,
         }
 
-        for i in range(int(qtdParcelas)):
+        total_parcelas = int(qtdParcelas)
+
+        for i in range(total_parcelas):
             if repeticao == "Mensal":
                 dataParcela = dataBase + relativedelta(months=i)
             elif repeticao == "Bimestral":
@@ -99,10 +103,13 @@ def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data
                 dataParcela = dataBase + relativedelta(years=i)
 
             dataFormatada = dataParcela.strftime("%Y-%m-%d")
+            numero_parcela = i + 1
             descricao = "lançamento referente a nota fiscal de entrada"
             identificador = numero_fatura.get() if numero_fatura else getattr(self, "numero_nfe", "")
             if identificador:
                 descricao += f" {identificador}"
+
+            descricao += f" - Parcela {numero_parcela}/{total_parcelas}"
             Insere.registraFaturamentoEntradaNoBanco(
                 confirmado,
                 dataFormatada,
@@ -111,6 +118,7 @@ def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data
                 identificador,
                 emitente_nome,
                 dados_completos=dados_completos,
+                numero_parcela=numero_parcela,
             )
     except Exception as exc:
         messagebox.showerror("Erro", f"Não foi possível salvar o faturamento da nota: {exc}")
