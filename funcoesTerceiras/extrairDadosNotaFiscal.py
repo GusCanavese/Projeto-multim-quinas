@@ -1,6 +1,7 @@
 import json
 import sys
 import os
+import re
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from consultas.insert import Insere
 import xmltodict
@@ -107,7 +108,21 @@ def extrairDadosDaNota(self, xmlCaminho, tipo, status):
 
     serie = acessar(nfe_proc, "NFe", "infNFe", "ide", "serie")
     numero = acessar(nfe_proc, "NFe", "infNFe", "ide", "nNF")
-    chave = acessar(nfe_proc, "protNFe", "infProt", "chNFe")
+    chave = acessar(nfe_proc, "protNFe", "infProt", "chNFe") or ""
+
+    # Fallbacks para garantir a chave de acesso mesmo quando o protocolo não estiver presente
+    chave = re.sub(r"\D+", "", str(chave))
+    if not chave:
+        if id_nfe:
+            m = re.search(r"([0-9]{44})", str(id_nfe))
+            if m:
+                chave = m.group(1)
+        if not chave:
+            m = re.search(r"<chNFe>([0-9]{44})</chNFe>", xml_conteudo)
+            if m:
+                chave = m.group(1)
+    if not chave:
+        raise ValueError("Não foi possível identificar a chave de acesso da NF-e gerada.")
 
     cUF = acessar(nfe_proc, "NFe", "infNFe", "ide", "cUF")
     uf_emit = acessar(nfe_proc, "NFe", "infNFe", "emit", "enderEmit", "UF")
@@ -170,6 +185,17 @@ def extrairDadosDaNota(self, xmlCaminho, tipo, status):
     nRec = acessar(nfe_proc, "protNFe", "infProt", "nRec")
     dhRecbto = acessar(nfe_proc, "protNFe", "infProt", "dhRecbto")
     status = cStat
+
+    try:
+        self.chave_nfe = chave
+        self.numero_nfe = numero
+        self.serie_nfe = serie
+        self.emitente_cnpj = emitente_cnpjcpf
+        self.destinatario_cnpj = destinatario_cnpjcpf
+        if hasattr(self, "variavelChaveDaNota") and hasattr(self.variavelChaveDaNota, "set"):
+            self.variavelChaveDaNota.set(chave)
+    except Exception:
+        pass
 
     qrcode_url = acessar(nfe_proc, "NFe", "infNFeSupl", "qrCode")
 
