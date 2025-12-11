@@ -13,6 +13,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, EhNotaDoConsumidor):
 
     self.variavelRepeticao = 0
+    self.salvarFaturamentoNota = bool(getattr(self, "importouNotaEntrada", False) or DadosNota)
     self.row = 1
     self.frameTelaGerarFaturamento = criaFrameJanela(
         self, 0.5, 0.5, 1, 1, self.corFundo)
@@ -196,9 +197,25 @@ def telaGerarFaturamentoEntradaNota(self, DadosNota, valorNota, EhNotaDoConsumid
 
     def salvarEFechar(self):
         try:
-            confirmarSalvamentoDoFaturamentoNota(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, self.data, self.variavelRepeticao)
-        except:
-            confirmarSalvamentoDoFaturamentoNota(self, self.listaEntradaQuantidade, self.listaEntradaValor, self.listaComboboxes, "99/99/9999", self.variavelRepeticao)
+            confirmarSalvamentoDoFaturamentoNota(
+                self,
+                self.listaEntradaQuantidade,
+                self.listaEntradaValor,
+                self.listaComboboxes,
+                self.data,
+                self.variavelRepeticao,
+                salvar_no_banco=self.salvarFaturamentoNota,
+            )
+        except Exception:
+            confirmarSalvamentoDoFaturamentoNota(
+                self,
+                self.listaEntradaQuantidade,
+                self.listaEntradaValor,
+                self.listaComboboxes,
+                "99/99/9999",
+                self.variavelRepeticao,
+                salvar_no_banco=self.salvarFaturamentoNota,
+            )
 
         telaObservacoesNotaSaida(self, EhNotaDoConsumidor)
 

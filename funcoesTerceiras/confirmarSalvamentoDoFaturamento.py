@@ -42,7 +42,10 @@ def confirmarSalvamentoDoFaturamento(self, quantidade, valor, formaPag, data, pe
 
 
 
-def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data, repeticao):
+def confirmarSalvamentoDoFaturamentoNota(self, quantidade, valor, formaPag, data, repeticao, salvar_no_banco=True):
+
+    if not salvar_no_banco:
+        return
 
     confirmado = "Não"
     qtdParcelas = quantidade[0].get()
