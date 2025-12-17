@@ -11,6 +11,9 @@ from decimal import Decimal, ROUND_HALF_UP
 def telaTotaisNotaSaida(self, EhNotaDoConsumidor):
     self.frameTelaTotais = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
+    # Garante que totais anteriores não interfiram nos próximos cálculos
+    self.valorSubtotalFaturamento = 0.0
+
     # DEBUG: listar tudo que foi salvo na tributação por produto
     def acessar(dados, *caminho, default="0.00"):
         atual = dados

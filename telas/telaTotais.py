@@ -7,6 +7,8 @@ from componentes import criaFrameJanela, criarLabelLateralEntry, criaBotao
 
 
 def telaTotais(self, dadosNota, IPI):
+    # Evita que totais de outras notas persistam ao abrir uma nova tela
+    self.valorSubtotalFaturamento = 0.0
     self.frameTelaTotais = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
     # variaveis

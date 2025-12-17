@@ -18,7 +18,7 @@ def acessar(dados, *caminho, default=""):
     return dados if isinstance(dados, str) else default
 
 
-def montar_parametros_nota_saida(dadosNota):
+def montar_parametros_nota_saida(dadosNota, cfop_override=None):
     def pegar_valor(dados, *caminhos, default=""):
         for caminho in caminhos:
             atual = dados
@@ -127,8 +127,19 @@ def montar_parametros_nota_saida(dadosNota):
     itens = inf_nfe.get("det", [])
     if isinstance(itens, dict):
         itens = [itens]
+    cfop_personalizado = ""
+    try:
+        cfop_personalizado = (cfop_override.get() if cfop_override else "").strip()
+    except Exception:
+        cfop_personalizado = str(cfop_override).strip() if cfop_override else ""
+    if cfop_personalizado:
+        for item in itens:
+            if isinstance(item, dict):
+                prod = item.get("prod", {}) if isinstance(item.get("prod", {}), dict) else {}
+                prod["CFOP"] = cfop_personalizado
+                item["prod"] = prod
     itens_json = json.dumps(itens, ensure_ascii=False)
-    cfop = acessar(itens[0], "prod", "CFOP") if itens else ""
+    cfop = cfop_personalizado or (acessar(itens[0], "prod", "CFOP") if itens else "")
     operacao = natOp
 
     def vazio_para_none(valor):
@@ -242,7 +253,8 @@ def telaObservacoes(self, dadosNota):
     )
     area2.place(relheight=0.3)
 
-    parametros = montar_parametros_nota_saida(dadosNota)
+    cfop_override = getattr(self, "cfop_produtos_var", None) or getattr(self, "variavelCFOP", None)
+    parametros = montar_parametros_nota_saida(dadosNota, cfop_override)
 
     def insereRetorna():
         Insere.inserir_nota_fiscal_saida(

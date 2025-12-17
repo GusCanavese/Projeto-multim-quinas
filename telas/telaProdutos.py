@@ -35,6 +35,13 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor=0, cfop=None, cnpj_busca="T
             return "refrimaquinas"
         return ""
 
+    # Garante que os acumuladores e itens começam vazios para cada nota
+    self.dadosNota = dadosNota if dadosNota else None
+    self.dadosNFeEntrada = dadosNota if dadosNota else None
+    self.dadosProdutos = {}
+    self.valoresDosItens = []
+    self.valorSubtotalFaturamento = 0.0
+
     nota_importada = bool(dadosNota)
     if nota_importada:
         self.dadosNota = dadosNota
@@ -76,6 +83,7 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor=0, cfop=None, cnpj_busca="T
     listaLabels = ["Item", "Produto", "Preço", "Quantidade", "Estoque", "Desconto $", "Desconto %", "Acréscimo", "Subtotal", "cfop"]
 
     variavelCfop = ctk.StringVar()
+    self.cfop_produtos_var = variavelCfop
     try:
         valor_cfop = cfop.get()
     except Exception:
@@ -853,7 +861,7 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor=0, cfop=None, cnpj_busca="T
             linha_widgets["quantidade"].insert(0, str(qCom))
 
             linha_widgets["estoque"].delete(0, "end")
-            linha_widgets["estoque"].insert(0, "0")
+            linha_widgets["estoque"].insert(0, str(qCom))
             linha_widgets["estoque"].configure(state="disabled")
 
             linha_widgets["desc_real"].delete(0, "end")

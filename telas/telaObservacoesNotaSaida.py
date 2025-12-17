@@ -103,7 +103,8 @@ def telaObservacoesNotaSaida(self, EhNotaDoConsumidor):
             messagebox.showerror("Erro", "Não há dados da nota importada para salvar.")
             return
         try:
-            parametros = montar_parametros_nota_saida(dados_nfe)
+            cfop_override = getattr(self, "cfop_produtos_var", None) or getattr(self, "variavelCFOP", None)
+            parametros = montar_parametros_nota_saida(dados_nfe, cfop_override)
             Insere.inserir_nota_fiscal_saida(
                 *parametros,
                 "Entrada",

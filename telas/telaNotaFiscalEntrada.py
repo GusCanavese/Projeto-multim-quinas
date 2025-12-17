@@ -124,6 +124,7 @@ def telaNotaFiscalEntrada(self, dadosNota):
     variavelStatus                   = ctk.StringVar()
     variavelDataConfirmacao          = ctk.StringVar()
     variavelCFOP                     = ctk.StringVar()
+    self.variavelCFOP = variavelCFOP
     variavelNatureza                 = ctk.StringVar()
     formaDePagamento                 = ctk.StringVar()
     variavelEntradaOuSaida           = ctk.StringVar()

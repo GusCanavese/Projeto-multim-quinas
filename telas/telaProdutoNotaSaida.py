@@ -14,6 +14,13 @@ from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
 def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
+    # Reinicia acumuladores e itens para evitar vazamentos entre notas
+    self.dadosNota = None
+    self.dadosNFeEntrada = None
+    self.dadosProdutos = {}
+    self.valoresDosItens = []
+    self.valorSubtotalFaturamento = 0.0
+
     self.row=1
     self.posicaoy = 0.2
     self.posicaox = 0.024
@@ -31,6 +38,7 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
 
     variavelCfop = ctk.StringVar()
     variavelCfop.set(cfop)
+    self.cfop_produtos_var = variavelCfop
 
 
 
