@@ -15,7 +15,7 @@ from componentes import criaFrameJanela, criaBotao, criaBotaoPequeno, criaLabel,
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
-def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
+def telaProdutos(self, dadosNota, EhNotaDoConsumidor=0, cfop=None, cnpj_busca="Todos"):
     print(EhNotaDoConsumidor)
     """
     Tela de Produtos da Nota de Saída.
@@ -23,11 +23,42 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
     pré-carregados automaticamente nas linhas (produto, preço, quantidade, subtotal).
     """
 
+    def _cnpj_por_nome(razao_social):
+        termo = (razao_social or "").lower()
+        if "nutrigel" in termo:
+            return "nutrigel"
+        if "multimaquinas" in termo:
+            return "multimaquinas"
+        if "polimaquinas" in termo:
+            return "polimaquinas"
+        if "refrimaquinas" in termo:
+            return "refrimaquinas"
+        return ""
+
     nota_importada = bool(dadosNota)
     if nota_importada:
         self.dadosNota = dadosNota
         # compatibilidade com telas que já utilizavam esse atributo
         self.dadosNFeEntrada = dadosNota
+
+        def _acessar(dados, *caminho):
+            for chave in caminho:
+                if isinstance(dados, dict) and chave in dados:
+                    dados = dados[chave]
+                else:
+                    return ""
+            if isinstance(dados, dict) and "#text" in dados:
+                return dados["#text"]
+            return dados if isinstance(dados, str) else ""
+
+        cnpj_busca = (
+            cnpj_busca
+            or _cnpj_por_nome(_acessar(dadosNota, "NFe", "infNFe", "emit", "xNome"))
+            or _cnpj_por_nome(_acessar(dadosNota, "NFe", "infNFe", "dest", "xNome"))
+            or _acessar(dadosNota, "NFe", "infNFe", "emit", "CNPJ")
+            or _acessar(dadosNota, "NFe", "infNFe", "dest", "CNPJ")
+            or "Todos"
+        )
 
     self.importouNotaEntrada = nota_importada
 
@@ -72,7 +103,9 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor, cfop):
 
         self.resultadoLabelsProduto = []
 
-        for i, row in enumerate(Buscas.buscaEstoqueProdutosFiscal(nomeDoProduto)):
+        cnpj_para_busca = cnpj_busca or "Todos"
+
+        for i, row in enumerate(Buscas.buscaEstoqueProdutosFiscal(nomeDoProduto, cnpj_para_busca)):
             if i >= 5:
                 break
             label = criaBotao(frameParaItensNoFrame,row[0],0.195,yNovo + 0.02 + i * 0.02,0.26,lambda nome=row[0], valor=row[6].replace(',', '.'), quantidade=row[8].replace(',', '.'), ent=entradaProduto, ncm=row[4]: selecionaProduto(nome, valor, quantidade, ent, ncm))

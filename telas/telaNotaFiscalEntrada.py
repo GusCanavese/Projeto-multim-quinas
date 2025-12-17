@@ -23,6 +23,19 @@ def acessar(dados, *caminho, default=""):
     return dados if isinstance(dados, str) else default
 
 
+def _cnpj_por_nome(razao_social):
+    termo = (razao_social or "").lower()
+    if "nutrigel" in termo:
+        return "nutrigel"
+    if "multimaquinas" in termo:
+        return "multimaquinas"
+    if "polimaquinas" in termo:
+        return "polimaquinas"
+    if "refrimaquinas" in termo:
+        return "refrimaquinas"
+    return ""
+
+
 def telaNotaFiscalEntrada(self, dadosNota):
     self.dadosNotaPegar = []
     self.frameTelaNotaFiscalEntrada = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
@@ -214,12 +227,20 @@ def telaNotaFiscalEntrada(self, dadosNota):
     formasPag = criarLabelComboBox(self.frameTelaNotaFiscalEntrada, "Forma de pagamento", 0.4, 0.64, 0.2, opcoesPagamento)
     formasPag.set(formaDePagamento.get())
 
+    cnpj_para_busca = (
+        _cnpj_por_nome(variavelRazaoSocialEmitente.get())
+        or _cnpj_por_nome(variavelRazaoSocialRemetente.get())
+        or variavelCNPJRazaoSocialEmitente.get()
+        or variavelCNPJRazaoSocialRemetente.get()
+        or "Todos"
+    )
+
     criaBotao(
         self.frameTelaNotaFiscalEntrada,
         "Próximo - Tela de Produtos",
         0.25,
         0.94,
         0.15,
-        lambda: telaProdutos(self, dadosNota, 0, variavelCFOP),
+        lambda: telaProdutos(self, dadosNota, 0, variavelCFOP, cnpj_para_busca),
     ).place(anchor="nw")
     criaBotao(self.frameTelaNotaFiscalEntrada, "Voltar", 0.05, 0.94, 0.15, lambda: self.frameTelaNotaFiscalEntrada.destroy()).place(anchor="nw")
