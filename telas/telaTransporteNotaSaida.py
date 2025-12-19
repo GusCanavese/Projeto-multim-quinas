@@ -3,8 +3,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from consultas.select import Buscas
-from componentes import criaBotaoPequeno, criaEntry, criaFrameJanela, criaLabel, criarLabelEntry, criarLabelComboBox, criaBotao
-from telas.telaCadastroTransportadoras import telaCadastroTransportadoras 
+from componentes import criaBotaoPequeno, criaEntry, criaFrameJanela, criaLabel, criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criaBotao
+from telas.telaCadastroTransportadoras import telaCadastroTransportadoras
 from telas.telaTotaisNotaSaida import telaTotaisNotaSaida
 
 def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
@@ -75,6 +75,12 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
     # variáveis
     variavelTransportador = ctk.StringVar()
     variavelCNPJTransportador = ctk.StringVar()
+    self.variavelCFOPTransporte = ctk.StringVar()
+    self.variavelBCRetencaoICMS = ctk.StringVar()
+    self.variavelValorICMSRetido = ctk.StringVar()
+    self.variavelValorServicoTransp = ctk.StringVar()
+    self.variavelAliquotaRetICMS = ctk.StringVar()
+    self.variavelMunicipioGerador = ctk.StringVar()
 
 
     criarLabelComboBox(self.frametelaTransporte, "Modalidade do frete", 0.05, 0.1, 0.25, opcoesTransporte)
@@ -84,6 +90,21 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
     self.nomeTransportador.bind("<Button-1>",buscaTransportador)
     self.documentoTransportador.bind("<Button-1>",buscaTransportador)
     self.documentoTransportador.bind("<KeyRelease>",buscaTransportador)
+
+    # Bloco de tributação organizado em colunas para evitar sobreposição com os volumes
+    frame_tributacao = ctk.CTkFrame(self.frametelaTransporte, fg_color="transparent")
+    frame_tributacao.place(relx=0.08, rely=0.52, relwidth=0.88, relheight=0.2)
+
+    colunas = [0.09, 0.41, 0.73]
+    largura_coluna = 0.18
+
+    criarLabelLateralEntry(frame_tributacao, "CFOP", colunas[0], 0.20, largura_coluna, self.variavelCFOPTransporte)
+    criarLabelLateralEntry(frame_tributacao, "BC Retenção ICMS", colunas[1], 0.20, largura_coluna, self.variavelBCRetencaoICMS)
+    criarLabelLateralEntry(frame_tributacao, "Valor ICMS Retido", colunas[2], 0.20, largura_coluna, self.variavelValorICMSRetido)
+
+    criarLabelLateralEntry(frame_tributacao, "Valor do Serviço", colunas[0], 0.68, largura_coluna, self.variavelValorServicoTransp)
+    criarLabelLateralEntry(frame_tributacao, "Aliquota Ret. ICMS", colunas[1], 0.68, largura_coluna, self.variavelAliquotaRetICMS)
+    criarLabelLateralEntry(frame_tributacao, "Município Gerador", colunas[2], 0.68, largura_coluna, self.variavelMunicipioGerador)
 
     self.posicaoy = 0.3
     self.posicaox = 0.05
@@ -162,6 +183,16 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
             try:
                 transp = dados["NFe"]["infNFe"]["transp"]
 
+                ret_transp = transp.get("retTransp", {}) if isinstance(transp, dict) else {}
+
+                def _valor_ret(chave):
+                    if not isinstance(ret_transp, dict):
+                        return ""
+                    val = ret_transp.get(chave, "")
+                    if isinstance(val, dict) and "#text" in val:
+                        val = val.get("#text", "")
+                    return str(val).strip()
+
                 # Nome do transportador
                 nomeTransp = ""
                 try:
@@ -199,6 +230,29 @@ def telaTransporteNotaSaida(self, EhNotaDoConsumidor, ehNotaEntrada):
                 self.dadosTransporteImportado["transportador"] = {
                     "nome": str(nomeTransp).strip(),
                     "documento": str(docTransp).strip(),
+                }
+
+                v_serv = _valor_ret("vServ")
+                v_bc_ret = _valor_ret("vBCRet")
+                p_icms_ret = _valor_ret("pICMSRet")
+                v_icms_ret = _valor_ret("vICMSRet")
+                cfop_ret = _valor_ret("CFOP")
+                cmunfg_ret = _valor_ret("cMunFG")
+
+                self.variavelValorServicoTransp.set(v_serv)
+                self.variavelBCRetencaoICMS.set(v_bc_ret)
+                self.variavelAliquotaRetICMS.set(p_icms_ret)
+                self.variavelValorICMSRetido.set(v_icms_ret)
+                self.variavelCFOPTransporte.set(cfop_ret)
+                self.variavelMunicipioGerador.set(cmunfg_ret)
+
+                self.dadosTransporteImportado["retencaoICMS"] = {
+                    "vServ": v_serv,
+                    "vBCRet": v_bc_ret,
+                    "pICMSRet": p_icms_ret,
+                    "vICMSRet": v_icms_ret,
+                    "CFOP": cfop_ret,
+                    "cMunFG": cmunfg_ret,
                 }
 
                 # ----------------- volumes: qVol, esp, marca, nVol, pesoB, pesoL -----------------

@@ -33,6 +33,12 @@ def telaTransporte(self, dadosNota):
     variavelCNPJTransportador = ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "transporta", "CNPJ"))
     variavelModelo = ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "ide", "mod"))
     variavelTributacao = ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "ICMS", "tomaICMS") or acessar(dadosNota, "NFe", "infNFe", "transp", "ICMS", "vServ") or "00")
+    self.variavelCFOPTransporte = ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "retTransp", "CFOP") or acessar(dadosNota, "NFe", "infNFe", "det", "prod", "CFOP"))
+    self.variavelBCRetencaoICMS = ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "retTransp", "vBCRet"))
+    self.variavelValorICMSRetido = ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "retTransp", "vICMSRet"))
+    self.variavelValorServicoTransp = ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "retTransp", "vServ"))
+    self.variavelAliquotaRetICMS = ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "retTransp", "pICMSRet"))
+    self.variavelMunicipioGerador = ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "retTransp", "cMunFG"))
 
     criarLabelEntry(self.frametelaTransporte, "Modalidade do frete", 0.05, 0.1, 0.25, variavelModalidade)
     criarLabelEntry(self.frametelaTransporte, "Transportador", 0.35, 0.1, 0.3, variavelTransportador)
@@ -51,12 +57,20 @@ def telaTransporte(self, dadosNota):
     criarLabelEntry(self.frametelaTransporte, "Desconto", 0.81, 0.2, 0.05, ctk.StringVar())
     criarLabelEntry(self.frametelaTransporte, "Total da Nota ", 0.88, 0.2, 0.05, ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "total", "ICMSTot", "vNF")))
 
-    criarLabelLateralEntry(self.frametelaTransporte, "CFOP", 0.10, 0.4, 0.08, ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "det", "prod", "CFOP")))
-    criarLabelLateralEntry(self.frametelaTransporte, "BC Retenção ICMS", 0.40, 0.4, 0.15, ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "retTransp", "vBCRet")))
-    criarLabelLateralEntry(self.frametelaTransporte, "Valor ICMS Retido", 0.70, 0.4, 0.15, ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "retTransp", "vICMSRet")))
-    criarLabelLateralEntry(self.frametelaTransporte, "Valor do Serviço", 0.10, 0.5, 0.15, ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "retTransp", "vServ")))
-    criarLabelLateralEntry(self.frametelaTransporte, "Aliquota Ret. ICMS", 0.40, 0.5, 0.15, ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "retTransp", "pICMSRet")))
-    criarLabelLateralEntry(self.frametelaTransporte, "Município Gerador", 0.70, 0.5, 0.15, ctk.StringVar(value=acessar(dadosNota, "NFe", "infNFe", "transp", "retTransp", "CFOP")))
+    # Bloco de tributação organizado em colunas para evitar sobreposição
+    frame_tributacao = ctk.CTkFrame(self.frametelaTransporte, fg_color="transparent")
+    frame_tributacao.place(relx=0.08, rely=0.52, relwidth=0.88, relheight=0.2)
+
+    colunas = [0.9, 0.41, 0.73]
+    largura_coluna = 0.9
+
+    criarLabelLateralEntry(frame_tributacao, "CFOP", colunas[0], 0.20, largura_coluna, self.variavelCFOPTransporte)
+    criarLabelLateralEntry(frame_tributacao, "BC Retenção ICMS", colunas[1], 0.20, largura_coluna, self.variavelBCRetencaoICMS)
+    criarLabelLateralEntry(frame_tributacao, "Valor ICMS Retido", colunas[2], 0.20, largura_coluna, self.variavelValorICMSRetido)
+
+    criarLabelLateralEntry(frame_tributacao, "Valor do Serviço", colunas[0], 0.68, largura_coluna, self.variavelValorServicoTransp)
+    criarLabelLateralEntry(frame_tributacao, "Aliquota Ret. ICMS", colunas[1], 0.68, largura_coluna, self.variavelAliquotaRetICMS)
+    criarLabelLateralEntry(frame_tributacao, "Município Gerador", colunas[2], 0.68, largura_coluna, self.variavelMunicipioGerador)
 
 
     criaBotao(self.frametelaTransporte, "Próximo - Observações", 0.25, 0.94, 0.15, lambda: telaObservacoes(self, dadosNota)).place(anchor="nw")
