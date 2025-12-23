@@ -234,19 +234,31 @@ def extrairDadosDaNota(self, xmlCaminho, tipo, status):
     cfop            = None if cfop            == "" else cfop
     operacao        = None if operacao        == "" else operacao
 
-    Insere.inserir_nota_fiscal_saida(tipo,modelo,serie,numero,chave,cUF,
-                                     uf_emit,uf_dest,tpAmb,tpNF,idDest,natOp,dhEmi,
-                                     dhSaiEnt,emitente_cnpjcpf,emitente_nome,
-                                     emitente_ie,destinatario_cnpjcpf,destinatario_nome,
-                                     destinatario_ie,valor_total,valor_produtos,
-                                     valor_desconto,valor_frete,valor_seguro,
-                                     valor_outras_despesas,valor_bc_icms,valor_icms,
-                                     valor_icms_desonerado,valor_fcp,valor_bc_icms_st,
-                                     valor_icms_st,valor_ipi,valor_pis,valor_cofins,
-                                     valor_bc_irrf,transportadora_cnpjcpf,transportadora_nome,
-                                     mod_frete,placa_veiculo,uf_veiculo,rntc,volum_qVol,
-                                     volum_esp,volum_marca,volum_nVol,peso_liquido,peso_bruto,
-                                     cStat,xMotivo,protocolo,nRec,dhRecbto,status,qrcode_url,
-                                     data_vencimento,itens_json,cfop,operacao, "Saída")
+    Insere.inserir_nota_fiscal(
+        chave,
+        numero,
+        serie,
+        dhEmi,
+        dhSaiEnt,
+        emitente_cnpjcpf,
+        emitente_nome,
+        destinatario_cnpjcpf,
+        destinatario_nome,
+        valor_total,
+        valor_produtos,
+        valor_bc_icms,
+        valor_icms,
+        valor_icms_desonerado,
+        valor_bc_icms_st,
+        valor_icms_st,
+        valor_ipi,
+        valor_pis,
+        valor_cofins,
+        valor_bc_irrf,
+        transportadora_cnpjcpf,
+        transportadora_nome,
+        itens_json,
+        data_vencimento,
+    )
 
 

@@ -244,6 +244,7 @@ class Insere:
                        valor_icms_desonerado, valor_bc_icms_st, valor_icms_st,
                        valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
                        transportadora_cnpj, transportadora_nome, itens_json, data_vencimento):
+        print("entrou aqui agora")
         
         resposta = messagebox.askquestion("Aviso", "Você tem certeza que deseja inserir essa nota fiscal?")
         if resposta == 'yes':
@@ -267,7 +268,7 @@ class Insere:
                 valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
                 transportadora_cnpj, transportadora_nome, itens_json, data_vencimento, confirmado, descricao, 
             )
-            
+            print("inseriu a nota")
             db.cursor.execute(query, dados)
             db.conn.commit()
 

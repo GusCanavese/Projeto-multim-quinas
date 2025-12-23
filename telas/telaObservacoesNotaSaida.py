@@ -105,6 +105,7 @@ def telaObservacoesNotaSaida(self, EhNotaDoConsumidor):
         try:
             cfop_override = getattr(self, "cfop_produtos_var", None) or getattr(self, "variavelCFOP", None)
             parametros = montar_parametros_nota_saida(dados_nfe, cfop_override)
+            print("ta chamando a da saída")
             Insere.inserir_nota_fiscal_saida(
                 *parametros,
                 "Entrada",

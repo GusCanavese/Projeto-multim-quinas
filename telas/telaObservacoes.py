@@ -257,7 +257,8 @@ def telaObservacoes(self, dadosNota):
     parametros = montar_parametros_nota_saida(dadosNota, cfop_override)
 
     def insereRetorna():
-        Insere.inserir_nota_fiscal_saida(
+        print("ta chamando a da entrada")
+        Insere.inserir_nota_fiscal(
             *parametros,
             "Saída",
         )
