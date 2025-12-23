@@ -1,6 +1,8 @@
 
 import sys
 import os
+import re
+import unicodedata
 
 from telas.telaTotais import telaTotais
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -23,8 +25,13 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor=0, cfop=None, cnpj_busca="T
     pré-carregados automaticamente nas linhas (produto, preço, quantidade, subtotal).
     """
 
+    def _normalizar_texto(texto):
+        texto = unicodedata.normalize("NFKD", str(texto or ""))
+        texto = texto.encode("ASCII", "ignore").decode("ASCII")
+        return re.sub(r"[^a-z0-9]+", "", texto.lower())
+
     def _cnpj_por_nome(razao_social):
-        termo = (razao_social or "").lower()
+        termo = _normalizar_texto(razao_social)
         if "nutrigel" in termo:
             return "nutrigel"
         if "multimaquinas" in termo:

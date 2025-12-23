@@ -3,6 +3,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import customtkinter as ctk
+import re
+import unicodedata
 from datetime import datetime
 from telas.telaProdutos import telaProdutos
 from componentes import criaFrameJanela, criarLabelEntry, criarLabelComboBox, criarLabelLateralEntry, criarLabelLateralComboBox, criaBotao
@@ -23,8 +25,14 @@ def acessar(dados, *caminho, default=""):
     return dados if isinstance(dados, str) else default
 
 
+def _normalizar_texto(texto):
+    texto = unicodedata.normalize("NFKD", str(texto or ""))
+    texto = texto.encode("ASCII", "ignore").decode("ASCII")
+    return re.sub(r"[^a-z0-9]+", "", texto.lower())
+
+
 def _cnpj_por_nome(razao_social):
-    termo = (razao_social or "").lower()
+    termo = _normalizar_texto(razao_social)
     if "nutrigel" in termo:
         return "nutrigel"
     if "multimaquinas" in termo:

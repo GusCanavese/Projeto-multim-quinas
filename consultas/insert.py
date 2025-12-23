@@ -5,6 +5,7 @@ import db
 import json
 from tkinter import messagebox
 import re
+import unicodedata
 from datetime import datetime
 
 
@@ -270,56 +271,78 @@ class Insere:
             db.cursor.execute(query, dados)
             db.conn.commit()
 
+            print("chamou para inserir produto")
             def registrar_produtos_entrada():
-                try:
-                    itens = json.loads(itens_json) if isinstance(itens_json, str) else itens_json
-                except Exception:
+                def normalizar_texto(texto):
+                    texto = unicodedata.normalize("NFKD", str(texto or ""))
+                    texto = texto.encode("ASCII", "ignore").decode("ASCII")
+                    return re.sub(r"[^a-z0-9]+", "", texto.lower())
+
+                def cnpj_por_nome(razao_social):
+                    print("assim veio o cnpj {}", razao_social)
+                    termo = normalizar_texto(razao_social)
+                    if any(nome in termo for nome in ["nutrigel", "multimaquinas", "polimaquinas", "refrimaquinas"]):
+                        return destinatario_cnpj or ""
+                    return destinatario_cnpj or ""
+
+                if not itens_json:
                     itens = []
+                elif isinstance(itens_json, str):
+                    itens = json.loads(itens_json)
+                else:
+                    itens = itens_json
 
                 if isinstance(itens, dict):
                     itens = [itens]
 
+                cnpj_produto = (
+                    cnpj_por_nome(destinatario_nome)
+                    or destinatario_cnpj
+                    or cnpj_por_nome(emitente_nome)
+                )
+
                 for item in itens:
                     prod = item.get("prod", {}) if isinstance(item, dict) else {}
                     nome = prod.get("xProd", "")
-                    valor_custo = prod.get("vUnCom", 0)
-                    quantidade = prod.get("qCom", 0)
+                    valor_custo = float(prod.get("vUnCom", 0) or 0)
+                    valor_venda = float(prod.get("vProd", valor_custo) or valor_custo)
+                    quantidade = float(prod.get("qCom", 0) or 0)
                     codigo_interno = prod.get("cProd", "")
                     ncm = prod.get("NCM", "")
                     cfop = prod.get("CFOP", "")
                     cest = prod.get("CEST", "")
                     origem_cst = prod.get("orig", "")
+                    codigo_barras = prod.get("cEAN", "")
+                    codigo_grade = prod.get("cEANTrib", "")
+                    custo = valor_custo
+                    cst = prod.get("CSOSN", "") or prod.get("CST", "") or ""
                     marca = prod.get("xProd", "")
 
-                    try:
-                        query_produto = (
-                            "INSERT INTO produtos("
-                            "nome_do_produto, valor_de_custo, valor_de_venda, quantidade, "
-                            "codigo_interno, codigo_ncm, codigo_cfop, codigo_cest, origem_cst, descricao, CNPJ, marca"
-                            ") VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
-                            "ON DUPLICATE KEY UPDATE quantidade = quantidade + VALUES(quantidade)"
-                        )
+                    query_produto_fiscal = (
+                        "INSERT INTO produtos_fiscal("
+                        "descricao_do_produto, cadigo_interno, codigo_de_barras, codigo_grade, "
+                        "codigo_NCM, CST_A, valor_venda, custo, quantidade_em_estoque, CFOP, "
+                        "estoque_MIN, estoque_MAX, CEST, cnpj"
+                        ") VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
+                        "ON DUPLICATE KEY UPDATE quantidade_em_estoque = quantidade_em_estoque + VALUES(quantidade_em_estoque)"
+                    )
 
-                        db.cursor.execute(
-                            query_produto,
-                            (
-                                nome,
-                                valor_custo,
-                                valor_custo,
-                                quantidade,
-                                codigo_interno,
-                                ncm,
-                                cfop,
-                                cest,
-                                origem_cst,
-                                nome,
-                                destinatario_cnpj,
-                                marca,
-                            ),
-                        )
-                        db.conn.commit()
-                    except Exception:
-                        continue
+                    query_produto = (
+                        "INSERT INTO produtos("
+                        "nome_do_produto, valor_de_custo, valor_de_venda, quantidade, "
+                        "codigo_interno, codigo_ncm, codigo_cfop, codigo_cest, origem_cst, descricao, CNPJ, marca"
+                        ") VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
+                        "ON DUPLICATE KEY UPDATE quantidade = quantidade + VALUES(quantidade)"
+                    )
+
+                    db.cursor.execute(
+                        query_produto_fiscal,
+                        (nome,codigo_interno,codigo_barras,codigo_grade,ncm,cst,valor_venda,custo,quantidade,cfop,0,0,cest,cnpj_produto,),)
+
+                    db.cursor.execute(
+                        query_produto,
+                        ( nome, valor_custo, valor_venda, quantidade, codigo_interno, ncm, cfop, cest, origem_cst, nome, cnpj_produto, marca,),)
+                    db.conn.commit()
 
             registrar_produtos_entrada()
             messagebox.showinfo("Sucesso", "Nota fiscal inserida com sucesso!")
