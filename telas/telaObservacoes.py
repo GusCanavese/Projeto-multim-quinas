@@ -257,11 +257,43 @@ def telaObservacoes(self, dadosNota):
     parametros = montar_parametros_nota_saida(dadosNota, cfop_override)
 
     def insereRetorna():
-        print("ta chamando a da entrada")
-        Insere.inserir_nota_fiscal(
-            *parametros,
-            "Saída",
-        )
+        print("ta chamando a da entrada nas observacoes")
+        tpNF = parametros[9] if len(parametros) > 9 else None
+        eh_entrada = str(tpNF) == "0"
+        data_saida = parametros[13] or parametros[12]
+
+        if eh_entrada:
+            Insere.inserir_nota_fiscal(
+                parametros[4],  # chave_nfe
+                parametros[3],  # numero_nfe
+                parametros[2],  # serie_nfe
+                parametros[12],  # data_emissao
+                data_saida,  # data_saida
+                parametros[14],  # emitente_cnpj
+                parametros[15],  # emitente_nome
+                parametros[17],  # destinatario_cnpj
+                parametros[18],  # destinatario_nome
+                parametros[20],  # valor_total
+                parametros[21],  # valor_produtos
+                parametros[26],  # valor_bc_icms
+                parametros[27],  # valor_icms
+                parametros[28],  # valor_icms_desonerado
+                parametros[30],  # valor_bc_icms_st
+                parametros[31],  # valor_icms_st
+                parametros[32],  # valor_ipi
+                parametros[33],  # valor_pis
+                parametros[34],  # valor_cofins
+                parametros[35],  # valor_bc_irrf
+                parametros[36],  # transportadora_cnpj
+                parametros[37],  # transportadora_nome
+                parametros[56],  # itens_json
+                parametros[55],  # data_vencimento
+            )
+        else:
+            Insere.inserir_nota_fiscal_saida(
+                *parametros,
+                "Saída",
+            )
         if getattr(self, "frameTelaObservacoes", None):
             self.frameTelaObservacoes.destroy()
         if getattr(self, "frameTelaTotais", None):

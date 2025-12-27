@@ -274,14 +274,20 @@ class Insere:
 
             print("chamou para inserir produto")
             def registrar_produtos_entrada():
+                def extrair_valor_numerico(valor):
+                    if isinstance(valor, dict):
+                        valor = valor.get("#text", 0)
+                    return float(valor or 0)
+
                 def normalizar_texto(texto):
                     texto = unicodedata.normalize("NFKD", str(texto or ""))
                     texto = texto.encode("ASCII", "ignore").decode("ASCII")
                     return re.sub(r"[^a-z0-9]+", "", texto.lower())
 
                 def cnpj_por_nome(razao_social):
-                    print("assim veio o cnpj {}", razao_social)
+                    print("assim veio o cnpj ", razao_social)
                     termo = normalizar_texto(razao_social)
+                    print("assim veio o cnpj normalizado ", razao_social)
                     if any(nome in termo for nome in ["nutrigel", "multimaquinas", "polimaquinas", "refrimaquinas"]):
                         return destinatario_cnpj or ""
                     return destinatario_cnpj or ""
@@ -301,13 +307,14 @@ class Insere:
                     or destinatario_cnpj
                     or cnpj_por_nome(emitente_nome)
                 )
+                print(cnpj_produto)
 
                 for item in itens:
                     prod = item.get("prod", {}) if isinstance(item, dict) else {}
                     nome = prod.get("xProd", "")
-                    valor_custo = float(prod.get("vUnCom", 0) or 0)
-                    valor_venda = float(prod.get("vProd", valor_custo) or valor_custo)
-                    quantidade = float(prod.get("qCom", 0) or 0)
+                    valor_custo = extrair_valor_numerico(prod.get("vUnCom", 0))
+                    valor_venda = extrair_valor_numerico(prod.get("vProd", valor_custo))
+                    quantidade = extrair_valor_numerico(prod.get("qCom", 0))
                     codigo_interno = prod.get("cProd", "")
                     ncm = prod.get("NCM", "")
                     cfop = prod.get("CFOP", "")
@@ -343,7 +350,10 @@ class Insere:
                     db.cursor.execute(
                         query_produto,
                         ( nome, valor_custo, valor_venda, quantidade, codigo_interno, ncm, cfop, cest, origem_cst, nome, cnpj_produto, marca,),)
+                    print("query para fiscal", query_produto_fiscal)
+                    print("query para geral", query_produto)
                     db.conn.commit()
+
 
             registrar_produtos_entrada()
             messagebox.showinfo("Sucesso", "Nota fiscal inserida com sucesso!")

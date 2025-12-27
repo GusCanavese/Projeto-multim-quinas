@@ -11,21 +11,34 @@ from telas.telaRelatorioDeNotasFiscais import telaRelatorioDeNotasFiscais
 
 
 def telaFiscal(self):
+        self.essaEhNotaDeEntrada = False
         self.frameTelaFiscal = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
 
-        relatorioDeVendas = criaBotao(self.frameTelaFiscal, "Emitir nota de saída", 0.66, 0.24, 0.24, lambda:telaNotaFiscalSaida(self, 1, 0))
+        def abrir_nota_saida():
+            self.essaEhNotaDeEntrada = False
+            telaNotaFiscalSaida(self, 1, 0)
+
+        relatorioDeVendas = criaBotao(self.frameTelaFiscal, "Emitir nota de saída", 0.66, 0.24, 0.24, abrir_nota_saida)
         relatorioDeVendas.configure(height=50, image=None, compound="left")
 
         estoque = criaBotao(self.frameTelaFiscal, "Estoque", 0.66, 0.35, 0.24, lambda:telaEstoqueFiscal(self))
         estoque.configure(height=50, image=None, compound="left")
 
-        gerarPedido = criaBotao(self.frameTelaFiscal, "Emitir nota de entrada (Importar XML)", 0.33, 0.24, 0.24, lambda:escolherNotaFiscal(self))
+        def importar_nota_entrada():
+            self.essaEhNotaDeEntrada = True
+            escolherNotaFiscal(self)
+
+        gerarPedido = criaBotao(self.frameTelaFiscal, "Emitir nota de entrada (Importar XML)", 0.33, 0.24, 0.24, importar_nota_entrada)
         gerarPedido.configure(height=50, image=None, compound="left")
 
         gerarOrcamento = criaBotao(self.frameTelaFiscal, "Gerar Sped fiscal", 0.33, 0.35, 0.24, lambda:telaSpeedFiscal(self))
         gerarOrcamento.configure(height=50, image=None, compound="left")
 
-        gerarOrcamento = criaBotao(self.frameTelaFiscal, "Gerar NFC-e", 0.33, 0.46, 0.24, lambda:telaNotaFiscalSaida(self, 0, 1))
+        def abrir_nfce():
+            self.essaEhNotaDeEntrada = False
+            telaNotaFiscalSaida(self, 0, 1)
+
+        gerarOrcamento = criaBotao(self.frameTelaFiscal, "Gerar NFC-e", 0.33, 0.46, 0.24, abrir_nfce)
         gerarOrcamento.configure(height=50, image=None, compound="left")
 
         verTodasAsNotas = criaBotao(self.frameTelaFiscal, "Ver todas as notas", 0.66, 0.46, 0.24, lambda:telaRelatorioDeNotasFiscais(self))
