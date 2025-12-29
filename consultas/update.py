@@ -55,13 +55,12 @@ class Atualiza:
         ))
         db.conn.commit()
 
-    def confirmarContaAPagar(numero_nfe, serie_nfe=""):
+    def confirmarContaAPagar(chave_nfe):
         query = """
             UPDATE contasapagar
                SET confirmado = 'Sim'
-             WHERE numero_nfe = %s
-               AND serie_nfe = %s
+             WHERE chave_nfe = %s
             LIMIT 1
         """
-        db.cursor.execute(query, (numero_nfe, serie_nfe))
+        db.cursor.execute(query, (chave_nfe,))
         db.conn.commit()

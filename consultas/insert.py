@@ -163,11 +163,11 @@ class Insere:
         db.cursor.execute(query, tuple(valores))
         db.conn.commit()
 
-        if numero_nfe:
+        if chave_base:
             try:
                 db.cursor.execute(
-                    "SELECT 1 FROM notas_fiscais WHERE numero = %s AND serie = %s LIMIT 1",
-                    (numero_nfe, dados_atualizados.get("serie_nfe", "")),
+                    "SELECT 1 FROM notas_fiscais WHERE chave = %s LIMIT 1",
+                    (chave_base,),
                 )
                 existe = db.cursor.fetchone()
                 if not existe:
@@ -191,7 +191,7 @@ class Insere:
                             dados_atualizados.get("data_emissao", hoje),
                             numero_nfe,
                             "Entrada",
-            chave_parcela,
+                            chave_base,
                             emitente_nome,
                             dados_atualizados.get("emitente_cnpj", ""),
                             dados_atualizados.get("destinatario_cnpj", ""),

@@ -185,9 +185,9 @@ def telaVercontasApagar(self, d):
             ctk.CTkLabel(bloco_item, text=item, anchor="w", justify="left", wraplength=750).pack(anchor="w", padx=10, pady=(0, 8))
 
         def confirmar_faturamento():
-            numero_atual = varNumeroNfe.get()
-            if not numero_atual:
-                messagebox.showwarning("Confirmar faturamento", "Número da NFE não encontrado para confirmação.")
+            chave_atual = varChaveNfe.get()
+            if not chave_atual:
+                messagebox.showwarning("Confirmar faturamento", "Chave da NFE não encontrada para confirmação.")
                 return
             if not messagebox.askyesno(
                 "Confirmar faturamento",
@@ -195,7 +195,7 @@ def telaVercontasApagar(self, d):
             ):
                 return
             try:
-                Atualiza.confirmarContaAPagar(numero_atual, varSerieNfe.get())
+                Atualiza.confirmarContaAPagar(chave_atual)
             except Exception as exc:
                 messagebox.showerror("Confirmar faturamento", f"Não foi possível confirmar: {exc}")
                 return
@@ -204,17 +204,17 @@ def telaVercontasApagar(self, d):
             messagebox.showinfo("Confirmar faturamento", "Faturamento confirmado com sucesso.")
 
         def excluir_faturamento():
-            numero_atual = varNumeroNfe.get()
-            if not numero_atual:
-                messagebox.showwarning("Excluir faturamento", "Número da NFE não encontrado para exclusão.")
+            chave_atual = varChaveNfe.get()
+            if not chave_atual:
+                messagebox.showwarning("Excluir faturamento", "Chave da NFE não encontrada para exclusão.")
                 return
             if not messagebox.askyesno(
                 "Excluir faturamento",
-                f"Tem certeza que deseja excluir o faturamento da nota {numero_atual}?",
+                f"Tem certeza que deseja excluir o faturamento da nota {varNumeroNfe.get()}?",
             ):
                 return
             try:
-                deleta.deletarContaAPagar(numero_atual, varSerieNfe.get())
+                deleta.deletarContaAPagar(chave_atual)
             except Exception as exc:
                 messagebox.showerror("Excluir faturamento", f"Não foi possível excluir: {exc}")
                 return
@@ -243,4 +243,3 @@ def telaVercontasApagar(self, d):
         btn_excluir.pack(side="left", expand=True, padx=10, pady=6)
 
         criaBotao(frame, "Voltar", 0.05, 0.94, 0.15, lambda: frame.destroy()).place(anchor="nw")
-
