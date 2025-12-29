@@ -328,7 +328,7 @@ class Insere:
 
                     query_produto_fiscal = (
                         "INSERT INTO produtos_fiscal("
-                        "descricao_do_produto, cadigo_interno, codigo_de_barras, codigo_grade, "
+                        "﻿descricao_do_produto, cadigo_interno, codigo_de_barras, codigo_grade, "
                         "codigo_NCM, CST_A, valor_venda, custo, quantidade_em_estoque, CFOP, "
                         "estoque_MIN, estoque_MAX, CEST, cnpj"
                         ") VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
