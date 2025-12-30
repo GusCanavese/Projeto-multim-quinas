@@ -183,9 +183,9 @@ class Buscas:
     
     def buscaEstoqueProdutosFiscal(valor, cnpj):
         if cnpj == "Todos":
-            queryBuscaProdutosEstoque = """SELECT nome_do_produto, cadigo_interno, codigo_de_barras, codigo_grade, codigo_NCM, CST_A, valor_venda, custo, quantidade_em_estoque, CFOP, estoque_MIN, estoque_MAX, CEST, cnpj FROM produtos_fiscal
+            queryBuscaProdutosEstoque = """SELECT ﻿descricao_do_produto, cadigo_interno, codigo_de_barras, codigo_grade, codigo_NCM, CST_A, valor_venda, custo, quantidade_em_estoque, CFOP, estoque_MIN, estoque_MAX, CEST, cnpj FROM produtos_fiscal
             WHERE 
-                nome_do_produto LIKE %s
+                ﻿descricao_do_produto LIKE %s
                 OR cadigo_interno LIKE %s
                 OR codigo_de_barras LIKE %s
                 OR codigo_grade LIKE %s
@@ -198,14 +198,14 @@ class Buscas:
                 OR estoque_MIN LIKE %s
                 OR estoque_MAX LIKE %s
                 OR CEST LIKE %s
-                ORDER BY nome_do_produto ASC"""
+                ORDER BY ﻿descricao_do_produto ASC"""
             db.cursor.execute(queryBuscaProdutosEstoque, (f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%"))
         else:
-            queryBuscaProdutosEstoque = """SELECT nome_do_produto, cadigo_interno, codigo_de_barras, codigo_grade, codigo_NCM, CST_A, valor_venda, custo, quantidade_em_estoque, CFOP, estoque_MIN, estoque_MAX, CEST, cnpj FROM produtos_fiscal
+            queryBuscaProdutosEstoque = """SELECT ﻿descricao_do_produto, cadigo_interno, codigo_de_barras, codigo_grade, codigo_NCM, CST_A, valor_venda, custo, quantidade_em_estoque, CFOP, estoque_MIN, estoque_MAX, CEST, cnpj FROM produtos_fiscal
             WHERE 
                 CNPJ like %s
                     AND (
-                        nome_do_produto LIKE %s
+                        ﻿descricao_do_produto LIKE %s
                         OR cadigo_interno LIKE %s
                         OR codigo_de_barras LIKE %s
                         OR codigo_grade LIKE %s
@@ -219,7 +219,7 @@ class Buscas:
                         OR estoque_MAX LIKE %s
                         OR CEST LIKE %s
                     )
-                ORDER BY nome_do_produto ASC"""
+                ORDER BY ﻿descricao_do_produto ASC"""
             db.cursor.execute(queryBuscaProdutosEstoque, (cnpj, f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%"))
 
         

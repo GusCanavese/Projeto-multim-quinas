@@ -279,6 +279,16 @@ class Insere:
                         valor = valor.get("#text", 0)
                     return float(valor or 0)
 
+                def extrair_texto(valor):
+                    if isinstance(valor, dict):
+                        valor = valor.get("#text", "")
+                    return str(valor or "")
+
+                def extrair_codigo_numerico(valor, padrao=0):
+                    texto = extrair_texto(valor)
+                    numeros = re.sub(r"\D", "", texto)
+                    return int(numeros) if numeros else padrao
+
                 def normalizar_texto(texto):
                     texto = unicodedata.normalize("NFKD", str(texto or ""))
                     texto = texto.encode("ASCII", "ignore").decode("ASCII")
@@ -316,7 +326,7 @@ class Insere:
                     valor_venda = extrair_valor_numerico(prod.get("vProd", valor_custo))
                     quantidade = extrair_valor_numerico(prod.get("qCom", 0))
                     codigo_interno = prod.get("cProd", "")
-                    ncm = prod.get("NCM", "")
+                    ncm = extrair_codigo_numerico(prod.get("NCM", ""))
                     cfop = prod.get("CFOP", "")
                     cest = prod.get("CEST", "")
                     origem_cst = prod.get("orig", "")
