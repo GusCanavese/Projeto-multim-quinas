@@ -15,10 +15,10 @@ def criarLabelEntry(frame, texto, relx, rely, width, variavel):
                 ):
         y=0.01
         
-        dif = 0.045
+        dif = 0.055
         fonte = ("TkDefaultFont", 11)
     else:
-        dif = 0.04
+        dif = 0.055
         fonte = ("TkDefaultFont", 15)
         y=0
 

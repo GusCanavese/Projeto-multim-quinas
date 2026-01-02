@@ -14,7 +14,7 @@ def telaVerPedidos(self, p, d, desc, itens_pedido):
         itens_pedido = list(itens_pedido.values())
 
     frame_acoes = ctk.CTkFrame(frame, fg_color="transparent")
-    frame_acoes.place(relx=0.5, rely=0.08, relwidth=0.92, relheight=0.16, anchor="center")
+    frame_acoes.place(relx=0.5, rely=0.05, relwidth=0.92, relheight=0.1, anchor="center")
 
     if p[5] == "Não confirmado":
         criaBotao(frame_acoes, 'Gerar faturamento', 0.68, 0.1, 0.18, lambda:telaGerarFaturamento(self, p[4], p[0], d[0]))
@@ -34,16 +34,12 @@ def telaVerPedidos(self, p, d, desc, itens_pedido):
             ),
         )
         self.status = "Venda em aberto"
-        dataDaVendaTelaVerPedidos = ''
-        self.dataDaVendaTelaVerPedidos = criarLabelEntry(
+        ctk.CTkLabel(
             frame_acoes,
-            "Data de confirmação",
-            0.28,
-            0.1,
-            0.22,
-            ctk.StringVar(value=dataDaVendaTelaVerPedidos),
-        )
-        ctk.CTkLabel(frame_acoes, text="Status: Venda em aberto").place(relx=0.02, rely=0.2, anchor="w")
+            text="Status: Venda em aberto",
+            font=("TkDefaultFont", 16, "bold"),
+            text_color="#f0b24a",
+        ).place(relx=0.02, rely=0.35, anchor="w")
         criaBotao(
             frame_acoes,
             'Confirmar venda',
@@ -54,19 +50,15 @@ def telaVerPedidos(self, p, d, desc, itens_pedido):
         )
     else:
         self.status = "Confirmado"
-        dataDaVendaTelaVerPedidos = p[5]
-        ctk.CTkLabel(frame_acoes, text="Status: Venda confirmada", text_color="green").place(relx=0.02, rely=0.2, anchor="w")
-        criarLabelEntry(
+        ctk.CTkLabel(
             frame_acoes,
-            "Data de confirmação",
-            0.28,
-            0.1,
-            0.22,
-            ctk.StringVar(value=dataDaVendaTelaVerPedidos),
-        )
+            text="Status: Venda confirmada",
+            font=("TkDefaultFont", 16, "bold"),
+            text_color="green",
+        ).place(relx=0.02, rely=0.35, anchor="w")
 
     tabs = ctk.CTkTabview(frame, fg_color="transparent")
-    tabs.place(relx=0.5, rely=0.5, relwidth=0.92, relheight=0.56, anchor="center")
+    tabs.place(relx=0.5, rely=0.46, relwidth=0.92, relheight=0.66, anchor="center")
     tab_resumo = tabs.add("Resumo")
     tab_cliente = tabs.add("Cliente")
     tab_itens = tabs.add("Itens")
@@ -76,16 +68,16 @@ def telaVerPedidos(self, p, d, desc, itens_pedido):
     x_dir = 0.55
     largura = 0.4
 
-    criarLabelEntry(tab_resumo, "Número da venda", x_esq, 0.08, largura, ctk.StringVar(value=p[0]))
-    criarLabelEntry(tab_resumo, "Data de criação", x_esq, 0.3, largura, ctk.StringVar(value=p[3]))
-    criarLabelEntry(tab_resumo, "Vendedor(a)", x_esq, 0.52, largura, ctk.StringVar(value=p[2]))
-    criarLabelEntry(tab_resumo, "Valor", x_dir, 0.08, largura, ctk.StringVar(value=p[4]))
-    criarLabelEntry(tab_resumo, "Status", x_dir, 0.3, largura, ctk.StringVar(value=self.status))
-    criarLabelEntry(tab_resumo, "Data de confirmação", x_dir, 0.52, largura, ctk.StringVar(value=p[5] or ""))
+    criarLabelEntry(tab_resumo, "Número da venda", x_esq, 0.06, largura, ctk.StringVar(value=p[0]))
+    criarLabelEntry(tab_resumo, "Data de criação", x_esq, 0.24, largura, ctk.StringVar(value=p[3]))
+    criarLabelEntry(tab_resumo, "Vendedor(a)", x_esq, 0.42, largura, ctk.StringVar(value=p[2]))
+    criarLabelEntry(tab_resumo, "Valor", x_dir, 0.06, largura, ctk.StringVar(value=p[4]))
+    criarLabelEntry(tab_resumo, "Status", x_dir, 0.24, largura, ctk.StringVar(value=self.status))
+    criarLabelEntry(tab_resumo, "Data de confirmação", x_dir, 0.42, largura, ctk.StringVar(value=p[5] or ""))
 
-    criarLabelEntry(tab_cliente, "Nome do cliente", x_esq, 0.08, largura, ctk.StringVar(value=d[0]))
-    criarLabelEntry(tab_cliente, "CPF/CNPJ", x_esq, 0.3, largura, ctk.StringVar(value=d[1]))
-    criarLabelEntry(tab_cliente, "Endereço", x_dir, 0.08, largura, ctk.StringVar(value=d[2]))
+    criarLabelEntry(tab_cliente, "Nome do cliente", x_esq, 0.06, largura, ctk.StringVar(value=d[0]))
+    criarLabelEntry(tab_cliente, "CPF/CNPJ", x_esq, 0.24, largura, ctk.StringVar(value=d[1]))
+    criarLabelEntry(tab_cliente, "Endereço", x_dir, 0.06, largura, ctk.StringVar(value=d[2]))
 
     itens_frame = ctk.CTkScrollableFrame(tab_itens, fg_color="transparent")
     itens_frame.place(relx=0.05, rely=0.1, relwidth=0.9, relheight=0.8, anchor="nw")
