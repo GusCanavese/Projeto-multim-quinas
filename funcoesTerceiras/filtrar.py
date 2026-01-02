@@ -8,8 +8,8 @@ import tkinter as tk
 from telas.telaVerPedidos import telaVerPedidos
 from telas.telaVercontasApagar import telaVercontasApagar
 from telas.telaVer import telaVer
-import json
 from componentes import criaLabel, criaBotao
+from funcoesTerceiras.normalizarItens import normalizar_itens_pedido
 
 def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=1):
     pedidos = Buscas.buscaPedidos(vendedor, numero, inicio, fim, checkbox)
@@ -37,13 +37,14 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
         dadosPedido = [pedido[0], pedido[5], pedido[2], pedido[1], pedido[3], self.status]
         dadosExtras = [pedido[5], pedido[6], pedido[7]]
 
-        dadosDoProdutoDoPedido = json.loads(pedido[8]) if pedido[8] else []
-        if isinstance(dadosDoProdutoDoPedido, dict):
-            dadosDoProdutoDoPedido = list(dadosDoProdutoDoPedido.values())
-        descricaoProdutos = [
-            f"{produto.get('descricao', '')} {produto.get('quantidade', '')}".strip()
-            for produto in dadosDoProdutoDoPedido
-        ]
+        dadosDoProdutoDoPedido = normalizar_itens_pedido(pedido[8])
+        descricaoProdutos = []
+        for produto in dadosDoProdutoDoPedido:
+            if not isinstance(produto, dict):
+                continue
+            descricao = f"{produto.get('descricao', '')} {produto.get('quantidade', '')}".strip()
+            if descricao:
+                descricaoProdutos.append(descricao)
 
         x = 0.03
         for colNum, valor in enumerate(dadosPedido):
