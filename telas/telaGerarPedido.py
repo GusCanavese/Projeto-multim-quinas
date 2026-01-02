@@ -10,6 +10,7 @@ import datetime
 from funcoesTerceiras.verificaSeQuerSalvar import salvarPedido
 from componentes import criaFrameJanela, criaFrameJanela, criaBotao, criaBotaoPequeno, criarLabelEntry, criaLabel, criaEntry, criaTextArea
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
+from telas.telaCadastroClientes import telaCadastroClientes
 
 
 def telaGerarPedido(self):
@@ -112,13 +113,18 @@ def telaGerarPedido(self):
         
         yNovo = 0.21  
 
-        for i, row in enumerate(dadosCliente):
-            if i >= 5:
-                break
-            label = ctk.CTkButton(frameTelaPedido,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cpf=row[1], cnpj=row[2], cep=row[4], endereco=row[5], referencia=row[6], num=row[7], bairro=row[8], rua=row[9]: selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, num, bairro, rua))
+        if len(dadosCliente) > 0:
+            for i, row in enumerate(dadosCliente):
+                if i >= 5:
+                    break
+                label = ctk.CTkButton(frameTelaPedido,  text=row[0], corner_radius=0,fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda  nome=row[0], cpf=row[1], cnpj=row[2], cep=row[4], endereco=row[5], referencia=row[6], num=row[7], bairro=row[8], rua=row[9]: selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, num, bairro, rua))
+                label.place(relx=0.05, rely=yNovo, relwidth=0.27)
+                self.resultadoLabels.append(label)  
+                yNovo += 0.0399
+        else:
+            label = ctk.CTkButton(frameTelaPedido, text="+ Cadastrar cliente", corner_radius=0, fg_color=self.cor, font=("Century Gothic bold", 15), command=lambda: telaCadastroClientes(self, 1))
             label.place(relx=0.05, rely=yNovo, relwidth=0.27)
-            self.resultadoLabels.append(label)  
-            yNovo += 0.0399
+            self.resultadoLabels.append(label)
 
     def selecionaCliente(nome, cpf, cnpj, cep, endereco, referencia, numero, bairro, rua):
 

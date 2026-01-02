@@ -22,7 +22,7 @@ def registraClienteNoBanco(self, frame, ehFiscal):
     referencia = self.referencia.get()
     
 
-    if not nome or not (cpf or cnpj) or not rua or not numero or not bairro or not cidade or not estado or not telefone: 
+    if not nome or not (cpf or cnpj) or not rua or not numero or not bairro or not cidade or not estado:
         messagebox.showinfo(title="Registro falhou", message="Campos obrigatórios não podem estar em branco")
     else:
         Insere.insereClienteNoBanco(nome, cpf, cnpj, IE, RG, CEP, rua, numero, bairro, cidade, estado, referencia, telefone, ehFiscal)

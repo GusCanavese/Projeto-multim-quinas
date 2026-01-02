@@ -48,7 +48,7 @@ def telaCadastroProdutos(self):
     self.ValorCusto.bind("<KeyRelease>", formatar_moeda)
     self.ValorVenda.bind("<KeyRelease>", formatar_moeda)
 
-    self.Quantidade = criarLabelEntry(frame, "Quantidade *", 0.79, 0.135, 0.10, None)
+    self.Quantidade = criarLabelEntry(frame, "Quantidade", 0.79, 0.135, 0.10, None)
 
 
     self.CodigoInterno = criarLabelEntry(frame, "Código interno", 0.1, 0.26, 0.20, None)

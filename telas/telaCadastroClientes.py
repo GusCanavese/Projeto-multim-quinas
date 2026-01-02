@@ -5,7 +5,7 @@ import customtkinter as ctk
 from tkinter import messagebox
 import requests
 from funcoesTerceiras.registraClienteNoBanco import registraClienteNoBanco
-from componentes import criaFrameJanela, criaFrameJanela, criarLabelEntry, criaBotao, criarLabelComboBox
+from componentes import criaFrameJanela, criaFrameJanela, criarLabelEntry, criaBotao, criaBotaoPequeno, criarLabelComboBox
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 def telaCadastroClientes(self, ehClienteFiscal):
@@ -25,10 +25,11 @@ def telaCadastroClientes(self, ehClienteFiscal):
     self.cnpj = criarLabelEntry(frame, "CNPJ", 0.15, 0.35, 0.30, None)
     self.IEcliente = criarLabelEntry(frame, "Inscrição Estadual", 0.15, 0.45, 0.30, None)
     self.RGcliente = criarLabelEntry(frame, "Insira o RG", 0.15, 0.55, 0.15, None)
-    self.telefoneCliente = criarLabelEntry(frame, "Telefone *", 0.31, 0.55, 0.14, None)
+    self.telefoneCliente = criarLabelEntry(frame, "Telefone", 0.31, 0.55, 0.14, None)
 
-    self.CEPcliente    = criarLabelEntry(frame, "CEP", 0.45+0.05, 0.15, 0.12, None)
-    self.rua = criarLabelEntry(frame, "Rua *", 0.63, 0.15, 0.22, rua)
+    self.CEPcliente    = criarLabelEntry(frame, "CEP", 0.45+0.05, 0.15, 0.10, None)
+    self.botaoBuscaCEP = criaBotaoPequeno(frame, "Buscar CEP", 0.615, 0.19, 0.05, lambda: buscaCep(self.CEPcliente.get(), self.numeroCliente.get()))
+    self.rua = criarLabelEntry(frame, "Rua *", 0.67, 0.15, 0.18, rua)
 
     self.bairroCliente = criarLabelEntry(frame, "Bairro *", 0.50, 0.25, 0.20, bairro)
     self.numeroCliente = criarLabelEntry(frame, "Número *", 0.71, 0.25, 0.14, None)

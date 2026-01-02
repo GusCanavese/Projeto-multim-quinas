@@ -22,7 +22,7 @@ def registraProdutoNoBanco(self, frame):
     CNPJ = self.CNPJ.get()
 
 
-    if not(nome and valorCusto and valorVenda and quantidade and CNPJ and marca):
+    if not(nome and valorCusto and valorVenda and CNPJ and marca):
         messagebox.showerror("erro", "valores estão em branco")
 
     else:
