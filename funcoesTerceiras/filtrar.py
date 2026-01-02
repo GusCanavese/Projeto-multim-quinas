@@ -8,6 +8,7 @@ import tkinter as tk
 from telas.telaVerPedidos import telaVerPedidos
 from telas.telaVercontasApagar import telaVercontasApagar
 from telas.telaVer import telaVer
+from telas.telaVerCliente import telaVerCliente
 from componentes import criaLabel, criaBotao
 from funcoesTerceiras.normalizarItens import normalizar_itens_pedido
 
@@ -289,3 +290,69 @@ def filtrarNotasFiscais(self, frame, valor, pagina=1):
                 lambda v=filtro_valor: filtrarNotasFiscais(self, frame, v, pagina + 1)
             )
             self.dadosTelaFiltrarFunc.append(btnProxima)
+
+
+def filtrarClientes(self, frame, valor, pagina=1):
+    clientes = Buscas.buscaDadosCliente(valor)
+
+    if hasattr(self, "dadosTelaFiltrarClientes"):
+        for item in self.dadosTelaFiltrarClientes:
+            item.destroy()
+    self.dadosTelaFiltrarClientes = []
+
+    inicio_cliente = (pagina - 1) * 10
+    fim_cliente = pagina * 10
+    clientes_pagina = clientes[inicio_cliente:fim_cliente]
+
+    total_clientes = len(clientes)
+    mostrar_paginacao = total_clientes > 10
+    tem_proxima = fim_cliente < total_clientes
+    filtro_valor = valor
+
+    y = 0.1
+
+    for cliente in clientes_pagina:
+        nome, cpf, cnpj, telefone, cep, cidade, referencia, numero, bairro, rua = cliente
+        documento = cpf or cnpj or ""
+        dados_cliente = [nome, documento, telefone, cidade, cep]
+
+        x = 0.03
+        for col_num, campo in enumerate(dados_cliente):
+            cor_de_fundo = "#1C60A0"
+            if col_num == 0:
+                label = criaLabel(frame, campo, x, y, 0.25, cor_de_fundo)
+                x += 0.255
+            elif col_num == 1:
+                label = criaLabel(frame, campo, x, y, 0.17, cor_de_fundo)
+                x += 0.175
+            elif col_num == 2:
+                label = criaLabel(frame, campo, x, y, 0.12, cor_de_fundo)
+                x += 0.125
+            elif col_num == 3:
+                label = criaLabel(frame, campo, x, y, 0.15, cor_de_fundo)
+                x += 0.155
+            else:
+                label = criaLabel(frame, campo, x, y, 0.1, cor_de_fundo)
+                x += 0.105
+
+            self.dadosTelaFiltrarClientes.append(label)
+
+        btn = criaBotao(frame, "Ver", 0.937, y, 0.05, lambda p=cliente: telaVerCliente(self, p))
+        self.dadosTelaFiltrarClientes.append(btn)
+
+        y += 0.059
+
+    if mostrar_paginacao:
+        if pagina > 1:
+            btn_anterior = criaBotao(
+                frame, "← Anterior", 0.33, 0.9, 0.2,
+                lambda v=filtro_valor: filtrarClientes(self, frame, v, pagina - 1),
+            )
+            self.dadosTelaFiltrarClientes.append(btn_anterior)
+
+        if tem_proxima:
+            btn_proxima = criaBotao(
+                frame, "Próximo →", 0.66, 0.9, 0.2,
+                lambda v=filtro_valor: filtrarClientes(self, frame, v, pagina + 1),
+            )
+            self.dadosTelaFiltrarClientes.append(btn_proxima)

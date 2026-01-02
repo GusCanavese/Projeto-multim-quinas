@@ -28,7 +28,7 @@ def telaCadastroClientes(self, ehClienteFiscal):
     self.telefoneCliente = criarLabelEntry(frame, "Telefone", 0.31, 0.55, 0.14, None)
 
     self.CEPcliente    = criarLabelEntry(frame, "CEP", 0.45+0.05, 0.15, 0.10, None)
-    self.botaoBuscaCEP = criaBotaoPequeno(frame, "Buscar CEP", 0.615, 0.19, 0.05, lambda: buscaCep(self.CEPcliente.get(), self.numeroCliente.get()))
+    self.botaoBuscaCEP = criaBotaoPequeno(frame, "Buscar CEP", 0.628, 0.204, 0.06, lambda: buscaCep(self.CEPcliente.get(), self.numeroCliente.get()))
     self.rua = criarLabelEntry(frame, "Rua *", 0.67, 0.15, 0.18, rua)
 
     self.bairroCliente = criarLabelEntry(frame, "Bairro *", 0.50, 0.25, 0.20, bairro)
