@@ -37,8 +37,13 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
         dadosPedido = [pedido[0], pedido[5], pedido[2], pedido[1], pedido[3], self.status]
         dadosExtras = [pedido[5], pedido[6], pedido[7]]
 
-        dadosDoProdutoDoPedido = json.loads(pedido[8])
-        descricaoProdutos = [f"{produto['descricao']} {produto['quantidade']}" for produto in dadosDoProdutoDoPedido]
+        dadosDoProdutoDoPedido = json.loads(pedido[8]) if pedido[8] else []
+        if isinstance(dadosDoProdutoDoPedido, dict):
+            dadosDoProdutoDoPedido = list(dadosDoProdutoDoPedido.values())
+        descricaoProdutos = [
+            f"{produto.get('descricao', '')} {produto.get('quantidade', '')}".strip()
+            for produto in dadosDoProdutoDoPedido
+        ]
 
         x = 0.03
         for colNum, valor in enumerate(dadosPedido):
@@ -59,7 +64,14 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
                 x += 0.175
                 self.dadosTelaVerPedidos.append(label)
 
-        btn = criaBotao(frame, "Ver", 0.94, y, 0.05, lambda p=dadosPedido, d=dadosExtras, desc=descricaoProdutos: telaVerPedidos(self, p, d, desc))
+        btn = criaBotao(
+            frame,
+            "Ver",
+            0.94,
+            y,
+            0.05,
+            lambda p=dadosPedido, d=dadosExtras, desc=descricaoProdutos, itens=dadosDoProdutoDoPedido: telaVerPedidos(self, p, d, desc, itens),
+        )
         self.dadosTelaVerPedidos.append(btn)
 
         y += 0.07
