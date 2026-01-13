@@ -51,7 +51,7 @@ def telaAcoes(self):
         relatorioDeVendas = criaBotao(frame, "Relatório de vendas", 0.66, 0.24, 0.24, lambda: telaRelatorioDeVendas(self))
         relatorioDeVendas.configure(height=50, image=fotoRelatorio, compound="left")
 
-        estoque = criaBotao(frame, "Estoque/Produtos", 0.66, 0.46, 0.24, lambda: telaEstoque(self))
+        estoque = criaBotao(frame, "Estoque/Produtos", 0.66, 0.35, 0.24, lambda: telaEstoque(self))
         estoque.configure(height=50, image=fotoEstoque, compound="left")
 
         gerarPedido = criaBotao(frame, "Gerar pedido", 0.33, 0.35, 0.24, lambda: telaGerarPedido(self))
