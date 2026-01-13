@@ -77,7 +77,7 @@ def telaAcoes(self):
         gerarOrcamento = criaBotao(frame, "Gerar orçamento", 0.33, 0.46, 0.24, lambda: telaGerarOrcamento(self))
         gerarOrcamento.configure(height=50, image=fotoOrcamento, compound="left")
 
-        gerenciar = criaBotao(frame, "Gerenciar ", 0.33, 0.57, 0.24, lambda: telaGerenciar(self))
+        gerenciar = criaBotao(frame, "Gerenciar cadastros", 0.33, 0.57, 0.24, lambda: telaGerenciar(self))
         gerenciar.configure(height=50, image=fotoGerenciar, compound="left")
 
         relatorioDeVendas = criaBotao(frame, "Relatório de vendas", 0.66, 0.24, 0.24, lambda: telaRelatorioDeVendas(self))

@@ -17,7 +17,7 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
 
 
     valores = ["Forma de pagamento", "Quantidade parcelas", "Valor"]
-    opcoesPagamento = ["", "Bndes", "Boleto", "Carnê", "Crédito a vista", "Crédito parcelado", "Débito", "Cheque", "Depósito"]
+    opcoesPagamento = ["", "Bndes", "Boleto", "Carnê", "Crédito a vista", "Crédito parcelado", "Débito", "Cheque", "Depósito", "Dinheiro"]
 
     largura_label = 0.2 
     posicaoy = 0.1
@@ -309,5 +309,4 @@ def modal(self, teste):
 
     botaoFechar = ctk.CTkButton(self.frame, text="X", width=10, height=10, corner_radius=0, command=lambda:destroyModal(self))
     botaoFechar.place(relx=0.989, rely=0.018, anchor="center")
-
 

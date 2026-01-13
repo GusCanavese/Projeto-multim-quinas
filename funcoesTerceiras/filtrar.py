@@ -27,6 +27,18 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
     pedidos_pagina = pedidos[inicio_pedido:fim_pedido]
 
     y = 0.12
+    params = {
+        "vendedor": vendedor,
+        "numero": numero,
+        "inicio": inicio,
+        "fim": fim,
+        "checkbox": checkbox,
+        "pagina": pagina,
+    }
+
+    def _atualizar_tabela(p=params):
+        filtrarPedidos(self, frame, p["vendedor"], p["numero"], p["inicio"], p["fim"], p["checkbox"], p["pagina"])
+
     for rowPedido, pedido in enumerate(pedidos_pagina, start=1):
         if pedido[4] != "":
             corDeFundo = self.corAfirma
@@ -72,7 +84,15 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
             0.94,
             y,
             0.05,
-            lambda p=dadosPedido, d=dadosExtras, desc=descricaoProdutos, itens=dadosDoProdutoDoPedido: telaVerPedidos(self, p, d, desc, itens),
+            lambda p=dadosPedido, d=dadosExtras, desc=descricaoProdutos, itens=dadosDoProdutoDoPedido, pedido_atual=pedido: telaVerPedidos(
+                self,
+                p,
+                d,
+                desc,
+                itens,
+                pedido=pedido_atual,
+                on_refresh=_atualizar_tabela,
+            ),
         )
         self.dadosTelaVerPedidos.append(btn)
 
@@ -80,16 +100,6 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
 
     # Adiciona botões de navegação se houver mais pedidos
     if len(pedidos) > 10:
-        params = {
-            'vendedor': vendedor,
-            'numero': numero,
-            'inicio': inicio,
-            'fim': fim,
-            'checkbox': checkbox,
-            'pagina': pagina
-        }
-
-
         if pagina > 1:
             btnAnterior = criaBotao(frame, "← Anterior", 0.33, 0.9, 0.2, lambda p=params: filtrarPedidos(self, frame, p['vendedor'], p['numero'], p['inicio'], p['fim'], p['checkbox'], p['pagina']-1))
             self.dadosTelaVerPedidos.append(btnAnterior)

@@ -1,9 +1,15 @@
+from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 def gerar_recibo(nome_arquivo, dados):
-    c = canvas.Canvas(nome_arquivo, pagesize=letter)
+    buffer = None
+    if nome_arquivo:
+        c = canvas.Canvas(nome_arquivo, pagesize=letter)
+    else:
+        buffer = BytesIO()
+        c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
 
     # Definindo a altura inicial
@@ -341,6 +347,10 @@ def gerar_recibo(nome_arquivo, dados):
         c.drawString(width/2 - 30, altura_item - 415, f"{dados['cpf']}")
 
     c.save()
+    if buffer:
+        buffer.seek(0)
+        return buffer.getvalue()
+    return None
     
 
 dados_exemplo = {

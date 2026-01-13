@@ -455,7 +455,7 @@ def telaGerarPedido(self):
     self.CPFCliente = criarLabelEntry(frameTelaPedido, "CPF/CNPJ *", 0.39, 0.15, 0.15, variavelCtkEntry)
     self.entradaCEP = criarLabelEntry(frameTelaPedido, "CEP *", 0.57, 0.15, 0.15, variavelCep)
     self.entradaNumero = criarLabelEntry(frameTelaPedido, "Nº *", 0.75, 0.15, 0.05, variavelNumero)
-    self.botaoBuscaCEP = criaBotaoPequeno(frameTelaPedido, "Buscar CEP", 0.865, 0.19, 0.07, lambda:buscaCep(self.entradaCEP.get(), self.entradaNumero.get()))
+    self.botaoBuscaCEP = criaBotaoPequeno(frameTelaPedido, "Buscar CEP", 0.865, 0.205, 0.07, lambda:buscaCep(self.entradaCEP.get(), self.entradaNumero.get()))
     self.entradaEnderecoNoPedido = criarLabelEntry(frameTelaPedido, "Endereço *", 0.39, 0.25, 0.33, variavelEndereco)
     self.entradaReferenciaEnderecoEntrega = criarLabelEntry(frameTelaPedido, "Referencia *", 0.75, 0.25, 0.15, variavelReferencia)
 

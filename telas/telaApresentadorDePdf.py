@@ -6,15 +6,16 @@ from funcoesTerceiras.imprimirPDF import imprimirPdf
 from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaBotao, criarLabelEntry, criaLabel, criaEntry, criaTextArea
 
 
-def telaApresentarPDF(self, caminhoPdf, condicao):
+def telaApresentarPDF(self, caminhoPdf, condicao, pdf_bytes=None):
     frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
    
     # Variável para controle de redimensionamento
     self.last_width = frame.winfo_width()
     self.last_height = frame.winfo_height()
     
+    documentoPdf = fitz.open(stream=pdf_bytes, filetype="pdf") if pdf_bytes else fitz.open(caminhoPdf)
+
     if condicao:
-        documentoPdf = fitz.open(caminhoPdf)
         self.numeroPagina = 1
         self.documentoPdf = documentoPdf
 
@@ -91,7 +92,8 @@ def telaApresentarPDF(self, caminhoPdf, condicao):
         criaBotao(frame, '→', 0.752-0.2, 0.975, 0.03, soma).configure(fg_color="#38343c")
         criaBotao(frame, '←', 0.646-0.2, 0.975, 0.03, subtracao).configure(fg_color="#38343c")
         criaBotao(frame, "◀️ Voltar", 0.15, 0.95, 0.15, lambda: frame.destroy())
-        criaBotao(frame, "Imprimir", 0.85, 0.95, 0.15, lambda: imprimirPdf("Pedido.pdf"))
+        if caminhoPdf:
+            criaBotao(frame, "Imprimir", 0.85, 0.95, 0.15, lambda: imprimirPdf(caminhoPdf))
 
         # Função para redimensionamento
         def on_resize(event):
@@ -113,7 +115,6 @@ def telaApresentarPDF(self, caminhoPdf, condicao):
         criaLabel(frame, "Seu pedido foi cadastrado com sucesso no banco de dados! Para acessar ele, vá na aba 'Consultar pedidos' ou clique no botão abaixo",
                 0.06, 0.3, 0.4, None).configure(wraplength=300, font=("Arial", 22))
 
-        documentoPdf = fitz.open(caminhoPdf)
         self.numeroPagina = 1
 
 
@@ -182,7 +183,8 @@ def telaApresentarPDF(self, caminhoPdf, condicao):
         criaBotao(frame, '→', 0.752, 0.9, 0.03, soma).configure(fg_color="#38343c")
         criaBotao(frame, '←', 0.646, 0.9, 0.03, subtracao).configure(fg_color="#38343c")
         criaBotao(frame, "◀️ Voltar", 0.15, 0.95, 0.15, lambda: frame.destroy())
-        criaBotao(frame, "Imprimir", 0.35, 0.95, 0.15, lambda: imprimirPdf("Pedido.pdf"))
+        if caminhoPdf:
+            criaBotao(frame, "Imprimir", 0.35, 0.95, 0.15, lambda: imprimirPdf(caminhoPdf))
 
         # Função para redimensionamento
         def on_resize(event):
