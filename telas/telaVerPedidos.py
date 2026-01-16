@@ -12,6 +12,7 @@ from componentes import criaFrameJanela, criaBotao, criarLabelEntry
 def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None):
     frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     itens_pedido = normalizar_itens_pedido(itens_pedido)
+    itens_por_pagina = 6
 
     numero = pedido[0] if pedido else p[0]
     data_emissao = pedido[1] if pedido else p[3]
@@ -25,6 +26,24 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
     status_confirmado = bool(data_confirmacao) or p[5] != "Não confirmado"
     status_texto = "Venda confirmada" if status_confirmado else "Venda em aberto"
 
+    def _parse_float(valor):
+        if valor is None:
+            return 0.0
+        if isinstance(valor, (int, float)):
+            return float(valor)
+        texto = str(valor).strip()
+        if not texto:
+            return 0.0
+        texto = texto.replace("R$", "").strip()
+        if "," in texto and "." in texto:
+            texto = texto.replace(".", "").replace(",", ".")
+        else:
+            texto = texto.replace(",", ".")
+        try:
+            return float(texto)
+        except ValueError:
+            return 0.0
+
     def _atualizar_lista():
         if on_refresh:
             on_refresh()
@@ -33,19 +52,39 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
         frame.destroy()
         _atualizar_lista()
 
+    def _criar_campo(texto, relx, rely, width, valor, desbloqueado=False):
+        variavel = ctk.StringVar(value=valor)
+        entry = criarLabelEntry(frame, texto, relx, rely, width, variavel)
+        if not desbloqueado:
+            entry.configure(state="disabled")
+        return entry
+
+    def _abrir_observacoes(texto):
+        frame_obs = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
+        ctk.CTkLabel(frame_obs, text="Observações", font=("Century Gothic bold", 24)).place(
+            relx=0.5, rely=0.08, anchor="center"
+        )
+        criarLabelEntry(
+            frame_obs,
+            "Observações",
+            0.05,
+            0.2,
+            0.9,
+            ctk.StringVar(value=texto),
+        ).configure(state="disabled")
+        criaBotao(frame_obs, "◀️ Voltar", 0.15, 0.9, 0.2, frame_obs.destroy)
+
     titulo = ctk.CTkLabel(frame, text="Venda Simples", font=("Century Gothic bold", 26))
     titulo.place(relx=0.5, rely=0.04, anchor="center")
 
-    frame_acoes = ctk.CTkFrame(frame, fg_color="transparent")
-    frame_acoes.place(relx=0.5, rely=0.11, relwidth=0.92, relheight=0.08, anchor="center")
-
     status_cor = "green" if status_confirmado else "#f0b24a"
-    ctk.CTkLabel(
-        frame_acoes,
+    status_label = ctk.CTkLabel(
+        frame,
         text=f"Status: {status_texto}",
         font=("TkDefaultFont", 16, "bold"),
         text_color=status_cor,
-    ).place(relx=0.02, rely=0.5, anchor="w")
+    )
+    status_label.place(relx=0.04, rely=0.12, anchor="w")
 
     def _confirmar_hoje():
         confirmarAlteracoesNoPedido.confirmarHoje(self, numero, frame, subtotal, destinatario)
@@ -63,91 +102,71 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
         _atualizar_lista()
 
     if not status_confirmado:
+        criaBotao(frame, "Confirmar venda", 0.48, 0.12, 0.16, _confirmar_hoje)
+        criaBotao(frame, "Confirmar alterações", 0.66, 0.12, 0.18, _confirmar_alteracoes)
         criaBotao(
-            frame_acoes,
-            "Confirmar venda",
-            0.48,
-            0.5,
-            0.16,
-            _confirmar_hoje,
-        )
-        criaBotao(
-            frame_acoes,
-            "Confirmar alterações",
-            0.66,
-            0.5,
-            0.18,
-            _confirmar_alteracoes,
-        )
-        criaBotao(
-            frame_acoes,
+            frame,
             "Gerar faturamento",
             0.86,
-            0.5,
+            0.12,
             0.18,
             lambda: telaGerarFaturamento(self, subtotal, numero, destinatario),
         )
 
-    frame_info = ctk.CTkFrame(frame, fg_color="transparent")
-    frame_info.place(relx=0.5, rely=0.26, relwidth=0.92, relheight=0.26, anchor="center")
-
-    def _criar_entry(frame_alvo, texto, relx, rely, width, valor, desbloqueado=False):
-        variavel = ctk.StringVar(value=valor)
-        entry = criarLabelEntry(frame_alvo, texto, relx, rely, width, variavel)
-        if not desbloqueado:
-            entry.configure(state="disabled")
-        return entry
-
-    _criar_entry(frame_info, "Número", 0.02, 0.05, 0.12, numero)
-    _criar_entry(frame_info, "Data da criação", 0.18, 0.05, 0.16, data_emissao)
-    self.dataDaVendaTelaVerPedidos = _criar_entry(
-        frame_info,
+    _criar_campo("Número", 0.04, 0.18, 0.12, numero)
+    _criar_campo("Data da criação", 0.18, 0.18, 0.14, data_emissao)
+    self.dataDaVendaTelaVerPedidos = _criar_campo(
         "Data de confirmação",
-        0.38,
-        0.05,
-        0.16,
+        0.34,
+        0.18,
+        0.14,
         data_confirmacao or "",
         desbloqueado=not status_confirmado,
     )
-    _criar_entry(frame_info, "Status", 0.58, 0.05, 0.16, status_texto)
-    _criar_entry(frame_info, "Vendedor", 0.78, 0.05, 0.2, vendedor)
+    status_entry = _criar_campo("Status", 0.50, 0.18, 0.18, status_texto)
+    status_entry.configure(text_color=status_cor)
+    _criar_campo("Vendedor", 0.70, 0.18, 0.26, vendedor)
 
-    _criar_entry(frame_info, "Nome do cliente", 0.02, 0.42, 0.36, destinatario)
-    _criar_entry(frame_info, "CPF/CNPJ", 0.42, 0.42, 0.18, cpf_cnpj)
-    _criar_entry(frame_info, "Endereço", 0.64, 0.42, 0.34, endereco)
+    _criar_campo("Nome do cliente", 0.04, 0.30, 0.32, destinatario)
+    _criar_campo("CPF/CNPJ", 0.38, 0.30, 0.18, cpf_cnpj)
+    _criar_campo("Endereço", 0.58, 0.30, 0.38, endereco)
 
     frame_itens = ctk.CTkFrame(frame, fg_color="transparent")
-    frame_itens.place(relx=0.5, rely=0.62, relwidth=0.92, relheight=0.26, anchor="center")
-    frame_itens.grid_columnconfigure(0, weight=3)
+    frame_itens.place(relx=0.5, rely=0.52, relwidth=0.92, relheight=0.26, anchor="center")
+    ctk.CTkLabel(frame_itens, text="Itens", font=("TkDefaultFont", 14, "bold")).grid(
+        row=0, column=0, columnspan=6, sticky="w", pady=(0, 6)
+    )
+    frame_itens.grid_columnconfigure(0, weight=4)
     frame_itens.grid_columnconfigure(1, weight=1)
-    frame_itens.grid_columnconfigure(2, weight=1)
-    frame_itens.grid_columnconfigure(3, weight=1)
-    frame_itens.grid_columnconfigure(4, weight=1)
-    frame_itens.grid_columnconfigure(5, weight=1)
+    frame_itens.grid_columnconfigure(2, weight=2)
+    frame_itens.grid_columnconfigure(3, weight=2)
+    frame_itens.grid_columnconfigure(4, weight=2)
+    frame_itens.grid_columnconfigure(5, weight=2)
 
-    def criar_celula(texto, row, column, padx=(0, 0)):
+    def _criar_celula(texto, row, column, padx=(0, 0)):
         entry = ctk.CTkEntry(
             frame_itens,
             state="disabled",
             corner_radius=6,
             border_width=1,
         )
-        entry.grid(row=row, column=column, sticky="ew", padx=padx, pady=(6, 0))
+        entry.grid(row=row, column=column, sticky="ew", padx=padx, pady=(4, 0))
         entry.configure(state="normal")
         entry.delete(0, "end")
         entry.insert(0, texto)
         entry.configure(state="disabled")
         return entry
 
-    criar_celula("Produto/Serviço", 0, 0)
-    criar_celula("Qtd", 0, 1, padx=(10, 0))
-    criar_celula("Valor Unitário", 0, 2, padx=(10, 0))
-    criar_celula("Desc($)", 0, 3, padx=(10, 0))
-    criar_celula("Desc(%)", 0, 4, padx=(10, 0))
-    criar_celula("Subtotal", 0, 5, padx=(10, 0))
+    _criar_celula("Produto/Serviço", 1, 0)
+    _criar_celula("Qtd", 1, 1, padx=(10, 0))
+    _criar_celula("Valor Unitário", 1, 2, padx=(10, 0))
+    _criar_celula("Desc($)", 1, 3, padx=(10, 0))
+    _criar_celula("Desc(%)", 1, 4, padx=(10, 0))
+    _criar_celula("Subtotal", 1, 5, padx=(10, 0))
 
-    if itens_pedido:
-        for index, item in enumerate(itens_pedido, start=1):
+    itens_visiveis = itens_pedido[:itens_por_pagina]
+    if itens_visiveis:
+        for index, item in enumerate(itens_visiveis, start=1):
             if not isinstance(item, dict):
                 continue
             descricao = str(item.get("descricao", ""))
@@ -156,47 +175,50 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
             desconto_reais = str(item.get("desconto_reais", 0.0))
             desconto_porcentagem = str(item.get("desconto_porcentagem", 0.0))
             subtotal_item = str(item.get("subtotal", ""))
-            criar_celula(descricao, index, 0)
-            criar_celula(quantidade, index, 1, padx=(10, 0))
-            criar_celula(preco, index, 2, padx=(10, 0))
-            criar_celula(desconto_reais, index, 3, padx=(10, 0))
-            criar_celula(desconto_porcentagem, index, 4, padx=(10, 0))
-            criar_celula(subtotal_item, index, 5, padx=(10, 0))
+            _criar_celula(descricao, index + 1, 0)
+            _criar_celula(quantidade, index + 1, 1, padx=(10, 0))
+            _criar_celula(preco, index + 1, 2, padx=(10, 0))
+            _criar_celula(desconto_reais, index + 1, 3, padx=(10, 0))
+            _criar_celula(desconto_porcentagem, index + 1, 4, padx=(10, 0))
+            _criar_celula(subtotal_item, index + 1, 5, padx=(10, 0))
     else:
-        criar_celula("Nenhum item informado.", 1, 0)
+        _criar_celula("Nenhum item informado.", 2, 0)
 
-    frame_resumo = ctk.CTkFrame(frame, fg_color="transparent")
-    frame_resumo.place(relx=0.5, rely=0.82, relwidth=0.92, relheight=0.1, anchor="center")
+    total_desc_reais = 0.0
+    total_desc_porc = 0.0
+    total_acrescimo = 0.0
+    for item in itens_pedido:
+        if not isinstance(item, dict):
+            continue
+        total_desc_reais += _parse_float(item.get("desconto_reais", 0.0))
+        total_desc_porc += _parse_float(item.get("desconto_porcentagem", 0.0))
+        total_acrescimo += _parse_float(item.get("acrescimo", 0.0))
+
+    total_subtotal = _parse_float(subtotal)
+    observacoes_texto = "\n".join(desc) if desc else "Sem observações."
+    precisa_pagina_observacoes = len(itens_pedido) > itens_por_pagina
+    if not precisa_pagina_observacoes:
+        _criar_campo("Observações", 0.04, 0.68, 0.44, observacoes_texto)
+    else:
+        criaBotao(frame, "Ver observações", 0.04, 0.68, 0.2, lambda: _abrir_observacoes(observacoes_texto))
+    _criar_campo("Desconto total($)", 0.52, 0.68, 0.18, f"{total_desc_reais:.2f}")
+    _criar_campo("Desconto total(%)", 0.72, 0.68, 0.18, f"{total_desc_porc:.2f}")
+    _criar_campo("Acréscimo total", 0.52, 0.78, 0.18, f"{total_acrescimo:.2f}")
+    _criar_campo("TOTAL:", 0.72, 0.78, 0.18, f"{total_subtotal:.2f}")
 
     ctk.CTkLabel(
-        frame_resumo,
+        frame,
         text="Condição de pagamento: À vista",
-        font=("TkDefaultFont", 14, "bold"),
-    ).place(relx=0.02, rely=0.5, anchor="w")
+        font=("TkDefaultFont", 12, "bold"),
+    ).place(relx=0.04, rely=0.86, anchor="w")
 
-    ctk.CTkLabel(
-        frame_resumo,
-        text=f"Total: {subtotal}",
-        font=("TkDefaultFont", 18, "bold"),
-    ).place(relx=0.98, rely=0.5, anchor="e")
-
-    frame_botoes = ctk.CTkFrame(frame, fg_color="transparent")
-    frame_botoes.place(relx=0.5, rely=0.92, relwidth=0.92, relheight=0.08, anchor="center")
-
-    criaBotao(frame_botoes, "◀️ Voltar", 0.15, 0.5, 0.2, _voltar)
+    criaBotao(frame, "◀️ Voltar", 0.15, 0.88, 0.2, _voltar)
 
     def _confirmar_exclusao():
         confirmarExclusaoDoPedido.confirmarExclusaoNoPedido(self, numero, desc, frame)
         _atualizar_lista()
 
-    botaoExclui = criaBotao(
-        frame_botoes,
-        "Cancelar/Excluir pedido",
-        0.82,
-        0.5,
-        0.2,
-        _confirmar_exclusao,
-    )
+    botaoExclui = criaBotao(frame, "Cancelar/Excluir pedido", 0.82, 0.88, 0.2, _confirmar_exclusao)
     botaoExclui.configure(fg_color=self.corNegado)
 
     def imprimirPedido():
@@ -241,4 +263,4 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
         pdf_bytes = geradorDePedido.gerar_recibo(None, dados)
         telaApresentarPDF(self, None, 1, pdf_bytes=pdf_bytes)
 
-    criaBotao(frame_botoes, "Imprimir pedido", 0.45, 0.5, 0.2, imprimirPedido)
+    criaBotao(frame, "Imprimir pedido", 0.45, 0.88, 0.2, imprimirPedido)
