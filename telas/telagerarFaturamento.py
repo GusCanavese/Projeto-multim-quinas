@@ -76,27 +76,32 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
 
 
 
+    def _parse_float(valor):
+        try:
+            return float(str(valor).replace(",", "."))
+        except (TypeError, ValueError):
+            return 0
+
+    def _valor_total_faturamento():
+        return _parse_float(valorDoPedido)
+
+    def _somar_valores_anteriores():
+        total = 0
+        for entrada in self.listaEntradaValor[:-1]:
+            total += _parse_float(entrada.get())
+        return total
+
     def calcularTotal():
         total = 0
         # Soma os valores das parcelas
         for entrada in self.listaEntradaValor:
-            try:
-                valor = float(entrada.get())
-            except ValueError:
-                valor = 0
-            total += valor
+            total += _parse_float(entrada.get())
 
         # Pega o desconto
-        try:
-            desconto = float(self.descontoTotalVindoDoPedido.get()) if self.descontoTotalVindoDoPedido.get() else 0
-        except ValueError:
-            desconto = 0
+        desconto = _parse_float(self.descontoTotalVindoDoPedido.get()) if self.descontoTotalVindoDoPedido.get() else 0
 
         # Pega o acréscimo
-        try:
-            acrescimo = float(self.acrescimoTotalVindoDoPedido.get()) if self.acrescimoTotalVindoDoPedido.get() else 0
-        except ValueError:
-            acrescimo = 0
+        acrescimo = _parse_float(self.acrescimoTotalVindoDoPedido.get()) if self.acrescimoTotalVindoDoPedido.get() else 0
 
         total = total - desconto + acrescimo
         self.totaisFormasDePagamento.set(f"{total:.2f}")
@@ -105,7 +110,6 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
 
     def adicionaParcela(self):
         self.valorDoPedidoVariavel = ctk.StringVar()
-        self.valorDoPedidoVariavel.set(valorDoPedido)  # ou valorDaNota.get()
 
         self.y += 0.038
         self.botaoAdicionarParcela.place(relx=0.2, rely=self.y)
@@ -128,10 +132,14 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
         self.entradaValor.bind("<KeyRelease>", lambda event: calcularTotal())
         self.listaEntradaValor.append(self.entradaValor)
 
-        if len(self.listaEntradaValor) != 1:
-            self.valorDoPedidoVariavel.set(0)
+        if len(self.listaEntradaValor) == 1:
+            self.valorDoPedidoVariavel.set(f"{_valor_total_faturamento():.2f}")
+        else:
+            restante = _valor_total_faturamento() - _somar_valores_anteriores()
+            self.valorDoPedidoVariavel.set(f"{max(restante, 0):.2f}")
 
         self.frameValorTotais.place(relx=0.2, rely=self.y+0.1, relwidth=0.6, relheight=0.35)
+        calcularTotal()
 
     adicionaParcela(self)
     
@@ -309,4 +317,3 @@ def modal(self, teste):
 
     botaoFechar = ctk.CTkButton(self.frame, text="X", width=10, height=10, corner_radius=0, command=lambda:destroyModal(self))
     botaoFechar.place(relx=0.989, rely=0.018, anchor="center")
-

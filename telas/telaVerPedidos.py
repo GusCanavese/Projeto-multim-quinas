@@ -206,12 +206,7 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
     _criar_campo("Acréscimo total", 0.52, 0.78, 0.18, f"{total_acrescimo:.2f}")
     _criar_campo("TOTAL:", 0.72, 0.78, 0.18, f"{total_subtotal:.2f}")
 
-    ctk.CTkLabel(
-        frame,
-        text="Condição de pagamento: À vista",
-        font=("TkDefaultFont", 12, "bold"),
-    ).place(relx=0.04, rely=0.86, anchor="w")
-
+    ctk.CTkLabel(frame,text="Condição de pagamento: À vista",font=("TkDefaultFont", 12, "bold"),).place(relx=0.04, rely=0.86, anchor="w")
     criaBotao(frame, "◀️ Voltar", 0.15, 0.88, 0.2, _voltar)
 
     def _confirmar_exclusao():
