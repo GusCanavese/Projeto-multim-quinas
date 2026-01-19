@@ -48,7 +48,7 @@ def telaAcoes(self):
 
 
     if self.cargo == (('Vendedor(a) externo',),) or self.cargo == (('Vendedor(a) interno',),):
-        relatorioDeVendas = criaBotao(frame, "Relatório de vendas", 0.66, 0.24, 0.24, lambda: telaRelatorioDeVendas(self))
+        relatorioDeVendas = criaBotao(frame, "Vendas", 0.66, 0.24, 0.24, lambda: telaRelatorioDeVendas(self))
         relatorioDeVendas.configure(height=50, image=fotoRelatorio, compound="left")
 
         estoque = criaBotao(frame, "Estoque/Produtos", 0.66, 0.35, 0.24, lambda: telaEstoque(self))
@@ -80,7 +80,7 @@ def telaAcoes(self):
         gerenciar = criaBotao(frame, "Gerenciar cadastros", 0.33, 0.57, 0.24, lambda: telaGerenciar(self))
         gerenciar.configure(height=50, image=fotoGerenciar, compound="left")
 
-        relatorioDeVendas = criaBotao(frame, "Relatório de vendas", 0.66, 0.24, 0.24, lambda: telaRelatorioDeVendas(self))
+        relatorioDeVendas = criaBotao(frame, "Vendas", 0.66, 0.24, 0.24, lambda: telaRelatorioDeVendas(self))
         relatorioDeVendas.configure(height=50, image=fotoRelatorio, compound="left")
         
         contasAPagar = criaBotao(frame, "Contas a pagar/receber", 0.66, 0.35, 0.24, lambda: telaContasAPagarEAReceber(self))

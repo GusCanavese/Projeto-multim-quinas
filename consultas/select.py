@@ -148,6 +148,20 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
 
+    def buscaNomeFuncionario(login):
+        queryBuscaNome = "SELECT nome FROM funcionarios WHERE login = %s;"
+        db.cursor.execute(queryBuscaNome, (login,))
+        resultado = db.cursor.fetchone()
+        return resultado[0] if resultado else login
+
+    def buscaVendedores():
+        queryBuscaVendedores = """SELECT nome FROM funcionarios
+        WHERE cargo LIKE %s
+        ORDER BY nome"""
+        db.cursor.execute(queryBuscaVendedores, ("Vendedor%",))
+        resultado = db.cursor.fetchall()
+        return resultado
+
     def buscaEstoqueProdutos(valor, cnpj):
         if cnpj == "Todos":
             queryBuscaProdutosEstoque = """SELECT quantidade, descricao, codigo_interno, valor_de_venda, CNPJ, codigo_ncm, codigo_cfop, codigo_cest, valor_de_venda, valor_de_custo, origem_cst, nome_do_produto, marca, valor_de_custo, id FROM produtos 
