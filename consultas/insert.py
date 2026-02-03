@@ -42,6 +42,7 @@ class Insere:
         query = f"INSERT INTO fornecedores ({', '.join(colunas)}) VALUES ({', '.join(valores)})"
         db.cursor.execute(query)
         db.conn.commit()
+        messagebox.showinfo(title="Info", message="Registrado com Sucesso")
 
 
 

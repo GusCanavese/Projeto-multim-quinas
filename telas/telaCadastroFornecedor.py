@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 import gc
 from funcoesTerceiras.registraFornecedorNoBanco import registraFornecedorNoBanco 
-from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaSimouNao, criarLabelEntry, criaBotao, criarLabelEntryEmail
+from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criaSimouNao, criarLabelEntry, criaBotao, criarLabelComboBox
 from funcoesTerceiras.maiusculo import aplicar_maiusculo_em_todos_entries
 
 
@@ -20,6 +20,11 @@ def telaCadastroFornecedores(self):
     frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     self.textoCadastroFornecedores = ctk.CTkLabel(frame, height=0, text="Cadastrar fornecedores", font=("Century Gothic bold", 30))
     self.textoCadastroFornecedores.place(relx=0.5, y=40, anchor="center")
+    estados = [
+        "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
+        "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
+        "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+    ]
 
     def meDesmarqueFornecedor(checkboxSelecionada):
         if checkboxSelecionada == "Sim.":
@@ -50,8 +55,9 @@ def telaCadastroFornecedores(self):
     self.bairroFornecedor            = criarLabelEntry(frame, "Bairro *",             0.54 - 0.03, 0.35, 0.2, bairro)
     self.numeroFornecedor            = criarLabelEntry(frame, "Número *",             0.76 - 0.03, 0.35, 0.2, None)
     self.cidadeFornecedor            = criarLabelEntry(frame, "Cidade *",             0.54 - 0.03, 0.45, 0.2, cidade)
-    self.estadoFornecedor            = criarLabelEntry(frame, "Estado *",             0.76 - 0.03, 0.45, 0.2, estado)
-    self.referencia                  = criarLabelEntry(frame, "Referência ",          0.54 - 0.03, 0.55, 0.2, None)
+    self.estadoFornecedor            = criarLabelComboBox(frame, "Estado *",          0.76 - 0.03, 0.465, 0.2, estados)
+    # self.estadoFornecedor            = criarLabelEntry(frame, "Estado *",             0.76 - 0.03, 0.45, 0.2, estado)
+    self.referencia                  = criarLabelEntry(frame, "Referência",           0.54 - 0.03, 0.55, 0.2, None)
 
 
 
