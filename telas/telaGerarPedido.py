@@ -28,7 +28,7 @@ def telaGerarPedido(self):
 
 
     usuarioLogado = self.logado
-    usuarioLogado = usuarioLogado.capitalize()
+    usuarioLogado = Buscas.buscaNomeFuncionario(usuarioLogado).capitalize()
 
     #pós refat 
     listaLabels = ["Item", "Produto", "Preço", "Quantidade", "Estoque", "Desconto $", "Desconto %", "Acréscimo", "Subtotal"]
