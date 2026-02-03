@@ -8,11 +8,15 @@ import customtkinter as ctk
 
 
 def registraProdutoNoBanco(self, frame):
+
     nome = self.nomeProduto.get()
     marca = self.marca.get()
     valorCusto = self.ValorCusto.get()
     valorVenda = self.ValorVenda.get()
-    quantidade = self.Quantidade.get()
+    if not self.Quantidade.get():
+        quantidade = 0
+    else:
+        quantidade = self.Quantidade.get()
     codigoInterno = self.CodigoInterno.get()
     NCM = self.NCM.get()
     CFOP = self.CFOP.get()

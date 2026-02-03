@@ -43,7 +43,7 @@ def telaCadastroFornecedores(self):
     self.inscricaoEstadualFornecedor = criarLabelEntry(frame, "Inscrição estadual *", 0.1  - 0.03, 0.45, 0.2, None)
     self.descricaoFornecedor         = criarLabelEntry(frame, "Descrição",            0.32 - 0.03, 0.45, 0.2, None)
     self.emailFornecedor             = criarLabelEntry(frame, "Email *",              0.1  - 0.03, 0.55, 0.2, None)
-    self.codigoCRT                   = criarLabelEntry(frame, "CRT *",                0.32 - 0.03, 0.55, 0.2, None)
+    self.codigoCRT                   = criarLabelEntry(frame, "CRT",                  0.32 - 0.03, 0.55, 0.2, None)
 
     self.CEPFornecedor               = criarLabelEntry(frame, "CEP *",                0.54 - 0.03, 0.25, 0.2, None)
     self.rua                         = criarLabelEntry(frame, "Rua *",                0.76 - 0.03, 0.25, 0.2, rua)
