@@ -597,6 +597,101 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor=0, cfop=None, cnpj_busca="T
             print(self.dadosProdutos)
             destroyModal()
 
+    def _parse_float(valor):
+        return float(str(valor or "0").replace(",", ".") or 0)
+
+    def _ajustar_por_subtotal(linha):
+        entry_preco = linha["preco"]
+        entry_quantida = linha["quantidade"]
+        entry_subtotal = linha["subtotal"]
+        entry_descReal = linha["desc_real"]
+        entry_descPorc = linha["desc_porcentagem"]
+        entry_acrescim = linha["acrescimo"]
+
+        preco_unit = _parse_float(entry_preco.get())
+        if preco_unit <= 0:
+            preco_unit = linha.get("subtotal_original", _parse_float(entry_subtotal.get()))
+
+        quantida = _parse_float(entry_quantida.get())
+        base_total = preco_unit * quantida if quantida > 0 else preco_unit
+        subtotal_digitado = _parse_float(entry_subtotal.get())
+
+        if base_total <= 0:
+            entry_descReal.delete(0, "end")
+            entry_descReal.insert(0, "0")
+            entry_descPorc.delete(0, "end")
+            entry_descPorc.insert(0, "0")
+            entry_acrescim.delete(0, "end")
+            entry_acrescim.insert(0, "0")
+            return
+
+        if subtotal_digitado < base_total:
+            desconto = base_total - subtotal_digitado
+            percentual = (desconto / base_total) * 100
+            entry_descReal.delete(0, "end")
+            entry_descReal.insert(0, f"{desconto:.2f}")
+            entry_descPorc.delete(0, "end")
+            entry_descPorc.insert(0, f"{percentual:.2f}")
+            entry_acrescim.delete(0, "end")
+            entry_acrescim.insert(0, "0")
+        elif subtotal_digitado > base_total:
+            acrescimo = subtotal_digitado - base_total
+            entry_descReal.delete(0, "end")
+            entry_descReal.insert(0, "0")
+            entry_descPorc.delete(0, "end")
+            entry_descPorc.insert(0, "0")
+            entry_acrescim.delete(0, "end")
+            entry_acrescim.insert(0, f"{acrescimo:.2f}")
+        else:
+            entry_descReal.delete(0, "end")
+            entry_descReal.insert(0, "0")
+            entry_descPorc.delete(0, "end")
+            entry_descPorc.insert(0, "0")
+            entry_acrescim.delete(0, "end")
+            entry_acrescim.insert(0, "0")
+
+    def _ajustar_desc_real(linha):
+        entry_preco = linha["preco"]
+        entry_quantida = linha["quantidade"]
+        entry_descReal = linha["desc_real"]
+        entry_descPorc = linha["desc_porcentagem"]
+        entry_subtotal = linha["subtotal"]
+
+        preco_unit = _parse_float(entry_preco.get())
+        if preco_unit <= 0:
+            preco_unit = linha.get("subtotal_original", _parse_float(entry_subtotal.get()))
+
+        quantida = _parse_float(entry_quantida.get())
+        base_total = preco_unit * quantida if quantida > 0 else preco_unit
+        desc_real = _parse_float(entry_descReal.get())
+
+        if base_total > 0:
+            percentual = max((desc_real / base_total) * 100, 0.0)
+        else:
+            percentual = 0.0
+
+        entry_descPorc.delete(0, "end")
+        entry_descPorc.insert(0, f"{percentual:.2f}")
+
+    def _ajustar_desc_porc(linha):
+        entry_preco = linha["preco"]
+        entry_quantida = linha["quantidade"]
+        entry_descReal = linha["desc_real"]
+        entry_descPorc = linha["desc_porcentagem"]
+        entry_subtotal = linha["subtotal"]
+
+        preco_unit = _parse_float(entry_preco.get())
+        if preco_unit <= 0:
+            preco_unit = linha.get("subtotal_original", _parse_float(entry_subtotal.get()))
+
+        quantida = _parse_float(entry_quantida.get())
+        base_total = preco_unit * quantida if quantida > 0 else preco_unit
+        desc_porc = _parse_float(entry_descPorc.get())
+
+        desconto = (base_total * (desc_porc / 100.0)) if base_total > 0 else 0.0
+        entry_descReal.delete(0, "end")
+        entry_descReal.insert(0, f"{desconto:.2f}")
+
     def atualizarTotalGeral():
         total = 0.0
 
@@ -607,32 +702,33 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor=0, cfop=None, cnpj_busca="T
             entry_subtotal    = linha["subtotal"]
             entry_quantida    = linha["quantidade"]
             entry_acrescim    = linha["acrescimo"]
+            subtotal_editado = linha.get("subtotal_editado", False)
 
-            descReal = float((entry_descReal.get() or "0").replace(",", "."))
-            descPorc = float((entry_descPorc.get() or "0").replace(",", ".")) / 100.0
-            quantida = float(entry_quantida.get() or 0)
-            acrescim = float((entry_acrescim.get() or "0").replace(",", "."))
+            descReal = _parse_float(entry_descReal.get())
+            descPorc = _parse_float(entry_descPorc.get())
+            quantida = _parse_float(entry_quantida.get())
+            acrescim = _parse_float(entry_acrescim.get())
 
             # Base unitária
-            precoAtual = float((entry_preco.get() or "0").replace(",", "."))
+            precoAtual = _parse_float(entry_preco.get())
             valorUnit = (
                 precoAtual if precoAtual > 0
-                else linha.get("subtotal_original", float((entry_subtotal.get() or "0").replace(",", ".")))
+                else linha.get("subtotal_original", _parse_float(entry_subtotal.get()))
             )
 
-            # 1) Total bruto da linha
-            baseSemDesc = (valorUnit * quantida if quantida > 0 else valorUnit) + acrescim
-            novo_subtotal = baseSemDesc
+            if subtotal_editado:
+                total += _parse_float(entry_subtotal.get())
+                continue
 
-            # 2) Desconto em R$
+            base_total = valorUnit * quantida if quantida > 0 else valorUnit
+            novo_subtotal = base_total
+
             if descReal > 0:
-                entry_descPorc.delete(0, "end"); entry_descPorc.insert(0, "0")
-                novo_subtotal = max(baseSemDesc - descReal, 0.0)
-
-            # 3) Desconto em %
+                novo_subtotal = max(base_total - descReal, 0.0)
             elif descPorc > 0:
-                entry_descReal.delete(0, "end"); entry_descReal.insert(0, "0")
-                novo_subtotal = max(baseSemDesc * (1.0 - descPorc), 0.0)
+                novo_subtotal = max(base_total * (1.0 - (descPorc / 100.0)), 0.0)
+
+            novo_subtotal += acrescim
 
             entry_subtotal.delete(0, "end")
             entry_subtotal.insert(0, f"{novo_subtotal:.2f}")
@@ -715,35 +811,37 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor=0, cfop=None, cnpj_busca="T
                 linha_widgets[campo] = entrada
 
                 if campo == "desc_real":
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada, lw=linha_widgets: (lw.update({"subtotal_editado": False}), _ajustar_desc_real(lw), atualizarTotalGeral()))
                     entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == "desc_porcentagem":
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada, lw=linha_widgets: (lw.update({"subtotal_editado": False}), _ajustar_desc_porc(lw), atualizarTotalGeral()))
                     entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'quantidade':
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada, lw=linha_widgets: (lw.update({"subtotal_editado": False}), atualizarTotalGeral()))
                     entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'acrescimo':
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada, lw=linha_widgets: (lw.update({"subtotal_editado": False}), atualizarTotalGeral()))
                     entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'cfop':
                     entrada.configure(textvariable=variavelCfop)
 
                 if campo == 'subtotal':
-                    entrada.bind("<KeyRelease>", lambda event: atualizarTotalGeral())
+                    entrada.bind("<KeyRelease>", lambda event, lw=linha_widgets: (lw.update({"subtotal_editado": True}), _ajustar_por_subtotal(lw), atualizarTotalGeral()))
+                    entrada.bind("<FocusOut>", lambda event, lw=linha_widgets: (lw.update({"subtotal_editado": False}), atualizarTotalGeral()))
 
                 if campo == "preco":
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada, lw=linha_widgets: (lw.update({"subtotal_editado": False}), atualizarTotalGeral()))
 
                 self.posicaox += 0.081
 
             self.contadorDeLinhas += 1
 
         self.posicaox = 0.024
+        linha_widgets["subtotal_editado"] = False
         self.linhas.append(linha_widgets)
         self.yNovo = self.posicaoy + 0.02
 

@@ -189,61 +189,151 @@ def telaGerarOrcamento(self):
     frameParaItensNoFrame.bind("<Button-1>", fechar_resultados)
     frameTelaPedido.bind("<Button-1>", fechar_resultados)
 
+    def _parse_float(valor):
+        return float(str(valor or "0").replace(",", ".") or 0)
+
+    def _ajustar_por_subtotal(linha):
+        entry_preco = linha["preco"]
+        entry_quantida = linha["quantidade"]
+        entry_subtotal = linha["subtotal"]
+        entry_descReal = linha["desc_real"]
+        entry_descPorc = linha["desc_porcentagem"]
+        entry_acrescim = linha["acrescimo"]
+
+        preco_unit = _parse_float(entry_preco.get())
+        if preco_unit <= 0:
+            preco_unit = linha.get("subtotal_original", _parse_float(entry_subtotal.get()))
+
+        quantida = _parse_float(entry_quantida.get())
+        base_total = preco_unit * quantida if quantida > 0 else preco_unit
+        subtotal_digitado = _parse_float(entry_subtotal.get())
+
+        if base_total <= 0:
+            entry_descReal.delete(0, "end")
+            entry_descReal.insert(0, "0")
+            entry_descPorc.delete(0, "end")
+            entry_descPorc.insert(0, "0")
+            entry_acrescim.delete(0, "end")
+            entry_acrescim.insert(0, "0")
+            return
+
+        if subtotal_digitado < base_total:
+            desconto = base_total - subtotal_digitado
+            percentual = (desconto / base_total) * 100
+            entry_descReal.delete(0, "end")
+            entry_descReal.insert(0, f"{desconto:.2f}")
+            entry_descPorc.delete(0, "end")
+            entry_descPorc.insert(0, f"{percentual:.2f}")
+            entry_acrescim.delete(0, "end")
+            entry_acrescim.insert(0, "0")
+        elif subtotal_digitado > base_total:
+            acrescimo = subtotal_digitado - base_total
+            entry_descReal.delete(0, "end")
+            entry_descReal.insert(0, "0")
+            entry_descPorc.delete(0, "end")
+            entry_descPorc.insert(0, "0")
+            entry_acrescim.delete(0, "end")
+            entry_acrescim.insert(0, f"{acrescimo:.2f}")
+        else:
+            entry_descReal.delete(0, "end")
+            entry_descReal.insert(0, "0")
+            entry_descPorc.delete(0, "end")
+            entry_descPorc.insert(0, "0")
+            entry_acrescim.delete(0, "end")
+            entry_acrescim.insert(0, "0")
+
+    def _ajustar_desc_real(linha):
+        entry_preco = linha["preco"]
+        entry_quantida = linha["quantidade"]
+        entry_descReal = linha["desc_real"]
+        entry_descPorc = linha["desc_porcentagem"]
+        entry_subtotal = linha["subtotal"]
+
+        preco_unit = _parse_float(entry_preco.get())
+        if preco_unit <= 0:
+            preco_unit = linha.get("subtotal_original", _parse_float(entry_subtotal.get()))
+
+        quantida = _parse_float(entry_quantida.get())
+        base_total = preco_unit * quantida if quantida > 0 else preco_unit
+        desc_real = _parse_float(entry_descReal.get())
+
+        if base_total > 0:
+            percentual = max((desc_real / base_total) * 100, 0.0)
+        else:
+            percentual = 0.0
+
+        entry_descPorc.delete(0, "end")
+        entry_descPorc.insert(0, f"{percentual:.2f}")
+
+    def _ajustar_desc_porc(linha):
+        entry_preco = linha["preco"]
+        entry_quantida = linha["quantidade"]
+        entry_descReal = linha["desc_real"]
+        entry_descPorc = linha["desc_porcentagem"]
+        entry_subtotal = linha["subtotal"]
+
+        preco_unit = _parse_float(entry_preco.get())
+        if preco_unit <= 0:
+            preco_unit = linha.get("subtotal_original", _parse_float(entry_subtotal.get()))
+
+        quantida = _parse_float(entry_quantida.get())
+        base_total = preco_unit * quantida if quantida > 0 else preco_unit
+        desc_porc = _parse_float(entry_descPorc.get())
+
+        desconto = (base_total * (desc_porc / 100.0)) if base_total > 0 else 0.0
+        entry_descReal.delete(0, "end")
+        entry_descReal.insert(0, f"{desconto:.2f}")
+
     def atualizarTotalGeral():
         total = 0.0
 
         for linha in self.linhas:
+            entry_preco = linha["preco"]
             entry_descPorc = linha["desc_porcentagem"]
             entry_descReal = linha["desc_real"]
             entry_subtotal = linha["subtotal"]
             entry_quantida = linha["quantidade"]
             entry_acrescim = linha["acrescimo"]
-            
-            
-            descReal = float(entry_descReal.get().replace(",", ".") or 0)
-            descPorc = float(entry_descPorc.get().replace(",", ".") or 0)
-            quantida = float(entry_quantida.get() or 0)
-            acrescim = float(entry_acrescim.get().replace(",", ".") or 0)
-            descPorc = descPorc/100
+            subtotal_editado = linha.get("subtotal_editado", False)
 
-            valorSubtotal = linha.get("subtotal_original", float(entry_subtotal.get().replace(",", ".") or 0))
+            descReal = _parse_float(entry_descReal.get())
+            descPorc = _parse_float(entry_descPorc.get())
+            quantida = _parse_float(entry_quantida.get())
+            acrescim = _parse_float(entry_acrescim.get())
 
-            descReal = float(entry_descReal.get().replace(",", ".") or 0)
+            preco_unit = _parse_float(entry_preco.get())
+            if preco_unit <= 0:
+                preco_unit = linha.get("subtotal_original", _parse_float(entry_subtotal.get()))
 
-            novo_subtotal = valorSubtotal - descReal if descReal > 0 else valorSubtotal
+            if subtotal_editado:
+                total += _parse_float(entry_subtotal.get())
+                continue
 
-            if descReal:
-                entry_descPorc.delete(0, "end")
-                entry_descPorc.insert(0, "0")
-                novo_subtotal = valorSubtotal - descReal if descReal > 0 else valorSubtotal
+            base_total = preco_unit * quantida if quantida > 0 else preco_unit
+            novo_subtotal = base_total
 
-            if descPorc:
-                entry_descReal.delete(0, "end")
-                entry_descReal.insert(0, "0")
-                desconto = valorSubtotal *descPorc if descPorc > 0 and descPorc < 100 else valorSubtotal
-                novo_subtotal = valorSubtotal - desconto
+            if descReal > 0:
+                novo_subtotal = max(base_total - descReal, 0.0)
+            elif descPorc > 0:
+                novo_subtotal = max(base_total * (1.0 - (descPorc / 100.0)), 0.0)
 
+            novo_subtotal += acrescim
 
-            if quantida >0:
-                novo_subtotal = novo_subtotal*quantida+acrescim
-                
             entry_subtotal.delete(0, "end")
             entry_subtotal.insert(0, f"{novo_subtotal:.2f}")
 
             total += novo_subtotal
 
-            
-       
-            desconto_total_porc = float(self.totalDescontoPorcentagem.get().replace(",", ".") or 0)
+            desconto_total_porc = _parse_float(self.totalDescontoPorcentagem.get())
             total -= total * (desconto_total_porc / 100)
 
-            desconto_total_real = float(self.totalDescontoReal.get().replace(",", ".") or 0)
+            desconto_total_real = _parse_float(self.totalDescontoReal.get())
             total -= desconto_total_real
 
-            acrescimo_total = float(self.totalAcrescimo.get().replace(",", ".") or 0)
+            acrescimo_total = _parse_float(self.totalAcrescimo.get())
             total += acrescimo_total
 
-            frete = float(self.valorFrete.get().replace(",", ".") or 0)
+            frete = _parse_float(self.valorFrete.get())
             total += frete
 
         # Exibe o TOTAL formatado
@@ -357,23 +447,24 @@ def telaGerarOrcamento(self):
                 
 
                 if campo == "desc_real":
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada, lw=linha_widgets: (lw.update({"subtotal_editado": False}), _ajustar_desc_real(lw), atualizarTotalGeral()))
                     entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == "desc_porcentagem":
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada, lw=linha_widgets: (lw.update({"subtotal_editado": False}), _ajustar_desc_porc(lw), atualizarTotalGeral()))
                     entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'quantidade':
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada, lw=linha_widgets: (lw.update({"subtotal_editado": False}), atualizarTotalGeral()))
                     entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'acrescimo':
-                    entrada.bind("<KeyRelease>", lambda event, e=entrada: atualizarTotalGeral())
+                    entrada.bind("<KeyRelease>", lambda event, e=entrada, lw=linha_widgets: (lw.update({"subtotal_editado": False}), atualizarTotalGeral()))
                     entrada.bind("<FocusIn>", lambda event: event.widget.delete(0, "end"))
 
                 if campo == 'subtotal':
-                    entrada.bind("<KeyRelease>", lambda event: atualizarTotalGeral())
+                    entrada.bind("<KeyRelease>", lambda event, lw=linha_widgets: (lw.update({"subtotal_editado": True}), _ajustar_por_subtotal(lw), atualizarTotalGeral()))
+                    entrada.bind("<FocusOut>", lambda event, lw=linha_widgets: (lw.update({"subtotal_editado": False}), atualizarTotalGeral()))
 
 
                 
@@ -382,6 +473,7 @@ def telaGerarOrcamento(self):
             self.contadorDeLinhas += 1
 
         self.posicaox = 0.024
+        linha_widgets["subtotal_editado"] = False
         self.linhas.append(linha_widgets)
         # atualizarTotalGeral()
         self.yNovo = self.posicaoy + 0.02
@@ -428,7 +520,7 @@ def telaGerarOrcamento(self):
     self.entradaNumero = criarLabelEntry(frameTelaPedido, "Nº *", 0.75, 0.15, 0.05, variavelNumero)
     self.botaoBuscaCEP = criaBotaoPequeno(frameTelaPedido, "Buscar CEP", 0.865, 0.19, 0.07, lambda:buscaCep(self.entradaCEP.get(), self.entradaNumero.get()))
     self.entradaEnderecoNoPedido = criarLabelEntry(frameTelaPedido, "Endereço *", 0.39, 0.25, 0.33, variavelEndereco)
-    self.entradaReferenciaEnderecoEntrega = criarLabelEntry(frameTelaPedido, "Referencia *", 0.75, 0.25, 0.15, variavelReferencia)
+    self.entradaReferenciaEnderecoEntrega = criarLabelEntry(frameTelaPedido, "Referência", 0.75, 0.25, 0.15, variavelReferencia)
 
     self.totalDescontoPorcentagem = criarLabelEntry(frameTelaPedido, "Desconto total(%)", 0.55, 0.675, 0.08, None)
     self.totalDescontoReal = criarLabelEntry(frameTelaPedido, "Desconto total($)", 0.67, 0.675, 0.08, None)
