@@ -11,12 +11,17 @@ def criarLabelEntry(frame, texto, relx, rely, width, variavel):
                     "Alíq. Cálc. Créd. (%)", "Vr. Cred. ICMS", "Alíq. IOF (%)", 
                     "Alíq. II (%)", "BC II ", "Vr. IOF", "Vr. II", "Vr. Desp. Aduaneiras", "Alíq. PIS (%)", "BC PIS", "Vr. PIS",
                     "Vr. COFINS ST", "BC COFINS ST", "Alíq. COFINS ST (%)","Vr. COFINS", "BC COFINS", "Alíq. COFINS (%)", "Vr. PIS ST",
-                    "BC PIS ST","Alíq. PIS ST (%)"
+                    "BC PIS ST","Alíq. PIS ST (%)", 
                 ):
         y=0.01
         
         dif = 0.055
         fonte = ("TkDefaultFont", 11)
+
+    elif texto in ("Descrição", "Parcelas", "Total", "Forma", "Vencimento"):
+        dif = 0.13
+        fonte = ("TkDefaultFont", 15)
+        y=0
     else:
         dif = 0.055
         fonte = ("TkDefaultFont", 15)

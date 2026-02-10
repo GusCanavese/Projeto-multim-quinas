@@ -172,9 +172,9 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
 
             botao_status = criaBotao(
                 corpo,
-                "Confirmar pagamento" if str(confirmado).strip().lower() != "sim" else "Desconfirmar",
-                0.84,
-                0.35,
+                "Confirmar Pgt." if str(confirmado).strip().lower() != "sim" else "Desconfirmar",
+                0.90,
+                0.40,
                 0.14,
                 lambda p=parcela, lbl=status_label, btn=None: None,
             )
@@ -183,7 +183,7 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
                 def _acao():
                     _toggle_confirmacao(parcela_ref, label_ref)
                     botao.configure(
-                        text="Confirmar pagamento"
+                        text="Confirmar Pgt."
                         if str(parcela_ref[0]).strip().lower() != "sim"
                         else "Desconfirmar"
                     )
