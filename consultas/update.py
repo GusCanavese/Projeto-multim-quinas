@@ -64,3 +64,17 @@ class Atualiza:
         """
         db.cursor.execute(query, (chave_nfe,))
         db.conn.commit()
+
+    def atualizaContaAReceber(confirmado, vencimento, descricao, total, formaPag, qtdParcelas):
+        query = """
+            UPDATE contasareceber
+               SET confirmado = %s
+             WHERE vencimento = %s
+               AND descricao = %s
+               AND total = %s
+               AND formaPag = %s
+               AND qtdParcelas = %s
+             LIMIT 1
+        """
+        db.cursor.execute(query, (confirmado, vencimento, descricao, total, formaPag, qtdParcelas))
+        db.conn.commit()

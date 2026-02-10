@@ -2,9 +2,12 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
+from tkinter import messagebox
 from funcoesTerceiras import confirmarAlteracoesNoPedido
 from funcoesTerceiras import confirmarExclusaoDoPedido
 from funcoesTerceiras.normalizarItens import normalizar_itens_pedido
+from consultas.select import Buscas
+from consultas.update import Atualiza
 from telas.telagerarFaturamento import telaGerarFaturamento
 from componentes import criaFrameJanela, criaBotao, criarLabelEntry
 
@@ -74,6 +77,122 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
         ).configure(state="disabled")
         criaBotao(frame_obs, "◀️ Voltar", 0.15, 0.9, 0.2, frame_obs.destroy)
 
+    def _abrir_faturamento():
+        faturamentos = Buscas.buscaFaturamentoPedido(numero)
+        if not faturamentos:
+            messagebox.showinfo(
+                title="Faturamento",
+                message="Nenhum faturamento cadastrado para este pedido.",
+            )
+            return
+
+        frame_faturamento = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
+        ctk.CTkLabel(
+            frame_faturamento,
+            text=f"Faturamento do pedido {numero}",
+            font=("Century Gothic bold", 24),
+        ).place(relx=0.5, rely=0.06, anchor="center")
+
+        ctk.CTkLabel(
+            frame_faturamento,
+            text="Parcelas",
+            font=("TkDefaultFont", 16, "bold"),
+        ).place(relx=0.05, rely=0.12, anchor="w")
+
+        lista_parcelas = ctk.CTkScrollableFrame(
+            frame_faturamento,
+            fg_color="transparent",
+        )
+        lista_parcelas.place(relx=0.05, rely=0.18, relwidth=0.9, relheight=0.64, anchor="nw")
+
+        def _cor_status(valor_confirmado):
+            return self.corAfirma if str(valor_confirmado).strip().lower() == "sim" else self.corNegado
+
+        def _texto_status(valor_confirmado):
+            return "Pago" if str(valor_confirmado).strip().lower() == "sim" else "Em aberto"
+
+        def _toggle_confirmacao(parcela, status_label):
+            confirmado, vencimento, descricao, total, forma, parcelas = parcela
+            novo_status = "Não" if str(confirmado).strip().lower() == "sim" else "Sim"
+            try:
+                Atualiza.atualizaContaAReceber(
+                    novo_status,
+                    vencimento,
+                    descricao,
+                    total,
+                    forma,
+                    parcelas,
+                )
+            except Exception as exc:
+                messagebox.showerror("Faturamento", f"Não foi possível atualizar a parcela: {exc}")
+                return
+            parcela[0] = novo_status
+            status_label.configure(text=_texto_status(novo_status), text_color=_cor_status(novo_status))
+
+        for indice, parcela in enumerate(faturamentos, start=1):
+            parcela = list(parcela)
+            confirmado, vencimento, descricao, total, forma, parcelas = parcela
+            card = ctk.CTkFrame(lista_parcelas, corner_radius=10, fg_color=self.cor)
+            card.pack(fill="x", pady=6, padx=6)
+
+            header = ctk.CTkFrame(card, fg_color="transparent")
+            header.pack(fill="x", padx=10, pady=(8, 2))
+            ctk.CTkLabel(
+                header,
+                text=f"Parcela {indice}",
+                font=("TkDefaultFont", 14, "bold"),
+            ).pack(side="left")
+
+            status_label = ctk.CTkLabel(
+                header,
+                text=_texto_status(confirmado),
+                text_color=_cor_status(confirmado),
+                font=("TkDefaultFont", 12, "bold"),
+            )
+            status_label.pack(side="right")
+
+            corpo = ctk.CTkFrame(card, fg_color="transparent")
+            corpo.pack(fill="x", padx=10, pady=(0, 8))
+
+            def _linha(campo, valor, relx, rely, largura):
+                criarLabelEntry(
+                    corpo,
+                    campo,
+                    relx,
+                    rely,
+                    largura,
+                    ctk.StringVar(value=str(valor)),
+                ).configure(state="disabled")
+
+            _linha("Vencimento", vencimento, 0.0, 0.05, 0.22)
+            _linha("Forma", forma, 0.24, 0.05, 0.18)
+            _linha("Total", total, 0.44, 0.05, 0.18)
+            _linha("Parcelas", parcelas, 0.64, 0.05, 0.18)
+            _linha("Descrição", descricao, 0.0, 0.35, 0.82)
+
+            botao_status = criaBotao(
+                corpo,
+                "Confirmar pagamento" if str(confirmado).strip().lower() != "sim" else "Desconfirmar",
+                0.84,
+                0.35,
+                0.14,
+                lambda p=parcela, lbl=status_label, btn=None: None,
+            )
+
+            def _configurar_botao(botao, parcela_ref, label_ref):
+                def _acao():
+                    _toggle_confirmacao(parcela_ref, label_ref)
+                    botao.configure(
+                        text="Confirmar pagamento"
+                        if str(parcela_ref[0]).strip().lower() != "sim"
+                        else "Desconfirmar"
+                    )
+                botao.configure(command=_acao)
+
+            _configurar_botao(botao_status, parcela, status_label)
+
+        criaBotao(frame_faturamento, "◀️ Voltar", 0.15, 0.9, 0.2, frame_faturamento.destroy)
+
     titulo = ctk.CTkLabel(frame, text="Venda Simples", font=("Century Gothic bold", 26))
     titulo.place(relx=0.5, rely=0.04, anchor="center")
 
@@ -112,6 +231,8 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
             0.18,
             lambda: telaGerarFaturamento(self, subtotal, numero, destinatario),
         )
+    else:
+        criaBotao(frame, "Ver faturamento", 0.86, 0.12, 0.18, _abrir_faturamento)
 
     _criar_campo("Número", 0.04, 0.18, 0.12, numero)
     _criar_campo("Data da criação", 0.18, 0.18, 0.14, data_emissao)

@@ -148,6 +148,16 @@ class Buscas:
         resultado = db.cursor.fetchall()
         return resultado
 
+    def buscaFaturamentoPedido(numero_pedido):
+        termo = f"%pedido de número {numero_pedido}%"
+        queryBuscaFaturamento = """SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas
+        FROM contasareceber
+        WHERE descricao LIKE %s
+        ORDER BY vencimento ASC"""
+        db.cursor.execute(queryBuscaFaturamento, (termo,))
+        resultado = db.cursor.fetchall()
+        return resultado
+
     def buscaNomeFuncionario(login):
         queryBuscaNome = "SELECT nome FROM funcionarios WHERE login = %s;"
         db.cursor.execute(queryBuscaNome, (login,))
