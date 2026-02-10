@@ -337,6 +337,23 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
     botaoExclui = criaBotao(frame, "Cancelar/Excluir pedido", 0.82, 0.88, 0.2, _confirmar_exclusao)
     botaoExclui.configure(fg_color=self.corNegado)
 
+    def _resumo_faturamento_para_pdf():
+        faturamentos = Buscas.buscaFaturamentoPedido(numero)
+        if not faturamentos:
+            return "Nenhum faturamento cadastrado para este pedido."
+
+        blocos = []
+        for indice, faturamento in enumerate(faturamentos, start=1):
+            confirmado, vencimento, _, total, forma, qtd_parcelas = faturamento
+            status = "Pago" if str(confirmado).strip().lower() == "sim" else "Em aberto"
+            bloco = [
+                f"Parcela {indice} | Vencimento: {vencimento} | Valor: R$ {total} | Forma: {forma}",
+                
+            ]
+            blocos.append("".join(bloco))
+
+        return "\n".join(blocos)
+
     def imprimirPedido():
         itens = []
         for item in itens_pedido:
@@ -370,7 +387,7 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
             "data_emissao": data_emissao,
             "subtotal": 1,
             "observacoes1": "",
-            "observacoes2": "",
+            "observacoes2": _resumo_faturamento_para_pdf(),
         }
 
         from funcoesTerceiras import geradorDePedido
