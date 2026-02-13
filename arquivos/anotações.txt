@@ -1,3 +1,4 @@
-corrigir dados que estão indo para as parcelas, na entrada "parcela" ta indo sempre 1, e isso é errado
+nas parcelas do faturamento, pode tirar o campo e o label "parcela" pois ele só confunde quem está olhando
 quando o pedido não tiver um faturamento, o pedido impresso não deve apresentar dados de faturamento.
 e após o faturamento ser gerado, o botão de gerar faturamento não deve mais existir
+após o pedido ter seu faturamento criado, porém ainda não confirmado, o botão de gerar faturamento deve sumir e ser substituido pelo "ver pedido"

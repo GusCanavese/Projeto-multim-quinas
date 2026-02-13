@@ -220,9 +220,15 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
         )
         _atualizar_lista()
 
+    faturamentos_existentes = Buscas.buscaFaturamentoPedido(numero)
+
     if not status_confirmado:
         criaBotao(frame, "Confirmar venda", 0.48, 0.12, 0.16, _confirmar_hoje)
         criaBotao(frame, "Confirmar alterações", 0.66, 0.12, 0.18, _confirmar_alteracoes)
+
+    if faturamentos_existentes:
+        criaBotao(frame, "Ver faturamento", 0.86, 0.12, 0.18, _abrir_faturamento)
+    else:
         criaBotao(
             frame,
             "Gerar faturamento",
@@ -231,8 +237,7 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
             0.18,
             lambda: telaGerarFaturamento(self, subtotal, numero, destinatario),
         )
-    else:
-        criaBotao(frame, "Ver faturamento", 0.86, 0.12, 0.18, _abrir_faturamento)
+
 
     _criar_campo("Número", 0.04, 0.18, 0.12, numero)
     _criar_campo("Data da criação", 0.18, 0.18, 0.14, data_emissao)
@@ -340,19 +345,17 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
     def _resumo_faturamento_para_pdf():
         faturamentos = Buscas.buscaFaturamentoPedido(numero)
         if not faturamentos:
-            return "Nenhum faturamento cadastrado para este pedido."
+            return ""
 
         blocos = []
         for indice, faturamento in enumerate(faturamentos, start=1):
-            confirmado, vencimento, _, total, forma, qtd_parcelas = faturamento
-            status = "Pago" if str(confirmado).strip().lower() == "sim" else "Em aberto"
-            bloco = [
-                f"Parcela {indice} | Vencimento: {vencimento} | Valor: R$ {total} | Forma: {forma}",
-                
-            ]
-            blocos.append("".join(bloco))
+            _, vencimento, _, total, forma, _ = faturamento
+            blocos.append(
+                f"Parcela {indice} | Vencimento: {vencimento} | Valor: R$ {total} | Forma: {forma}"
+            )
 
         return "\n".join(blocos)
+
 
     def imprimirPedido():
         itens = []

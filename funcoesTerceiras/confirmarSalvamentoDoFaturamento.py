@@ -34,7 +34,14 @@ def confirmarSalvamentoDoFaturamento(self, quantidade, valor, formaPag, data, pe
 
             dataFormatada = dataParcela.strftime("%Y-%m-%d")
 
-            Insere.registraFaturamentoNoBanco(confirmado, dataFormatada, descricao, valorParcela, formaPagamento, 1)
+            Insere.registraFaturamentoNoBanco(
+                confirmado,
+                dataFormatada,
+                descricao,
+                valorParcela,
+                formaPagamento,
+                qtdParcelas,
+            )
         messagebox.showinfo(title="Acessar Info", message="Registrado com Sucesso")
 
     else:
