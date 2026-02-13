@@ -93,17 +93,11 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
             font=("Century Gothic bold", 24),
         ).place(relx=0.5, rely=0.06, anchor="center")
 
-        ctk.CTkLabel(
-            frame_faturamento,
-            text="Parcelas",
-            font=("TkDefaultFont", 16, "bold"),
-        ).place(relx=0.05, rely=0.12, anchor="w")
-
         lista_parcelas = ctk.CTkScrollableFrame(
             frame_faturamento,
             fg_color="transparent",
         )
-        lista_parcelas.place(relx=0.05, rely=0.18, relwidth=0.9, relheight=0.64, anchor="nw")
+        lista_parcelas.place(relx=0.05, rely=0.12, relwidth=0.9, relheight=0.70, anchor="nw")
 
         def _cor_status(valor_confirmado):
             return self.corAfirma if str(valor_confirmado).strip().lower() == "sim" else self.corNegado
@@ -167,14 +161,13 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
             _linha("Vencimento", vencimento, 0.0, 0.05, 0.22)
             _linha("Forma", forma, 0.24, 0.05, 0.18)
             _linha("Total", total, 0.44, 0.05, 0.18)
-            _linha("Parcelas", parcelas, 0.64, 0.05, 0.18)
             _linha("Descrição", descricao, 0.0, 0.35, 0.82)
 
             botao_status = criaBotao(
                 corpo,
                 "Confirmar Pgt." if str(confirmado).strip().lower() != "sim" else "Desconfirmar",
                 0.90,
-                0.40,
+                0.48,
                 0.14,
                 lambda p=parcela, lbl=status_label, btn=None: None,
             )
@@ -348,10 +341,10 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
             return ""
 
         blocos = []
-        for indice, faturamento in enumerate(faturamentos, start=1):
+        for faturamento in faturamentos:
             _, vencimento, _, total, forma, _ = faturamento
             blocos.append(
-                f"Parcela {indice} | Vencimento: {vencimento} | Valor: R$ {total} | Forma: {forma}"
+                f"Vencimento: {vencimento} | Valor: R$ {total} | Forma: {forma}"
             )
 
         return "\n".join(blocos)

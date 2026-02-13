@@ -11,6 +11,8 @@ def gerar_recibo(nome_arquivo, dados):
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
+    observacoes_financeiras = str(dados.get('observacoes2', '') or '').strip()
+    exibir_faturamento = bool(observacoes_financeiras)
 
     # Definindo a altura inicial
     altura = height - 10
@@ -230,7 +232,6 @@ def gerar_recibo(nome_arquivo, dados):
 
         c.setFont("Times-Bold", 9)
         c.drawString(23, altura_item -140 + novaAltura, "OBSERVAÇÕES DO PEDIDO")
-        c.drawString(450, altura_item -140 + novaAltura, "FECHAMENTO FINANCEIRO")
         
         c.setFont("Times-Roman", 9)
         texto = c.beginText(23, altura_item - 160 + novaAltura)  
@@ -239,34 +240,35 @@ def gerar_recibo(nome_arquivo, dados):
             texto.textLine(linha)  
         c.drawText(texto)
 
-
-        texto2 = c.beginText(322, altura_item - 203 + novaAltura)  
-        texto2.setFont("Times-Roman", 9)
-        for linha in dados['observacoes2'].split('\n'):
-            texto2.textLine(linha)  
-        c.drawText(texto2)
-    
-
-        c.setFont("Times-Roman", 7)
-
-        c.drawString(338, altura_item -160 + novaAltura, "PAGO")
-        c.rect(322, altura_item - 165 + novaAltura, 15, 15, stroke=1, fill=0)
-
-        c.drawString(388, altura_item -160 + novaAltura, "A VISTA")
-        c.rect(372, altura_item - 165 + novaAltura, 15, 15, stroke=1, fill=0)
-
-        c.drawString(450, altura_item -160 + novaAltura, "A PRAZO")
-        c.rect(434, altura_item - 165 + novaAltura, 15, 15, stroke=1, fill=0)
-
-        c.drawString(510, altura_item -160 + novaAltura, "RECEBER NA ENTREGA")
-        c.rect(494, altura_item - 165 + novaAltura, 15, 15, stroke=1, fill=0)
-
-        c.setFont("Times-Bold", 9)
-        c.drawString(322, altura_item -183 + novaAltura, "FINANCEIRO")
         c.rect(20, altura_item - 143 + novaAltura, (width - 50)/2 -5, -200, stroke=1, fill=0)
-        c.line(314, altura_item - 175 + novaAltura, 590, altura_item - 175 + novaAltura)
 
-        c.rect((width - 20)/2 + 18, altura_item - 143 + novaAltura, (width - 50)/2 - 5, -200, stroke=1, fill=0)
+        if exibir_faturamento:
+            c.setFont("Times-Bold", 9)
+            c.drawString(450, altura_item -140 + novaAltura, "FECHAMENTO FINANCEIRO")
+
+            texto2 = c.beginText(322, altura_item - 203 + novaAltura)  
+            texto2.setFont("Times-Roman", 9)
+            for linha in observacoes_financeiras.split('\n'):
+                texto2.textLine(linha)  
+            c.drawText(texto2)
+
+            c.setFont("Times-Roman", 7)
+            c.drawString(338, altura_item -160 + novaAltura, "PAGO")
+            c.rect(322, altura_item - 165 + novaAltura, 15, 15, stroke=1, fill=0)
+
+            c.drawString(388, altura_item -160 + novaAltura, "A VISTA")
+            c.rect(372, altura_item - 165 + novaAltura, 15, 15, stroke=1, fill=0)
+
+            c.drawString(450, altura_item -160 + novaAltura, "A PRAZO")
+            c.rect(434, altura_item - 165 + novaAltura, 15, 15, stroke=1, fill=0)
+
+            c.drawString(510, altura_item -160 + novaAltura, "RECEBER NA ENTREGA")
+            c.rect(494, altura_item - 165 + novaAltura, 15, 15, stroke=1, fill=0)
+
+            c.setFont("Times-Bold", 9)
+            c.drawString(322, altura_item -183 + novaAltura, "FINANCEIRO")
+            c.line(314, altura_item - 175 + novaAltura, 590, altura_item - 175 + novaAltura)
+            c.rect((width - 20)/2 + 18, altura_item - 143 + novaAltura, (width - 50)/2 - 5, -200, stroke=1, fill=0)
         
         c.setFont("Helvetica", 9) 
         
@@ -286,7 +288,6 @@ def gerar_recibo(nome_arquivo, dados):
     elif altura_item >= 422:
         c.setFont("Times-Bold", 9)
         c.drawString(23, altura_item -140, "OBSERVAÇÕES DO PEDIDO")
-        c.drawString(450, altura_item -140, "FECHAMENTO FINANCEIRO")
         
         c.setFont("Times-Roman", 9)
         texto = c.beginText(23, altura_item - 160)  
@@ -295,36 +296,35 @@ def gerar_recibo(nome_arquivo, dados):
             texto.textLine(linha)  
         c.drawText(texto)
 
-
-        texto2 = c.beginText(322, altura_item - 203)  
-        texto2.setFont("Times-Roman", 9)
-        for linha in dados['observacoes2'].split('\n'):
-            texto2.textLine(linha)  
-        c.drawText(texto2)
-    
-
-        c.setFont("Times-Roman", 7)
-
-        c.drawString(338, altura_item -160, "PAGO")
-        c.rect(322, altura_item - 165, 15, 15, stroke=1, fill=0)
-
-        c.drawString(388, altura_item -160, "A VISTA")
-        c.rect(372, altura_item - 165, 15, 15, stroke=1, fill=0)
-
-        c.drawString(450, altura_item -160, "A PRAZO")
-        c.rect(434, altura_item - 165, 15, 15, stroke=1, fill=0)
-
-        c.drawString(510, altura_item -160, "RECEBER NA ENTREGA")
-        c.rect(494, altura_item - 165, 15, 15, stroke=1, fill=0)
-
-        c.setFont("Times-Bold", 9)
-        c.drawString(322, altura_item -190, "FINANCEIRO")
         c.rect(20, altura_item - 143, (width - 50)/2 -5, -200, stroke=1, fill=0)
-        c.line(314, altura_item - 175, 590, altura_item - 175)
 
-        c.rect((width - 20)/2 + 18, altura_item - 143, (width - 50)/2 - 5, -200, stroke=1, fill=0)
+        if exibir_faturamento:
+            c.setFont("Times-Bold", 9)
+            c.drawString(450, altura_item -140, "FECHAMENTO FINANCEIRO")
 
-        c.rect((width - 20)/2 + 18, altura_item - 143, (width - 50)/2 - 5, -200, stroke=1, fill=0)
+            texto2 = c.beginText(322, altura_item - 203)  
+            texto2.setFont("Times-Roman", 9)
+            for linha in observacoes_financeiras.split('\n'):
+                texto2.textLine(linha)  
+            c.drawText(texto2)
+
+            c.setFont("Times-Roman", 7)
+            c.drawString(338, altura_item -160, "PAGO")
+            c.rect(322, altura_item - 165, 15, 15, stroke=1, fill=0)
+
+            c.drawString(388, altura_item -160, "A VISTA")
+            c.rect(372, altura_item - 165, 15, 15, stroke=1, fill=0)
+
+            c.drawString(450, altura_item -160, "A PRAZO")
+            c.rect(434, altura_item - 165, 15, 15, stroke=1, fill=0)
+
+            c.drawString(510, altura_item -160, "RECEBER NA ENTREGA")
+            c.rect(494, altura_item - 165, 15, 15, stroke=1, fill=0)
+
+            c.setFont("Times-Bold", 9)
+            c.drawString(322, altura_item -190, "FINANCEIRO")
+            c.line(314, altura_item - 175, 590, altura_item - 175)
+            c.rect((width - 20)/2 + 18, altura_item - 143, (width - 50)/2 - 5, -200, stroke=1, fill=0)
         
         
         
