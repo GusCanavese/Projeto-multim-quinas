@@ -22,6 +22,10 @@ def criarLabelEntry(frame, texto, relx, rely, width, variavel):
         dif = 0.13
         fonte = ("TkDefaultFont", 15)
         y=0
+    elif texto in ("Filtrar "):
+        dif = 0.041
+        fonte = ("TkDefaultFont", 15)
+        y=0
     else:
         dif = 0.055
         fonte = ("TkDefaultFont", 15)

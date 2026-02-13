@@ -13,7 +13,7 @@ def telaEstoque(self):
 
     # Filtros - lado esquerdo
 
-    buscar = criarLabelEntry(frame,"Filtrar", 0.05, 0.04, 0.22, None)
+    buscar = criarLabelEntry(frame,"Filtrar ", 0.05, 0.04, 0.22, None)
     filtrarPorVendedor = criarLabelComboBox(frame, "Filtrar por nome", 0.315, 0.04, 0.22, opcoes)
 
 

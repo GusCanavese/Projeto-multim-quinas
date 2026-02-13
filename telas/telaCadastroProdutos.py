@@ -59,7 +59,7 @@ def telaCadastroProdutos(self):
     self.CEST = criarLabelEntry(frame, "Código CEST", 0.73, 0.26, 0.16, None)
 
     self.OrigemCST = criarLabelEntry(frame, "Origem (CST A)", 0.1, 0.4, 0.20, None)
-    self.Descricao = criarLabelEntry(frame, "Descrição", 0.33, 0.4, 0.265, None)
+    self.Descricao = criarLabelEntry(frame, "Detalhes", 0.33, 0.4, 0.265, None)
     self.CNPJ = criarLabelComboBox(frame, "CNPJ *", 0.63, 0.415, 0.26, opcoesCNPJ)
 
     criaBotao(frame, "◀️ Voltar", 0.29, 0.80, 0.20, lambda:frame.destroy())
