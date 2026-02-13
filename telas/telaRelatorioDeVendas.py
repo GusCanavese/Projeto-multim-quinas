@@ -20,8 +20,7 @@ def telaRelatorioDeVendas(self):
 
 
     self.filtrarPorNumero = criarLabelEntry(frame,"Filtrar", 0.055, 0.04, 0.22, None)
-    self.filtrarPorVendedor = criarLabelComboBox(frame, "Filtrar por vendedor(a)", 0.315, 0.08, 0.22, opcoes)
-    self.filtrarPorVendedor.place_configure(rely=0.095)
+    self.filtrarPorVendedor = criarLabelComboBox(frame, "Filtrar por vendedor(a)", 0.315, 0.055, 0.22, opcoes)
     self.filtrarPorVendedor.set("Todos")
     
     self.selecionarPeriodo = ctk.CTkCheckBox(frame, text="Selecionar período")
@@ -32,7 +31,7 @@ def telaRelatorioDeVendas(self):
     # Botões 
     
     
-    criaBotao(frame, "Buscar", 0.84, 0.08, 0.1, lambda:filtrar.filtrarPedidos( self, frameVendas, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(), self.datePickerInicio.get() if hasattr(self, "datePickerInicio") else None, self.datePickerFim.get() if hasattr(self, "datePickerFim") else None, self.selecionarPeriodo.get()))
+    criaBotao(frame, "Buscar", 0.105, 0.14, 0.1, lambda:filtrar.filtrarPedidos( self, frameVendas, self.filtrarPorVendedor.get(), self.filtrarPorNumero.get(), self.datePickerInicio.get() if hasattr(self, "datePickerInicio") else None, self.datePickerFim.get() if hasattr(self, "datePickerFim") else None, self.selecionarPeriodo.get()))
     criaBotao(frame, "◀️ Voltar", 0.15, 0.94, 0.15, lambda:frame.destroy())
 
 
@@ -54,4 +53,3 @@ def telaRelatorioDeVendas(self):
         else:
             criaLabel(frameVendas, coluna, x, y, 0.17, self.cor)  # Data de emissão
             x += 0.175
-

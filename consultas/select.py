@@ -93,25 +93,34 @@ class Buscas:
         return resultado
     
     def buscaPedidos(vendedor, numero, inicio, fim, checkbox):
+        data_emissao_sem_hora = """
+            COALESCE(
+                DATE(data_emissao),
+                DATE(STR_TO_DATE(data_emissao, '%%d/%%m/%%Y %%H:%%i:%%s')),
+                DATE(STR_TO_DATE(data_emissao, '%%d/%%m/%%Y'))
+            )
+        """
+
         if checkbox and inicio and fim:
             if vendedor != "Todos":
                 queryBuscaPedidos = """SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao, 
                                     destinatario, cpf, endereco, itens FROM pedidos 
                                 WHERE
-                                    data_emissao BETWEEN %s AND %s
+                                    {data_emissao_sem_hora} BETWEEN STR_TO_DATE(%s, '%%d/%%m/%%Y') AND STR_TO_DATE(%s, '%%d/%%m/%%Y')
                                     AND vendedor LIKE %s
                                     AND (
                                         destinatario LIKE %s
-                                        numero_recibo LIKE %s
+                                        OR numero_recibo LIKE %s
                                         OR subtotal LIKE %s
                                     ) 
                                 ORDER BY numero_recibo ASC"""
-                parametros = (inicio, fim, f"%{vendedor}%", f"%{numero}%", f"%{numero}%")
+                queryBuscaPedidos = queryBuscaPedidos.format(data_emissao_sem_hora=data_emissao_sem_hora)
+                parametros = (inicio, fim, f"%{vendedor}%", f"%{numero}%", f"%{numero}%", f"%{numero}%")
             else:
                 queryBuscaPedidos = """SELECT numero_recibo, data_emissao, vendedor, subtotal, data_confirmacao,
                                     destinatario, cpf, endereco, itens FROM pedidos 
                                 WHERE 
-                                    data_emissao BETWEEN %s AND %s
+                                    {data_emissao_sem_hora} BETWEEN STR_TO_DATE(%s, '%%d/%%m/%%Y') AND STR_TO_DATE(%s, '%%d/%%m/%%Y')
                                     AND (
                                         destinatario LIKE %s
                                         OR vendedor LIKE %s
@@ -119,6 +128,7 @@ class Buscas:
                                         OR subtotal LIKE %s
                                     )
                                 ORDER BY numero_recibo ASC"""
+                queryBuscaPedidos = queryBuscaPedidos.format(data_emissao_sem_hora=data_emissao_sem_hora)
                 parametros = (inicio, fim, f"%{numero}%", f"%{numero}%", f"%{numero}%", f"%{numero}%")
         else:
             if vendedor != "Todos":

@@ -73,9 +73,6 @@ def criarLabelComboBox(frame, texto, relx, rely, width, lista):
     if texto in ("CST A", "CSOSN", "CST B", "CST",):
         fonte = ("TkDefaultFont", 11)
         y=0.01
-    elif texto in ("Filtrar por vendedor(a)"):
-        fonte = ("TkDefaultFont", 15)
-        y = -0.04
     else:
         fonte = ("TkDefaultFont", 15)
         y=0
