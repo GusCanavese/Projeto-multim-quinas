@@ -1,4 +1,1 @@
-nas parcelas do faturamento, pode tirar o campo e o label "parcela" pois ele só confunde quem está olhando
-quando o pedido não tiver um faturamento, o pedido impresso não deve apresentar dados de faturamento.
-e após o faturamento ser gerado, o botão de gerar faturamento não deve mais existir
-após o pedido ter seu faturamento criado, porém ainda não confirmado, o botão de gerar faturamento deve sumir e ser substituido pelo "ver pedido"
+ao gerar faturamento e voltar para a tela do pedido/venda, o botão deve automaticamente sair de "gerar faturamento" para "ver faturamento" sem tem que sair e voltar para a tela novamente

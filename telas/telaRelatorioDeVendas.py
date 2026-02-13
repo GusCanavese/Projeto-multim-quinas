@@ -12,17 +12,20 @@ from componentes import criaFrameJanela,  criaFrame, criaFrameJanela, criarLabel
 def telaRelatorioDeVendas(self):
     frame = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
     frameVendas = criaFrameJanela(frame, 0.5, 0.5, 0.95, 0.7, self.corFundo)
-    vendedores = [vendedor[0] for vendedor in Buscas.buscaVendedores()]
-    opcoes = ["Todos", *vendedores]
+    opcoes = ["Todos"]
+
+    for item in Buscas.buscaVendedores():
+        opcoes.append(item[0])
+
 
 
     self.filtrarPorNumero = criarLabelEntry(frame,"Filtrar", 0.055, 0.04, 0.22, None)
-    self.filtrarPorVendedor = criarLabelComboBox(frame, "Filtrar por vendedor(a)", 0.315, 0.04, 0.22, opcoes)
+    self.filtrarPorVendedor = criarLabelComboBox(frame, "Filtrar por vendedor(a)", 0.315, 0.08, 0.22, opcoes)
     self.filtrarPorVendedor.place_configure(rely=0.095)
     self.filtrarPorVendedor.set("Todos")
     
     self.selecionarPeriodo = ctk.CTkCheckBox(frame, text="Selecionar período")
-    self.selecionarPeriodo.place(relx=0.54, rely=0.065, anchor="nw")
+    self.selecionarPeriodo.place(relx=0.54, rely=0.082, anchor="nw")
     self.selecionarPeriodo.bind("<Button-1>", command=lambda event: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodo(self,frame, self.selecionarPeriodo.get(), event))
     
 

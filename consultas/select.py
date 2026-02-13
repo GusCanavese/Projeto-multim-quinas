@@ -166,9 +166,9 @@ class Buscas:
 
     def buscaVendedores():
         queryBuscaVendedores = """SELECT nome FROM funcionarios
-        WHERE cargo LIKE %s
+        WHERE cargo LIKE %s or cargo LIKE %s
         ORDER BY nome"""
-        db.cursor.execute(queryBuscaVendedores, ("Vendedor%",))
+        db.cursor.execute(queryBuscaVendedores, ("Vendedor%", "Gerente"))
         resultado = db.cursor.fetchall()
         return resultado
 

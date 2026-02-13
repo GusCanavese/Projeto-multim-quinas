@@ -66,7 +66,7 @@ def telaAcoes(self):
         criaBotao(frame, "Trocar usuário", 0.33, 0.80, 0.18, lambda: frame.destroy())
 
 
-    elif self.cargo == (('Financeiro',),) or self.cargo == (('Gerente',),):
+    elif self.cargo == (('Financeiro',),) or self.cargo == (('Gerente',),) or self.cargo == (('adm',),):
 
         cadastros = criaBotao(frame, "Cadastros", 0.33, 0.24, 0.24, lambda: telaCadastros(self))
         cadastros.configure(height=50, image=fotoCadastros, compound="left")
