@@ -11,6 +11,32 @@ class Atualiza:
         db.cursor.execute(queryAtualizaPedido, (dataHoje.strftime("%d/%m/%Y") ,identificador,))
         db.conn.commit()
 
+    def atualizaDadosPedido(
+        identificador,
+        vendedor,
+        destinatario,
+        cpf,
+        endereco,
+        subtotal,
+        itens_json,
+    ):
+        queryAtualizaPedido = """
+            UPDATE pedidos
+               SET vendedor = %s,
+                   destinatario = %s,
+                   cpf = %s,
+                   endereco = %s,
+                   subtotal = %s,
+                   itens = %s
+             WHERE numero_recibo = %s
+             LIMIT 1
+        """
+        db.cursor.execute(
+            queryAtualizaPedido,
+            (vendedor, destinatario, cpf, endereco, subtotal, itens_json, identificador),
+        )
+        db.conn.commit()
+
     def atualizaProduto(quantidade, preco, custo, id):
         dataHoje = date.today()
         queryAtualizaPedido = "UPDATE produtos SET quantidade = %s, valor_de_venda = %s, valor_de_custo = %s  WHERE id LIKE %s LIMIT 1"

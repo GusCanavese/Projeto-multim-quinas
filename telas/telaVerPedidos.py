@@ -2,6 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
+import json
 from tkinter import messagebox
 from funcoesTerceiras import confirmarAlteracoesNoPedido
 from funcoesTerceiras import confirmarExclusaoDoPedido
@@ -60,7 +61,7 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
         entry = criarLabelEntry(frame, texto, relx, rely, width, variavel)
         if not desbloqueado:
             entry.configure(state="disabled")
-        return entry
+        return entry, variavel
 
     def _abrir_observacoes(texto):
         frame_obs = criaFrameJanela(self, 0.5, 0.5, 1, 1, self.corFundo)
@@ -199,56 +200,95 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
     status_label.place(relx=0.04, rely=0.12, anchor="w")
 
     def _confirmar_hoje():
-        confirmarAlteracoesNoPedido.confirmarHoje(self, numero, frame, subtotal, destinatario)
+        faturamentos = Buscas.buscaFaturamentoPedido(numero)
+        if not faturamentos:
+            messagebox.showwarning(
+                "Confirmar venda",
+                "Sem faturamento cadastrado, a venda não pode ser confirmada.",
+            )
+            return
+        confirmarAlteracoesNoPedido.confirmarHoje(self, numero, frame)
         _atualizar_lista()
 
     def _confirmar_alteracoes():
-        confirmarAlteracoesNoPedido.confirmarAlteracoesNoPedido(
+        itens_atualizados = []
+        for linha in linhas_itens:
+            item_atualizado = {
+                "descricao": linha["descricao"].get().strip(),
+                "quantidade": linha["quantidade"].get().strip(),
+                "preco": linha["preco"].get().strip(),
+                "desconto_reais": linha["desconto_reais"].get().strip() or "0",
+                "desconto_porcentagem": linha["desconto_porcentagem"].get().strip() or "0",
+                "subtotal": linha["subtotal"].get().strip() or "0",
+                "acrescimo": "0",
+            }
+            if item_atualizado["descricao"]:
+                itens_atualizados.append(item_atualizado)
+
+        subtotal_atualizado = sum(_parse_float(item.get("subtotal", 0)) for item in itens_atualizados)
+        dados_atualizacao = {
+            "vendedor": variavelVendedor.get().strip(),
+            "destinatario": variavelDestinatario.get().strip(),
+            "cpf": variavelCpfCnpj.get().strip(),
+            "endereco": variavelEndereco.get().strip(),
+            "subtotal": subtotal_atualizado,
+            "itens_json": json.dumps(itens_atualizados, ensure_ascii=False),
+        }
+
+        alterou = confirmarAlteracoesNoPedido.confirmarAlteracoesNoPedido(
             self,
-            self.dataDaVendaTelaVerPedidos.get(),
             numero,
-            frame,
             subtotal,
             destinatario,
+            dados_atualizacao=dados_atualizacao,
         )
-        _atualizar_lista()
+        if alterou:
+            _atualizar_lista()
 
-    faturamentos_existentes = Buscas.buscaFaturamentoPedido(numero)
+    botao_faturamento = None
+
+    def _renderizar_botao_faturamento():
+        nonlocal botao_faturamento
+        if botao_faturamento is not None and botao_faturamento.winfo_exists():
+            botao_faturamento.destroy()
+
+        faturamentos_existentes = Buscas.buscaFaturamentoPedido(numero)
+        if faturamentos_existentes:
+            botao_faturamento = criaBotao(frame, "Ver faturamento", 0.86, 0.12, 0.18, _abrir_faturamento)
+        else:
+            botao_faturamento = criaBotao(
+                frame,
+                "Gerar faturamento",
+                0.86,
+                0.12,
+                0.18,
+                lambda: telaGerarFaturamento(self, subtotal, numero, destinatario, on_saved=_renderizar_botao_faturamento),
+            )
 
     if not status_confirmado:
         criaBotao(frame, "Confirmar venda", 0.48, 0.12, 0.16, _confirmar_hoje)
         criaBotao(frame, "Confirmar alterações", 0.66, 0.12, 0.18, _confirmar_alteracoes)
 
-    if faturamentos_existentes:
-        criaBotao(frame, "Ver faturamento", 0.86, 0.12, 0.18, _abrir_faturamento)
-    else:
-        criaBotao(
-            frame,
-            "Gerar faturamento",
-            0.86,
-            0.12,
-            0.18,
-            lambda: telaGerarFaturamento(self, subtotal, numero, destinatario),
-        )
+    _renderizar_botao_faturamento()
 
 
     _criar_campo("Número", 0.04, 0.18, 0.12, numero)
     _criar_campo("Data da criação", 0.18, 0.18, 0.14, data_emissao)
-    self.dataDaVendaTelaVerPedidos = _criar_campo(
+    self.dataDaVendaTelaVerPedidos, _ = _criar_campo(
         "Data de confirmação",
         0.34,
         0.18,
         0.14,
         data_confirmacao or "",
-        desbloqueado=not status_confirmado,
+        desbloqueado=False,
     )
-    status_entry = _criar_campo("Status", 0.50, 0.18, 0.18, status_texto)
+    status_entry, _ = _criar_campo("Status", 0.50, 0.18, 0.18, status_texto)
     status_entry.configure(text_color=status_cor)
-    _criar_campo("Vendedor", 0.70, 0.18, 0.26, vendedor)
+    campoVendedor, variavelVendedor = _criar_campo("Vendedor", 0.70, 0.18, 0.26, vendedor, desbloqueado=not status_confirmado)
 
-    _criar_campo("Nome do cliente", 0.04, 0.30, 0.32, destinatario)
-    _criar_campo("CPF/CNPJ", 0.38, 0.30, 0.18, cpf_cnpj)
-    _criar_campo("Endereço", 0.58, 0.30, 0.38, endereco)
+    campoDestinatario, variavelDestinatario = _criar_campo("Nome do cliente", 0.04, 0.30, 0.32, destinatario, desbloqueado=not status_confirmado)
+    campoCpfCnpj, variavelCpfCnpj = _criar_campo("CPF/CNPJ", 0.38, 0.30, 0.18, cpf_cnpj, desbloqueado=not status_confirmado)
+    campoEndereco, variavelEndereco = _criar_campo("Endereço", 0.58, 0.30, 0.38, endereco, desbloqueado=not status_confirmado)
 
     frame_itens = ctk.CTkFrame(frame, fg_color="transparent")
     frame_itens.place(relx=0.5, rely=0.52, relwidth=0.92, relheight=0.26, anchor="center")
@@ -262,7 +302,7 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
     frame_itens.grid_columnconfigure(4, weight=2)
     frame_itens.grid_columnconfigure(5, weight=2)
 
-    def _criar_celula(texto, row, column, padx=(0, 0)):
+    def _criar_celula(texto, row, column, padx=(0, 0), editavel=False):
         entry = ctk.CTkEntry(
             frame_itens,
             state="disabled",
@@ -273,7 +313,8 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
         entry.configure(state="normal")
         entry.delete(0, "end")
         entry.insert(0, texto)
-        entry.configure(state="disabled")
+        if not editavel:
+            entry.configure(state="disabled")
         return entry
 
     _criar_celula("Produto/Serviço", 1, 0)
@@ -284,6 +325,7 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
     _criar_celula("Subtotal", 1, 5, padx=(10, 0))
 
     itens_visiveis = itens_pedido[:itens_por_pagina]
+    linhas_itens = []
     if itens_visiveis:
         for index, item in enumerate(itens_visiveis, start=1):
             if not isinstance(item, dict):
@@ -294,12 +336,16 @@ def telaVerPedidos(self, p, d, desc, itens_pedido, pedido=None, on_refresh=None)
             desconto_reais = str(item.get("desconto_reais", 0.0))
             desconto_porcentagem = str(item.get("desconto_porcentagem", 0.0))
             subtotal_item = str(item.get("subtotal", ""))
-            _criar_celula(descricao, index + 1, 0)
-            _criar_celula(quantidade, index + 1, 1, padx=(10, 0))
-            _criar_celula(preco, index + 1, 2, padx=(10, 0))
-            _criar_celula(desconto_reais, index + 1, 3, padx=(10, 0))
-            _criar_celula(desconto_porcentagem, index + 1, 4, padx=(10, 0))
-            _criar_celula(subtotal_item, index + 1, 5, padx=(10, 0))
+            editavel = not status_confirmado
+            linha = {
+                "descricao": _criar_celula(descricao, index + 1, 0, editavel=editavel),
+                "quantidade": _criar_celula(quantidade, index + 1, 1, padx=(10, 0), editavel=editavel),
+                "preco": _criar_celula(preco, index + 1, 2, padx=(10, 0), editavel=editavel),
+                "desconto_reais": _criar_celula(desconto_reais, index + 1, 3, padx=(10, 0), editavel=editavel),
+                "desconto_porcentagem": _criar_celula(desconto_porcentagem, index + 1, 4, padx=(10, 0), editavel=editavel),
+                "subtotal": _criar_celula(subtotal_item, index + 1, 5, padx=(10, 0), editavel=editavel),
+            }
+            linhas_itens.append(linha)
     else:
         _criar_celula("Nenhum item informado.", 2, 0)
 

@@ -7,7 +7,7 @@ from funcoesTerceiras import calculaParcelasFaturamento
 from funcoesTerceiras.confirmarSalvamentoDoFaturamento import confirmarSalvamentoDoFaturamento
 from componentes import criaFrameJanela, criaBotao, criaFrame
 
-def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
+def telaGerarFaturamento(self, valorDoPedido, numero, pedido, on_saved=None):
     self.variavelRepeticao = 0
 
     self.row=1
@@ -203,6 +203,8 @@ def telaGerarFaturamento(self, valorDoPedido, numero, pedido):
             quantidade = self.listaEntradaQuantidade[i].get()
             valor = self.listaEntradaValor[i].get()
         self.frameTelaGerarFaturamento.destroy()
+        if callable(on_saved):
+            on_saved()
     criaBotao(self.frameTelaGerarFaturamento, "Salvar e fechar", 0.4, 0.918, 0.15, lambda: salvarEFechar(self))
 
     self.descontoTotal.bind("<KeyRelease>", lambda event: self.calcularTotal())
