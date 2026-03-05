@@ -785,7 +785,7 @@ def telaProdutosNotaSaida(self, cnpj, cfop, EhNotaDoConsumidor):
             elif i == 1:
                 entradaProduto = criaEntry(frameParaItensNoFrame, self.posicaox, self.posicaoy, 0.16, None)
                 entradaProduto.bind("<KeyRelease>", lambda event, ent=entradaProduto, y=self.posicaoy: buscaProduto(ent.get(), ent, y))
-                entradaProduto.bind("<Button-1>", lambda event, ent=entradaProduto, y=self.posicaoy: buscaProduto(ent.get(), ent, y))
+                entradaProduto.bind("<ButtonRelease-1>", lambda event, ent=entradaProduto, y=self.posicaoy: buscaProduto(ent.get(), ent, y))
                 linha_widgets["produto"] = entradaProduto
                 self.posicaox += 0.161
                 self.entradaProduto = entradaProduto

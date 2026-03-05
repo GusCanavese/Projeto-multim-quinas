@@ -287,7 +287,7 @@ def telaNotaFiscalSaida(self, valor, EhNotaDoConsumidor):
     opcoes=["nenhum", "Multimáquinas", "Nutrigel", "Polimáquinas"]
     emt = criarLabelComboBox(self.frameTelaNotaSaida, "Razão social", 0.1, 0.35, 0.3, opcoes)
     emt.configure(command= lambda valor: decideEmitente(self, emt.get()))
-    criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.35, 0.15, self.variavelCNPJRazaoSocialEmitente)
+    criarLabelEntry(self.frameTelaNotaSaida, "CNPJ", 0.45, 0.335, 0.15, self.variavelCNPJRazaoSocialEmitente)
 
     self.variavelHoraEntradaSaida.set('')
     criarLabelLateralEntry(self.frameTelaNotaSaida, "Status", 0.75, 0.09, 0.1, self.variavelStatus)

@@ -777,8 +777,26 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor=0, cfop=None, cnpj_busca="T
         )
     )
     
-    self.botaoRemoverItem = ctk.CTkButton(frameParaItensNoFrame, text="X", width=20, corner_radius=0, fg_color="red", command=lambda: removerItem(self))
-    self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotao-0.04)
+    def garantir_botao_remover():
+        botao_remover_invalido = (
+            not hasattr(self, "botaoRemoverItem")
+            or self.botaoRemoverItem is None
+            or not self.botaoRemoverItem.winfo_exists()
+        )
+
+        if botao_remover_invalido:
+            self.botaoRemoverItem = ctk.CTkButton(
+                frameParaItensNoFrame,
+                text="X",
+                width=20,
+                corner_radius=0,
+                fg_color="red",
+                command=lambda: removerItem(self),
+            )
+
+        return self.botaoRemoverItem
+
+    garantir_botao_remover().place(relx=0.91, rely=self.posicaoyBotao-0.04)
 
     def adicionarItem(self):
         self.posicaoy += 0.02
@@ -786,7 +804,7 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor=0, cfop=None, cnpj_busca="T
         self.posicaoyBotaoRemover += 0.02
 
         self.botaoAdicionarItem.place(relx=0.875, rely=self.posicaoyBotao)
-        self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotaoRemover)
+        garantir_botao_remover().place(relx=0.91, rely=self.posicaoyBotaoRemover)
         linha_widgets = {}
 
         self.btnTribut = criaBotao(frameParaItensNoFrame, "Tribut", 0.89, self.posicaoyBotaoRemover + 0.0095, 0.03, lambda lw=linha_widgets: botaoTribut(self, lw))
@@ -801,7 +819,11 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor=0, cfop=None, cnpj_busca="T
             elif i == 1:
                 entradaProduto = criaEntry(frameParaItensNoFrame, self.posicaox, self.posicaoy, 0.16, None)
                 entradaProduto.bind("<KeyRelease>", lambda event, ent=entradaProduto, y=self.posicaoy: buscaProduto(ent.get(), ent, y))
-                entradaProduto.bind("<Button-1>", lambda event, ent=entradaProduto, y=self.posicaoy: buscaProduto(ent.get(), ent, y))
+
+                def ao_clicar_produto(event, ent=entradaProduto, y=self.posicaoy):
+                    buscaProduto(ent.get(), ent, y)
+
+                entradaProduto.bind("<ButtonRelease-1>", ao_clicar_produto)
                 linha_widgets["produto"] = entradaProduto
                 self.posicaox += 0.161
                 self.entradaProduto = entradaProduto
@@ -862,10 +884,11 @@ def telaProdutos(self, dadosNota, EhNotaDoConsumidor=0, cfop=None, cnpj_busca="T
             self.posicaoyBotaoRemover -= 0.02
 
             self.botaoAdicionarItem.place(relx=0.883, rely=self.posicaoyBotao)
-            self.botaoRemoverItem.place(relx=0.91, rely=self.posicaoyBotaoRemover)
+            garantir_botao_remover().place(relx=0.91, rely=self.posicaoyBotaoRemover)
 
         if len(self.linhas) == 1:
-            self.botaoRemoverItem.place_forget()
+            if hasattr(self, "botaoRemoverItem") and self.botaoRemoverItem.winfo_exists():
+                self.botaoRemoverItem.place_forget()
 
         self.yNovo = self.posicaoy + 0.02
         self.entradaProduto = ""
