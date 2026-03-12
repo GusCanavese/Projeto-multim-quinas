@@ -195,7 +195,7 @@ class Buscas:
                         OR marca LIKE %s
                     )
                 ORDER BY descricao ASC"""
-            db.cursor.execute(queryBuscaProdutosEstoque, (cnpj, f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%"))
+            db.cursor.execute(queryBuscaProdutosEstoque, (f"%{cnpj}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%"))
 
         
         resultado = db.cursor.fetchall()
