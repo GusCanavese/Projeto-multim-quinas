@@ -25,7 +25,7 @@ def telaRelatorioDeVendas(self):
     
     self.selecionarPeriodo = ctk.CTkCheckBox(frame, text="Selecionar período")
     self.selecionarPeriodo.place(relx=0.54, rely=0.082, anchor="nw")
-    self.selecionarPeriodo.bind("<Button-1>", command=lambda event: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodo(self,frame, self.selecionarPeriodo.get(), event))
+    self.selecionarPeriodo.configure(command=lambda: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodo(self, frame, self.selecionarPeriodo.get()))
     
 
     # Botões 

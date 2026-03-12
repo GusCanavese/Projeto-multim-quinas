@@ -6,8 +6,17 @@ from consultas.select import Buscas
 import tkinter as tk
 from tkcalendar import DateEntry
 
+
+def _destruir_filtro_periodo(self):
+    for atributo in ("labelDataInicio", "datePickerInicio", "labelDataFim", "datePickerFim"):
+        widget = getattr(self, atributo, None)
+        if widget is not None:
+            widget.destroy()
+            delattr(self, atributo)
+
 def verificaSeQuerFiltrarPorPeriodo(self, frame, checkbox, event=None):
     if checkbox:
+        _destruir_filtro_periodo(self)
         # Data Inicial
         self.labelDataInicio = ctk.CTkLabel(frame, text="Data Inicial:")
         self.labelDataInicio.place(relx=0.68, rely=0.02, anchor="nw")
@@ -20,19 +29,13 @@ def verificaSeQuerFiltrarPorPeriodo(self, frame, checkbox, event=None):
         self.datePickerFim = DateEntry(frame, width=12, date_pattern="dd/MM/yyyy")
         self.datePickerFim.place(relx=0.76, rely=0.079, anchor="nw")
     else:
-        self.labelDataInicio.destroy()
-        del self.labelDataInicio
-        self.datePickerInicio.destroy()
-        del self.datePickerInicio
-        self.labelDataFim.destroy()
-        del self.labelDataFim
-        self.datePickerFim.destroy()
-        del self.datePickerFim
+        _destruir_filtro_periodo(self)
 
 
 
 def verificaSeQuerFiltrarPorPeriodoContas(self, frame, checkbox, event=None):
     if checkbox:
+        _destruir_filtro_periodo(self)
         # Data Inicial
         self.labelDataInicio = ctk.CTkLabel(frame, text="Data Inicial:")
         self.labelDataInicio.place(relx=0.7, rely=0.02, anchor="nw")
@@ -45,12 +48,5 @@ def verificaSeQuerFiltrarPorPeriodoContas(self, frame, checkbox, event=None):
         self.datePickerFim = DateEntry(frame, width=12, date_pattern="dd/MM/yyyy")
         self.datePickerFim.place(relx=0.8, rely=0.06, anchor="nw")
     else:
-        self.labelDataInicio.destroy()
-        del self.labelDataInicio
-        self.datePickerInicio.destroy()
-        del self.datePickerInicio
-        self.labelDataFim.destroy()
-        del self.labelDataFim
-        self.datePickerFim.destroy()
-        del self.datePickerFim
+        _destruir_filtro_periodo(self)
         

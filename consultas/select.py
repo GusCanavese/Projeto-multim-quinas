@@ -36,62 +36,49 @@ class Buscas:
         return resultado
     
     def buscaContasAReceber(valor, inicio, fim):
-        queryBuscaCliente = """SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasareceber
-        where
-        confirmado like %s
-        or vencimento like %s
-        or descricao like %s
-        or total like %s
-        or formaPag like %s
-        or qtdParcelas like %s"""
-        if inicio:
-            queryBuscaCliente = """SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasareceber
-            where
-            confirmado like %s
-            or vencimento like %s
-            or descricao like %s
-            or total like %s
-            or formaPag like %s
-            or qtdParcelas like %s"""
-            queryBuscaCliente += " AND vencimento BETWEEN %s AND %s"
-            db.cursor.execute(queryBuscaCliente, (f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", inicio, fim))
-        else:
-            queryBuscaCliente = """SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasareceber
-            where
-            confirmado like %s
-            or vencimento like %s
-            or descricao like %s
-            or total like %s
-            or formaPag like %s
-            or qtdParcelas like %s"""
-            db.cursor.execute(queryBuscaCliente, (f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%",))
-        resultado = db.cursor.fetchall()
-        return resultado
-    
-    def buscaContasAPagar(valor, inicio, fim):
-         
-        if inicio:
-            queryBuscaCliente = """SELECT confirmado, data_vencimento, descricao,  valor_total, numero_nfe, emitente_nome FROM contasapagar
-            where
-            confirmado like %s
-            or descricao like %s
-            or valor_total like %s
-            or numero_nfe like %s"""
-            queryBuscaCliente += " AND data_vencimento BETWEEN %s AND %s"
-            db.cursor.execute(queryBuscaCliente, (f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", inicio, fim))
-        else:
-            queryBuscaCliente = """SELECT confirmado, data_vencimento, descricao, valor_total, numero_nfe, emitente_nome, chave_nfe, serie_nfe, data_emissao, data_saida, emitente_cnpj, destinatario_cnpj, destinatario_nome, valor_produtos, valor_bc_icms, valor_icms, valor_icms_desonerado, valor_bc_icms_st, valor_icms_st, valor_ipi, valor_pis, valor_cofins, valor_bc_irrf, transportadora_cnpj, transportadora_nome, itens, data_registro FROM contasapagar
-            where
-            confirmado like %s
-            or data_vencimento like %s
-            or descricao like %s
-            or valor_total like %s
-            or numero_nfe like %s"""
-            db.cursor.execute(queryBuscaCliente, (f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%",f"%{valor}%",))
+        query = """SELECT confirmado, vencimento, descricao, total, formaPag, qtdParcelas FROM contasareceber
+        WHERE (
+            confirmado LIKE %s
+            OR vencimento LIKE %s
+            OR descricao LIKE %s
+            OR total LIKE %s
+            OR formaPag LIKE %s
+            OR qtdParcelas LIKE %s
+        )"""
+        params = [f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%"]
 
+        if inicio and fim:
+            query += " AND vencimento BETWEEN %s AND %s"
+            params.extend([inicio, fim])
+
+        db.cursor.execute(query, tuple(params))
         resultado = db.cursor.fetchall()
         return resultado
-    
+
+    def buscaContasAPagar(valor, inicio, fim):
+        query = """SELECT confirmado, data_vencimento, descricao, valor_total, numero_nfe, emitente_nome,
+            chave_nfe, serie_nfe, data_emissao, data_saida, emitente_cnpj, destinatario_cnpj,
+            destinatario_nome, valor_produtos, valor_bc_icms, valor_icms, valor_icms_desonerado,
+            valor_bc_icms_st, valor_icms_st, valor_ipi, valor_pis, valor_cofins, valor_bc_irrf,
+            transportadora_cnpj, transportadora_nome, itens, data_registro
+            FROM contasapagar
+            WHERE (
+                confirmado LIKE %s
+                OR data_vencimento LIKE %s
+                OR descricao LIKE %s
+                OR valor_total LIKE %s
+                OR numero_nfe LIKE %s
+            )"""
+        params = [f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%", f"%{valor}%"]
+
+        if inicio and fim:
+            query += " AND data_vencimento BETWEEN %s AND %s"
+            params.extend([inicio, fim])
+
+        db.cursor.execute(query, tuple(params))
+        resultado = db.cursor.fetchall()
+        return resultado
+
     def buscaPedidos(vendedor, numero, inicio, fim, checkbox):
         data_emissao_sem_hora = """
             COALESCE(

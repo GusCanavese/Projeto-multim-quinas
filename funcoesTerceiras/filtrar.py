@@ -110,14 +110,31 @@ def filtrarPedidos(self, frame, vendedor, numero, inicio, fim, checkbox, pagina=
 
 
 def _aplicar_filtro_periodo(self):
-    if hasattr(self, "datePickerInicio") and hasattr(self, "datePickerFim"):
-        inicio = self.datePickerInicio.get()
-        fim = self.datePickerFim.get()
-        inicio = datetime.strptime(inicio, "%d/%m/%Y").strftime("%Y-%m-%d")
-        fim = datetime.strptime(fim, "%d/%m/%Y").strftime("%Y-%m-%d")
-    else:
-        inicio = None
-        fim = None
+    if not (hasattr(self, "datePickerInicio") and hasattr(self, "datePickerFim")):
+        return None, None
+
+    inicio_txt = (self.datePickerInicio.get() or "").strip()
+    fim_txt = (self.datePickerFim.get() or "").strip()
+
+    if not inicio_txt or not fim_txt:
+        return None, None
+
+    formatos = ("%d/%m/%Y", "%Y-%m-%d")
+
+    def _converter(texto):
+        for fmt in formatos:
+            try:
+                return datetime.strptime(texto, fmt).strftime("%Y-%m-%d")
+            except ValueError:
+                continue
+        return None
+
+    inicio = _converter(inicio_txt)
+    fim = _converter(fim_txt)
+
+    if not inicio or not fim:
+        return None, None
+
     return inicio, fim
 
 
@@ -181,8 +198,19 @@ def _renderizar_contas(self, frame, contas, pagina, atributo_lista):
             getattr(self, atributo_lista).append(btnProxima)
 
 
+def _limpar_lista_widgets(self, nome_atributo):
+    if hasattr(self, nome_atributo):
+        for item in getattr(self, nome_atributo):
+            try:
+                item.destroy()
+            except Exception:
+                pass
+        setattr(self, nome_atributo, [])
+
+
 def filtrarContasAReceber(self, frame, valor, inicio=None, pagina=1):
     self.valorAtualFiltroContas = valor
+    _limpar_lista_widgets(self, "dadosTelaFiltrarContasPagar")
     inicio, fim = _aplicar_filtro_periodo(self)
     contas = Buscas.buscaContasAReceber(valor, inicio, fim)
     _renderizar_contas(self, frame, contas, pagina, "dadosTelaFiltrarContasReceber")
@@ -190,6 +218,7 @@ def filtrarContasAReceber(self, frame, valor, inicio=None, pagina=1):
 
 def filtrarContasAPagar(self, frame, valor, inicio=None, pagina=1):
     self.valorAtualFiltroContas = valor
+    _limpar_lista_widgets(self, "dadosTelaFiltrarContasReceber")
     inicio, fim = _aplicar_filtro_periodo(self)
     contas = Buscas.buscaContasAPagar(valor, inicio, fim)
     _renderizar_contas(self, frame, contas, pagina, "dadosTelaFiltrarContasPagar")

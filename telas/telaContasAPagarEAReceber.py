@@ -15,11 +15,10 @@ def telaContasAPagarEAReceber(self):
 
     self.selecionarPeriodoContas = ctk.CTkCheckBox(frame, text="Selecionar período")
     self.selecionarPeriodoContas.place(relx=0.55, rely=0.05, anchor="nw")
-    self.selecionarPeriodoContas.bind(
-        "<Button-1>",
-        command=lambda event: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodoContas(
-            self, frame, self.selecionarPeriodoContas.get(), event
-        ),
+    self.selecionarPeriodoContas.configure(
+        command=lambda: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodoContas(
+            self, frame, self.selecionarPeriodoContas.get()
+        )
     )
 
     campo_filtro = criarLabelEntry(frame, "Filtrar", 0.055, 0.01, 0.23, None)

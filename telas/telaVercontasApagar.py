@@ -42,7 +42,9 @@ def telaVercontasApagar(self, d):
     varItens               = ctk.StringVar()
     varDataRegistro        = ctk.StringVar()
 
-    if " pedido" in d[2]:
+    descricao = str(d[2]).lower() if len(d) > 2 else ""
+
+    if len(d) <= 6 or "pedido" in descricao:
         varConfirmado.set(d[0])
         varVencimento.set(d[1])
         varDescricao.set(d[2])
@@ -53,7 +55,7 @@ def telaVercontasApagar(self, d):
         
         criarLabelEntry(frame, "Foi confirmado?", 0.05, 0.05, 0.1, varConfirmado)
         criarLabelEntry(frame, "Data vencimento", 0.2, 0.05, 0.1, varVencimento)
-        criarLabelEntry(frame, "Descrição", 0.35, 0.05, 0.6, varDescricao)
+        criarLabelEntry(frame, "Mais informações", 0.35, 0.05, 0.6, varDescricao)
 
         
         criarLabelEntry(frame, "Valor total", 0.05, 0.2, 0.267, varTotal)
@@ -64,7 +66,7 @@ def telaVercontasApagar(self, d):
 
 
 
-    if " nota" in d[2]:
+    if len(d) > 6 and "nota" in descricao:
         varConfirmado.set(d[0]),
         varVencimento.set(d[1]),
         varDescricao.set(d[2]),
@@ -242,4 +244,17 @@ def telaVercontasApagar(self, d):
         )
         btn_excluir.pack(side="left", expand=True, padx=10, pady=6)
 
+        criaBotao(frame, "Voltar", 0.05, 0.94, 0.15, lambda: frame.destroy()).place(anchor="nw")
+
+
+    if len(d) > 6 and "nota" not in descricao and "pedido" not in descricao:
+        varConfirmado.set(d[0] if len(d) > 0 else "")
+        varVencimento.set(d[1] if len(d) > 1 else "")
+        varDescricao.set(d[2] if len(d) > 2 else "")
+        varTotal.set(d[3] if len(d) > 3 else "")
+
+        criarLabelEntry(frame, "Confirmado", 0.05, 0.05, 0.2, varConfirmado)
+        criarLabelEntry(frame, "Vencimento", 0.27, 0.05, 0.2, varVencimento)
+        criarLabelEntry(frame, "Valor total", 0.49, 0.05, 0.2, varTotal)
+        criarLabelEntry(frame, "Descrição", 0.05, 0.18, 0.9, varDescricao)
         criaBotao(frame, "Voltar", 0.05, 0.94, 0.15, lambda: frame.destroy()).place(anchor="nw")
