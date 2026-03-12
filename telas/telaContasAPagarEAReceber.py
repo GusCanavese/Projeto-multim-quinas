@@ -14,7 +14,7 @@ def telaContasAPagarEAReceber(self):
     opcoes = ["Nenhum", "Entrada/Débito", "Saída/Crédito", "Importar XML"]
 
     self.selecionarPeriodoContas = ctk.CTkCheckBox(frame, text="Selecionar período")
-    self.selecionarPeriodoContas.place(relx=0.55, rely=0.03, anchor="nw")
+    self.selecionarPeriodoContas.place(relx=0.55, rely=0.05, anchor="nw")
     self.selecionarPeriodoContas.bind(
         "<Button-1>",
         command=lambda event: verificaSeQuerFiltrarPorPeriodo.verificaSeQuerFiltrarPorPeriodoContas(
@@ -22,7 +22,7 @@ def telaContasAPagarEAReceber(self):
         ),
     )
 
-    campo_filtro = criarLabelEntry(frame, "Filtrar", 0.23, 0.01, 0.23, None)
+    campo_filtro = criarLabelEntry(frame, "Filtrar", 0.055, 0.01, 0.23, None)
 
     def buscar_contas_receber():
         filtrar.filtrarContasAReceber(
@@ -42,8 +42,8 @@ def telaContasAPagarEAReceber(self):
             pagina=1,
         )
 
-    criaBotao(frame, "Contas a receber", 0.19, 0.11, 0.18, buscar_contas_receber)
-    criaBotao(frame, "Contas a pagar", 0.41, 0.11, 0.18, buscar_contas_pagar)
+    criaBotao(frame, "Contas a receber", 0.145, 0.11, 0.18, buscar_contas_receber)
+    criaBotao(frame, "Contas a pagar", 0.35, 0.11, 0.18, buscar_contas_pagar)
 
 
     def escolheTela(valor):

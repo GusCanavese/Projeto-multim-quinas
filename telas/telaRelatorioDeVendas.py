@@ -19,7 +19,7 @@ def telaRelatorioDeVendas(self):
 
 
 
-    self.filtrarPorNumero = criarLabelEntry(frame,"Filtrar", 0.055, 0.04, 0.22, None)
+    self.filtrarPorNumero = criarLabelEntry(frame,"Filtrar", 0.055, 0.055, 0.22, None)
     self.filtrarPorVendedor = criarLabelComboBox(frame, "Filtrar por vendedor(a)", 0.315, 0.055, 0.22, opcoes)
     self.filtrarPorVendedor.set("Todos")
     

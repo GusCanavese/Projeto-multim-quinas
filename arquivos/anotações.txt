@@ -1,1 +1,5 @@
-ao gerar faturamento e voltar para a tela do pedido/venda, o botão deve automaticamente sair de "gerar faturamento" para "ver faturamento" sem tem que sair e voltar para a tela novamente
+busca por período não funciona, corrigir todos os datepicker que tem nas paginas dos programas 
+corrigir o desalinhamento
+tirar "buscar por nome"
+botão do contas a pagar não me retorna nada, deve pelo menos apagar os registros que estão aparecendo na tela para aparecer seus dados atuais
+tela do "ver" de contas a receber, totalmente desconfigurada, faça aparecer de uma forma bonita, ou apresentável
